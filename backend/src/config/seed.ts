@@ -1,30 +1,31 @@
 /**
  * Seed — crea el administrador inicial
- * Ejecutar: npx ts-node src/config/seed.ts
+ * Se ejecuta automáticamente al iniciar el servidor.
+ * También se puede correr manualmente: pnpm db:seed
  */
 import './env'
 import bcrypt from 'bcryptjs'
 import { v4 as uuidv4 } from 'uuid'
 import { pool } from './db'
-import { env } from './env'
 
-async function seed() {
+export async function runSeed(): Promise<void> {
   const adminEmail    = process.env.ADMIN_EMAIL
   const adminPassword = process.env.ADMIN_PASSWORD
   const adminNombre   = process.env.ADMIN_NOMBRE || 'Administrador'
 
   if (!adminEmail || !adminPassword) {
-    console.error('❌ Define ADMIN_EMAIL y ADMIN_PASSWORD en el .env')
-    process.exit(1)
+    console.warn('⚠️  ADMIN_EMAIL / ADMIN_PASSWORD no definidos. Seed omitido.')
+    return
   }
 
-  const [existe] = await pool.execute<any[]>(
-    'SELECT id FROM admins WHERE correo = ?', [adminEmail]
+  const [rows] = await pool.execute<any[]>(
+    'SELECT id FROM admins WHERE correo = ?',
+    [adminEmail]
   )
 
-  if (existe.length) {
+  if ((rows as any[]).length) {
     console.log(`ℹ️  Admin ${adminEmail} ya existe. No se creó duplicado.`)
-    process.exit(0)
+    return
   }
 
   const hash = await bcrypt.hash(adminPassword, 12)
@@ -36,10 +37,11 @@ async function seed() {
   )
 
   console.log(`✅ Admin creado: ${adminEmail} (super_admin)`)
-  process.exit(0)
 }
 
-seed().catch(err => {
-  console.error('❌ Error en seed:', err)
-  process.exit(1)
-})
+// Ejecución directa: pnpm db:seed
+if (require.main === module) {
+  runSeed()
+    .then(() => process.exit(0))
+    .catch(err => { console.error('❌ Error en seed:', err); process.exit(1) })
+}

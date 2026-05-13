@@ -4,6 +4,8 @@ import cookieParser from 'cookie-parser'
 import { helmetMiddleware, corsMiddleware, generalRateLimit, sanitizeInput, errorHandler } from './middleware/security'
 import { testConnection } from './config/db'
 import { env } from './config/env'
+import { runMigrations } from './config/migrate'
+import { runSeed }       from './config/seed'
 
 import authRoutes        from './routes/auth.routes'
 import adminRoutes       from './routes/admin.routes'
@@ -57,8 +59,10 @@ async function start() {
     console.log(`📦 Modo: ${env.NODE_ENV}`)
   })
 
-  // Luego intenta conectar a MySQL (con reintentos, sin matar el proceso)
+  // Conecta a MySQL (con reintentos), crea tablas y admin inicial
   await testConnection()
+  await runMigrations()
+  await runSeed()
 }
 
 start()
