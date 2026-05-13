@@ -50,8 +50,9 @@ app.use(errorHandler)
 // ── Iniciar servidor ──────────────────────────────────────────────────────
 async function start() {
   await testConnection()
-  app.listen(parseInt(env.PORT), () => {
-    console.log(`🚀 Aliados API corriendo en http://localhost:${env.PORT}`)
+  const port = parseInt(process.env.PORT || env.PORT || '3001')
+  app.listen(port, '0.0.0.0', () => {
+    console.log(`🚀 Aliados API corriendo en http://0.0.0.0:${port}`)
     console.log(`📦 Modo: ${env.NODE_ENV}`)
   })
 }

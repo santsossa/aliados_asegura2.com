@@ -21,11 +21,11 @@ const envSchema = z.object({
 
   OTP_EXPIRES_MINUTES:     z.string().default('10'),
 
-  RESEND_API_KEY:          z.string(),
-  EMAIL_FROM:              z.string().email(),
+  RESEND_API_KEY:          z.string().default(''),
+  EMAIL_FROM:              z.string().email().default('noreply@asegura2.com.co'),
   EMAIL_FROM_NAME:         z.string().default('Asegura2.com'),
 
-  FRONTEND_URL:            z.string().url(),
+  FRONTEND_URL:            z.string().default('*'),
 
   RATE_LIMIT_WINDOW_MS:    z.string().default('900000'),
   RATE_LIMIT_MAX:          z.string().default('100'),
