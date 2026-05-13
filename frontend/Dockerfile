@@ -11,9 +11,12 @@ RUN pnpm run build
 
 FROM node:20-alpine AS runner
 WORKDIR /app
-RUN npm install -g serve
 
+# Instala express para el servidor estático
+RUN echo '{"dependencies":{"express":"^4"}}' > package.json && npm install --omit=dev
+
+COPY server.js .
 COPY --from=builder /app/dist ./dist
 
 EXPOSE 3000
-CMD ["sh", "-c", "serve -s dist -l tcp://0.0.0.0:${PORT:-3000}"]
+CMD ["node", "server.js"]
