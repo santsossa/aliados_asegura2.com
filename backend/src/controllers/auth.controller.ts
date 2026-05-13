@@ -251,7 +251,7 @@ export async function verificarOTP(req: Request, res: Response, next: NextFuncti
 
       const admin        = rows[0]
       const accessToken  = generateAccessToken(admin.id, admin.correo, 'admin', admin.rol)
-      const refreshToken = await generateRefreshToken(admin.id)
+      const refreshToken = await generateRefreshToken(admin.id, 'admin')
       await logAuth('admin', admin.id, admin.correo, 'otp_ok', req)
       res.cookie('refreshToken', refreshToken, COOKIE_OPTS)
       res.json({ status:'success', accessToken, user: { id:admin.id, nombre:admin.nombre, correo:admin.correo, tipo:'admin', rol:admin.rol } })
@@ -296,21 +296,21 @@ export async function refresh(req: Request, res: Response, next: NextFunction) {
       return
     }
 
-    // Intentar encontrar en aliados primero, luego en admins
+    const tipo = result.tipo
     let user: any = null
-    let tipo: 'aliado'|'admin' = 'aliado'
 
-    const [aliadoRows] = await pool.execute<any[]>('SELECT id, correo FROM aliados WHERE id = ? AND estado = "activo"', [result.aliadoId])
-    if (aliadoRows.length) { user = aliadoRows[0]; tipo = 'aliado' }
-    else {
+    if (tipo === 'admin') {
       const [adminRows] = await pool.execute<any[]>('SELECT id, correo, rol FROM admins WHERE id = ? AND estado = "activo"', [result.aliadoId])
-      if (adminRows.length) { user = adminRows[0]; tipo = 'admin' }
+      if (adminRows.length) user = adminRows[0]
+    } else {
+      const [aliadoRows] = await pool.execute<any[]>('SELECT id, correo FROM aliados WHERE id = ? AND estado = "activo"', [result.aliadoId])
+      if (aliadoRows.length) user = aliadoRows[0]
     }
 
     if (!user) { res.clearCookie('refreshToken'); res.status(401).json({ status:'error', message:'Usuario no encontrado.' }); return }
 
-    await revokeRefreshToken(result.tokenId)
-    const newRefreshToken = await generateRefreshToken(user.id)
+    await revokeRefreshToken(result.tokenId, tipo)
+    const newRefreshToken = await generateRefreshToken(user.id, tipo)
     const accessToken     = generateAccessToken(user.id, user.correo, tipo, user.rol)
 
     res.cookie('refreshToken', newRefreshToken, COOKIE_OPTS)
@@ -324,7 +324,7 @@ export async function refresh(req: Request, res: Response, next: NextFunction) {
 export async function logout(req: Request, res: Response, next: NextFunction) {
   try {
     if (req.aliado) {
-      await revokeAllRefreshTokens(req.aliado.sub)
+      await revokeAllRefreshTokens(req.aliado.sub, req.aliado.tipo)
       await logAuth(req.aliado.tipo, req.aliado.sub, req.aliado.email, 'logout', req)
     }
     res.clearCookie('refreshToken', { path: '/' })

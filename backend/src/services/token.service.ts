@@ -17,46 +17,63 @@ export function generateAccessToken(
   )
 }
 
-export async function generateRefreshToken(aliadoId: string): Promise<string> {
-  const token      = uuidv4() + '-' + uuidv4()
-  const tokenHash  = await bcrypt.hash(token, 10)
-  const expiresAt  = new Date()
+export async function generateRefreshToken(
+  userId: string,
+  tipo: 'aliado' | 'admin' = 'aliado'
+): Promise<string> {
+  const token     = uuidv4() + '-' + uuidv4()
+  const tokenHash = await bcrypt.hash(token, 10)
+  const expiresAt = new Date()
   expiresAt.setDate(expiresAt.getDate() + 7)
 
-  await pool.execute(
-    'INSERT INTO refresh_tokens (aliado_id, token_hash, expires_at) VALUES (?, ?, ?)',
-    [aliadoId, tokenHash, expiresAt]
-  )
+  if (tipo === 'admin') {
+    await pool.execute(
+      'INSERT INTO admin_refresh_tokens (admin_id, token_hash, expires_at) VALUES (?, ?, ?)',
+      [userId, tokenHash, expiresAt]
+    )
+  } else {
+    await pool.execute(
+      'INSERT INTO refresh_tokens (aliado_id, token_hash, expires_at) VALUES (?, ?, ?)',
+      [userId, tokenHash, expiresAt]
+    )
+  }
 
   return token
 }
 
 export async function verifyRefreshToken(
   token: string
-): Promise<{ aliadoId: string; tokenId: string } | null> {
-  const [rows] = await pool.execute<any[]>(
-    `SELECT id, aliado_id, token_hash
-     FROM refresh_tokens
-     WHERE revocado = FALSE AND expires_at > NOW()
-     ORDER BY created_at DESC
-     LIMIT 50`
+): Promise<{ aliadoId: string; tokenId: string; tipo: 'aliado' | 'admin' } | null> {
+  // Buscar en aliados
+  const [aliadoRows] = await pool.execute<any[]>(
+    'SELECT id, aliado_id, token_hash FROM refresh_tokens WHERE revocado = FALSE AND expires_at > NOW() ORDER BY created_at DESC LIMIT 50'
   )
-
-  for (const row of rows) {
+  for (const row of aliadoRows) {
     const match = await bcrypt.compare(token, row.token_hash)
-    if (match) return { aliadoId: row.aliado_id, tokenId: row.id }
+    if (match) return { aliadoId: row.aliado_id, tokenId: row.id, tipo: 'aliado' }
+  }
+
+  // Buscar en admins
+  const [adminRows] = await pool.execute<any[]>(
+    'SELECT id, admin_id, token_hash FROM admin_refresh_tokens WHERE revocado = FALSE AND expires_at > NOW() ORDER BY created_at DESC LIMIT 50'
+  )
+  for (const row of adminRows) {
+    const match = await bcrypt.compare(token, row.token_hash)
+    if (match) return { aliadoId: row.admin_id, tokenId: row.id, tipo: 'admin' }
   }
 
   return null
 }
 
-export async function revokeRefreshToken(tokenId: string): Promise<void> {
-  await pool.execute('UPDATE refresh_tokens SET revocado = TRUE WHERE id = ?', [tokenId])
+export async function revokeRefreshToken(tokenId: string, tipo: 'aliado' | 'admin' = 'aliado'): Promise<void> {
+  const table = tipo === 'admin' ? 'admin_refresh_tokens' : 'refresh_tokens'
+  await pool.execute(`UPDATE ${table} SET revocado = TRUE WHERE id = ?`, [tokenId])
 }
 
-export async function revokeAllRefreshTokens(aliadoId: string): Promise<void> {
-  await pool.execute(
-    'UPDATE refresh_tokens SET revocado = TRUE WHERE aliado_id = ?',
-    [aliadoId]
-  )
+export async function revokeAllRefreshTokens(userId: string, tipo: 'aliado' | 'admin' = 'aliado'): Promise<void> {
+  if (tipo === 'admin') {
+    await pool.execute('UPDATE admin_refresh_tokens SET revocado = TRUE WHERE admin_id = ?', [userId])
+  } else {
+    await pool.execute('UPDATE refresh_tokens SET revocado = TRUE WHERE aliado_id = ?', [userId])
+  }
 }

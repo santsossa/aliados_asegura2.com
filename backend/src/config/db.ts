@@ -10,7 +10,7 @@ export const pool = mysql.createPool({
   waitForConnections: true,
   connectionLimit:    10,
   queueLimit:         0,
-  timezone:           '-05:00',   // Colombia (UTC-5)
+  timezone:           'Z',        // UTC — evita conflictos con NOW() en Railway
   charset:            'utf8mb4',
 })
 
