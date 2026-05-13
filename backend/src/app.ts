@@ -49,12 +49,16 @@ app.use(errorHandler)
 
 // ── Iniciar servidor ──────────────────────────────────────────────────────
 async function start() {
-  await testConnection()
   const port = parseInt(process.env.PORT || env.PORT || '3001')
+
+  // Arranca el HTTP server PRIMERO para que Railway pueda hacer el healthcheck
   app.listen(port, '0.0.0.0', () => {
     console.log(`🚀 Aliados API corriendo en http://0.0.0.0:${port}`)
     console.log(`📦 Modo: ${env.NODE_ENV}`)
   })
+
+  // Luego intenta conectar a MySQL (con reintentos, sin matar el proceso)
+  await testConnection()
 }
 
 start()
