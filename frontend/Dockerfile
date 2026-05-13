@@ -18,5 +18,4 @@ RUN echo '{"dependencies":{"express":"^4"}}' > package.json && npm install --omi
 COPY server.js .
 COPY --from=builder /app/dist ./dist
 
-EXPOSE 3000
 CMD ["node", "server.js"]

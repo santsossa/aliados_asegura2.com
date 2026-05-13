@@ -18,7 +18,4 @@ RUN pnpm install --frozen-lockfile --prod
 
 COPY --from=builder /app/dist ./dist
 
-EXPOSE 3001
 CMD ["node", "dist/app.js"]
-
-# Railway inyecta PORT automáticamente como variable de entorno
