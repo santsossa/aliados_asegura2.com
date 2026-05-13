@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "description": "Asegura2.com — Backend del Portal de Aliados",
   "main": "dist/app.js",
+  "packageManager": "pnpm@10.33.2",
+  "engines": { "node": ">=20.0.0", "pnpm": ">=10.0.0" },
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/app.ts",
     "build": "tsc",
