@@ -7,14 +7,17 @@ import {
 } from 'lucide-react'
 import { LogoFull, LogoIcon } from '../components/Logo'
 
-const NAV_ITEMS = [
-  { to: '/dashboard',                        icon: Home,        label: 'Home'             },
-  { to: '/dashboard/cotizaciones',           icon: FileText,    label: 'Cotizaciones'     },
-  { to: '/dashboard/mis-polizas',            icon: Shield,      label: 'Mis pólizas'      },
-  { to: '/dashboard/mis-pagos',              icon: DollarSign,  label: 'Mis pagos'        },
-  { to: '/dashboard/informacion-financiera', icon: CreditCard,  label: 'Info. financiera' },
-  { to: '#',                                 icon: HelpCircle,  label: 'Soporte'          },
-  { to: '#',                                 icon: Settings,    label: 'Configuración'    },
+const NAV_MAIN = [
+  { to: '/dashboard',                        icon: Home,       label: 'Home'             },
+  { to: '/dashboard/cotizaciones',           icon: FileText,   label: 'Cotizaciones'     },
+  { to: '/dashboard/mis-polizas',            icon: Shield,     label: 'Mis pólizas'      },
+  { to: '/dashboard/mis-pagos',              icon: DollarSign, label: 'Mis pagos'        },
+  { to: '/dashboard/informacion-financiera', icon: CreditCard, label: 'Info. financiera' },
+]
+
+const NAV_SUPPORT = [
+  { icon: HelpCircle, label: 'Soporte'       },
+  { icon: Settings,   label: 'Configuración' },
 ]
 
 
@@ -65,8 +68,8 @@ export default function DashboardLayout() {
                 </button>
               </div>
 
-              {/* Nav items */}
-              {NAV_ITEMS.map(({ to, icon: Icon, label }) => (
+              {/* ── Sección principal ── */}
+              {NAV_MAIN.map(({ to, icon: Icon, label }) => (
                 <NavLink
                   key={label}
                   to={to}
@@ -82,31 +85,70 @@ export default function DashboardLayout() {
                     fontWeight:     600,
                     fontSize:       14,
                     color:          isActive ? '#2D2A7A' : '#16151b',
-                    background:     'transparent',
+                    background:     isActive ? '#edeef3' : 'transparent',
                     transition:     'background 0.15s, color 0.15s',
                     overflow:       'hidden',
                     whiteSpace:     'nowrap',
                     flexShrink:     0,
                   })}
-                  onMouseEnter={e => e.currentTarget.style.background='#edeef3'}
-                  onMouseLeave={e => e.currentTarget.style.background='transparent'}
+                  onMouseEnter={e => { if (!e.currentTarget.dataset.active) e.currentTarget.style.background='#edeef3' }}
+                  onMouseLeave={e => { if (!e.currentTarget.dataset.active) e.currentTarget.style.background='transparent' }}
                 >
                   {({ isActive }) => (
                     <>
                       <span style={{ display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, width:28 }}>
                         <Icon size={19} color={isActive ? '#2D2A7A' : '#374151'} />
                       </span>
-                      <span style={{
-                        opacity:   open ? 1 : 0,
-                        maxWidth:  open ? 140 : 0,
-                        overflow:  'hidden',
-                        transition:'opacity 0.2s ease, max-width 0.25s ease',
-                      }}>
+                      <span style={{ opacity:open?1:0, maxWidth:open?140:0, overflow:'hidden', transition:'opacity 0.2s ease, max-width 0.25s ease' }}>
                         {label}
                       </span>
                     </>
                   )}
                 </NavLink>
+              ))}
+
+              {/* ── Divisor ── */}
+              <div style={{ margin:'10px 6px', borderTop:'1px solid #eeeeef' }} />
+
+              {/* ── Sección soporte ── */}
+              {open && (
+                <span style={{ fontSize:10, fontWeight:700, color:'#b0b4c1', textTransform:'uppercase', letterSpacing:'0.08em', padding:'0 6px', marginBottom:2 }}>
+                  Ayuda
+                </span>
+              )}
+              {NAV_SUPPORT.map(({ icon: Icon, label }) => (
+                <button
+                  key={label}
+                  style={{
+                    display:    'flex',
+                    alignItems: 'center',
+                    gap:        12,
+                    height:     40,
+                    padding:    '0 6px',
+                    borderRadius: 50,
+                    border:     'none',
+                    background: 'transparent',
+                    color:      '#16151b',
+                    fontWeight: 600,
+                    fontSize:   14,
+                    cursor:     'pointer',
+                    width:      '100%',
+                    overflow:   'hidden',
+                    whiteSpace: 'nowrap',
+                    transition: 'background 0.15s',
+                    flexShrink: 0,
+                    textAlign:  'left',
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.background='#edeef3'}
+                  onMouseLeave={e => e.currentTarget.style.background='transparent'}
+                >
+                  <span style={{ display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, width:28 }}>
+                    <Icon size={19} color="#374151" />
+                  </span>
+                  <span style={{ opacity:open?1:0, maxWidth:open?140:0, overflow:'hidden', transition:'opacity 0.2s ease, max-width 0.25s ease' }}>
+                    {label}
+                  </span>
+                </button>
               ))}
             </nav>
 
