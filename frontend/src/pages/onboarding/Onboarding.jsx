@@ -12,6 +12,46 @@ const TIPOS_ALIADO = [
   'Otro',
 ]
 
+const BANCOS_COLOMBIA = [
+  // ── Bancos tradicionales ──────────────────────────────
+  'Bancolombia',
+  'Banco de Bogotá',
+  'Davivienda',
+  'BBVA Colombia',
+  'Banco de Occidente',
+  'Banco Popular',
+  'Banco AV Villas',
+  'Banco Caja Social',
+  'Scotiabank Colpatria',
+  'Banco GNB Sudameris',
+  'Banco Itaú',
+  'Banco Falabella',
+  'Banco Agrario de Colombia',
+  'Banco WWB',
+  'Banco Mundo Mujer',
+  'Bancoomeva',
+  'Banco Finandina',
+  'Banco Pichincha',
+  'Banco Santander de Negocios Colombia',
+  'Banco Cooperativo Coopcentral',
+  'Banco Serfinanza',
+  'Multibank',
+  // ── Billeteras y neobancos ────────────────────────────
+  'Nequi',
+  'Daviplata',
+  'Lulo Bank',
+  'Nubank',
+  'Movii',
+  'Rappipay',
+  'Powwi',
+  'Dale!',
+  // ── Cooperativas financieras ──────────────────────────
+  'Confiar Cooperativa Financiera',
+  'Coofinep Cooperativa Financiera',
+  'JFK Cooperativa Financiera',
+  'Cotrafa Cooperativa Financiera',
+]
+
 const STAGES = ['Datos personales', 'Información bancaria', 'Tu perfil', 'Completado']
 
 const inputStyle = {
@@ -204,9 +244,20 @@ export default function Onboarding() {
               <h2 style={{ fontSize: 20, fontWeight: 800, color: '#111827', marginBottom: 4 }}>Datos bancarios</h2>
               <p style={{ fontSize: 13, color: '#9ca3af', marginBottom: 24 }}>Para procesarte tus comisiones.</p>
               <form onSubmit={handleBanco}>
-                <Field label="Banco *">
-                  <input style={inputStyle} value={banco} onChange={e => setBanco(e.target.value)} required placeholder="Ej. Bancolombia, Nequi, Daviplata"
-                    onFocus={e => e.target.style.borderColor = '#2D2A7A'} onBlur={e => e.target.style.borderColor = '#e5e7eb'} />
+                <Field label="Banco o billetera *">
+                  <select style={{ ...inputStyle, appearance: 'none' }} value={banco} onChange={e => setBanco(e.target.value)} required
+                    onFocus={e => e.target.style.borderColor = '#2D2A7A'} onBlur={e => e.target.style.borderColor = '#e5e7eb'}>
+                    <option value="">Selecciona tu banco...</option>
+                    <optgroup label="Bancos tradicionales">
+                      {BANCOS_COLOMBIA.slice(0, 22).map(b => <option key={b} value={b}>{b}</option>)}
+                    </optgroup>
+                    <optgroup label="Billeteras y neobancos">
+                      {BANCOS_COLOMBIA.slice(22, 30).map(b => <option key={b} value={b}>{b}</option>)}
+                    </optgroup>
+                    <optgroup label="Cooperativas financieras">
+                      {BANCOS_COLOMBIA.slice(30).map(b => <option key={b} value={b}>{b}</option>)}
+                    </optgroup>
+                  </select>
                 </Field>
                 <Field label="Tipo de cuenta *">
                   <select style={{ ...inputStyle, appearance: 'none' }} value={tipoCuenta} onChange={e => setTipoCuenta(e.target.value)} required
