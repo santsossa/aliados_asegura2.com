@@ -113,7 +113,7 @@ export async function registro(req: Request, res: Response, next: NextFunction) 
     )
 
     const otp = await generateOTP(aliadoId)
-    await sendOTPEmail(correo, 'nuevo usuario', otp)
+    await sendOTPEmail(correo, null, otp)   // sin nombre aún
     await logAuth('aliado', aliadoId, correo, 'registro', req)
 
     res.status(201).json({ status: 'success', userId: aliadoId, tipo: 'registro' })

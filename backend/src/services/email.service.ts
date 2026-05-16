@@ -64,18 +64,24 @@ export async function sendVerificationEmail(
 // ── Correo con OTP ────────────────────────────────────────────────────────
 export async function sendOTPEmail(
   to: string,
-  nombre: string,
+  nombre: string | null | undefined,
   otp: string
 ): Promise<void> {
+  const saludo = nombre
+    ? `<h2 style="color:#2D2A7A;margin-bottom:8px">Hola, ${nombre} 👋</h2>
+       <p style="color:#374151;font-size:15px;line-height:1.6">
+         Este es tu código de acceso al Portal de Aliados de Asegura2.com:
+       </p>`
+    : `<p style="color:#374151;font-size:15px;line-height:1.6;margin-bottom:8px">
+         Tu código de verificación es:
+       </p>`
+
   await sendMail({
     to,
     subject: `${otp} es tu código de acceso — Asegura2.com`,
     html: `
       <div style="font-family:Inter,sans-serif;max-width:520px;margin:0 auto;padding:32px 24px;background:#fff;border-radius:16px">
-        <h2 style="color:#2D2A7A;margin-bottom:8px">Hola, ${nombre} 👋</h2>
-        <p style="color:#374151;font-size:15px;line-height:1.6">
-          Tu código de verificación para el Portal de Aliados de Asegura2.com es:
-        </p>
+        ${saludo}
         <div style="background:#eeedf8;border-radius:12px;padding:24px;text-align:center;margin:24px 0">
           <span style="font-size:36px;font-weight:800;letter-spacing:8px;color:#2D2A7A">${otp}</span>
         </div>
