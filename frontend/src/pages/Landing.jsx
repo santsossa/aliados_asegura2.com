@@ -685,59 +685,85 @@ export default function Landing() {
           <div className="text-center mb-12">
             <p className="text-xs font-semibold text-brand uppercase tracking-widest mb-3">Perfiles</p>
             <h2 className="text-3xl font-bold text-gray-900 mb-3">¿Este modelo es para ti?</h2>
-            <p className="text-gray-400 text-sm max-w-md mx-auto">Diseñado para personas que ya están en el mundo vehicular y quieren sumar ingresos sin esfuerzo extra.</p>
+            <p className="text-gray-400 text-sm max-w-lg mx-auto">Si tienes acceso a personas con carros o que están a punto de comprarlo, ya tienes todo lo que necesitas para ganar comisiones.</p>
           </div>
 
-          {/* 2 cards principales */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 max-w-2xl mx-auto">
+          {/* Grid de perfiles */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto">
             {[
               {
                 bg:    '#2D2A7A',
                 emoji: '🏎️',
-                ePos:  { top: 28, right: 24, rotate: '-15deg', fontSize: 96 },
-                deco:  { width: 140, height: 140, top: -35, left: -30, opacity: 0.1 },
                 title: 'Asesor de concesionario',
-                desc:  'Cada entrega de carro nuevo es una comisión directa para ti.',
-                h:     300,
+                desc:  'Cada entrega de carro nuevo es una comisión directa. El cliente ya confía en ti.',
+                rotate: '-12deg',
               },
               {
                 bg:    '#d97706',
                 emoji: '🚗',
-                ePos:  { top: 24, right: 20, rotate: '12deg', fontSize: 96 },
-                deco:  { width: 160, height: 160, bottom: 40, left: -50, opacity: 0.12 },
                 title: 'Vendedor de carros usados',
-                desc:  'Alto volumen de clientes que ya quieren proteger su inversión.',
-                h:     300,
+                desc:  'Alto volumen de clientes que quieren proteger su inversión desde el primer día.',
+                rotate: '10deg',
+              },
+              {
+                bg:    '#0f766e',
+                emoji: '🔧',
+                title: 'Mecánico o taller',
+                desc:  'Tus clientes ya tienen carro y confían en tu criterio. Recomienda su seguro y gana.',
+                rotate: '-8deg',
+              },
+              {
+                bg:    '#7c3aed',
+                emoji: '📋',
+                title: 'Tramitador vehicular',
+                desc:  'Traspasos, RUNT, trámites — cada dueño de carro que atiendes es un cliente potencial.',
+                rotate: '14deg',
+              },
+              {
+                bg:    '#be185d',
+                emoji: '🚕',
+                title: 'Conductor o flota',
+                desc:  'Conductores de apps, dueños de flotas, transportadores. Tu red ya tiene carros.',
+                rotate: '-10deg',
+              },
+              {
+                bg:    '#1d4ed8',
+                emoji: '💼',
+                title: 'Quiero ingresos extra',
+                desc:  'No importa tu trabajo actual. Si conoces personas con carros, puedes ser aliado.',
+                rotate: '8deg',
               },
             ].map((c, i) => (
               <div
                 key={i}
-                className="relative rounded-3xl overflow-hidden flex flex-col justify-end p-6"
-                style={{ backgroundColor: c.bg, height: c.h }}
+                className="relative rounded-2xl overflow-hidden flex flex-col justify-end p-5"
+                style={{ backgroundColor: c.bg, minHeight: 200 }}
               >
-                <div className="absolute rounded-full bg-white"
-                  style={{ ...c.deco, position: 'absolute' }} />
+                {/* Círculo decorativo */}
+                <div className="absolute rounded-full bg-white/10"
+                  style={{ width: 120, height: 120, top: -30, left: -30 }} />
 
+                {/* Emoji flotante */}
                 <div className="absolute select-none leading-none"
-                  style={{ top: c.ePos.top, right: c.ePos.right, fontSize: c.ePos.fontSize, transform: `rotate(${c.ePos.rotate})` }}>
+                  style={{ top: 16, right: 16, fontSize: 72, transform: `rotate(${c.rotate})`, opacity: 0.9 }}>
                   {c.emoji}
                 </div>
 
                 <div className="relative z-10">
-                  <h3 className="text-base font-bold text-white mb-1 leading-tight">{c.title}</h3>
-                  <p className="text-sm text-white/65 leading-snug">{c.desc}</p>
+                  <h3 className="text-sm font-bold text-white mb-1 leading-tight">{c.title}</h3>
+                  <p className="text-xs text-white/60 leading-snug">{c.desc}</p>
                 </div>
               </div>
             ))}
           </div>
 
-          {/* Nota final */}
-          <div className="text-center mt-8">
+          {/* CTA final */}
+          <div className="text-center mt-10">
             <p className="text-sm text-gray-500 mb-4">
-              ¿Trabajas con vehículos de otra forma? Si tienes acceso a compradores o dueños de carros, este modelo puede funcionar para ti.
+              Si tienes dudas, regístrate gratis — no hay costo ni compromiso.
             </p>
             <Link to="/registro" className="inline-flex items-center gap-2 bg-brand hover:bg-brand-dark text-white font-semibold px-6 py-3 rounded-xl text-sm transition-colors shadow-md shadow-brand/20">
-              Regístrate y empieza a vender
+              Regístrate y empieza a ganar
               <ArrowRight size={15} />
             </Link>
           </div>
