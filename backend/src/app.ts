@@ -10,6 +10,7 @@ import { runSeed }       from './config/seed'
 import authRoutes        from './routes/auth.routes'
 import adminRoutes       from './routes/admin.routes'
 import aliadosRoutes     from './routes/aliados.routes'
+import onboardingRoutes  from './routes/onboarding.routes'
 import cotizacionesRoutes from './routes/cotizaciones.routes'
 import leadsRoutes       from './routes/leads.routes'
 import polizasRoutes     from './routes/polizas.routes'
@@ -35,9 +36,10 @@ app.disable('x-powered-by')
 app.get('/health', (_req, res) => res.json({ status: 'ok', app: 'Aliados API', env: env.NODE_ENV }))
 
 // ── Rutas ─────────────────────────────────────────────────────────────────
-app.use('/api/auth',         authRoutes)
-app.use('/api/admin',        adminRoutes)
-app.use('/api/aliados',      aliadosRoutes)
+app.use('/api/auth',                   authRoutes)
+app.use('/api/admin',                  adminRoutes)
+app.use('/api/aliados',                aliadosRoutes)
+app.use('/api/aliados/onboarding',     onboardingRoutes)
 app.use('/api/cotizaciones', cotizacionesRoutes)
 app.use('/api/leads',        leadsRoutes)
 app.use('/api/polizas',      polizasRoutes)

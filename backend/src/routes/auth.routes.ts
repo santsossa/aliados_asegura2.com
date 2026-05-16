@@ -11,16 +11,22 @@ const router = Router()
 router.post('/registro',
   authRateLimit,
   [
-    body('nombre').trim().isLength({ min:2, max:100 }).withMessage('Nombre inválido'),
-    body('cedula').trim().isLength({ min:5, max:20 }).withMessage('Cédula inválida'),
     body('correo').isEmail().normalizeEmail().withMessage('Correo inválido'),
-    body('telefono').trim().isLength({ min:7, max:20 }).withMessage('Teléfono inválido'),
-    body('ciudad').trim().isLength({ min:2, max:80 }).withMessage('Ciudad inválida'),
-    body('tipo_aliado').isIn(['Asesor de concesionario','Vendedor de carros usados','Agente independiente','Otro']).withMessage('Tipo inválido'),
     body('contrasena').isLength({ min:8 }).withMessage('La contraseña debe tener al menos 8 caracteres'),
   ],
   validate,
   AuthCtrl.registro
+)
+
+// POST /api/auth/verificar-registro
+router.post('/verificar-registro',
+  otpRateLimit,
+  [
+    body('userId').isUUID().withMessage('ID inválido'),
+    body('otp').isLength({ min:6, max:6 }).isNumeric().withMessage('OTP inválido'),
+  ],
+  validate,
+  AuthCtrl.verificarRegistroOTP
 )
 
 // GET /api/auth/verificar-correo?token=...

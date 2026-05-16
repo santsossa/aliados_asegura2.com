@@ -1,13 +1,17 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
-import { ProtectedRoute, AdminRoute, AliasRoute } from './components/ProtectedRoute'
+import { ProtectedRoute, AdminRoute, AliasRoute, OnboardingRoute } from './components/ProtectedRoute'
 
 // Public
-import Landing         from './pages/Landing'
-import Login           from './pages/auth/Login'
-import Otp             from './pages/auth/Otp'
-import Registro        from './pages/auth/Registro'
-import VerificarCorreo from './pages/auth/VerificarCorreo'
+import Landing            from './pages/Landing'
+import Login              from './pages/auth/Login'
+import Otp                from './pages/auth/Otp'
+import Registro           from './pages/auth/Registro'
+import VerificarRegistro  from './pages/auth/VerificarRegistro'
+import VerificarCorreo    from './pages/auth/VerificarCorreo'
+
+// Onboarding
+import Onboarding from './pages/onboarding/Onboarding'
 
 // Dashboard aliado
 import DashboardLayout from './layouts/DashboardLayout'
@@ -33,11 +37,15 @@ export default function App() {
       <BrowserRouter>
         <Routes>
           {/* ── Públicas ─────────────────────────────────── */}
-          <Route path="/"                    element={<Landing />} />
-          <Route path="/login"               element={<Login />} />
-          <Route path="/login/otp"           element={<Otp />} />
-          <Route path="/registro"            element={<Registro />} />
-          <Route path="/verificar-correo"    element={<VerificarCorreo />} />
+          <Route path="/"                      element={<Landing />} />
+          <Route path="/login"                 element={<Login />} />
+          <Route path="/login/otp"             element={<Otp />} />
+          <Route path="/registro"              element={<Registro />} />
+          <Route path="/registro/verificar"    element={<VerificarRegistro />} />
+          <Route path="/verificar-correo"      element={<VerificarCorreo />} />
+
+          {/* ── Onboarding ───────────────────────────────── */}
+          <Route path="/onboarding" element={<OnboardingRoute><Onboarding /></OnboardingRoute>} />
 
           {/* ── Dashboard aliado ─────────────────────────── */}
           <Route path="/dashboard" element={<AliasRoute><DashboardLayout /></AliasRoute>}>

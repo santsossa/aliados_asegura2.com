@@ -36,7 +36,14 @@ export function AuthProvider({ children }) {
     tokenRef.current = accessToken   // en memoria, nunca en localStorage
     try {
       const payload = JSON.parse(atob(accessToken.split('.')[1]))
-      setUser({ id: payload.sub, email: payload.email, tipo: payload.tipo, rol: payload.rol, nombre: payload.nombre })
+      setUser({
+        id:              payload.sub,
+        email:           payload.email,
+        tipo:            payload.tipo,
+        rol:             payload.rol,
+        nombre:          payload.nombre,
+        onboarding_step: payload.onboarding_step ?? null,
+      })
     } catch { clearAuth() }
   }
 

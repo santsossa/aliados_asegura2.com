@@ -8,10 +8,17 @@ export function generateAccessToken(
   id: string,
   email: string,
   tipo: 'aliado' | 'admin',
-  rol?: string
+  rol?: string,
+  onboarding_step?: number
 ): string {
   return jwt.sign(
-    { sub: id, email, tipo, ...(rol && { rol }) },
+    {
+      sub: id,
+      email,
+      tipo,
+      ...(rol !== undefined && { rol }),
+      ...(onboarding_step !== undefined && { onboarding_step }),
+    },
     env.JWT_SECRET,
     { expiresIn: env.JWT_EXPIRES_IN as jwt.SignOptions['expiresIn'] }
   )

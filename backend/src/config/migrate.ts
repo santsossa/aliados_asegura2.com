@@ -186,6 +186,18 @@ const ALTER_STMTS = [
   `ALTER TABLE aliados ADD COLUMN bloqueado_hasta TIMESTAMP NULL DEFAULT NULL`,
   `ALTER TABLE admins  ADD COLUMN intentos_fallidos INT NOT NULL DEFAULT 0`,
   `ALTER TABLE admins  ADD COLUMN bloqueado_hasta TIMESTAMP NULL DEFAULT NULL`,
+  `ALTER TABLE aliados ADD COLUMN apellido VARCHAR(100) NULL AFTER nombre`,
+  `ALTER TABLE aliados ADD COLUMN onboarding_step TINYINT NOT NULL DEFAULT 0`,
+]
+
+// ── Columnas modificadas (v3) — idempotente, se ejecutan siempre ─────────
+const MODIFY_STMTS = [
+  `ALTER TABLE aliados MODIFY COLUMN nombre VARCHAR(100) NULL`,
+  `ALTER TABLE aliados MODIFY COLUMN cedula VARCHAR(20) NULL`,
+  `ALTER TABLE aliados MODIFY COLUMN telefono VARCHAR(20) NULL`,
+  `ALTER TABLE aliados MODIFY COLUMN ciudad VARCHAR(80) NULL`,
+  `ALTER TABLE aliados MODIFY COLUMN tipo_aliado ENUM('Asesor de concesionario','Vendedor de carros usados','Agente independiente','Otro') NULL`,
+  `ALTER TABLE aliados MODIFY COLUMN estado ENUM('pendiente','onboarding','activo','inactivo') NOT NULL DEFAULT 'pendiente'`,
 ]
 
 export async function runMigrations(): Promise<void> {
@@ -207,6 +219,15 @@ export async function runMigrations(): Promise<void> {
       } else {
         throw err
       }
+    }
+  }
+
+  // Columnas modificadas — idempotente, errores silenciosos
+  for (const stmt of MODIFY_STMTS) {
+    try {
+      await pool.execute(stmt)
+    } catch {
+      // ignorar errores (columna ya tiene el tipo correcto, etc.)
     }
   }
 

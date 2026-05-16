@@ -3,12 +3,13 @@ import jwt from 'jsonwebtoken'
 import { env } from '../config/env'
 
 export interface AuthPayload {
-  sub:   string
-  email: string
-  tipo:  'aliado' | 'admin'
-  rol?:  string
-  iat:   number
-  exp:   number
+  sub:              string
+  email:            string
+  tipo:             'aliado' | 'admin'
+  rol?:             string
+  onboarding_step?: number
+  iat:              number
+  exp:              number
 }
 
 // Extiende Request para incluir el usuario autenticado

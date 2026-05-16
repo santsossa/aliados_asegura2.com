@@ -72,16 +72,35 @@ const CREDS_ERROR = { status: 'error', message: 'Correo o contraseña incorrecto
 // ─────────────────────────────────────────────────────────────────────────────
 // POST /api/auth/registro
 // ─────────────────────────────────────────────────────────────────────────────
+function isPasswordStrong(password: string): boolean {
+  return (
+    password.length >= 8 &&
+    /[A-Z]/.test(password) &&
+    /[a-z]/.test(password) &&
+    /[0-9]/.test(password) &&
+    /[^A-Za-z0-9]/.test(password)
+  )
+}
+
 export async function registro(req: Request, res: Response, next: NextFunction) {
   try {
-    const { nombre, cedula, correo, telefono, ciudad, tipo_aliado, contrasena } = req.body
+    const { correo, contrasena } = req.body
+
+    if (!isPasswordStrong(contrasena)) {
+      res.status(400).json({
+        status: 'error',
+        message: 'La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial.',
+        code: 'WEAK_PASSWORD',
+      })
+      return
+    }
 
     const [existe] = await pool.execute<any[]>(
-      'SELECT id FROM aliados WHERE correo = ? OR cedula = ?',
-      [correo, cedula]
+      'SELECT id FROM aliados WHERE correo = ?',
+      [correo]
     )
     if (existe.length) {
-      res.status(409).json({ status: 'error', message: 'El correo o cédula ya están registrados.' })
+      res.status(409).json({ status: 'error', message: 'El correo ya está registrado.' })
       return
     }
 
@@ -89,24 +108,15 @@ export async function registro(req: Request, res: Response, next: NextFunction) 
     const aliadoId = uuidv4()
 
     await pool.execute(
-      `INSERT INTO aliados (id, nombre, cedula, correo, telefono, ciudad, tipo_aliado, contrasena_hash)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      [aliadoId, nombre, cedula, correo, telefono, ciudad, tipo_aliado, hash]
+      `INSERT INTO aliados (id, correo, contrasena_hash) VALUES (?, ?, ?)`,
+      [aliadoId, correo, hash]
     )
 
-    const token     = uuidv4()
-    const expiresAt = new Date()
-    expiresAt.setHours(expiresAt.getHours() + 24)
-
-    await pool.execute(
-      'INSERT INTO email_verificacion (aliado_id, token, expires_at) VALUES (?, ?, ?)',
-      [aliadoId, token, expiresAt]
-    )
-
-    await sendVerificationEmail(correo, nombre, token)
+    const otp = await generateOTP(aliadoId)
+    await sendOTPEmail(correo, 'nuevo usuario', otp)
     await logAuth('aliado', aliadoId, correo, 'registro', req)
 
-    res.status(201).json({ status: 'success', message: 'Cuenta creada. Revisa tu correo para verificarla.' })
+    res.status(201).json({ status: 'success', userId: aliadoId, tipo: 'registro' })
   } catch (err) { next(err) }
 }
 
@@ -131,6 +141,44 @@ export async function verificarCorreo(req: Request, res: Response, next: NextFun
     await pool.execute("UPDATE aliados SET estado = 'activo' WHERE id = ?", [rows[0].aliado_id])
 
     res.json({ status: 'success', message: 'Correo verificado. Ya puedes iniciar sesión.' })
+  } catch (err) { next(err) }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// POST /api/auth/verificar-registro
+// ─────────────────────────────────────────────────────────────────────────────
+export async function verificarRegistroOTP(req: Request, res: Response, next: NextFunction) {
+  try {
+    const { userId, otp } = req.body
+
+    const [rows] = await pool.execute<any[]>(
+      "SELECT id, correo FROM aliados WHERE id = ? AND estado = 'pendiente'",
+      [userId]
+    )
+    if (!rows.length) {
+      res.status(404).json({ status: 'error', message: 'No encontrado o ya verificado.' })
+      return
+    }
+
+    const valid = await verifyOTP(userId, otp)
+    if (!valid) {
+      await logAuth('aliado', userId, rows[0].correo, 'otp_fail', req)
+      res.status(401).json({ status: 'error', message: 'Código inválido o expirado.' })
+      return
+    }
+
+    await pool.execute("UPDATE aliados SET estado = 'onboarding' WHERE id = ?", [userId])
+    await logAuth('aliado', userId, rows[0].correo, 'otp_ok', req)
+
+    const accessToken  = generateAccessToken(rows[0].id, rows[0].correo, 'aliado', undefined, 0)
+    const refreshToken = await generateRefreshToken(rows[0].id)
+
+    res.cookie('refreshToken', refreshToken, COOKIE_OPTS)
+    res.json({
+      status: 'success',
+      accessToken,
+      user: { id: rows[0].id, correo: rows[0].correo, tipo: 'aliado', onboarding_step: 0 },
+    })
   } catch (err) { next(err) }
 }
 
@@ -213,7 +261,7 @@ export async function login(req: Request, res: Response, next: NextFunction) {
       return
     }
 
-    if (aliado.estado !== 'activo') {
+    if (aliado.estado !== 'activo' && aliado.estado !== 'onboarding') {
       res.status(403).json({ status: 'error', message: 'Cuenta no verificada. Revisa tu correo.' })
       return
     }
@@ -221,7 +269,7 @@ export async function login(req: Request, res: Response, next: NextFunction) {
     // Éxito
     await resetarIntentos('aliados', aliado.id)
     const otp = await generateOTP(aliado.id)
-    await sendOTPEmail(aliado.correo, aliado.nombre, otp)
+    await sendOTPEmail(aliado.correo, aliado.nombre ?? 'aliado', otp)
     await logAuth('aliado', aliado.id, correo, 'login_ok', req)
 
     res.json({ status: 'success', message: 'Código enviado a tu correo.', userId: aliado.id, tipo: 'aliado' })
@@ -260,7 +308,7 @@ export async function verificarOTP(req: Request, res: Response, next: NextFuncti
 
     // Aliado
     const [rows] = await pool.execute<any[]>(
-      'SELECT id, nombre, correo FROM aliados WHERE id = ? AND estado = "activo"',
+      'SELECT id, nombre, correo, onboarding_step FROM aliados WHERE id = ? AND estado IN ("activo", "onboarding")',
       [userId]
     )
     if (!rows.length) { res.status(404).json({ status:'error', message:'No encontrado.' }); return }
@@ -273,11 +321,12 @@ export async function verificarOTP(req: Request, res: Response, next: NextFuncti
     }
 
     const aliado       = rows[0]
-    const accessToken  = generateAccessToken(aliado.id, aliado.correo, 'aliado')
+    const step         = aliado.onboarding_step ?? 0
+    const accessToken  = generateAccessToken(aliado.id, aliado.correo, 'aliado', undefined, step)
     const refreshToken = await generateRefreshToken(aliado.id)
     await logAuth('aliado', aliado.id, aliado.correo, 'otp_ok', req)
     res.cookie('refreshToken', refreshToken, COOKIE_OPTS)
-    res.json({ status:'success', accessToken, user: { id:aliado.id, nombre:aliado.nombre, correo:aliado.correo, tipo:'aliado' } })
+    res.json({ status:'success', accessToken, user: { id:aliado.id, nombre:aliado.nombre, correo:aliado.correo, tipo:'aliado', onboarding_step: step } })
   } catch (err) { next(err) }
 }
 
@@ -303,7 +352,7 @@ export async function refresh(req: Request, res: Response, next: NextFunction) {
       const [adminRows] = await pool.execute<any[]>('SELECT id, correo, rol FROM admins WHERE id = ? AND estado = "activo"', [result.aliadoId])
       if (adminRows.length) user = adminRows[0]
     } else {
-      const [aliadoRows] = await pool.execute<any[]>('SELECT id, correo FROM aliados WHERE id = ? AND estado = "activo"', [result.aliadoId])
+      const [aliadoRows] = await pool.execute<any[]>('SELECT id, correo, onboarding_step FROM aliados WHERE id = ? AND estado IN ("activo", "onboarding")', [result.aliadoId])
       if (aliadoRows.length) user = aliadoRows[0]
     }
 
@@ -311,7 +360,7 @@ export async function refresh(req: Request, res: Response, next: NextFunction) {
 
     await revokeRefreshToken(result.tokenId, tipo)
     const newRefreshToken = await generateRefreshToken(user.id, tipo)
-    const accessToken     = generateAccessToken(user.id, user.correo, tipo, user.rol)
+    const accessToken     = generateAccessToken(user.id, user.correo, tipo, user.rol, tipo === 'aliado' ? (user.onboarding_step ?? undefined) : undefined)
 
     res.cookie('refreshToken', newRefreshToken, COOKIE_OPTS)
     res.json({ status:'success', accessToken })
