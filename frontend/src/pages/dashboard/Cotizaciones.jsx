@@ -436,16 +436,16 @@ export default function Cotizaciones() {
             return (
               <div
                 key={c.id}
-                onClick={() => setModalCot(c)}
-                className="bg-white rounded-2xl border border-gray-100 shadow-sm px-5 py-4 cursor-pointer hover:border-indigo-200 hover:shadow-md transition-all"
+                className="bg-white rounded-2xl border border-gray-100 shadow-sm px-5 py-4"
               >
                 <div className="flex items-center justify-between gap-4">
-                  <div className="flex items-center gap-4">
+                  {/* Info izquierda */}
+                  <div className="flex items-center gap-4 min-w-0">
                     <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center flex-shrink-0">
                       <Car size={18} className="text-blue-600" />
                     </div>
-                    <div>
-                      <p className="font-semibold text-gray-900 text-sm">
+                    <div className="min-w-0">
+                      <p className="font-semibold text-gray-900 text-sm truncate">
                         {c.cliente_nombre || 'Cliente sin nombre'}
                       </p>
                       <p className="text-xs text-gray-400 mt-0.5">
@@ -457,20 +457,31 @@ export default function Cotizaciones() {
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 flex-shrink-0 flex-wrap justify-end">
-                    {nPlanes > 0 && (
-                      <span style={{ fontSize:11, color:'#6b7280', background:'#f3f4f6', borderRadius:99, padding:'2px 8px' }}>
-                        {nPlanes} planes
+
+                  {/* Derecha: estado + ver más */}
+                  <div className="flex items-center gap-3 flex-shrink-0">
+                    <div className="flex flex-col items-end gap-1">
+                      <span style={{ background: badge.bg, color: badge.color, fontSize: 11, fontWeight: 600, padding: '3px 10px', borderRadius: 99, whiteSpace:'nowrap' }}>
+                        {badge.label}
                       </span>
-                    )}
-                    {noEnviada && !within24h && (
-                      <span style={{ fontSize:10, color:'#ea580c', background:'#fff7ed', borderRadius:99, padding:'2px 8px', fontWeight:600 }}>
-                        Vencida
-                      </span>
-                    )}
-                    <span style={{ background: badge.bg, color: badge.color, fontSize: 11, fontWeight: 600, padding: '3px 10px', borderRadius: 99 }}>
-                      {badge.label}
-                    </span>
+                      {noEnviada && !within24h && (
+                        <span style={{ fontSize:10, color:'#ea580c', fontWeight:600 }}>Vencida</span>
+                      )}
+                    </div>
+                    <button
+                      onClick={() => setModalCot(c)}
+                      style={{ display:'flex', alignItems:'center', gap:4, background:'#f3f4f6', border:'none',
+                               borderRadius:99, padding:'6px 12px', cursor:'pointer', color:'#374151',
+                               fontSize:12, fontWeight:600, whiteSpace:'nowrap',
+                               transition:'background 0.15s' }}
+                      onMouseEnter={e => e.currentTarget.style.background='#e5e7eb'}
+                      onMouseLeave={e => e.currentTarget.style.background='#f3f4f6'}
+                    >
+                      Ver más
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                        <path d="M9 18l6-6-6-6"/>
+                      </svg>
+                    </button>
                   </div>
                 </div>
               </div>
