@@ -560,9 +560,12 @@ export default function Cotizar() {
         <div style={{ display:'flex', justifyContent:'flex-end', marginBottom:12 }}>
           <button
             onClick={async () => { await saveCotizacion(); reset() }}
-            style={{ fontSize:12, color:'#9ca3af', background:'none', border:'1px solid #e5e7eb',
-                     borderRadius:99, padding:'6px 14px', cursor:'pointer', fontWeight:500 }}>
-            Cerrar cotización
+            style={{ fontSize:12, color:'#dc2626', background:'#fef2f2', border:'1.5px solid #fecaca',
+                     borderRadius:99, padding:'7px 16px', cursor:'pointer', fontWeight:700,
+                     display:'flex', alignItems:'center', gap:6, transition:'background 0.15s' }}
+            onMouseEnter={e => e.currentTarget.style.background='#fee2e2'}
+            onMouseLeave={e => e.currentTarget.style.background='#fef2f2'}>
+            ✕ Cerrar cotización
           </button>
         </div>
 
