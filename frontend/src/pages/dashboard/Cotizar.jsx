@@ -282,6 +282,7 @@ export default function Cotizar() {
   const [showReminder, setShowReminder]   = useState(false)
   const [pendingPlan,  setPendingPlan]    = useState(null)
   const [cotSaved,     setCotSaved]       = useState(false)
+  const cotizacionIdRef = React.useRef(null)
 
   const authH = { Authorization:`Bearer ${getToken()}`, 'Content-Type':'application/json' }
 
@@ -396,24 +397,31 @@ export default function Cotizar() {
   }, [phase])
 
   async function saveCotizacion() {
-    if (cotSaved || !plate || (fullPlans.length === 0 && basicPlans.length === 0)) return
+    if (cotSaved || !plate) return
     try {
-      await fetch(`${API}/api/cotizar/guardar`, {
+      const formData = {
+        placa: plate,
+        vehicleModel,
+        comercial_value: commercialValue,
+        cliente_nombre: `${form.nombre} ${form.apellido}`.trim() || null,
+        cliente_telefono: form.celular || null,
+        cliente_correo: form.correo || null,
+        datos_cotizacion: {
+          form: { nombre: form.nombre, apellido: form.apellido, correo: form.correo, celular: form.celular, ciudad: cityName },
+          commercial_value: commercialValue,
+          planes_full: fullPlans.length,
+          planes_basico: basicPlans.length,
+          mejor_precio: [...fullPlans, ...basicPlans].length > 0
+            ? Math.min(...[...fullPlans, ...basicPlans].map(p => p.price)) : null,
+        },
+      }
+      const r = await fetch(`${API}/api/cotizar/guardar`, {
         method: 'POST',
         headers: authH,
-        body: JSON.stringify({
-          placa: plate,
-          vehicleModel,
-          datos_cotizacion: {
-            form: { nombre: form.nombre, apellido: form.apellido, correo: form.correo, celular: form.celular, ciudad: cityName },
-            commercial_value: commercialValue,
-            planes_full:  fullPlans.length,
-            planes_basico: basicPlans.length,
-            mejor_precio: [...fullPlans, ...basicPlans].length > 0
-              ? Math.min(...[...fullPlans, ...basicPlans].map(p => p.price)) : null,
-          },
-        }),
+        body: JSON.stringify(formData),
       })
+      const d = await r.json()
+      if (d.id) cotizacionIdRef.current = d.id
       setCotSaved(true)
     } catch {}
   }
@@ -460,6 +468,7 @@ export default function Cotizar() {
       main:    selectedPlan.main,
     }))
     fd.append('aliado_nombre', `${user?.nombre||''} ${user?.apellido||''}`.trim() || user?.email || '')
+    if (cotizacionIdRef.current) fd.append('cotizacion_id', String(cotizacionIdRef.current))
     fd.append('cedula_titular',    cedulaFile)
     fd.append('tarjeta_propiedad', tarjetaFile)
     try {
@@ -480,6 +489,7 @@ export default function Cotizar() {
     setCedulaFile(null); setTarjetaFile(null); setSendErr('')
     setVehicleModel(''); setCommercialValue(null)
     setForm({ nombre:'', apellido:'', gender:'', tipoDoc:'CC', numDoc:'', diaNac:'', mesNac:'', anioNac:'', correo:'', ciudad:'', celular:'' })
+    cotizacionIdRef.current = null
   }
 
   const step1Ok = form.nombre.trim().length>=2 && form.apellido.trim().length>=2 && !!form.gender

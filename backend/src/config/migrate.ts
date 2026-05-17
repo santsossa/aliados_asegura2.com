@@ -188,6 +188,11 @@ const ALTER_STMTS = [
   `ALTER TABLE admins  ADD COLUMN bloqueado_hasta TIMESTAMP NULL DEFAULT NULL`,
   `ALTER TABLE aliados ADD COLUMN apellido VARCHAR(100) NULL AFTER nombre`,
   `ALTER TABLE aliados ADD COLUMN onboarding_step TINYINT NOT NULL DEFAULT 0`,
+  `ALTER TABLE cotizaciones ADD COLUMN estado ENUM('activa','enviada','cerrada') NOT NULL DEFAULT 'activa'`,
+  `ALTER TABLE cotizaciones ADD COLUMN cliente_nombre VARCHAR(150) NULL`,
+  `ALTER TABLE cotizaciones ADD COLUMN cliente_telefono VARCHAR(20) NULL`,
+  `ALTER TABLE cotizaciones ADD COLUMN cliente_correo VARCHAR(150) NULL`,
+  `ALTER TABLE cotizaciones ADD COLUMN comercial_value DECIMAL(14,0) NULL`,
 ]
 
 // ── Columnas modificadas (v3) — idempotente, se ejecutan siempre ─────────

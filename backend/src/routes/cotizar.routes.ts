@@ -66,15 +66,17 @@ import { pool } from '../config/db'
 router.post('/guardar', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const aliadoId = req.aliado!.sub
-    const { placa, vehicleModel, datos_cotizacion } = req.body
+    const { placa, vehicleModel, datos_cotizacion, cliente_nombre, cliente_telefono, cliente_correo, comercial_value } = req.body
     const now = new Date()
-    await pool.execute(
-      `INSERT INTO cotizaciones (aliado_id, placa, anio, datos_cotizacion, mes, anio_cot)
-       VALUES (?, ?, ?, ?, ?, ?)`,
+    const [result] = await pool.execute<any>(
+      `INSERT INTO cotizaciones (aliado_id, placa, anio, datos_cotizacion, mes, anio_cot, cliente_nombre, cliente_telefono, cliente_correo, comercial_value)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [aliadoId, placa || null, vehicleModel || null,
-       JSON.stringify(datos_cotizacion || {}), now.getMonth() + 1, now.getFullYear()]
+       JSON.stringify(datos_cotizacion || {}), now.getMonth() + 1, now.getFullYear(),
+       cliente_nombre || null, cliente_telefono || null, cliente_correo || null,
+       comercial_value || null]
     )
-    res.json({ status: 'success' })
+    res.json({ status: 'success', id: result.insertId })
   } catch (err) { next(err) }
 })
 
@@ -163,6 +165,30 @@ router.post('/emitir',
           maxBodyLength: Infinity,
         }
       )
+
+      // Save to local DB
+      try {
+        const cotizacionId = req.body.cotizacion_id || null
+        const fd_parsed = JSON.parse(req.body.formData || '{}')
+        const pol_parsed = JSON.parse(req.body.poliza || '{}')
+        const clienteNombre = `${fd_parsed.firstName || ''} ${fd_parsed.lastName || ''}`.trim()
+        const clienteTel = String(fd_parsed.mobileNumber || fd_parsed.celular || '')
+        const aseguradora = pol_parsed.company || ''
+        const valorPrima = pol_parsed.price || 0
+
+        if (cotizacionId) {
+          await pool.execute(
+            `UPDATE cotizaciones SET estado = 'enviada' WHERE id = ? AND aliado_id = ?`,
+            [cotizacionId, aliado.sub]
+          )
+        }
+        await pool.execute(
+          `INSERT INTO leads (aliado_id, cotizacion_id, cliente_nombre, cliente_telefono, aseguradora, valor_prima)
+           VALUES (?, ?, ?, ?, ?, ?)`,
+          [aliado.sub, cotizacionId, clienteNombre, clienteTel, aseguradora, valorPrima]
+        )
+      } catch { /* no interrumpir si falla el guardado local */ }
+
       res.json(r.data)
     } catch (err: any) {
       const msg = err.response?.data?.message || 'Error enviando lead al CRM'
