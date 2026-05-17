@@ -14,13 +14,11 @@ function pct(n) {
 }
 
 // ─── Badge colours ───────────────────────────────────────────────────────────
-const BADGE = {
-  enviada:       { bg: '#dbeafe', color: '#1d4ed8', label: 'Enviada'      },
-  aprobada:      { bg: '#dcfce7', color: '#16a34a', label: 'Aprobada'     },
-  en_proceso:    { bg: '#fef3c7', color: '#d97706', label: 'En proceso'   },
-  no_convertida: { bg: '#fee2e2', color: '#dc2626', label: 'No convertida' },
-  pendiente:     { bg: '#f3e8ff', color: '#7c3aed', label: 'Pendiente'    },
-  procesado:     { bg: '#dcfce7', color: '#16a34a', label: 'Completado'   },
+const BADGE_ENVIADA     = { bg: '#dcfce7', color: '#16a34a', label: 'Enviada a emitir'    }
+const BADGE_NO_ENVIADA  = { bg: '#f3f4f6', color: '#374151', label: 'No enviada a emitir' }
+
+function getBadge(estado) {
+  return estado === 'enviada' ? BADGE_ENVIADA : BADGE_NO_ENVIADA
 }
 
 const MESES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre']
@@ -216,7 +214,7 @@ export default function Dashboard() {
       <div style={{ maxWidth: '72rem', margin: '0 auto' }}>
       {/* Greeting */}
       <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700, color: '#111827' }}>
-        Hola, {user?.nombre || 'aliado'} 👋
+        Hola, {user?.nombre || user?.email?.split('@')[0] || 'aliado'} 👋
       </h1>
       <p style={{ margin: '4px 0 20px', fontSize: 13, color: '#9ca3af' }}>
         Resumen de tu actividad · {mesLabel} {anioLabel}
@@ -318,7 +316,7 @@ export default function Dashboard() {
             <div>
               {actividad.map((a, i) => {
                 const isLead = a.tipo === 'lead'
-                const badge = BADGE[a.estado] || { bg: '#f3f4f6', color: '#6b7280', label: a.estado }
+                const badge = getBadge(a.estado)
                 const Icon = isLead ? FileText : Shield
                 const iconBg = isLead ? '#dbeafe' : '#ede9fe'
                 const iconColor = isLead ? '#2563eb' : '#7c3aed'

@@ -8,9 +8,12 @@ const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 const MESES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic']
 
 const ESTADO_BADGE = {
-  activa:   { bg:'#dbeafe', color:'#1d4ed8', label:'Cotizada'         },
-  enviada:  { bg:'#dcfce7', color:'#16a34a', label:'Enviada a emitir' },
-  cerrada:  { bg:'#f3f4f6', color:'#6b7280', label:'Cerrada'          },
+  enviada: { bg:'#dcfce7', color:'#16a34a', label:'Enviada a emitir'    },
+  default: { bg:'#f3f4f6', color:'#374151', label:'No enviada a emitir' },
+}
+
+function getBadgeCoti(estado) {
+  return estado === 'enviada' ? ESTADO_BADGE.enviada : ESTADO_BADGE.default
 }
 
 const fmt = n => n ? ('$' + Math.round(n).toLocaleString('es-CO')) : '—'
@@ -56,7 +59,7 @@ export default function Cotizaciones() {
           {cotizaciones.map(c => {
             let datos = {}
             try { datos = JSON.parse(c.datos_cotizacion || '{}') } catch {}
-            const badge = ESTADO_BADGE[c.estado] || ESTADO_BADGE.activa
+            const badge = getBadgeCoti(c.estado)
             const fecha = new Date(c.created_at)
             const fechaStr = `${fecha.getDate()} ${MESES[fecha.getMonth()]} ${fecha.getFullYear()}`
             const totalPlanes = (datos.planes_full || 0) + (datos.planes_basico || 0)

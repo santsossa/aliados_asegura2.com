@@ -37,16 +37,29 @@ export default function MisPolizas() {
       .finally(() => setLoading(false))
   }, [])
 
+  const ahora = new Date()
+  const mesActual = ahora.getMonth()
+  const anioActual = ahora.getFullYear()
+
+  const esDelMesActual = (created_at) => {
+    const f = new Date(created_at)
+    return f.getMonth() === mesActual && f.getFullYear() === anioActual
+  }
+
   const allItems = [
     ...data.polizas.map(p => ({ ...p, _tipo: 'poliza' })),
     ...data.leads.map(l => ({ ...l, _tipo: 'lead', estado: 'en_proceso' })),
-  ].sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+  ]
+    .filter(item => esDelMesActual(item.created_at))
+    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
 
   return (
     <div className="p-6 lg:p-8 max-w-5xl mx-auto">
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Mis pólizas</h1>
-        <p className="text-gray-500 text-sm mt-1">Seguimiento de las pólizas que has enviado a emitir.</p>
+        <p className="text-gray-500 text-sm mt-1">
+          Pólizas enviadas a emitir este mes · {MESES[new Date().getMonth()]} {new Date().getFullYear()}
+        </p>
       </div>
 
       {/* Leyenda */}
@@ -74,8 +87,8 @@ export default function MisPolizas() {
           <div className="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center mb-4">
             <Shield size={24} className="text-gray-300" />
           </div>
-          <p className="text-gray-400 font-medium text-sm">Sin pólizas aún</p>
-          <p className="text-gray-300 text-xs mt-1">Las pólizas que envíes a emitir aparecerán aquí</p>
+          <p className="text-gray-400 font-medium text-sm">Sin pólizas este mes</p>
+          <p className="text-gray-300 text-xs mt-1">Las pólizas enviadas a emitir este mes aparecerán aquí</p>
         </div>
       ) : (
         <div className="space-y-3">
