@@ -42,6 +42,7 @@ export function AuthProvider({ children }) {
         tipo:            payload.tipo,
         rol:             payload.rol,
         nombre:          payload.nombre,
+        apellido:        payload.apellido,
         onboarding_step: payload.onboarding_step ?? null,
       })
     } catch { clearAuth() }

@@ -202,10 +202,6 @@ export default function Dashboard() {
     },
   ]
 
-  const comPct = rendimiento.meta_mes > 0
-    ? Math.min(100, Math.round((rendimiento.comisiones_mes / rendimiento.meta_mes) * 100))
-    : 0
-
   // X-axis tick labels for bar chart
   const tickDias = [1, 8, 15, 22, 29]
 
@@ -214,7 +210,7 @@ export default function Dashboard() {
       <div style={{ maxWidth: '72rem', margin: '0 auto' }}>
       {/* Greeting */}
       <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700, color: '#111827' }}>
-        Hola, {user?.nombre || user?.email?.split('@')[0] || 'aliado'} 👋
+        Hola, {[user?.nombre, user?.apellido].filter(Boolean).join(' ') || 'aliado'} 👋
       </h1>
       <p style={{ margin: '4px 0 20px', fontSize: 13, color: '#9ca3af' }}>
         Resumen de tu actividad · {mesLabel} {anioLabel}
@@ -388,54 +384,26 @@ export default function Dashboard() {
           {/* Header */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <span style={{ fontWeight: 700, fontSize: 14, color: '#111827' }}>Tu rendimiento</span>
-            <span style={{
-              fontSize: 11, fontWeight: 600, padding: '3px 10px', borderRadius: 99,
-              background: '#f3f4f6', color: '#6b7280',
-            }}>
+            <span style={{ fontSize: 11, fontWeight: 600, padding: '3px 10px', borderRadius: 99, background: '#f3f4f6', color: '#6b7280' }}>
               Este mes
             </span>
           </div>
 
-          {/* Meta mensual */}
+          {/* Comisiones del mes */}
           <div>
-            <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 6 }}>
-              <div>
-                <span style={{ fontSize: 20, fontWeight: 700, color: '#111827' }}>
-                  {fmt(rendimiento.comisiones_mes)}
-                </span>
-                <span style={{ fontSize: 13, color: '#9ca3af', marginLeft: 4 }}>
-                  / {fmt(rendimiento.meta_mes)}
-                </span>
-              </div>
-              <span style={{ fontSize: 16, fontWeight: 700, color: '#2D2A7A' }}>{comPct}%</span>
-            </div>
-            <div style={{ height: 6, background: '#f3f4f6', borderRadius: 99, overflow: 'hidden' }}>
-              <div style={{
-                height: '100%',
-                width: `${comPct}%`,
-                background: '#2D2A7A',
-                borderRadius: 99,
-                transition: 'width 0.6s ease',
-              }} />
-            </div>
-            <p style={{ margin: '5px 0 0', fontSize: 11, color: '#9ca3af' }}>
-              Meta mensual de comisiones
-            </p>
+            <p style={{ margin: '0 0 4px', fontSize: 11, color: '#9ca3af', fontWeight: 500 }}>Comisiones generadas</p>
+            <span style={{ fontSize: 28, fontWeight: 800, color: '#111827', letterSpacing: '-0.5px' }}>
+              {fmt(rendimiento.comisiones_mes)}
+            </span>
           </div>
 
           {/* Bar chart */}
-          <div>
+          <div style={{ flex: 1 }}>
             <BarChart data={rendimiento.grafica} color="#2D2A7A" />
-            {/* X-axis ticks */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4, paddingLeft: 0 }}>
-              {tickDias.map(dia => {
-                // approximate position as % of total days
-                const totalDias = rendimiento.grafica.length || 30
-                const left = ((dia - 1) / (totalDias - 1)) * 100
-                return (
-                  <span key={dia} style={{ fontSize: 10, color: '#9ca3af' }}>{dia}</span>
-                )
-              })}
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
+              {tickDias.map(dia => (
+                <span key={dia} style={{ fontSize: 10, color: '#9ca3af' }}>{dia}</span>
+              ))}
             </div>
           </div>
 
@@ -448,6 +416,39 @@ export default function Dashboard() {
               Ver reporte completo →
             </button>
           </div>
+        </div>
+      </div>
+
+      {/* ── Card ancha: Iniciar cotización ── */}
+      <div
+        onClick={() => navigate('/dashboard/cotizar')}
+        style={{
+          marginTop: 16,
+          background: 'linear-gradient(135deg, #2D2A7A 0%, #4B47B0 100%)',
+          borderRadius: 16,
+          padding: '22px 28px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          cursor: 'pointer',
+          boxShadow: '0 4px 14px rgba(45,42,122,0.25)',
+          transition: 'transform 0.15s, box-shadow 0.15s',
+        }}
+        onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 20px rgba(45,42,122,0.32)' }}
+        onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 14px rgba(45,42,122,0.25)' }}
+      >
+        <div>
+          <p style={{ margin: 0, fontSize: 18, fontWeight: 800, color: '#fff' }}>Iniciar una cotización</p>
+          <p style={{ margin: '4px 0 0', fontSize: 13, color: 'rgba(255,255,255,0.7)' }}>
+            Cotiza seguro de automóvil para tu cliente en segundos
+          </p>
+        </div>
+        <div style={{
+          width: 44, height: 44, borderRadius: 12,
+          background: 'rgba(255,255,255,0.15)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+        }}>
+          <ChevronRight size={22} color="#fff" />
         </div>
       </div>
       </div>  {/* max-width wrapper */}
