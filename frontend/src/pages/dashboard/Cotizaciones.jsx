@@ -72,12 +72,13 @@ export default function Cotizaciones() {
                     </div>
                     <div>
                       <p className="font-semibold text-gray-900 text-sm">
-                        {c.cliente_nombre || 'Cliente sin nombre'} · {c.placa || 'Sin placa'}
+                        {c.cliente_nombre || 'Cliente sin nombre'}
                       </p>
                       <p className="text-xs text-gray-400 mt-0.5">
-                        {fechaStr}
-                        {c.comercial_value ? ` · Valor: ${fmt(c.comercial_value)}` : ''}
-                        {totalPlanes > 0 ? ` · ${totalPlanes} planes cotizados` : ''}
+                        {c.cliente_tipo_doc && c.cliente_cedula
+                          ? `${c.cliente_tipo_doc} ${c.cliente_cedula} · `
+                          : ''}
+                        {c.placa || 'Sin placa'}
                       </p>
                     </div>
                   </div>

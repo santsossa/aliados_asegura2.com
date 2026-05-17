@@ -193,6 +193,14 @@ const ALTER_STMTS = [
   `ALTER TABLE cotizaciones ADD COLUMN cliente_telefono VARCHAR(20) NULL`,
   `ALTER TABLE cotizaciones ADD COLUMN cliente_correo VARCHAR(150) NULL`,
   `ALTER TABLE cotizaciones ADD COLUMN comercial_value DECIMAL(14,0) NULL`,
+  `ALTER TABLE cotizaciones ADD COLUMN cliente_cedula VARCHAR(30) NULL`,
+  `ALTER TABLE cotizaciones ADD COLUMN cliente_tipo_doc VARCHAR(10) NULL`,
+  `ALTER TABLE leads ADD COLUMN cliente_cedula VARCHAR(30) NULL`,
+  `ALTER TABLE leads ADD COLUMN cliente_tipo_doc VARCHAR(10) NULL`,
+  `ALTER TABLE leads ADD COLUMN placa VARCHAR(10) NULL`,
+  `ALTER TABLE polizas ADD COLUMN cliente_cedula VARCHAR(30) NULL`,
+  `ALTER TABLE polizas ADD COLUMN cliente_tipo_doc VARCHAR(10) NULL`,
+  `ALTER TABLE polizas ADD COLUMN placa VARCHAR(10) NULL`,
 ]
 
 // ── Columnas modificadas (v3) — idempotente, se ejecutan siempre ─────────

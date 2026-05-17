@@ -406,6 +406,8 @@ export default function Cotizar() {
         cliente_nombre: `${form.nombre} ${form.apellido}`.trim() || null,
         cliente_telefono: form.celular || null,
         cliente_correo: form.correo || null,
+        cliente_cedula: form.numDoc || null,
+        cliente_tipo_doc: form.tipoDoc || null,
         datos_cotizacion: {
           form: { nombre: form.nombre, apellido: form.apellido, correo: form.correo, celular: form.celular, ciudad: cityName },
           commercial_value: commercialValue,

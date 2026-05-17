@@ -334,12 +334,16 @@ export default function Dashboard() {
                       <Icon size={16} color={iconColor} />
                     </div>
 
-                    {/* Title + aseguradora */}
+                    {/* Title + cedula + placa */}
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontSize: 13, fontWeight: 600, color: '#111827', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                        {title}
+                        {a.cliente_nombre || title}
                       </div>
-                      <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 1 }}>{a.aseguradora || '—'}</div>
+                      <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 1 }}>
+                        {a.cliente_tipo_doc && a.cliente_cedula
+                          ? `${a.cliente_tipo_doc} ${a.cliente_cedula}${a.placa ? ' · ' + a.placa : ''}`
+                          : a.placa || a.aseguradora || '—'}
+                      </div>
                     </div>
 
                     {/* Time */}

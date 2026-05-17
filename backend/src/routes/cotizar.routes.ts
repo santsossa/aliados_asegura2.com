@@ -66,15 +66,15 @@ import { pool } from '../config/db'
 router.post('/guardar', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const aliadoId = req.aliado!.sub
-    const { placa, vehicleModel, datos_cotizacion, cliente_nombre, cliente_telefono, cliente_correo, comercial_value } = req.body
+    const { placa, vehicleModel, datos_cotizacion, cliente_nombre, cliente_telefono, cliente_correo, comercial_value, cliente_cedula, cliente_tipo_doc } = req.body
     const now = new Date()
     const [result] = await pool.execute<any>(
-      `INSERT INTO cotizaciones (aliado_id, placa, anio, datos_cotizacion, mes, anio_cot, cliente_nombre, cliente_telefono, cliente_correo, comercial_value)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO cotizaciones (aliado_id, placa, anio, datos_cotizacion, mes, anio_cot, cliente_nombre, cliente_telefono, cliente_correo, comercial_value, cliente_cedula, cliente_tipo_doc)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [aliadoId, placa || null, vehicleModel || null,
        JSON.stringify(datos_cotizacion || {}), now.getMonth() + 1, now.getFullYear(),
        cliente_nombre || null, cliente_telefono || null, cliente_correo || null,
-       comercial_value || null]
+       comercial_value || null, cliente_cedula || null, cliente_tipo_doc || null]
     )
     res.json({ status: 'success', id: result.insertId })
   } catch (err) { next(err) }
@@ -176,16 +176,22 @@ router.post('/emitir',
         const aseguradora = pol_parsed.company || ''
         const valorPrima = pol_parsed.price || 0
 
+        const clienteCedula = String(fd_parsed.identification || '')
+        const docTypeId = Number(fd_parsed.documentTypeId)
+        const DOC_ID_MAP: Record<number,string> = { 1:'CC', 2:'CE', 3:'PA', 4:'NIT' }
+        const clienteTipoDoc = DOC_ID_MAP[docTypeId] || 'CC'
+        const placaEmitir = String(fd_parsed.plate || pol_parsed.plate || '').toUpperCase() || null
+
         if (cotizacionId) {
           await pool.execute(
-            `UPDATE cotizaciones SET estado = 'enviada' WHERE id = ? AND aliado_id = ?`,
-            [cotizacionId, aliado.sub]
+            `UPDATE cotizaciones SET estado = 'enviada', cliente_cedula = COALESCE(cliente_cedula, ?), cliente_tipo_doc = COALESCE(cliente_tipo_doc, ?) WHERE id = ? AND aliado_id = ?`,
+            [clienteCedula || null, clienteTipoDoc || null, cotizacionId, aliado.sub]
           )
         }
         await pool.execute(
-          `INSERT INTO leads (aliado_id, cotizacion_id, cliente_nombre, cliente_telefono, aseguradora, valor_prima)
-           VALUES (?, ?, ?, ?, ?, ?)`,
-          [aliado.sub, cotizacionId, clienteNombre, clienteTel, aseguradora, valorPrima]
+          `INSERT INTO leads (aliado_id, cotizacion_id, cliente_nombre, cliente_telefono, aseguradora, valor_prima, cliente_cedula, cliente_tipo_doc, placa)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          [aliado.sub, cotizacionId, clienteNombre, clienteTel, aseguradora, valorPrima, clienteCedula || null, clienteTipoDoc || null, placaEmitir]
         )
       } catch { /* no interrumpir si falla el guardado local */ }
 

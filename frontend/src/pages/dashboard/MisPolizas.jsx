@@ -105,9 +105,10 @@ export default function MisPolizas() {
                     <div>
                       <p className="font-semibold text-gray-900 text-sm">{item.cliente_nombre || 'Cliente'}</p>
                       <p className="text-xs text-gray-400 mt-0.5">
-                        {item.aseguradora || '—'}
+                        {item.cliente_tipo_doc && item.cliente_cedula
+                          ? `${item.cliente_tipo_doc} ${item.cliente_cedula}`
+                          : item.cliente_cedula || null}
                         {item.placa ? ` · ${item.placa}` : ''}
-                        {' · '}{fechaStr}
                       </p>
                     </div>
                   </div>

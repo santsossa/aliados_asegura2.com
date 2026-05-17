@@ -149,15 +149,19 @@ router.get('/dashboard', async (req, res, next) => {
     const [[ganTotal]]= await pool.execute<any[]>(`SELECT COALESCE(SUM(monto_total),0) total FROM pagos WHERE aliado_id=? AND estado='procesado'`, [id])
     const [[ganAnt]]  = await pool.execute<any[]>(`SELECT COALESCE(SUM(monto_total),0) total FROM pagos WHERE aliado_id=? AND estado='procesado' AND (anio<? OR (anio=? AND mes<?))`, [id, anio, anio, mes])
 
-    // Actividad reciente: cotizaciones + leads + polizas, ordenados por fecha
+    // Actividad reciente: cotizaciones + leads, ordenados por fecha
     const [actividad] = await pool.execute<any[]>(
-      `(SELECT 'cotizacion' tipo, id, COALESCE(cliente_nombre, 'Sin nombre') cliente_nombre, placa aseguradora, comercial_value monto, estado, created_at FROM cotizaciones WHERE aliado_id=? ORDER BY created_at DESC LIMIT 4)
+      `(SELECT 'cotizacion' tipo, id, COALESCE(cliente_nombre,'Sin nombre') cliente_nombre,
+               cliente_cedula, cliente_tipo_doc, placa,
+               comercial_value monto, estado, created_at
+        FROM cotizaciones WHERE aliado_id=? ORDER BY created_at DESC LIMIT 5)
        UNION ALL
-       (SELECT 'lead' tipo, id, cliente_nombre, aseguradora, valor_prima monto, 'enviada' estado, created_at FROM leads WHERE aliado_id=? ORDER BY created_at DESC LIMIT 4)
-       UNION ALL
-       (SELECT 'poliza' tipo, id, cliente_nombre, aseguradora, valor_comision monto, estado, created_at FROM polizas WHERE aliado_id=? ORDER BY created_at DESC LIMIT 4)
+       (SELECT 'lead' tipo, id, cliente_nombre,
+               cliente_cedula, cliente_tipo_doc, COALESCE(placa,'') placa,
+               valor_prima monto, 'enviada' estado, created_at
+        FROM leads WHERE aliado_id=? ORDER BY created_at DESC LIMIT 5)
        ORDER BY created_at DESC LIMIT 10`,
-      [id, id, id]
+      [id, id]
     )
 
     // Comisiones este mes por día (para gráfica de barras)
@@ -212,7 +216,8 @@ router.get('/me/cotizaciones', async (req, res, next) => {
   try {
     const [rows] = await pool.execute<any[]>(
       `SELECT id, placa, anio, estado, cliente_nombre, cliente_telefono, cliente_correo,
-              comercial_value, datos_cotizacion, mes, anio_cot, created_at
+              comercial_value, datos_cotizacion, mes, anio_cot, created_at,
+              cliente_cedula, cliente_tipo_doc
        FROM cotizaciones WHERE aliado_id = ? ORDER BY created_at DESC LIMIT 100`,
       [req.aliado!.sub]
     )
@@ -225,7 +230,8 @@ router.get('/me/polizas', async (req, res, next) => {
     // Leads sent to emit (pending emission)
     const [leads] = await pool.execute<any[]>(
       `SELECT l.id, l.cliente_nombre, l.cliente_telefono, l.aseguradora, l.valor_prima,
-              l.created_at, c.placa, c.comercial_value,
+              l.created_at, l.cliente_cedula, l.cliente_tipo_doc,
+              COALESCE(l.placa, c.placa) AS placa, c.comercial_value,
               'en_proceso' as estado, 'lead' as tipo
        FROM leads l
        LEFT JOIN cotizaciones c ON c.id = l.cotizacion_id
@@ -235,8 +241,14 @@ router.get('/me/polizas', async (req, res, next) => {
     // Polizas processed by admin
     const [polizas] = await pool.execute<any[]>(
       `SELECT p.id, p.cliente_nombre, p.aseguradora, p.valor_prima, p.valor_comision,
-              p.estado, p.created_at, p.mes, p.anio, 'poliza' as tipo, NULL as placa
-       FROM polizas p WHERE p.aliado_id = ? ORDER BY p.created_at DESC`,
+              p.estado, p.created_at, p.mes, p.anio, 'poliza' as tipo,
+              COALESCE(p.cliente_cedula, l.cliente_cedula) AS cliente_cedula,
+              COALESCE(p.cliente_tipo_doc, l.cliente_tipo_doc) AS cliente_tipo_doc,
+              COALESCE(p.placa, l.placa, c.placa) AS placa
+       FROM polizas p
+       LEFT JOIN leads l ON l.id = p.lead_id
+       LEFT JOIN cotizaciones c ON c.id = l.cotizacion_id
+       WHERE p.aliado_id = ? ORDER BY p.created_at DESC`,
       [req.aliado!.sub]
     )
     res.json({ status: 'success', data: { leads, polizas } })
