@@ -1,4 +1,4 @@
-import { useState, useEffect, Fragment } from 'react'
+import React, { useState, useEffect, Fragment } from 'react'
 import { useAuth } from '../../context/AuthContext'
 import ComboBox from '../../components/ComboBox'
 
@@ -59,6 +59,61 @@ function mapPlan(resp) {
   }
 }
 
+/* ── coverage tooltips ───────────────────────────────────────────────────── */
+const COVERAGE_TIPS = {
+  'responsabilidad civil': 'Paga los daños que tu carro cause a otras personas o sus vehículos.',
+  'responsabilidad civil extracontractual': 'Cubre daños a terceros (personas o propiedades ajenas) causados por accidente.',
+  'todo riesgo': 'Cubre daños a tu propio carro: accidentes, robo parcial, rayones y más.',
+  'hurto': 'Te pagan si te roban el carro, ya sea total o parcialmente.',
+  'pérdida total': 'Si el carro queda destruido o irrecuperable, te pagan el valor comercial.',
+  'pérdida total por hurto': 'Si te roban el carro y no aparece, te pagan el valor comercial.',
+  'asistencia en carretera': 'Te ayudan si te quedas varado: grúa, llanta, batería y más.',
+  'vehículo de reemplazo': 'Te prestan un carro mientras reparan el tuyo.',
+  'cristales': 'Cubre rotura o daño del parabrisas y ventanas.',
+  'gastos médicos': 'Paga el tratamiento médico de los ocupantes del carro en un accidente.',
+  'muerte accidental': 'Paga a tus beneficiarios si falleces en un accidente de tránsito.',
+  'incendio': 'Cubre daños si el carro se incendia, por cualquier causa.',
+  'terremoto': 'Cubre daños al carro causados por sismo, terremoto o erupción volcánica.',
+  'fenómenos naturales': 'Cubre daños por inundación, granizo, vendaval y otros eventos naturales.',
+  'actos mal intencionados': 'Cubre daños causados por vandalismo o actos de terceros malintencionados.',
+  'accidentes': 'Cubre daños al carro por colisión o vuelco.',
+  'rc': 'Responsabilidad Civil: paga daños que tu carro cause a otras personas.',
+  'llamada médica': 'Servicio de orientación médica telefónica disponible las 24 horas.',
+}
+
+function getCoverageTip(name = '') {
+  const lower = name.toLowerCase()
+  const key = Object.keys(COVERAGE_TIPS).find(k => lower.includes(k))
+  return key ? COVERAGE_TIPS[key] : null
+}
+
+function CovTooltip({ name }) {
+  const [show, setShow] = React.useState(false)
+  const tip = getCoverageTip(name)
+  if (!tip) return <span>{name}</span>
+  return (
+    <span style={{ display:'inline-flex', alignItems:'center', gap:4, position:'relative' }}>
+      <span>{name}</span>
+      <span
+        onMouseEnter={() => setShow(true)}
+        onMouseLeave={() => setShow(false)}
+        style={{ width:14, height:14, borderRadius:'50%', background:'#e5e7eb', color:'#6b7280',
+                 fontSize:9, fontWeight:800, display:'inline-flex', alignItems:'center',
+                 justifyContent:'center', cursor:'help', flexShrink:0, lineHeight:1 }}>
+        ?
+      </span>
+      {show && (
+        <span style={{ position:'absolute', bottom:'calc(100% + 6px)', left:0, background:'#111827',
+                       color:'#fff', fontSize:11, padding:'7px 10px', borderRadius:8, zIndex:200,
+                       lineHeight:1.5, maxWidth:220, boxShadow:'0 4px 16px rgba(0,0,0,0.2)',
+                       pointerEvents:'none', whiteSpace:'normal' }}>
+          {tip}
+        </span>
+      )}
+    </span>
+  )
+}
+
 /* ── mini components ─────────────────────────────────────────────────────── */
 // Alias local para no romper referencias — usa el ComboBox global
 function Sel({ value, onChange, options, placeholder }) {
@@ -102,7 +157,8 @@ function PlanCard({ plan, onElegir }) {
           <div style={{ display:'flex', flexWrap:'wrap', gap:'4px 12px' }}>
             {plan.main.map((item,i) => (
               <span key={i} style={{ fontSize:12, color:'#6b7280', display:'flex', alignItems:'center', gap:4 }}>
-                <span style={{ color:'#2D2A7A', fontWeight:700 }}>✓</span> {item}
+                <span style={{ color:'#2D2A7A', fontWeight:700 }}>✓</span>
+                <CovTooltip name={item} />
               </span>
             ))}
           </div>
@@ -127,7 +183,8 @@ function PlanCard({ plan, onElegir }) {
         <div style={{ padding:'0 20px 16px', display:'flex', flexWrap:'wrap', gap:'4px 16px', borderTop:'1px solid #f3f4f6' }}>
           {plan.extras.map((item,i) => (
             <span key={i} style={{ fontSize:12, color:'#6b7280', display:'flex', alignItems:'center', gap:4 }}>
-              <span style={{ color:'#16a34a' }}>✓</span> {item}
+              <span style={{ color:'#16a34a' }}>✓</span>
+              <CovTooltip name={item} />
             </span>
           ))}
         </div>
@@ -171,6 +228,10 @@ export default function Cotizar() {
   const [tarjetaFile,  setTarjetaFile]  = useState(null)
   const [sending, setSending] = useState(false)
   const [sendErr, setSendErr] = useState('')
+
+  const [showReminder, setShowReminder]   = useState(false)
+  const [pendingPlan,  setPendingPlan]    = useState(null)
+  const [cotSaved,     setCotSaved]       = useState(false)
 
   const authH = { Authorization:`Bearer ${getToken()}`, 'Content-Type':'application/json' }
 
@@ -263,7 +324,48 @@ export default function Cotizar() {
     if (phase === 'results') fetchQuotes()
   }, [phase])
 
-  function handleElegir(plan) { setSelectedPlan(plan); setPhase('emitir'); setSendErr('') }
+  async function saveCotizacion() {
+    if (cotSaved || !plate || (fullPlans.length === 0 && basicPlans.length === 0)) return
+    try {
+      await fetch(`${API}/api/cotizar/guardar`, {
+        method: 'POST',
+        headers: authH,
+        body: JSON.stringify({
+          placa: plate,
+          vehicleModel,
+          datos_cotizacion: {
+            form: { nombre: form.nombre, apellido: form.apellido, correo: form.correo, celular: form.celular, ciudad: cityName },
+            commercial_value: commercialValue,
+            planes_full:  fullPlans.length,
+            planes_basico: basicPlans.length,
+            mejor_precio: [...fullPlans, ...basicPlans].length > 0
+              ? Math.min(...[...fullPlans, ...basicPlans].map(p => p.price)) : null,
+          },
+        }),
+      })
+      setCotSaved(true)
+    } catch {}
+  }
+
+  useEffect(() => {
+    return () => {
+      // Save on component unmount (navigation away)
+      saveCotizacion()
+    }
+  }, [plate, fullPlans, basicPlans, cotSaved])
+
+  function handleElegir(plan) {
+    setPendingPlan(plan)
+    setShowReminder(true)
+  }
+
+  function confirmElegir() {
+    setSelectedPlan(pendingPlan)
+    setShowReminder(false)
+    setPendingPlan(null)
+    setPhase('emitir')
+    setSendErr('')
+  }
 
   async function handleEmitir(e) {
     e.preventDefault()
@@ -443,9 +545,25 @@ export default function Cotizar() {
           )}
           {!loadingQ && allPlans.length>0 && <>
             <span style={{ color:'#a5b4fc',fontSize:13 }}>· {allPlans.length} planes</span>
-            <span style={{ color:'#86efac',fontSize:13 }}>Mejor: {fmt(Math.min(...allPlans.map(p=>p.price)))}</span>
+            <span style={{ color:'#86efac',fontSize:13 }}>Mejor precio: {fmt(Math.min(...allPlans.map(p=>p.price)))}</span>
           </>}
           <button onClick={() => setPhase('form')} style={{ marginLeft:'auto',fontSize:12,color:'#a5b4fc',background:'none',border:'1px solid rgba(255,255,255,0.3)',borderRadius:99,padding:'4px 12px',cursor:'pointer' }}>← Editar datos</button>
+        </div>
+
+        {commercialValue && (
+          <div style={{ background:'#fef9c3', border:'1px solid #fde68a', borderRadius:10, padding:'8px 16px', marginBottom:12, fontSize:13, color:'#92400e', fontWeight:600 }}>
+            🚗 Valor asegurado del vehículo: {fmt(commercialValue)}
+          </div>
+        )}
+
+        {/* Cerrar cotización */}
+        <div style={{ display:'flex', justifyContent:'flex-end', marginBottom:12 }}>
+          <button
+            onClick={async () => { await saveCotizacion(); reset() }}
+            style={{ fontSize:12, color:'#9ca3af', background:'none', border:'1px solid #e5e7eb',
+                     borderRadius:99, padding:'6px 14px', cursor:'pointer', fontWeight:500 }}>
+            Cerrar cotización
+          </button>
         </div>
 
         {/* Spinner + barra de progreso mientras cargan */}
@@ -504,6 +622,37 @@ export default function Cotizar() {
 
         {!loadingQ && allPlans.length===0 && !fetchErr && (
           <p style={{ textAlign:'center',color:'#9ca3af',fontSize:14,padding:'40px 0' }}>No se encontraron cotizaciones. Verifica los datos del cliente e intenta de nuevo.</p>
+        )}
+
+        {/* Reminder modal before going to emitir */}
+        {showReminder && (
+          <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:500,
+                        display:'flex', alignItems:'center', justifyContent:'center', padding:16 }}>
+            <div style={{ background:'#fff', borderRadius:20, padding:'28px 24px', maxWidth:400, width:'100%' }}>
+              <div style={{ fontSize:36, textAlign:'center', marginBottom:12 }}>📋</div>
+              <h3 style={{ fontSize:18, fontWeight:800, color:'#111827', textAlign:'center', marginBottom:8 }}>
+                Para emitir necesitas
+              </h3>
+              <p style={{ fontSize:13, color:'#6b7280', textAlign:'center', marginBottom:20, lineHeight:1.6 }}>
+                Para enviar esta póliza a Asegura2.com necesitarás adjuntar:
+              </p>
+              <div style={{ display:'flex', flexDirection:'column', gap:10, marginBottom:24 }}>
+                {['📄 Cédula del titular del vehículo (PDF o imagen)', '🚗 Tarjeta de propiedad del vehículo (PDF o imagen)'].map(item => (
+                  <div key={item} style={{ background:'#f0f0fd', borderRadius:10, padding:'10px 14px', fontSize:13, color:'#2D2A7A', fontWeight:600 }}>{item}</div>
+                ))}
+              </div>
+              <div style={{ display:'flex', gap:10 }}>
+                <button onClick={() => { setShowReminder(false); setPendingPlan(null) }}
+                  style={{ flex:1, background:'none', border:'1.5px solid #e5e7eb', borderRadius:99, padding:'11px 0', fontSize:14, fontWeight:600, cursor:'pointer', color:'#374151' }}>
+                  Cancelar
+                </button>
+                <button onClick={confirmElegir}
+                  style={{ flex:1, background:'#2D2A7A', color:'#fff', border:'none', borderRadius:99, padding:'11px 0', fontSize:14, fontWeight:700, cursor:'pointer' }}>
+                  Continuar →
+                </button>
+              </div>
+            </div>
+          </div>
         )}
       </div>
     )

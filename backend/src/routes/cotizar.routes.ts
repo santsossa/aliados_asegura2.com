@@ -60,6 +60,24 @@ function normalizeQuote(body: Record<string, any>): Record<string, any> {
   return m
 }
 
+// ── Guardar cotización como actividad ──────────────────────────────────────
+import { pool } from '../config/db'
+
+router.post('/guardar', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const aliadoId = req.aliado!.sub
+    const { placa, vehicleModel, datos_cotizacion } = req.body
+    const now = new Date()
+    await pool.execute(
+      `INSERT INTO cotizaciones (aliado_id, placa, anio, datos_cotizacion, mes, anio_cot)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+      [aliadoId, placa || null, vehicleModel || null,
+       JSON.stringify(datos_cotizacion || {}), now.getMonth() + 1, now.getFullYear()]
+    )
+    res.json({ status: 'success' })
+  } catch (err) { next(err) }
+})
+
 // ── Municipios ──────────────────────────────────────────────────────────────
 router.get('/municipios', async (req: Request, res: Response, next: NextFunction) => {
   try {
