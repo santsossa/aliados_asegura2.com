@@ -394,8 +394,13 @@ export default function Cotizar() {
     }
   }
 
+  const quotesLoadedRef = React.useRef(false)
+
   useEffect(() => {
-    if (phase === 'results') fetchQuotes()
+    if (phase === 'results' && !quotesLoadedRef.current) {
+      quotesLoadedRef.current = true
+      fetchQuotes()
+    }
   }, [phase])
 
   // Ref siempre actualizado — resuelve stale closure en cleanup
@@ -519,12 +524,14 @@ export default function Cotizar() {
   }
 
   function reset() {
+    quotesLoadedRef.current = false
     setPhase('placa'); setPlate(''); setStep(1)
     setFullPlans([]); setBasicPlans([]); setSelectedPlan(null)
     setCedulaFile(null); setTarjetaFile(null); setSendErr('')
     setVehicleModel(''); setCommercialValue(null)
     setForm({ nombre:'', apellido:'', gender:'', tipoDoc:'CC', numDoc:'', diaNac:'', mesNac:'', anioNac:'', correo:'', ciudad:'', celular:'' })
     cotizacionIdRef.current = null
+    saveRef.current.cotSaved = false
   }
 
   const step1Ok = form.nombre.trim().length>=2 && form.apellido.trim().length>=2 && !!form.gender
@@ -679,7 +686,7 @@ export default function Cotizar() {
         {/* Cerrar cotización */}
         <div style={{ display:'flex', justifyContent:'flex-end', marginBottom:12 }}>
           <button
-            onClick={async () => { await saveCotizacion(); reset() }}
+            onClick={() => reset()}
             style={{ fontSize:12, color:'#dc2626', background:'#fef2f2', border:'1.5px solid #fecaca',
                      borderRadius:99, padding:'7px 16px', cursor:'pointer', fontWeight:700,
                      display:'flex', alignItems:'center', gap:6, transition:'background 0.15s' }}
