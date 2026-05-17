@@ -89,7 +89,7 @@ function PlanCard({ plan, onElegir }) {
             <img src={plan.logo} alt={plan.company} style={{ maxWidth:52, maxHeight:30, objectFit:'contain' }}
               onError={e => {
                 e.currentTarget.style.display='none'
-                const span = e.currentTarget.nextSibling as HTMLElement
+                const span = e.currentTarget.nextSibling
                 if (span) span.style.display='block'
               }} />
           ) : null}
@@ -214,7 +214,7 @@ export default function Cotizar() {
       city:           cityName,        vehicleModel,
     }
 
-    const collected: { full: any[], basic: any[], cvValue: number|null } = { full: [], basic: [], cvValue: null }
+    const collected = { full: [], basic: [], cvValue: null }
 
     try {
       const provR = await fetch(`${API}/api/cotizar/proveedores`, { headers: authH })
@@ -227,7 +227,7 @@ export default function Cotizar() {
 
       // Timeout de 25 segundos para proveedores lentos
       const TIMEOUT = 25000
-      const withTimeout = (p: Promise<any>) =>
+      const withTimeout = (p) =>
         Promise.race([p, new Promise(resolve => setTimeout(resolve, TIMEOUT))])
 
       await Promise.allSettled(
