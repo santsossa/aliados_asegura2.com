@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { LogoFull } from '../../components/Logo'
+import ComboBox from '../../components/ComboBox'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
@@ -51,6 +52,10 @@ const BANCOS_COLOMBIA = [
   'JFK Cooperativa Financiera',
   'Cotrafa Cooperativa Financiera',
 ]
+
+const BANCOS_OPTIONS      = BANCOS_COLOMBIA.map(b => ({ v: b, label: b }))
+const TIPO_CUENTA_OPTIONS = [{ v:'Ahorros', label:'Ahorros' }, { v:'Corriente', label:'Corriente' }]
+const TIPOS_OPTIONS       = TIPOS_ALIADO.map(t => ({ v: t, label: t }))
 
 const STAGES = ['Datos personales', 'Información bancaria', 'Tu perfil', 'Completado']
 
@@ -225,12 +230,19 @@ export default function Onboarding() {
                   <input style={inputStyle} value={cedula} onChange={e => setCedula(e.target.value.replace(/\D/g, ''))} required placeholder="Ej. 1234567890"
                     onFocus={e => e.target.style.borderColor = '#2D2A7A'} onBlur={e => e.target.style.borderColor = '#e5e7eb'} />
                 </Field>
-                <Field label="Teléfono *">
-                  <input style={inputStyle} type="tel" value={telefono} onChange={e => setTelefono(e.target.value)} required placeholder="Ej. 300 123 4567"
-                    onFocus={e => e.target.style.borderColor = '#2D2A7A'} onBlur={e => e.target.style.borderColor = '#e5e7eb'} />
+                <Field label="Celular (10 dígitos) *">
+                  <input style={{ ...inputStyle, borderColor: telefono.length > 0 && telefono.length !== 10 ? '#dc2626' : '#e5e7eb' }}
+                    type="tel" inputMode="numeric" value={telefono}
+                    onChange={e => setTelefono(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                    required placeholder="Ej. 3001234567"
+                    onFocus={e => e.target.style.borderColor = '#2D2A7A'}
+                    onBlur={e => e.target.style.borderColor = telefono.length > 0 && telefono.length !== 10 ? '#dc2626' : '#e5e7eb'} />
+                  {telefono.length > 0 && telefono.length !== 10 && (
+                    <p style={{ color: '#dc2626', fontSize: 11, margin: '4px 0 0' }}>El celular debe tener exactamente 10 dígitos</p>
+                  )}
                 </Field>
                 {error && <p style={{ color: '#dc2626', fontSize: 13, marginBottom: 12 }}>{error}</p>}
-                <button type="submit" disabled={loading}
+                <button type="submit" disabled={loading || telefono.length !== 10}
                   style={{ width: '100%', background: loading ? '#9ca3af' : '#2D2A7A', color: '#fff', fontWeight: 700, fontSize: 15, border: 'none', borderRadius: 99, padding: '13px 0', cursor: loading ? 'not-allowed' : 'pointer', transition: 'background 0.2s' }}>
                   {loading ? 'Guardando...' : 'Continuar'}
                 </button>
@@ -245,27 +257,10 @@ export default function Onboarding() {
               <p style={{ fontSize: 13, color: '#9ca3af', marginBottom: 24 }}>Para procesarte tus comisiones.</p>
               <form onSubmit={handleBanco}>
                 <Field label="Banco o billetera *">
-                  <select style={{ ...inputStyle, appearance: 'none' }} value={banco} onChange={e => setBanco(e.target.value)} required
-                    onFocus={e => e.target.style.borderColor = '#2D2A7A'} onBlur={e => e.target.style.borderColor = '#e5e7eb'}>
-                    <option value="">Selecciona tu banco...</option>
-                    <optgroup label="Bancos tradicionales">
-                      {BANCOS_COLOMBIA.slice(0, 22).map(b => <option key={b} value={b}>{b}</option>)}
-                    </optgroup>
-                    <optgroup label="Billeteras y neobancos">
-                      {BANCOS_COLOMBIA.slice(22, 30).map(b => <option key={b} value={b}>{b}</option>)}
-                    </optgroup>
-                    <optgroup label="Cooperativas financieras">
-                      {BANCOS_COLOMBIA.slice(30).map(b => <option key={b} value={b}>{b}</option>)}
-                    </optgroup>
-                  </select>
+                  <ComboBox options={BANCOS_OPTIONS} value={banco} onChange={setBanco} placeholder="Busca tu banco..." />
                 </Field>
                 <Field label="Tipo de cuenta *">
-                  <select style={{ ...inputStyle, appearance: 'none' }} value={tipoCuenta} onChange={e => setTipoCuenta(e.target.value)} required
-                    onFocus={e => e.target.style.borderColor = '#2D2A7A'} onBlur={e => e.target.style.borderColor = '#e5e7eb'}>
-                    <option value="">Selecciona...</option>
-                    <option value="Ahorros">Ahorros</option>
-                    <option value="Corriente">Corriente</option>
-                  </select>
+                  <ComboBox options={TIPO_CUENTA_OPTIONS} value={tipoCuenta} onChange={setTipoCuenta} placeholder="Selecciona..." />
                 </Field>
                 <Field label="Número de cuenta *">
                   <input style={inputStyle} value={numeroCuenta} onChange={e => setNumeroCuenta(e.target.value)} required placeholder="Número de tu cuenta"
@@ -291,11 +286,7 @@ export default function Onboarding() {
               <p style={{ fontSize: 13, color: '#9ca3af', marginBottom: 24 }}>Casi listo — dinos cómo trabajas.</p>
               <form onSubmit={handleTipo}>
                 <Field label="Tipo de aliado *">
-                  <select style={{ ...inputStyle, appearance: 'none' }} value={tipoAliado} onChange={e => setTipoAliado(e.target.value)} required
-                    onFocus={e => e.target.style.borderColor = '#2D2A7A'} onBlur={e => e.target.style.borderColor = '#e5e7eb'}>
-                    <option value="">Selecciona...</option>
-                    {TIPOS_ALIADO.map(t => <option key={t} value={t}>{t}</option>)}
-                  </select>
+                  <ComboBox options={TIPOS_OPTIONS} value={tipoAliado} onChange={setTipoAliado} placeholder="Selecciona tu perfil..." />
                 </Field>
                 <Field label="Ciudad *">
                   <input style={inputStyle} value={ciudad} onChange={e => setCiudad(e.target.value)} required placeholder="Ej. Bogotá, Medellín"

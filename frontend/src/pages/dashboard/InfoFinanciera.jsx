@@ -1,6 +1,7 @@
 import { CreditCard, User, Building2, Edit3, Check, X, Loader2 } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { useAuth } from '../../context/AuthContext'
+import ComboBox from '../../components/ComboBox'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
@@ -226,21 +227,24 @@ export default function InfoFinanciera() {
           <div>
             <label className="text-xs font-medium text-gray-500 mb-1 block">Banco o billetera</label>
             {editBanco
-              ? <select className={inp} value={formBanco.banco} onChange={e => setFormBanco(p => ({ ...p, banco: e.target.value }))}>
-                  <option value="">Selecciona...</option>
-                  {BANCOS.map(b => <option key={b} value={b}>{b}</option>)}
-                </select>
+              ? <ComboBox
+                  value={formBanco.banco}
+                  onChange={v => setFormBanco(p => ({ ...p, banco: v }))}
+                  options={BANCOS.map(b => ({ v:b, label:b }))}
+                  placeholder="Busca tu banco..."
+                />
               : <div className={dis}>{banco?.banco || <span className="text-gray-300">—</span>}</div>}
           </div>
           {/* Tipo cuenta */}
           <div>
             <label className="text-xs font-medium text-gray-500 mb-1 block">Tipo de cuenta</label>
             {editBanco
-              ? <select className={inp} value={formBanco.tipo_cuenta} onChange={e => setFormBanco(p => ({ ...p, tipo_cuenta: e.target.value }))}>
-                  <option value="">Selecciona...</option>
-                  <option value="Ahorros">Ahorros</option>
-                  <option value="Corriente">Corriente</option>
-                </select>
+              ? <ComboBox
+                  value={formBanco.tipo_cuenta}
+                  onChange={v => setFormBanco(p => ({ ...p, tipo_cuenta: v }))}
+                  options={[{ v:'Ahorros', label:'Ahorros' }, { v:'Corriente', label:'Corriente' }]}
+                  placeholder="Selecciona..."
+                />
               : <div className={dis}>{banco?.tipo_cuenta || <span className="text-gray-300">—</span>}</div>}
           </div>
           {/* Número */}

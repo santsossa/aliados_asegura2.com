@@ -1,5 +1,6 @@
 import { useState, useEffect, Fragment } from 'react'
 import { useAuth } from '../../context/AuthContext'
+import ComboBox from '../../components/ComboBox'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
@@ -59,18 +60,9 @@ function mapPlan(resp) {
 }
 
 /* ── mini components ─────────────────────────────────────────────────────── */
+// Alias local para no romper referencias — usa el ComboBox global
 function Sel({ value, onChange, options, placeholder }) {
-  return (
-    <select value={value} onChange={e => onChange(e.target.value)}
-      style={{ width:'100%', padding:'10px 14px', border:'1.5px solid #e5e7eb', borderRadius:10,
-               fontSize:14, background:'#fff', color: value ? '#111827' : '#9ca3af', cursor:'pointer',
-               outline:'none' }}
-      onFocus={e => e.target.style.borderColor='#2D2A7A'}
-      onBlur={e => e.target.style.borderColor='#e5e7eb'}>
-      {placeholder && <option value="">{placeholder}</option>}
-      {options.map(o => <option key={o.v} value={o.v}>{o.label}</option>)}
-    </select>
-  )
+  return <ComboBox value={value} onChange={onChange} options={options} placeholder={placeholder || 'Selecciona...'} />
 }
 function Inp({ value, onChange, placeholder, type='text' }) {
   return (
@@ -295,7 +287,9 @@ export default function Cotizar() {
 
   const step1Ok = form.nombre.trim().length>=2 && form.apellido.trim().length>=2 && !!form.gender
   const step2Ok = form.numDoc.trim().length>=5 && !!(form.diaNac && form.mesNac && form.anioNac)
-  const step3Ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.correo) && !!form.ciudad && form.celular.trim().length>=7
+  const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.correo)
+  const celOk   = form.celular.replace(/\D/g,'').length === 10
+  const step3Ok = emailOk && !!form.ciudad && celOk
 
   /* ── PLACA ── */
   if (phase === 'placa') return (
@@ -384,17 +378,22 @@ export default function Cotizar() {
 
         {step===3 && <>
           <h2 style={{ fontSize:17,fontWeight:800,color:'#111827',marginBottom:20 }}>Contacto del cliente</h2>
-          <Fld label="Correo electrónico *"><Inp type="email" value={form.correo} onChange={v=>setF('correo',v)} placeholder="correo@ejemplo.com" /></Fld>
-          <Fld label="Ciudad donde circula el vehículo *">
-            <select value={form.ciudad}
-              onChange={e => { setF('ciudad',e.target.value); const c=cities.find(x=>String(x.id)===e.target.value); setCityName(c?`${c.name} (${c.departmentName})`:'') }}
-              style={{ width:'100%',padding:'10px 14px',border:'1.5px solid #e5e7eb',borderRadius:10,fontSize:14,background:'#fff',color:form.ciudad?'#111827':'#9ca3af',outline:'none' }}
-              onFocus={e=>e.target.style.borderColor='#2D2A7A'} onBlur={e=>e.target.style.borderColor='#e5e7eb'}>
-              <option value="">Selecciona ciudad...</option>
-              {cities.map(c => <option key={c.id} value={String(c.id)}>{c.name} ({c.departmentName})</option>)}
-            </select>
+          <Fld label="Correo electrónico *">
+            <Inp type="email" value={form.correo} onChange={v=>setF('correo',v)} placeholder="correo@ejemplo.com" />
+            {form.correo && !emailOk && <p style={{ color:'#dc2626',fontSize:11,margin:'4px 0 0' }}>Ingresa un correo válido</p>}
           </Fld>
-          <Fld label="Número de celular *"><Inp type="tel" value={form.celular} onChange={v=>setF('celular',v.replace(/\D/g,'').slice(0,10))} placeholder="Ej. 3001234567" /></Fld>
+          <Fld label="Ciudad donde circula el vehículo *">
+            <ComboBox
+              value={form.ciudad}
+              onChange={v => { setF('ciudad',v); const c=cities.find(x=>String(x.id)===v); setCityName(c?`${c.name} (${c.departmentName})`:'') }}
+              options={cities.map(c => ({ v:String(c.id), label:`${c.name} (${c.departmentName})` }))}
+              placeholder="Escribe o selecciona ciudad..."
+            />
+          </Fld>
+          <Fld label="Celular del cliente (10 dígitos) *">
+            <Inp type="tel" value={form.celular} onChange={v=>setF('celular',v.replace(/\D/g,'').slice(0,10))} placeholder="Ej. 3001234567" />
+            {form.celular && !celOk && <p style={{ color:'#dc2626',fontSize:11,margin:'4px 0 0' }}>El celular debe tener exactamente 10 dígitos</p>}
+          </Fld>
           <div style={{ display:'flex',gap:10,marginTop:8 }}>
             <button onClick={() => setStep(2)} style={btnS}>← Atrás</button>
             <button onClick={() => setPhase('results')} disabled={!step3Ok} style={{ ...btnP(!step3Ok),flex:1 }}>Ver cotizaciones →</button>
