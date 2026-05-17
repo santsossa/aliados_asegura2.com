@@ -293,6 +293,13 @@ export default function Cotizar() {
       .catch(() => {})
   }, [])
 
+  // Extrae valor comercial de cualquier objeto de respuesta (múltiples nombres posibles)
+  function extractCV(obj) {
+    if (!obj) return null
+    return obj.commercialValue || obj.valorAsegurado || obj.insuredValue
+      || obj.vehicleValue || obj.valor || obj.value || null
+  }
+
   // Confirmar placa → pedir datos fasecolda
   function handlePlateConfirm() {
     fetch(`${API}/api/cotizar/fasecolda`, {
@@ -301,9 +308,11 @@ export default function Cotizar() {
     })
       .then(r => r.json())
       .then(d => {
-        const info = d?.response
+        // La respuesta puede venir en d.response o directo en d
+        const info = d?.response || d
         if (info?.modelo) setVehicleModel(/(\d{4})/.exec(info.modelo)?.[1] || info.modelo)
-        if (info?.valorAsegurado) setCommercialValue(info.valorAsegurado)
+        const cv = extractCV(info)
+        if (cv) setCommercialValue(Number(cv))
       })
       .catch(() => {})
     setPhase('form'); setStep(1)
@@ -350,7 +359,9 @@ export default function Cotizar() {
                 if (resp && !resp.error && price > 0) {
                   const plan = mapPlan(resp)
                   if (plan.company !== 'Seguros del Estado') {
-                    if (resp?.commercialValue) setCommercialValue(resp.commercialValue)
+                    // Busca valor asegurado en múltiples campos posibles
+                    const cv = extractCV(resp)
+                    if (cv) setCommercialValue(Number(cv))
                     // Actualiza el estado inmediatamente — stream progresivo
                     if (plan.productFull) setFullPlans(p => [...p, plan].sort((a,b) => a.price-b.price))
                     else                  setBasicPlans(p => [...p, plan].sort((a,b) => a.price-b.price))
@@ -363,6 +374,16 @@ export default function Cotizar() {
           ])
         )
       )
+      // Fallback: si ningún proveedor devolvió el valor, buscarlo en los planes ya recibidos
+      setFullPlans(prev => {
+        setBasicPlans(bPrev => {
+          const all = [...prev, ...bPrev]
+          const cv = all.map(p => extractCV(p.raw)).find(v => v)
+          if (cv) setCommercialValue(Number(cv))
+          return bPrev
+        })
+        return prev
+      })
     } catch {
       setFetchErr('No se pudieron obtener cotizaciones. Intenta nuevamente.')
     } finally {
@@ -588,7 +609,7 @@ export default function Cotizar() {
         <div style={{ background:'#2D2A7A',borderRadius:14,padding:'14px 20px',display:'flex',alignItems:'center',gap:16,marginBottom:20,flexWrap:'wrap' }}>
           <span style={{ color:'#fff',fontWeight:800,fontSize:14 }}>{displayPlate(plate)}</span>
           <span style={{ color:'#a5b4fc',fontSize:13 }}>{form.nombre} {form.apellido}</span>
-          {commercialValue && (
+          {commercialValue != null && commercialValue > 0 && (
             <span style={{ color:'#fde68a',fontSize:13,fontWeight:600 }}>
               Valor asegurado: {fmt(commercialValue)}
             </span>
@@ -600,9 +621,13 @@ export default function Cotizar() {
           <button onClick={() => setPhase('form')} style={{ marginLeft:'auto',fontSize:12,color:'#a5b4fc',background:'none',border:'1px solid rgba(255,255,255,0.3)',borderRadius:99,padding:'4px 12px',cursor:'pointer' }}>← Editar datos</button>
         </div>
 
-        {commercialValue && (
+        {commercialValue != null && commercialValue > 0 ? (
           <div style={{ background:'#fef9c3', border:'1px solid #fde68a', borderRadius:10, padding:'8px 16px', marginBottom:12, fontSize:13, color:'#92400e', fontWeight:600 }}>
             🚗 Valor asegurado del vehículo: {fmt(commercialValue)}
+          </div>
+        ) : !loadingQ && (
+          <div style={{ background:'#f9fafb', border:'1px solid #e5e7eb', borderRadius:10, padding:'7px 16px', marginBottom:12, fontSize:12, color:'#9ca3af' }}>
+            ℹ️ Valor asegurado no disponible para esta placa (se usa el valor de referencia de cada aseguradora)
           </div>
         )}
 
