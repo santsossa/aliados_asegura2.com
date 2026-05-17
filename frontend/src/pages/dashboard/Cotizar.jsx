@@ -448,6 +448,11 @@ export default function Cotizar() {
         <div style={{ background:'#2D2A7A',borderRadius:14,padding:'14px 20px',display:'flex',alignItems:'center',gap:16,marginBottom:20,flexWrap:'wrap' }}>
           <span style={{ color:'#fff',fontWeight:800,fontSize:14 }}>{displayPlate(plate)}</span>
           <span style={{ color:'#a5b4fc',fontSize:13 }}>{form.nombre} {form.apellido}</span>
+          {commercialValue && (
+            <span style={{ color:'#fde68a',fontSize:13,fontWeight:600 }}>
+              Valor asegurado: {fmt(commercialValue)}
+            </span>
+          )}
           {!loadingQ && allPlans.length>0 && <>
             <span style={{ color:'#a5b4fc',fontSize:13 }}>· {allPlans.length} planes</span>
             <span style={{ color:'#86efac',fontSize:13 }}>Mejor: {fmt(Math.min(...allPlans.map(p=>p.price)))}</span>
