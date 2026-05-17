@@ -174,11 +174,15 @@ function Fld({ label, children }) {
 
 function PlanCard({ plan, onElegir }) {
   const [open, setOpen] = useState(false)
+  const allCoverages = [...plan.main, ...plan.extras]
   return (
     <div style={{ background:'#fff', border:'1.5px solid #e5e7eb', borderRadius:14, overflow:'hidden', marginBottom:10, transition:'box-shadow 0.15s' }}
       onMouseEnter={e => e.currentTarget.style.boxShadow='0 4px 16px rgba(45,42,122,0.12)'}
       onMouseLeave={e => e.currentTarget.style.boxShadow='none'}>
+
+      {/* ── Fila principal ── */}
       <div style={{ display:'flex', alignItems:'center', gap:16, padding:'16px 20px' }}>
+        {/* Logo */}
         <div style={{ width:64, flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center', background:'#f9fafb', borderRadius:10, padding:'6px 8px', minHeight:40 }}>
           {plan.logo ? (
             <img src={plan.logo} alt={plan.company} style={{ maxWidth:52, maxHeight:30, objectFit:'contain' }}
@@ -192,23 +196,22 @@ function PlanCard({ plan, onElegir }) {
             {plan.company.split(' ').slice(0,2).join('\n')}
           </span>
         </div>
+
+        {/* Nombre + botón coberturas */}
         <div style={{ flex:1, minWidth:0 }}>
-          <div style={{ fontWeight:700, fontSize:14, color:'#111827', marginBottom:4 }}>{plan.company}</div>
-          <div style={{ display:'flex', flexWrap:'wrap', gap:'4px 12px' }}>
-            {plan.main.map((item,i) => (
-              <span key={i} style={{ fontSize:12, color:'#6b7280', display:'flex', alignItems:'center', gap:4 }}>
-                <span style={{ color:'#2D2A7A', fontWeight:700 }}>✓</span>
-                <CovTooltip name={item} />
-              </span>
-            ))}
-          </div>
-          {plan.extras.length > 0 && (
-            <button onClick={() => setOpen(v=>!v)}
-              style={{ fontSize:11, color:'#2D2A7A', background:'none', border:'none', cursor:'pointer', padding:0, marginTop:4, fontWeight:600 }}>
-              {open ? '↑ Ocultar' : `↓ +${plan.extras.length} coberturas`}
-            </button>
-          )}
+          <div style={{ fontWeight:700, fontSize:14, color:'#111827', marginBottom:6 }}>{plan.company}</div>
+          <button onClick={() => setOpen(v=>!v)}
+            style={{ fontSize:11, color: open ? '#6b7280' : '#2D2A7A', background: open ? '#f9fafb' : '#edeef8',
+                     border:'none', borderRadius:99, padding:'4px 12px', cursor:'pointer', fontWeight:600,
+                     display:'flex', alignItems:'center', gap:4 }}>
+            {open
+              ? <>↑ Ocultar coberturas</>
+              : <>{allCoverages.length > 0 ? `↓ Ver ${allCoverages.length} coberturas` : 'Sin coberturas detalladas'}</>
+            }
+          </button>
         </div>
+
+        {/* Precio + elegir */}
         <div style={{ textAlign:'right', flexShrink:0 }}>
           <div style={{ fontSize:11, color:'#9ca3af', marginBottom:2 }}>Prima anual</div>
           <div style={{ fontSize:20, fontWeight:800, color:'#111827', lineHeight:1 }}>{fmt(plan.price)}</div>
@@ -219,14 +222,21 @@ function PlanCard({ plan, onElegir }) {
           </button>
         </div>
       </div>
-      {open && plan.extras.length > 0 && (
-        <div style={{ padding:'0 20px 16px', display:'flex', flexWrap:'wrap', gap:'4px 16px', borderTop:'1px solid #f3f4f6' }}>
-          {plan.extras.map((item,i) => (
-            <span key={i} style={{ fontSize:12, color:'#6b7280', display:'flex', alignItems:'center', gap:4 }}>
-              <span style={{ color:'#16a34a' }}>✓</span>
-              <CovTooltip name={item} />
-            </span>
-          ))}
+
+      {/* ── Coberturas expandidas ── */}
+      {open && (
+        <div style={{ borderTop:'1px solid #f3f4f6', padding:'14px 20px 18px' }}>
+          <div style={{ display:'flex', flexWrap:'wrap', gap:'8px 20px' }}>
+            {allCoverages.map((item,i) => (
+              <span key={i} style={{ fontSize:12, color:'#374151', display:'flex', alignItems:'center', gap:5 }}>
+                <span style={{ color:'#16a34a', fontWeight:700, fontSize:13 }}>✓</span>
+                <CovTooltip name={item} />
+              </span>
+            ))}
+          </div>
+          {allCoverages.length === 0 && (
+            <p style={{ fontSize:12, color:'#9ca3af', margin:0 }}>No se encontraron detalles de coberturas para este plan.</p>
+          )}
         </div>
       )}
     </div>
