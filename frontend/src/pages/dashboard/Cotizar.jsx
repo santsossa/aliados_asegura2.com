@@ -61,24 +61,64 @@ function mapPlan(resp) {
 
 /* ── coverage tooltips ───────────────────────────────────────────────────── */
 const COVERAGE_TIPS = {
-  'responsabilidad civil': 'Paga los daños que tu carro cause a otras personas o sus vehículos.',
-  'responsabilidad civil extracontractual': 'Cubre daños a terceros (personas o propiedades ajenas) causados por accidente.',
-  'todo riesgo': 'Cubre daños a tu propio carro: accidentes, robo parcial, rayones y más.',
-  'hurto': 'Te pagan si te roban el carro, ya sea total o parcialmente.',
-  'pérdida total': 'Si el carro queda destruido o irrecuperable, te pagan el valor comercial.',
-  'pérdida total por hurto': 'Si te roban el carro y no aparece, te pagan el valor comercial.',
-  'asistencia en carretera': 'Te ayudan si te quedas varado: grúa, llanta, batería y más.',
-  'vehículo de reemplazo': 'Te prestan un carro mientras reparan el tuyo.',
-  'cristales': 'Cubre rotura o daño del parabrisas y ventanas.',
-  'gastos médicos': 'Paga el tratamiento médico de los ocupantes del carro en un accidente.',
-  'muerte accidental': 'Paga a tus beneficiarios si falleces en un accidente de tránsito.',
-  'incendio': 'Cubre daños si el carro se incendia, por cualquier causa.',
-  'terremoto': 'Cubre daños al carro causados por sismo, terremoto o erupción volcánica.',
-  'fenómenos naturales': 'Cubre daños por inundación, granizo, vendaval y otros eventos naturales.',
-  'actos mal intencionados': 'Cubre daños causados por vandalismo o actos de terceros malintencionados.',
-  'accidentes': 'Cubre daños al carro por colisión o vuelco.',
-  'rc': 'Responsabilidad Civil: paga daños que tu carro cause a otras personas.',
-  'llamada médica': 'Servicio de orientación médica telefónica disponible las 24 horas.',
+  // Responsabilidad civil
+  'responsabilidad civil extracontractual': 'Si en un accidente le causas daños al carro de otra persona o la hieres, la aseguradora paga por ti. Sin esto, tendrías que pagarlo de tu bolsillo.',
+  'responsabilidad civil': 'Si chocas y le dañas el carro a alguien, o atropellas a una persona, la aseguradora responde económicamente por ti ante el afectado.',
+
+  // Daños al vehículo propio
+  'todo riesgo': 'Si chocas, te rayan el carro o sufre cualquier daño, la aseguradora paga la reparación aunque el accidente haya sido culpa tuya.',
+  'daños propios': 'Si chocas el carro contra otro vehículo o un poste, la aseguradora cubre el costo de reparación de tu propio vehículo.',
+  'colisión': 'Si chocas el carro contra otro objeto o vehículo, la aseguradora paga la reparación, sin importar quién tuvo la culpa.',
+  'pérdida parcial': 'Si el carro sufre daños que se pueden reparar (como un golpe o raspón), la aseguradora paga la reparación.',
+
+  // Pérdida total
+  'pérdida total por accidente': 'Si el carro choca tan fuerte que no vale la pena repararlo, la aseguradora te paga el valor comercial del carro.',
+  'pérdida total': 'Si el carro queda destruido o los daños superan el 75% de su valor, la aseguradora te paga el precio de mercado del vehículo.',
+
+  // Hurto y robo
+  'pérdida total por hurto': 'Si te roban el carro y después de 30 días no aparece, la aseguradora te paga el valor comercial del vehículo.',
+  'hurto parcial': 'Si te roban partes del carro (espejos, rines, batería, etc.), la aseguradora cubre el reemplazo de esas piezas.',
+  'hurto': 'Si te roban el carro completo y no aparece, la aseguradora te paga su valor. Así no quedas sin nada.',
+
+  // Asistencia
+  'asistencia en carretera': 'Si el carro se daña en la vía y no puedes seguir, te mandan grúa, mecánico, cambio de llanta o gasolina donde estés.',
+  'auxilio en carretera': 'Si te quedas varado en la carretera (llanta pinchada, batería muerta, sin gasolina), la aseguradora te manda ayuda.',
+  'grúa': 'Si el carro no puede moverse por un accidente o daño, la aseguradora te envía una grúa para llevarlo al taller.',
+
+  // Vehículo de reemplazo
+  'vehículo de reemplazo': 'Si el carro está en el taller siendo reparado por un accidente cubierto, la aseguradora te presta otro carro para que no quedes sin transporte.',
+  'carro de reemplazo': 'Mientras tu carro está en reparación, la aseguradora te presta un vehículo para que puedas seguir moviéndote con normalidad.',
+
+  // Cristales
+  'cristales': 'Si el parabrisas o una ventana se rompen por una piedra, un objeto u otro impacto, la aseguradora paga el reemplazo sin deducible adicional.',
+  'vidrios': 'Si se rompe el parabrisas o las ventanas del carro, la aseguradora cubre el costo de reposición.',
+
+  // Salud de ocupantes
+  'gastos médicos': 'Si tú o tus pasajeros salen heridos en un accidente, la aseguradora ayuda a pagar los gastos de hospitalización, cirugías y tratamiento médico.',
+  'muerte accidental': 'Si el conductor o un pasajero fallece en un accidente de tránsito, la aseguradora paga una suma de dinero a su familia.',
+  'invalidez': 'Si como consecuencia de un accidente de tránsito quedas con una incapacidad permanente, la aseguradora te paga una compensación.',
+
+  // Incendio y fenómenos
+  'incendio': 'Si el carro se incendia, ya sea por falla mecánica, cortocircuito u otro motivo, la aseguradora cubre los daños o te paga el valor del vehículo.',
+  'terremoto': 'Si un sismo, terremoto o erupción volcánica daña tu carro, la aseguradora lo cubre aunque normalmente no tengas culpa.',
+  'fenómenos naturales': 'Si una inundación, vendaval, granizo o avalancha daña el carro, la aseguradora paga la reparación o el valor del vehículo.',
+  'inundación': 'Si el carro se daña porque quedó bajo el agua por una lluvia intensa o desbordamiento, la aseguradora lo cubre.',
+
+  // Actos de terceros
+  'actos mal intencionados': 'Si alguien raya el carro, le rompe vidrios o lo daña intencionalmente, la aseguradora cubre la reparación.',
+  'vandalismo': 'Si desconocidos dañan el carro a propósito (pintura rayada, espejos rotos, etc.), la aseguradora paga la reparación.',
+
+  // Servicios adicionales
+  'llamada médica': 'Si tienes una urgencia médica, puedes llamar las 24 horas del día a un médico que te orienta sobre qué hacer o a dónde ir.',
+  'orientación jurídica': 'Si tienes un accidente y necesitas asesoría legal, la aseguradora te conecta con un abogado para guiarte.',
+  'traslado de pasajeros': 'Si el carro se daña lejos de la ciudad, la aseguradora paga el regreso de los pasajeros a su lugar de origen.',
+  'taxi': 'Si el carro está en el taller, la aseguradora te cubre algunos viajes en taxi para que no quedes sin movilidad.',
+  'estadía': 'Si el carro se daña en otra ciudad y no puedes viajar, la aseguradora puede pagar el hospedaje mientras se soluciona.',
+
+  // Accesorios
+  'accesorios': 'Si te roban o dañan elementos del carro como parlantes, rines o pantallas, la aseguradora los reemplaza.',
+  'equipos de sonido': 'Si te roban o dañan el sistema de sonido del carro, la aseguradora lo cubre.',
+  'rc': 'Si en un accidente le causas daños a otra persona o a su vehículo, la aseguradora paga por ti, evitando que tengas que hacerlo de tu bolsillo.',
 }
 
 function getCoverageTip(name = '') {
