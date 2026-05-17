@@ -24,6 +24,42 @@ const CRM_HEADERS = {
   'x-api-key':    env.CRM_API_KEY,
 }
 
+// ── Normaliza el body igual que front-a2 antes de enviarlo a la API ─────────
+const DOC_MAP: Record<string, number> = { CC: 1, CE: 2, PA: 3, NIT: 4, TI: 3 }
+const GENDER_MAP: Record<string, number> = { M: 1, F: 2, Masculino: 1, Femenino: 2 }
+
+function normalizeQuote(body: Record<string, any>): Record<string, any> {
+  const m = { ...body }
+
+  // documentTypeId → number
+  if (typeof m.documentTypeId === 'string') {
+    const asInt = parseInt(m.documentTypeId, 10)
+    m.documentTypeId = isNaN(asInt) ? (DOC_MAP[m.documentTypeId] ?? 1) : asInt
+  }
+
+  // municipalityId → number
+  if (typeof m.municipalityId === 'string') {
+    const asInt = parseInt(m.municipalityId, 10)
+    if (!isNaN(asInt)) m.municipalityId = asInt
+  }
+
+  // genderId → number (puede venir como 'M', 'F', 'Masculino', 'Femenino', 1 o 2)
+  if (m.genderId !== undefined && m.genderId !== null) {
+    const asInt = parseInt(String(m.genderId), 10)
+    m.genderId = isNaN(asInt) ? (GENDER_MAP[m.genderId] ?? undefined) : asInt
+  }
+  if (!m.genderId) delete m.genderId
+
+  // plate → uppercase
+  if (m.plate) m.plate = String(m.plate).toUpperCase()
+
+  // identification y mobileNumber → string
+  if (m.identification !== undefined) m.identification = String(m.identification)
+  if (m.mobileNumber   !== undefined) m.mobileNumber   = String(m.mobileNumber)
+
+  return m
+}
+
 // ── Municipios ──────────────────────────────────────────────────────────────
 router.get('/municipios', async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -57,14 +93,16 @@ router.get('/proveedores', async (req: Request, res: Response, next: NextFunctio
 // ── Cotizar 1 proveedor ─────────────────────────────────────────────────────
 router.post('/quote', async (req: Request, res: Response, next: NextFunction) => {
   try {
+    const body = normalizeQuote(req.body)
     const r = await axios.post(
       `${INS_BASE}/api/InsuranceQuotation/lightVehicleOneRes`,
-      req.body,
+      body,
       { headers: INS_HEADERS }
     )
     res.json(r.data)
   } catch (err: any) {
-    res.status(err.response?.status || 500).json({ error: 'Error cotizando' })
+    // Devuelve 200 con error embebido para que el frontend lo ignore (igual que front-a2)
+    res.json({ response: null, error: err.response?.data || 'Error cotizando' })
   }
 })
 
