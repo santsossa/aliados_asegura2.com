@@ -323,6 +323,7 @@ export default function Cotizar() {
   async function fetchQuotes() {
     setLoadingQ(true); setFetchErr(''); setFullPlans([]); setBasicPlans([])
     setProgress({ done:0, total:0 })
+    const collectedFull = []; const collectedBasic = []
 
     const birthDate = `${form.anioNac}-${String(form.mesNac).padStart(2,'0')}-${String(form.diaNac).padStart(2,'0')}`
     const model = {
@@ -364,8 +365,8 @@ export default function Cotizar() {
                     const cv = extractCV(resp)
                     if (cv) setCommercialValue(Number(cv))
                     // Actualiza el estado inmediatamente — stream progresivo
-                    if (plan.productFull) setFullPlans(p => [...p, plan].sort((a,b) => a.price-b.price))
-                    else                  setBasicPlans(p => [...p, plan].sort((a,b) => a.price-b.price))
+                    if (plan.productFull) { collectedFull.push(plan); setFullPlans(p => [...p, plan].sort((a,b) => a.price-b.price)) }
+                    else                  { collectedBasic.push(plan); setBasicPlans(p => [...p, plan].sort((a,b) => a.price-b.price)) }
                   }
                 }
               })
@@ -389,6 +390,7 @@ export default function Cotizar() {
       setFetchErr('No se pudieron obtener cotizaciones. Intenta nuevamente.')
     } finally {
       setLoadingQ(false)
+      saveCotizacionWithPlans(collectedFull, collectedBasic)
     }
   }
 
@@ -398,14 +400,16 @@ export default function Cotizar() {
 
   // Ref siempre actualizado — resuelve stale closure en cleanup
   const saveRef = React.useRef({})
-  saveRef.current = { plate, form, vehicleModel, commercialValue, cityName, fullPlans, basicPlans, cotSaved }
+  saveRef.current = { plate, form, vehicleModel, commercialValue, cityName, cotSaved }
 
-  async function saveCotizacion() {
+  // Guardar cotizacion con planes reales (llamado al final de fetchQuotes)
+  async function saveCotizacionWithPlans(allFull, allBasic) {
     const s = saveRef.current
     if (s.cotSaved || !s.plate) return
     try {
+      const allQuotes = [...allFull, ...allBasic]
       const nombre = `${s.form.nombre} ${s.form.apellido}`.trim() || null
-      const formData = {
+      const body = {
         placa: s.plate,
         vehicleModel: s.vehicleModel,
         comercial_value: s.commercialValue,
@@ -415,18 +419,24 @@ export default function Cotizar() {
         cliente_cedula: s.form.numDoc || null,
         cliente_tipo_doc: s.form.tipoDoc || null,
         datos_cotizacion: {
-          form: { nombre: s.form.nombre, apellido: s.form.apellido, correo: s.form.correo, celular: s.form.celular, ciudad: s.cityName },
+          form_full: { ...s.form, cityName: s.cityName },
           commercial_value: s.commercialValue,
-          planes_full: s.fullPlans.length,
-          planes_basico: s.basicPlans.length,
-          mejor_precio: [...s.fullPlans, ...s.basicPlans].length > 0
-            ? Math.min(...[...s.fullPlans, ...s.basicPlans].map(p => p.price)) : null,
+          quotes: allQuotes.map(p => ({
+            insuranceCode: p.insuranceCode,
+            carrierId: p.carrierId,
+            company: p.company,
+            logo: p.logo,
+            price: p.price,
+            productFull: p.productFull,
+            main: p.main,
+          })),
+          mejor_precio: allQuotes.length > 0 ? Math.min(...allQuotes.map(p => p.price)) : null,
         },
       }
       const r = await fetch(`${API}/api/cotizar/guardar`, {
         method: 'POST',
         headers: { Authorization:`Bearer ${getToken()}`, 'Content-Type':'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(body),
       })
       const d = await r.json()
       if (d.id) cotizacionIdRef.current = d.id
@@ -435,14 +445,27 @@ export default function Cotizar() {
     } catch {}
   }
 
-  // Guardar al entrar a resultados (form completo disponible)
+  // Guardar al salir sin haber llegado a resultados (respaldo)
   useEffect(() => {
-    if (phase === 'results') saveCotizacion()
-  }, [phase])
-
-  // Guardar al salir (respaldo por si no llegó a resultados)
-  useEffect(() => {
-    return () => { saveCotizacion() }
+    return () => {
+      if (!saveRef.current.cotSaved && saveRef.current.plate) {
+        const s = saveRef.current
+        const nombre = `${s.form.nombre} ${s.form.apellido}`.trim() || null
+        fetch(`${API}/api/cotizar/guardar`, {
+          method: 'POST',
+          headers: { Authorization:`Bearer ${getToken()}`, 'Content-Type':'application/json' },
+          body: JSON.stringify({
+            placa: s.plate, vehicleModel: s.vehicleModel,
+            comercial_value: s.commercialValue,
+            cliente_nombre: nombre, cliente_telefono: s.form.celular || null,
+            cliente_correo: s.form.correo || null,
+            cliente_cedula: s.form.numDoc || null,
+            cliente_tipo_doc: s.form.tipoDoc || null,
+            datos_cotizacion: { form_full: { ...s.form, cityName: s.cityName }, quotes: [] },
+          }),
+        }).catch(() => {})
+      }
+    }
   }, []) // solo en unmount
 
   function handleElegir(plan) {

@@ -47,4 +47,19 @@ router.post('/',
   }
 )
 
+// DELETE /api/cotizaciones/:id — eliminar cotización propia
+router.delete('/:id', async (req: any, res: any, next: any) => {
+  try {
+    const [result] = await pool.execute<any>(
+      `DELETE FROM cotizaciones WHERE id = ? AND aliado_id = ?`,
+      [req.params.id, req.aliado!.sub]
+    )
+    if (result.affectedRows === 0) {
+      res.status(404).json({ status: 'error', message: 'Cotización no encontrada.' })
+      return
+    }
+    res.json({ status: 'success', message: 'Cotización eliminada.' })
+  } catch (err) { next(err) }
+})
+
 export default router
