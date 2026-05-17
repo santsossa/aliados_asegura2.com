@@ -198,7 +198,7 @@ export default function Cotizar() {
     setPhase('form'); setStep(1)
   }
 
-  // Cotizaciones — espera a que TODAS respondan o hasta timeout de 25s
+  // Cotizaciones — stream progresivo: cada quote aparece en cuanto llega
   async function fetchQuotes() {
     setLoadingQ(true); setFetchErr(''); setFullPlans([]); setBasicPlans([])
     setProgress({ done:0, total:0 })
@@ -214,8 +214,6 @@ export default function Cotizar() {
       city:           cityName,        vehicleModel,
     }
 
-    const collected = { full: [], basic: [], cvValue: null }
-
     try {
       const provR = await fetch(`${API}/api/cotizar/proveedores`, { headers: authH })
       const provD = await provR.json()
@@ -225,14 +223,11 @@ export default function Cotizar() {
 
       let done = 0
 
-      // Timeout de 25 segundos para proveedores lentos
-      const TIMEOUT = 25000
-      const withTimeout = (p) =>
-        Promise.race([p, new Promise(resolve => setTimeout(resolve, TIMEOUT))])
-
       await Promise.allSettled(
         providers.map(provider =>
-          withTimeout(
+          // Timeout de 30s por proveedor — el race solo controla el contador,
+          // el fetch sigue corriendo y actualiza el estado si llega tarde
+          Promise.race([
             fetch(`${API}/api/cotizar/quote`, {
               method:'POST', headers: authH,
               body: JSON.stringify({ ...model, provider }),
@@ -244,26 +239,19 @@ export default function Cotizar() {
                 if (resp && !resp.error && price > 0) {
                   const plan = mapPlan(resp)
                   if (plan.company !== 'Seguros del Estado') {
-                    if (resp?.commercialValue) collected.cvValue = resp.commercialValue
-                    if (plan.productFull) collected.full.push(plan)
-                    else collected.basic.push(plan)
+                    if (resp?.commercialValue) setCommercialValue(resp.commercialValue)
+                    // Actualiza el estado inmediatamente — stream progresivo
+                    if (plan.productFull) setFullPlans(p => [...p, plan].sort((a,b) => a.price-b.price))
+                    else                  setBasicPlans(p => [...p, plan].sort((a,b) => a.price-b.price))
                   }
                 }
               })
               .catch(() => {})
-              .finally(() => { done++; setProgress({ done, total: providers.length }) })
-          )
+              .finally(() => { done++; setProgress({ done, total: providers.length }) }),
+            new Promise(resolve => setTimeout(resolve, 30000))
+          ])
         )
       )
-
-      // Una vez completadas TODAS, ordenamos y mostramos
-      if (collected.cvValue) setCommercialValue(collected.cvValue)
-      setFullPlans([...collected.full].sort((a,b) => a.price-b.price))
-      setBasicPlans([...collected.basic].sort((a,b) => a.price-b.price))
-
-      if (!collected.full.length && !collected.basic.length) {
-        setFetchErr('No se encontraron cotizaciones. Verifica los datos del cliente.')
-      }
     } catch {
       setFetchErr('No se pudieron obtener cotizaciones. Intenta nuevamente.')
     } finally {
@@ -460,32 +448,35 @@ export default function Cotizar() {
           <button onClick={() => setPhase('form')} style={{ marginLeft:'auto',fontSize:12,color:'#a5b4fc',background:'none',border:'1px solid rgba(255,255,255,0.3)',borderRadius:99,padding:'4px 12px',cursor:'pointer' }}>← Editar datos</button>
         </div>
 
-        {/* Loading completo — espera todas las respuestas */}
+        {/* Spinner + barra de progreso mientras cargan */}
         {loadingQ && (
-          <div style={{ background:'#fff',borderRadius:16,border:'1px solid #eeeeef',padding:'40px 24px',textAlign:'center',marginBottom:16 }}>
-            <div style={{ fontSize:40,marginBottom:16 }}>⏳</div>
-            <p style={{ fontSize:16,fontWeight:700,color:'#111827',marginBottom:6 }}>Consultando aseguradoras...</p>
-            <p style={{ fontSize:13,color:'#9ca3af',marginBottom:20 }}>Comparando precios en tiempo real. Esto puede tomar hasta 25 segundos.</p>
-            {/* Barra de progreso */}
-            {progress.total > 0 && (
-              <>
-                <div style={{ background:'#e5e7eb',borderRadius:99,height:6,marginBottom:8,overflow:'hidden',maxWidth:400,margin:'0 auto 8px' }}>
-                  <div style={{ height:'100%',background:'#2D2A7A',borderRadius:99,width:`${(progress.done/progress.total)*100}%`,transition:'width 0.4s ease' }} />
-                </div>
-                <p style={{ fontSize:12,color:'#9ca3af' }}>{progress.done} de {progress.total} aseguradoras consultadas</p>
-              </>
-            )}
-            {/* Logos animados */}
-            <div style={{ display:'flex',justifyContent:'center',gap:16,marginTop:24,flexWrap:'wrap' }}>
-              {['allianz','axa','bolivar','equidad','hdi','mapfre','sbs','solidaria','sura'].map((logo,i) => (
-                <img key={logo} src={`/logos/${logo}.png`} alt={logo}
-                  style={{ width:48,height:28,objectFit:'contain',opacity:0.5+Math.sin(i)*0.3,filter:'grayscale(40%)' }}
-                  onError={e => e.currentTarget.style.display='none'} />
-              ))}
+          <div style={{ marginBottom:16 }}>
+            <div style={{ display:'flex',alignItems:'center',gap:12,marginBottom:10 }}>
+              {/* Spinner SVG igual al de front-a2 */}
+              <svg viewBox="3 3 18 18" width={22} height={22} style={{ animation:'spin 0.85s linear infinite', fill:'#2D2A7A', flexShrink:0 }}>
+                <style>{`@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}`}</style>
+                <path d="M12 5C8.13401 5 5 8.13401 5 12C5 15.866 8.13401 19 12 19C15.866 19 19 15.866 19 12C19 8.13401 15.866 5 12 5ZM3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12Z" opacity="0.18"/>
+                <path d="M16.9497 7.05015C14.2161 4.31648 9.78392 4.31648 7.05025 7.05015C6.65973 7.44067 6.02656 7.44067 5.63604 7.05015C5.24551 6.65962 5.24551 6.02646 5.63604 5.63593C9.15076 2.12121 14.8492 2.12121 18.364 5.63593C18.7545 6.02646 18.7545 6.65962 18.364 7.05015C17.9734 7.44067 17.3403 7.44067 16.9497 7.05015Z"/>
+              </svg>
+              <span style={{ fontSize:13,color:'#6b7280' }}>
+                Comparando aseguradoras{progress.total > 0 ? ` · ${progress.done} de ${progress.total}` : '...'}
+              </span>
             </div>
+            {progress.total > 0 && (
+              <div style={{ background:'#e5e7eb',borderRadius:99,height:4,overflow:'hidden' }}>
+                <div style={{ height:'100%',background:'#2D2A7A',borderRadius:99,width:`${(progress.done/progress.total)*100}%`,transition:'width 0.3s ease' }} />
+              </div>
+            )}
           </div>
         )}
         {!loadingQ && fetchErr && <p style={{ color:'#dc2626',fontSize:13,marginBottom:16 }}>{fetchErr}</p>}
+
+        {/* Placeholder mientras no hay resultados aún */}
+        {loadingQ && fullPlans.length===0 && basicPlans.length===0 && (
+          <div style={{ background:'#fff',border:'1px solid #eeeeef',borderRadius:14,padding:'48px 24px',textAlign:'center' }}>
+            <p style={{ color:'#9ca3af',fontSize:14,margin:0 }}>Los resultados aparecerán aquí en cuanto cada aseguradora responda</p>
+          </div>
+        )}
 
         {/* Planes Full */}
         {fullPlans.length>0 && <div style={{ marginBottom:20 }}>
