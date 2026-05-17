@@ -29,6 +29,11 @@ const envSchema = z.object({
 
   RATE_LIMIT_WINDOW_MS:    z.string().default('900000'),
   RATE_LIMIT_MAX:          z.string().default('100'),
+
+  INSURANCE_API_URL: z.string().default('https://api.asegura2.com.co'),
+  INSURANCE_API_KEY: z.string().default(''),
+  CRM_URL:           z.string().default(''),
+  CRM_API_KEY:       z.string().default(''),
 })
 
 const parsed = envSchema.safeParse(process.env)

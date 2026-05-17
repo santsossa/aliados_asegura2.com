@@ -4,7 +4,10 @@
   "description": "Asegura2.com — Backend del Portal de Aliados",
   "main": "dist/app.js",
   "packageManager": "pnpm@10.33.2",
-  "engines": { "node": ">=20.0.0", "pnpm": ">=10.0.0" },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=10.0.0"
+  },
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/app.ts",
     "build": "tsc",
@@ -18,6 +21,8 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "@types/multer": "^2.1.0",
+    "axios": "^1.16.1",
     "bcryptjs": "^3.0.3",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
@@ -25,8 +30,10 @@
     "express": "^5.2.1",
     "express-rate-limit": "^8.5.1",
     "express-validator": "^7.3.2",
+    "form-data": "^4.0.5",
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.3",
+    "multer": "^2.1.1",
     "mysql2": "^3.22.3",
     "nodemailer": "^8.0.7",
     "uuid": "^14.0.0",
