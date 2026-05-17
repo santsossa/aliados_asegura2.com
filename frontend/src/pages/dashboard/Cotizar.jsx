@@ -219,7 +219,7 @@ export default function Cotizar() {
     try {
       const provR = await fetch(`${API}/api/cotizar/proveedores`, { headers: authH })
       const provD = await provR.json()
-      const providers: any[] = provD?.response || provD?.data?.response || []
+      const providers = provD?.response || provD?.data?.response || []
       if (!providers.length) { setFetchErr('No se encontraron proveedores.'); return }
       setProgress({ done:0, total: providers.length })
 
