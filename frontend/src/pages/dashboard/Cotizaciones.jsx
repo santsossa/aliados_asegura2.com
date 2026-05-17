@@ -68,9 +68,22 @@ const COVERAGE_TIPS = {
 }
 
 function getCoverageTip(name = '') {
-  const lower = name.toLowerCase()
-  const key = Object.keys(COVERAGE_TIPS).find(k => lower.includes(k))
-  return key ? COVERAGE_TIPS[key] : null
+  const lower = name.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+  const keys = Object.keys(COVERAGE_TIPS)
+  const exact = keys.find(k => {
+    const kn = k.normalize('NFD').replace(/[̀-ͯ]/g, '')
+    return lower === kn || lower.includes(kn) || kn.includes(lower)
+  })
+  if (exact) return COVERAGE_TIPS[exact]
+  const words = lower.split(/\s+/).filter(w => w.length > 4)
+  for (const w of words) {
+    const match = keys.find(k => {
+      const kn = k.normalize('NFD').replace(/[̀-ͯ]/g, '')
+      return kn.includes(w) || w.includes(kn.split(' ')[0])
+    })
+    if (match) return COVERAGE_TIPS[match]
+  }
+  return null
 }
 
 function CovTooltip({ name }) {
@@ -327,7 +340,9 @@ function CotizacionModal({ cotizacion, token, user, onClose, onDeleted, onEmitid
                         const planKey = `${tipo}-${i}`
                         const isSel = selectedPlan?.insuranceCode === q.insuranceCode && selectedPlan?.company === q.company
                         const isOpen = expandedPlan === planKey
-                        const allCov = [...(q.main || []), ...(q.extras || [])]
+                        const allCov = q.coverages?.length
+                          ? q.coverages
+                          : [...(q.main || []), ...(q.extras || [])]
                         return (
                           <div
                             key={i}

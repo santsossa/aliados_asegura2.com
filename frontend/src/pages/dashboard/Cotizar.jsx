@@ -54,7 +54,9 @@ function mapPlan(resp) {
     id: `p-${++_idCounter}`, carrierId: resp.insuranceCarrierId || resp.insuranceCode || null,
     insuranceCode: resp.insuranceCode || null, company: co.name, logo: co.logo,
     price: resp.yearlyTotal || resp.monthlyTotal || 0,
-    main: coverages.slice(0,3), extras: coverages.slice(3),
+    coverages,                          // TODAS las coberturas — para guardar en DB
+    main: coverages.slice(0,3),         // primeras 3 — para preview rápido en PlanCard
+    extras: coverages.slice(3),         // el resto — para expandir en PlanCard
     productFull: resp.productFull === true || (resp.insuranceCarrier||'').toLowerCase().includes('hdi'),
     raw: resp,
   }
@@ -123,9 +125,24 @@ const COVERAGE_TIPS = {
 }
 
 function getCoverageTip(name = '') {
-  const lower = name.toLowerCase()
-  const key = Object.keys(COVERAGE_TIPS).find(k => lower.includes(k))
-  return key ? COVERAGE_TIPS[key] : null
+  const lower = name.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '') // quita tildes
+  // Buscar coincidencia exacta primero, luego parcial
+  const keys = Object.keys(COVERAGE_TIPS)
+  const exact = keys.find(k => {
+    const kn = k.normalize('NFD').replace(/[̀-ͯ]/g, '')
+    return lower === kn || lower.includes(kn) || kn.includes(lower)
+  })
+  if (exact) return COVERAGE_TIPS[exact]
+  // Buscar por palabras clave individuales
+  const words = lower.split(/\s+/).filter(w => w.length > 4)
+  for (const w of words) {
+    const match = keys.find(k => {
+      const kn = k.normalize('NFD').replace(/[̀-ͯ]/g, '')
+      return kn.includes(w) || w.includes(kn.split(' ')[0])
+    })
+    if (match) return COVERAGE_TIPS[match]
+  }
+  return null
 }
 
 function CovTooltip({ name }) {
@@ -376,11 +393,23 @@ export default function Cotizar() {
       .catch(() => {})
   }, [])
 
+  // Parsea valor numérico tolerando formato colombiano "45.000.000"
+  function parseNumericCV(raw) {
+    if (raw == null || raw === '') return null
+    // Si ya es número positivo, úsalo directamente
+    if (typeof raw === 'number' && raw > 0) return raw
+    // Limpiar formato colombiano: quitar puntos de miles, cambiar coma decimal por punto
+    const cleaned = String(raw).replace(/\./g, '').replace(',', '.').replace(/[^0-9.]/g, '')
+    const n = Number(cleaned)
+    return (!isNaN(n) && n > 0) ? n : null
+  }
+
   // Extrae valor comercial — front-A2 confirma que Fasecolda devuelve "valorAsegurado"
   function extractCV(obj) {
     if (!obj) return null
     for (const k of ['valorAsegurado','commercialValue','insuredValue','vehicleValue','valor','value']) {
-      if (obj[k] != null && obj[k] !== '' && Number(obj[k]) > 0) return Number(obj[k])
+      const v = parseNumericCV(obj[k])
+      if (v != null) return v
     }
     // Buscar en response anidado
     if (obj.response) return extractCV(obj.response)
@@ -519,8 +548,8 @@ export default function Cotizar() {
             logo: p.logo,
             price: p.price,
             productFull: p.productFull,
+            coverages: p.coverages || [...(p.main||[]), ...(p.extras||[])],
             main: p.main || [],
-            extras: p.extras || [],
           })),
           mejor_precio: allQuotes.length > 0 ? Math.min(...allQuotes.map(p => p.price)) : null,
         },
