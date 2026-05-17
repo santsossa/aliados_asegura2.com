@@ -84,9 +84,18 @@ function PlanCard({ plan, onElegir }) {
       onMouseEnter={e => e.currentTarget.style.boxShadow='0 4px 16px rgba(45,42,122,0.12)'}
       onMouseLeave={e => e.currentTarget.style.boxShadow='none'}>
       <div style={{ display:'flex', alignItems:'center', gap:16, padding:'16px 20px' }}>
-        <div style={{ width:60, flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
-          <img src={plan.logo} alt={plan.company} style={{ maxWidth:54, maxHeight:32, objectFit:'contain' }}
-            onError={e => { e.currentTarget.style.display='none' }} />
+        <div style={{ width:64, flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center', background:'#f9fafb', borderRadius:10, padding:'6px 8px', minHeight:40 }}>
+          {plan.logo ? (
+            <img src={plan.logo} alt={plan.company} style={{ maxWidth:52, maxHeight:30, objectFit:'contain' }}
+              onError={e => {
+                e.currentTarget.style.display='none'
+                const span = e.currentTarget.nextSibling as HTMLElement
+                if (span) span.style.display='block'
+              }} />
+          ) : null}
+          <span style={{ fontSize:9,fontWeight:700,color:'#6b7280',textAlign:'center',lineHeight:1.2,display: plan.logo ? 'none' : 'block' }}>
+            {plan.company.split(' ').slice(0,2).join('\n')}
+          </span>
         </div>
         <div style={{ flex:1, minWidth:0 }}>
           <div style={{ fontWeight:700, fontSize:14, color:'#111827', marginBottom:4 }}>{plan.company}</div>
@@ -189,10 +198,11 @@ export default function Cotizar() {
     setPhase('form'); setStep(1)
   }
 
-  // Stream de cotizaciones
+  // Cotizaciones — espera a que TODAS respondan o hasta timeout de 25s
   async function fetchQuotes() {
     setLoadingQ(true); setFetchErr(''); setFullPlans([]); setBasicPlans([])
     setProgress({ done:0, total:0 })
+
     const birthDate = `${form.anioNac}-${String(form.mesNac).padStart(2,'0')}-${String(form.diaNac).padStart(2,'0')}`
     const model = {
       documentTypeId: form.tipoDoc,    identification: form.numDoc,
@@ -203,36 +213,62 @@ export default function Cotizar() {
       gender:         form.gender,     email:          form.correo,
       city:           cityName,        vehicleModel,
     }
+
+    const collected: { full: any[], basic: any[], cvValue: number|null } = { full: [], basic: [], cvValue: null }
+
     try {
       const provR = await fetch(`${API}/api/cotizar/proveedores`, { headers: authH })
       const provD = await provR.json()
-      const providers = provD?.response || provD?.data?.response || []
+      const providers: any[] = provD?.response || provD?.data?.response || []
+      if (!providers.length) { setFetchErr('No se encontraron proveedores.'); return }
       setProgress({ done:0, total: providers.length })
-      let done = 0, gotFirst = false
-      await Promise.allSettled(providers.map(provider =>
-        fetch(`${API}/api/cotizar/quote`, {
-          method:'POST', headers: authH,
-          body: JSON.stringify({ ...model, provider }),
-        })
-          .then(r => r.json())
-          .then(d => {
-            const resp = d?.response
-            const price = parseFloat(resp?.yearlyTotal || resp?.monthlyTotal || 0)
-            if (resp && !resp.error && price > 0) {
-              const plan = mapPlan(resp)
-              if (plan.company !== 'Seguros del Estado') {
-                if (!gotFirst) { gotFirst=true; setLoadingQ(false) }
-                if (resp?.commercialValue) setCommercialValue(resp.commercialValue)
-                if (plan.productFull) setFullPlans(p => [...p, plan].sort((a,b) => a.price-b.price))
-                else setBasicPlans(p => [...p, plan].sort((a,b) => a.price-b.price))
-              }
-            }
-          })
-          .catch(() => {})
-          .finally(() => { done++; setProgress({ done, total: providers.length }) })
-      ))
-    } catch { setFetchErr('No se pudieron obtener cotizaciones. Intenta nuevamente.') }
-    finally { setLoadingQ(false) }
+
+      let done = 0
+
+      // Timeout de 25 segundos para proveedores lentos
+      const TIMEOUT = 25000
+      const withTimeout = (p: Promise<any>) =>
+        Promise.race([p, new Promise(resolve => setTimeout(resolve, TIMEOUT))])
+
+      await Promise.allSettled(
+        providers.map(provider =>
+          withTimeout(
+            fetch(`${API}/api/cotizar/quote`, {
+              method:'POST', headers: authH,
+              body: JSON.stringify({ ...model, provider }),
+            })
+              .then(r => r.json())
+              .then(d => {
+                const resp = d?.response
+                const price = parseFloat(resp?.yearlyTotal || resp?.monthlyTotal || 0)
+                if (resp && !resp.error && price > 0) {
+                  const plan = mapPlan(resp)
+                  if (plan.company !== 'Seguros del Estado') {
+                    if (resp?.commercialValue) collected.cvValue = resp.commercialValue
+                    if (plan.productFull) collected.full.push(plan)
+                    else collected.basic.push(plan)
+                  }
+                }
+              })
+              .catch(() => {})
+              .finally(() => { done++; setProgress({ done, total: providers.length }) })
+          )
+        )
+      )
+
+      // Una vez completadas TODAS, ordenamos y mostramos
+      if (collected.cvValue) setCommercialValue(collected.cvValue)
+      setFullPlans([...collected.full].sort((a,b) => a.price-b.price))
+      setBasicPlans([...collected.basic].sort((a,b) => a.price-b.price))
+
+      if (!collected.full.length && !collected.basic.length) {
+        setFetchErr('No se encontraron cotizaciones. Verifica los datos del cliente.')
+      }
+    } catch {
+      setFetchErr('No se pudieron obtener cotizaciones. Intenta nuevamente.')
+    } finally {
+      setLoadingQ(false)
+    }
   }
 
   useEffect(() => {
@@ -419,16 +455,32 @@ export default function Cotizar() {
           <button onClick={() => setPhase('form')} style={{ marginLeft:'auto',fontSize:12,color:'#a5b4fc',background:'none',border:'1px solid rgba(255,255,255,0.3)',borderRadius:99,padding:'4px 12px',cursor:'pointer' }}>← Editar datos</button>
         </div>
 
-        {/* Progreso */}
-        {(loadingQ || progress.done < progress.total) && progress.total > 0 && (
-          <div style={{ background:'#e5e7eb',borderRadius:99,height:5,marginBottom:14,overflow:'hidden' }}>
-            <div style={{ height:'100%',background:'#2D2A7A',borderRadius:99,width:`${(progress.done/progress.total)*100}%`,transition:'width 0.3s' }} />
+        {/* Loading completo — espera todas las respuestas */}
+        {loadingQ && (
+          <div style={{ background:'#fff',borderRadius:16,border:'1px solid #eeeeef',padding:'40px 24px',textAlign:'center',marginBottom:16 }}>
+            <div style={{ fontSize:40,marginBottom:16 }}>⏳</div>
+            <p style={{ fontSize:16,fontWeight:700,color:'#111827',marginBottom:6 }}>Consultando aseguradoras...</p>
+            <p style={{ fontSize:13,color:'#9ca3af',marginBottom:20 }}>Comparando precios en tiempo real. Esto puede tomar hasta 25 segundos.</p>
+            {/* Barra de progreso */}
+            {progress.total > 0 && (
+              <>
+                <div style={{ background:'#e5e7eb',borderRadius:99,height:6,marginBottom:8,overflow:'hidden',maxWidth:400,margin:'0 auto 8px' }}>
+                  <div style={{ height:'100%',background:'#2D2A7A',borderRadius:99,width:`${(progress.done/progress.total)*100}%`,transition:'width 0.4s ease' }} />
+                </div>
+                <p style={{ fontSize:12,color:'#9ca3af' }}>{progress.done} de {progress.total} aseguradoras consultadas</p>
+              </>
+            )}
+            {/* Logos animados */}
+            <div style={{ display:'flex',justifyContent:'center',gap:16,marginTop:24,flexWrap:'wrap' }}>
+              {['allianz','axa','bolivar','equidad','hdi','mapfre','sbs','solidaria','sura'].map((logo,i) => (
+                <img key={logo} src={`/logos/${logo}.png`} alt={logo}
+                  style={{ width:48,height:28,objectFit:'contain',opacity:0.5+Math.sin(i)*0.3,filter:'grayscale(40%)' }}
+                  onError={e => e.currentTarget.style.display='none'} />
+              ))}
+            </div>
           </div>
         )}
-        {loadingQ && allPlans.length===0 && (
-          <p style={{ textAlign:'center',color:'#6b7280',fontSize:14,padding:'60px 0' }}>⏳ Consultando aseguradoras, espera un momento...</p>
-        )}
-        {fetchErr && <p style={{ color:'#dc2626',fontSize:13,marginBottom:16 }}>{fetchErr}</p>}
+        {!loadingQ && fetchErr && <p style={{ color:'#dc2626',fontSize:13,marginBottom:16 }}>{fetchErr}</p>}
 
         {/* Planes Full */}
         {fullPlans.length>0 && <div style={{ marginBottom:20 }}>
