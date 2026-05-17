@@ -26,8 +26,8 @@ export async function personal(req: Request, res: Response, next: NextFunction) 
       [nombre, apellido, cedula, telefono, aliadoId]
     )
 
-    const [rows] = await pool.execute<any[]>('SELECT correo FROM aliados WHERE id = ?', [aliadoId])
-    const accessToken = generateAccessToken(aliadoId, rows[0].correo, 'aliado', undefined, 1)
+    const [rows] = await pool.execute<any[]>('SELECT correo, nombre, apellido FROM aliados WHERE id = ?', [aliadoId])
+    const accessToken = generateAccessToken(aliadoId, rows[0].correo, 'aliado', undefined, 1, rows[0].nombre, rows[0].apellido)
 
     res.json({ status: 'success', accessToken, onboarding_step: 1 })
   } catch (err) { next(err) }
@@ -65,8 +65,8 @@ export async function banco(req: Request, res: Response, next: NextFunction) {
       [aliadoId]
     )
 
-    const [rows] = await pool.execute<any[]>('SELECT correo FROM aliados WHERE id = ?', [aliadoId])
-    const accessToken = generateAccessToken(aliadoId, rows[0].correo, 'aliado', undefined, 2)
+    const [rows] = await pool.execute<any[]>('SELECT correo, nombre, apellido FROM aliados WHERE id = ?', [aliadoId])
+    const accessToken = generateAccessToken(aliadoId, rows[0].correo, 'aliado', undefined, 2, rows[0].nombre, rows[0].apellido)
 
     res.json({ status: 'success', accessToken, onboarding_step: 2 })
   } catch (err) { next(err) }
@@ -86,8 +86,8 @@ export async function tipo(req: Request, res: Response, next: NextFunction) {
       [tipo_aliado, ciudad, aliadoId]
     )
 
-    const [rows] = await pool.execute<any[]>('SELECT correo FROM aliados WHERE id = ?', [aliadoId])
-    const accessToken = generateAccessToken(aliadoId, rows[0].correo, 'aliado', undefined, 3)
+    const [rows] = await pool.execute<any[]>('SELECT correo, nombre, apellido FROM aliados WHERE id = ?', [aliadoId])
+    const accessToken = generateAccessToken(aliadoId, rows[0].correo, 'aliado', undefined, 3, rows[0].nombre, rows[0].apellido)
 
     res.json({ status: 'success', accessToken, onboarding_step: 3 })
   } catch (err) { next(err) }
