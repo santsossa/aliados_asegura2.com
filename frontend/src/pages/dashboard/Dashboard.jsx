@@ -212,7 +212,8 @@ export default function Dashboard() {
   const tickDias = [1, 8, 15, 22, 29]
 
   return (
-    <div style={{ padding: '20px 24px', height: '100%', overflowY: 'auto' }}>
+    <div style={{ padding: '24px 32px', height: '100%', overflowY: 'auto' }}>
+      <div style={{ maxWidth: '72rem', margin: '0 auto' }}>
       {/* Greeting */}
       <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700, color: '#111827' }}>
         Hola, {user?.nombre || 'aliado'} 👋
@@ -222,7 +223,7 @@ export default function Dashboard() {
       </p>
 
       {/* ── Row 1: Stat cards ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 14, marginBottom: 20 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 16, marginBottom: 16 }}>
         {cards.map((c) => {
           const Icon = c.icon
           return (
@@ -285,7 +286,7 @@ export default function Dashboard() {
       </div>
 
       {/* ── Row 2: Actividad + Rendimiento ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 400px', gap: 14 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: 16 }}>
 
         {/* Actividad reciente */}
         <div style={{
@@ -451,6 +452,7 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+      </div>  {/* max-width wrapper */}
     </div>
   )
 }
