@@ -5,6 +5,110 @@ import { useAuth } from '../../context/AuthContext'
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 const MESES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic']
 const fmt = n => n ? ('$' + Math.round(n).toLocaleString('es-CO')) : '—'
+const fmtCV = n => n ? new Intl.NumberFormat('es-CO', { style:'currency', currency:'COP', maximumFractionDigits:0 }).format(n) : null
+
+// ── Tooltips de coberturas ────────────────────────────────────────────────────
+const COVERAGE_TIPS = {
+  'responsabilidad civil extracontractual': 'Si en un accidente le causas daños al carro de otra persona o la hieres, la aseguradora paga por ti. Sin esto, tendrías que pagarlo de tu bolsillo.',
+  'responsabilidad civil': 'Si chocas y le dañas el carro a alguien, o atropellas a una persona, la aseguradora responde económicamente por ti ante el afectado.',
+  'todo riesgo': 'Si chocas, te rayan el carro o sufre cualquier daño, la aseguradora paga la reparación aunque el accidente haya sido culpa tuya.',
+  'daños propios': 'Si chocas el carro contra otro vehículo o un poste, la aseguradora cubre el costo de reparación de tu propio vehículo.',
+  'colisión': 'Si chocas el carro contra otro objeto o vehículo, la aseguradora paga la reparación, sin importar quién tuvo la culpa.',
+  'pérdida parcial': 'Si el carro sufre daños que se pueden reparar (como un golpe o raspón), la aseguradora paga la reparación.',
+  'pérdida total por accidente': 'Si el carro choca tan fuerte que no vale la pena repararlo, la aseguradora te paga el valor comercial del carro.',
+  'pérdida total': 'Si el carro queda destruido o los daños superan el 75% de su valor, la aseguradora te paga el precio de mercado del vehículo.',
+  'pérdida total por hurto': 'Si te roban el carro y después de 30 días no aparece, la aseguradora te paga el valor comercial del vehículo.',
+  'hurto parcial': 'Si te roban partes del carro (espejos, rines, batería, etc.), la aseguradora cubre el reemplazo de esas piezas.',
+  'hurto': 'Si te roban el carro completamente y no aparece, la aseguradora te paga su valor comercial.',
+  'robo': 'Si te roban el carro, la aseguradora cubre el valor del vehículo si no es recuperado en cierto plazo.',
+  'asistencia en carretera': 'Si el carro se daña lejos de casa, la aseguradora envía un técnico, grúa o combustible para ayudarte donde estés.',
+  'grúa': 'Si el carro no puede moverse por un accidente o daño mecánico, la aseguradora paga el traslado al taller más cercano.',
+  'auto sustituto': 'Mientras tu carro está en el taller, la aseguradora te presta otro vehículo para que no quedes sin transporte.',
+  'cristales': 'Si se rompen el parabrisas o las ventanas del carro, la aseguradora paga su reemplazo aunque no haya habido un choque.',
+  'incendio': 'Si el carro se incendia, ya sea por falla mecánica, cortocircuito u otro motivo, la aseguradora cubre los daños.',
+  'terremoto': 'Si un sismo o erupción volcánica daña tu carro, la aseguradora lo cubre.',
+  'fenómenos naturales': 'Si una inundación, vendaval, granizo o avalancha daña el carro, la aseguradora paga la reparación.',
+  'inundación': 'Si el carro se daña porque quedó bajo el agua por una lluvia intensa o desbordamiento, la aseguradora lo cubre.',
+  'actos mal intencionados': 'Si alguien raya el carro, le rompe vidrios o lo daña intencionalmente, la aseguradora cubre la reparación.',
+  'vandalismo': 'Si desconocidos dañan el carro a propósito (pintura rayada, espejos rotos, etc.), la aseguradora paga la reparación.',
+  'llamada médica': 'Si tienes una urgencia médica en carretera, puedes llamar 24/7 a un médico que te orienta sobre qué hacer o a dónde ir.',
+  'orientación jurídica': 'Si tienes un accidente y necesitas asesoría legal, la aseguradora te conecta con un abogado para guiarte.',
+  'traslado de pasajeros': 'Si el carro se daña lejos de la ciudad, la aseguradora paga el regreso de los pasajeros a su lugar de origen.',
+  'taxi': 'Si el carro está en el taller, la aseguradora te cubre algunos viajes en taxi para que no quedes sin movilidad.',
+  'accesorios': 'Si te roban o dañan elementos del carro como parlantes, rines o pantallas, la aseguradora los reemplaza.',
+  'rc': 'Si en un accidente le causas daños a otra persona o a su vehículo, la aseguradora paga por ti.',
+}
+
+function getCoverageTip(name = '') {
+  const lower = name.toLowerCase()
+  const key = Object.keys(COVERAGE_TIPS).find(k => lower.includes(k))
+  return key ? COVERAGE_TIPS[key] : null
+}
+
+function CovTooltip({ name }) {
+  const [show, setShow] = useState(false)
+  const tip = getCoverageTip(name)
+  return (
+    <span style={{ display:'inline-flex', alignItems:'center', gap:4, position:'relative' }}>
+      <span style={{ fontSize:11, color:'#374151' }}>{name}</span>
+      {tip && (
+        <>
+          <span
+            onMouseEnter={() => setShow(true)} onMouseLeave={() => setShow(false)}
+            style={{ width:13, height:13, borderRadius:'50%', background:'#e5e7eb', color:'#6b7280',
+                     fontSize:8, fontWeight:800, display:'inline-flex', alignItems:'center',
+                     justifyContent:'center', cursor:'help', flexShrink:0, lineHeight:1 }}>
+            ?
+          </span>
+          {show && (
+            <span style={{ position:'absolute', bottom:'calc(100% + 6px)', left:0, background:'#111827',
+                           color:'#fff', fontSize:11, padding:'8px 11px', borderRadius:9, zIndex:300,
+                           lineHeight:1.5, width:230, boxShadow:'0 4px 16px rgba(0,0,0,0.2)',
+                           pointerEvents:'none', whiteSpace:'normal' }}>
+              {tip}
+            </span>
+          )}
+        </>
+      )}
+    </span>
+  )
+}
+
+// ── Tooltip Full vs Básico ────────────────────────────────────────────────────
+const PLAN_TIPS = {
+  full: 'El plan completo incluye cobertura TODO RIESGO: protege tu carro contra daños propios (choques, raspones, rayones, volcamiento), pérdida total, hurto, cristales, fenómenos naturales y más. También cubre responsabilidad civil ante terceros y servicios adicionales como grúa y auto sustituto. Es la protección más amplia que puedes tener.',
+  basico: 'El plan básico cubre lo esencial: responsabilidad civil ante terceros (si le causas daño a otra persona o vehículo) y pérdida total (si el carro queda destruido o lo roban y no aparece). No cubre daños propios por choques o raspones. Es ideal si buscas un costo menor con lo mínimo indispensable.',
+}
+
+function PlanTipoTooltip({ tipo }) {
+  const [show, setShow] = useState(false)
+  const tip = PLAN_TIPS[tipo]
+  const label = tipo === 'full' ? 'Plan Completo (Full)' : 'Plan Básico'
+  const color = tipo === 'full' ? '#7c3aed' : '#2563eb'
+  const bg = tipo === 'full' ? '#ede9fe' : '#dbeafe'
+  return (
+    <span style={{ display:'inline-flex', alignItems:'center', gap:5, position:'relative' }}>
+      <span style={{ background:bg, color, fontSize:11, fontWeight:700, padding:'3px 10px', borderRadius:99 }}>
+        {label}
+      </span>
+      <span
+        onMouseEnter={() => setShow(true)} onMouseLeave={() => setShow(false)}
+        style={{ width:15, height:15, borderRadius:'50%', background:'#e5e7eb', color:'#6b7280',
+                 fontSize:9, fontWeight:800, display:'inline-flex', alignItems:'center',
+                 justifyContent:'center', cursor:'help', flexShrink:0 }}>
+        ?
+      </span>
+      {show && (
+        <span style={{ position:'absolute', bottom:'calc(100% + 8px)', left:0, background:'#111827',
+                       color:'#fff', fontSize:11, padding:'10px 13px', borderRadius:10, zIndex:300,
+                       lineHeight:1.6, width:260, boxShadow:'0 4px 20px rgba(0,0,0,0.25)',
+                       pointerEvents:'none', whiteSpace:'normal' }}>
+          {tip}
+        </span>
+      )}
+    </span>
+  )
+}
 
 const ESTADO_BADGE = {
   enviada: { bg:'#dcfce7', color:'#16a34a', label:'Enviada a emitir'    },
@@ -142,13 +246,15 @@ function CotizacionModal({ cotizacion, token, user, onClose, onDeleted, onEmitid
           {/* Datos del cliente */}
           <div style={{ background:'#f9fafb', borderRadius:12, padding:'14px 16px', marginBottom:16 }}>
             <p style={{ margin:'0 0 4px', fontSize:13, fontWeight:700, color:'#111827' }}>{nombre}</p>
-            {(cedula || placa) && (
-              <p style={{ margin:0, fontSize:12, color:'#6b7280' }}>
-                {tipoCedula && cedula ? `${tipoCedula} ${cedula}` : cedula || ''}
-                {cedula && placa ? ' · ' : ''}
-                {placa || ''}
-              </p>
-            )}
+            <p style={{ margin:0, fontSize:12, color:'#6b7280' }}>
+              {tipoCedula && cedula ? `${tipoCedula} ${cedula}` : cedula || '—'}
+              {placa ? ` · ${placa}` : ''}
+            </p>
+            {/* Valor asegurado — siempre visible */}
+            <p style={{ margin:'6px 0 0', fontSize:12, color:'#374151' }}>
+              <span style={{ color:'#9ca3af' }}>Valor asegurado: </span>
+              <strong>{fmtCV(cotizacion.comercial_value || datos.commercial_value) || 'No registrado'}</strong>
+            </p>
           </div>
 
           {/* Estado y tiempo */}
@@ -176,51 +282,70 @@ function CotizacionModal({ cotizacion, token, user, onClose, onDeleted, onEmitid
               </h3>
               {quotes.length === 0 ? (
                 <div style={{ textAlign:'center', padding:'24px 0', color:'#9ca3af', fontSize:13 }}>
-                  Sin planes disponibles para esta cotización
+                  Sin planes disponibles — esta cotización fue guardada antes de la última actualización
                 </div>
-              ) : (
-                <div style={{ display:'flex', flexDirection:'column', gap:8, marginBottom:16 }}>
-                  {quotes.map((q, i) => {
-                    const isSel = selectedPlan?.insuranceCode === q.insuranceCode && selectedPlan?.company === q.company
-                    return (
-                      <div
-                        key={i}
-                        onClick={() => puedeEmitir && emitPhase === 'select' ? setSelectedPlan(q) : undefined}
-                        style={{
-                          border: isSel ? '2px solid #2D2A7A' : '1.5px solid #e5e7eb',
-                          borderRadius:12, padding:'12px 14px',
-                          cursor: puedeEmitir && emitPhase === 'select' ? 'pointer' : 'default',
-                          background: isSel ? '#f5f4ff' : '#fff',
-                          transition:'border-color 0.15s, background 0.15s',
-                          display:'flex', alignItems:'center', gap:12,
-                        }}
-                      >
-                        {q.logo && (
-                          <img src={q.logo} alt={q.company}
-                            style={{ width:48, height:28, objectFit:'contain', flexShrink:0 }}
-                            onError={e => e.currentTarget.style.display='none'} />
-                        )}
-                        <div style={{ flex:1, minWidth:0 }}>
-                          <p style={{ margin:0, fontSize:13, fontWeight:700, color:'#111827' }}>{q.company}</p>
-                          {q.main?.length > 0 && (
-                            <p style={{ margin:'2px 0 0', fontSize:11, color:'#6b7280', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
-                              {q.main.slice(0,3).join(' · ')}
-                            </p>
-                          )}
-                        </div>
-                        <div style={{ textAlign:'right', flexShrink:0 }}>
-                          <p style={{ margin:0, fontSize:15, fontWeight:800, color:'#111827' }}>{fmt(q.price)}</p>
-                          <p style={{ margin:0, fontSize:10, color:'#9ca3af' }}>anual</p>
-                        </div>
-                        {puedeEmitir && emitPhase === 'select' && (
-                          <div style={{ width:18, height:18, borderRadius:'50%', border:`2px solid ${isSel?'#2D2A7A':'#d1d5db'}`,
-                                        background: isSel ? '#2D2A7A' : '#fff', flexShrink:0 }} />
-                        )}
-                      </div>
-                    )
-                  })}
-                </div>
-              )}
+              ) : (() => {
+                const fullPlans  = quotes.filter(q => q.productFull)
+                const basicPlans = quotes.filter(q => !q.productFull)
+                const renderGroup = (plans, tipo) => plans.length === 0 ? null : (
+                  <div key={tipo} style={{ marginBottom:14 }}>
+                    <div style={{ marginBottom:8 }}>
+                      <PlanTipoTooltip tipo={tipo} />
+                    </div>
+                    <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
+                      {plans.map((q, i) => {
+                        const isSel = selectedPlan?.insuranceCode === q.insuranceCode && selectedPlan?.company === q.company
+                        return (
+                          <div
+                            key={i}
+                            onClick={() => puedeEmitir && emitPhase === 'select' ? setSelectedPlan(q) : undefined}
+                            style={{
+                              border: isSel ? '2px solid #2D2A7A' : '1.5px solid #e5e7eb',
+                              borderRadius:12, padding:'12px 14px',
+                              cursor: puedeEmitir && emitPhase === 'select' ? 'pointer' : 'default',
+                              background: isSel ? '#f5f4ff' : '#fff',
+                              transition:'border-color 0.15s, background 0.15s',
+                            }}
+                          >
+                            {/* Fila superior: logo + empresa + precio */}
+                            <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom: q.main?.length > 0 ? 8 : 0 }}>
+                              {q.logo && (
+                                <img src={q.logo} alt={q.company}
+                                  style={{ width:44, height:26, objectFit:'contain', flexShrink:0 }}
+                                  onError={e => e.currentTarget.style.display='none'} />
+                              )}
+                              <p style={{ margin:0, fontSize:13, fontWeight:700, color:'#111827', flex:1 }}>{q.company}</p>
+                              <div style={{ textAlign:'right', flexShrink:0 }}>
+                                <p style={{ margin:0, fontSize:15, fontWeight:800, color:'#111827' }}>{fmt(q.price)}</p>
+                                <p style={{ margin:0, fontSize:10, color:'#9ca3af' }}>anual</p>
+                              </div>
+                              {puedeEmitir && emitPhase === 'select' && (
+                                <div style={{ width:18, height:18, borderRadius:'50%', border:`2px solid ${isSel?'#2D2A7A':'#d1d5db'}`,
+                                              background: isSel ? '#2D2A7A' : '#fff', flexShrink:0 }} />
+                              )}
+                            </div>
+                            {/* Coberturas con tooltips */}
+                            {q.main?.length > 0 && (
+                              <div style={{ display:'flex', flexWrap:'wrap', gap:'4px 8px', paddingTop:4,
+                                            borderTop:'1px solid #f3f4f6' }}>
+                                {q.main.map((cov, ci) => (
+                                  <CovTooltip key={ci} name={cov} />
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )
+                return (
+                  <div style={{ marginBottom:16 }}>
+                    {renderGroup(fullPlans, 'full')}
+                    {renderGroup(basicPlans, 'basico')}
+                  </div>
+                )
+              })()}
 
               {/* Alerta: ya enviada */}
               {!noEnviada && (
