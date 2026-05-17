@@ -396,44 +396,54 @@ export default function Cotizar() {
     if (phase === 'results') fetchQuotes()
   }, [phase])
 
+  // Ref siempre actualizado — resuelve stale closure en cleanup
+  const saveRef = React.useRef({})
+  saveRef.current = { plate, form, vehicleModel, commercialValue, cityName, fullPlans, basicPlans, cotSaved }
+
   async function saveCotizacion() {
-    if (cotSaved || !plate) return
+    const s = saveRef.current
+    if (s.cotSaved || !s.plate) return
     try {
+      const nombre = `${s.form.nombre} ${s.form.apellido}`.trim() || null
       const formData = {
-        placa: plate,
-        vehicleModel,
-        comercial_value: commercialValue,
-        cliente_nombre: `${form.nombre} ${form.apellido}`.trim() || null,
-        cliente_telefono: form.celular || null,
-        cliente_correo: form.correo || null,
-        cliente_cedula: form.numDoc || null,
-        cliente_tipo_doc: form.tipoDoc || null,
+        placa: s.plate,
+        vehicleModel: s.vehicleModel,
+        comercial_value: s.commercialValue,
+        cliente_nombre: nombre,
+        cliente_telefono: s.form.celular || null,
+        cliente_correo: s.form.correo || null,
+        cliente_cedula: s.form.numDoc || null,
+        cliente_tipo_doc: s.form.tipoDoc || null,
         datos_cotizacion: {
-          form: { nombre: form.nombre, apellido: form.apellido, correo: form.correo, celular: form.celular, ciudad: cityName },
-          commercial_value: commercialValue,
-          planes_full: fullPlans.length,
-          planes_basico: basicPlans.length,
-          mejor_precio: [...fullPlans, ...basicPlans].length > 0
-            ? Math.min(...[...fullPlans, ...basicPlans].map(p => p.price)) : null,
+          form: { nombre: s.form.nombre, apellido: s.form.apellido, correo: s.form.correo, celular: s.form.celular, ciudad: s.cityName },
+          commercial_value: s.commercialValue,
+          planes_full: s.fullPlans.length,
+          planes_basico: s.basicPlans.length,
+          mejor_precio: [...s.fullPlans, ...s.basicPlans].length > 0
+            ? Math.min(...[...s.fullPlans, ...s.basicPlans].map(p => p.price)) : null,
         },
       }
       const r = await fetch(`${API}/api/cotizar/guardar`, {
         method: 'POST',
-        headers: authH,
+        headers: { Authorization:`Bearer ${getToken()}`, 'Content-Type':'application/json' },
         body: JSON.stringify(formData),
       })
       const d = await r.json()
       if (d.id) cotizacionIdRef.current = d.id
+      saveRef.current.cotSaved = true
       setCotSaved(true)
     } catch {}
   }
 
+  // Guardar al entrar a resultados (form completo disponible)
   useEffect(() => {
-    return () => {
-      // Save on component unmount (navigation away)
-      saveCotizacion()
-    }
-  }, [plate, fullPlans, basicPlans, cotSaved])
+    if (phase === 'results') saveCotizacion()
+  }, [phase])
+
+  // Guardar al salir (respaldo por si no llegó a resultados)
+  useEffect(() => {
+    return () => { saveCotizacion() }
+  }, []) // solo en unmount
 
   function handleElegir(plan) {
     setPendingPlan(plan)
