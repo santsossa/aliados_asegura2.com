@@ -525,25 +525,48 @@ function CotizacionModal({ cotizacion, token, user, onClose, onDeleted, onEmitid
   )
 }
 
-// ── File upload field ─────────────────────────────────────────────────────────
-function FileField({ label, file, onChange, accept }) {
+// ── Drag & Drop file field ────────────────────────────────────────────────────
+function FileField({ label, file, onChange, accept = '.pdf,.jpg,.jpeg,.png' }) {
+  const [dragging, setDragging] = useState(false)
   const ref = useRef()
+
+  const handleDrop = (e) => {
+    e.preventDefault(); setDragging(false)
+    const f = e.dataTransfer.files?.[0]
+    if (f) onChange(f)
+  }
+
+  const border = file ? '#2D2A7A' : dragging ? '#6366f1' : '#d1d5db'
+  const bg     = file ? '#f5f4ff' : dragging ? '#eef2ff' : '#f9fafb'
+
   return (
     <div style={{ marginBottom:12 }}>
       <p style={{ margin:'0 0 6px', fontSize:12, fontWeight:600, color:'#374151' }}>{label}</p>
       <div
+        onDrop={handleDrop}
+        onDragOver={e => { e.preventDefault(); setDragging(true) }}
+        onDragLeave={() => setDragging(false)}
         onClick={() => ref.current?.click()}
-        style={{
-          border: `2px dashed ${file ? '#2D2A7A' : '#d1d5db'}`,
-          borderRadius:10, padding:'12px 16px', cursor:'pointer',
-          background: file ? '#f5f4ff' : '#f9fafb',
-          display:'flex', alignItems:'center', gap:10,
-          transition:'border-color 0.15s, background 0.15s',
-        }}>
-        <span style={{ fontSize:20 }}>{file ? '📄' : '📎'}</span>
-        <span style={{ fontSize:12, color: file ? '#2D2A7A' : '#9ca3af', fontWeight: file ? 600 : 400 }}>
-          {file ? file.name : 'Toca para seleccionar archivo'}
+        style={{ border:`2px dashed ${border}`, borderRadius:10, padding:'14px 16px',
+                 cursor:'pointer', background:bg, transition:'all 0.2s',
+                 display:'flex', alignItems:'center', gap:10 }}>
+        <span style={{ fontSize:20, flexShrink:0 }}>
+          {file ? (file.name.endsWith('.pdf') ? '📄' : '🖼️') : dragging ? '📂' : '📎'}
         </span>
+        <div style={{ flex:1, minWidth:0 }}>
+          <p style={{ margin:0, fontSize:12, fontWeight: file ? 600 : 400,
+                      color: file ? '#2D2A7A' : dragging ? '#6366f1' : '#9ca3af',
+                      overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+            {file ? file.name : dragging ? 'Suelta aquí' : 'Arrastra o toca para adjuntar'}
+          </p>
+          {!file && <p style={{ margin:'1px 0 0', fontSize:10, color:'#9ca3af' }}>PDF, JPG o PNG</p>}
+        </div>
+        {file && (
+          <button type="button" onClick={e => { e.stopPropagation(); onChange(null) }}
+            style={{ background:'none', border:'none', cursor:'pointer', color:'#9ca3af', fontSize:14, padding:0, flexShrink:0 }}>
+            ✕
+          </button>
+        )}
       </div>
       <input ref={ref} type="file" accept={accept} style={{ display:'none' }}
         onChange={e => onChange(e.target.files?.[0] || null)} />

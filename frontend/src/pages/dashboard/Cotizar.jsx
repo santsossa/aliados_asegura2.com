@@ -272,6 +272,58 @@ function PlanCard({ plan, onElegir }) {
   )
 }
 
+// ── Drag & Drop file upload ───────────────────────────────────────────────────
+function DragDropFile({ label, file, onChange, accept = '.pdf,.jpg,.jpeg,.png' }) {
+  const [dragging, setDragging] = React.useState(false)
+  const inputRef = React.useRef()
+
+  const handleDrop = (e) => {
+    e.preventDefault(); setDragging(false)
+    const f = e.dataTransfer.files?.[0]
+    if (f) onChange(f)
+  }
+  const handleDragOver = (e) => { e.preventDefault(); setDragging(true) }
+  const handleDragLeave = () => setDragging(false)
+
+  const border = file ? '#2D2A7A' : dragging ? '#6366f1' : '#e5e7eb'
+  const bg     = file ? '#f0f0fd' : dragging ? '#eef2ff' : '#f9fafb'
+
+  return (
+    <div style={{ marginBottom:16 }}>
+      <div style={{ fontSize:12, fontWeight:600, color:'#374151', marginBottom:6 }}>{label}</div>
+      <div
+        onDrop={handleDrop} onDragOver={handleDragOver} onDragLeave={handleDragLeave}
+        onClick={() => inputRef.current?.click()}
+        style={{ border:`2px dashed ${border}`, borderRadius:12, padding:'18px 16px',
+                 cursor:'pointer', background:bg, transition:'all 0.2s',
+                 display:'flex', alignItems:'center', gap:12 }}
+      >
+        <span style={{ fontSize:26, flexShrink:0 }}>
+          {file ? (file.name.endsWith('.pdf') ? '📄' : '🖼️') : dragging ? '📂' : '📎'}
+        </span>
+        <div style={{ flex:1, minWidth:0 }}>
+          <p style={{ margin:0, fontSize:13, fontWeight: file ? 700 : 400,
+                      color: file ? '#2D2A7A' : dragging ? '#6366f1' : '#9ca3af',
+                      overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+            {file ? file.name : dragging ? 'Suelta el archivo aquí' : 'Arrastra o toca para adjuntar'}
+          </p>
+          {!file && <p style={{ margin:'2px 0 0', fontSize:11, color:'#9ca3af' }}>PDF, JPG o PNG</p>}
+        </div>
+        {file && (
+          <button
+            type="button"
+            onClick={e => { e.stopPropagation(); onChange(null) }}
+            style={{ background:'none', border:'none', cursor:'pointer', color:'#9ca3af', fontSize:16, padding:0, flexShrink:0 }}>
+            ✕
+          </button>
+        )}
+      </div>
+      <input ref={inputRef} type="file" accept={accept} style={{ display:'none' }}
+        onChange={e => onChange(e.target.files?.[0] || null)} />
+    </div>
+  )
+}
+
 /* ── styles ──────────────────────────────────────────────────────────────── */
 const card = { background:'#fff', borderRadius:20, padding:'28px 24px', boxShadow:'0 2px 20px rgba(0,0,0,0.06)', maxWidth:520, margin:'0 auto' }
 const btnP = (disabled=false) => ({ background: disabled ? '#9ca3af':'#2D2A7A', color:'#fff', border:'none', borderRadius:99, padding:'12px 28px', fontSize:14, fontWeight:700, cursor: disabled?'not-allowed':'pointer', transition:'background 0.2s' })
@@ -861,22 +913,8 @@ export default function Cotizar() {
           <h2 style={{ fontSize:16,fontWeight:800,color:'#111827',marginBottom:4 }}>Documentos requeridos</h2>
           <p style={{ fontSize:13,color:'#9ca3af',marginBottom:20 }}>Adjunta los documentos del cliente en PDF o imagen.</p>
 
-          {[
-            { key:'cedula', label:'Cédula del titular *', file:cedulaFile, setFile:setCedulaFile },
-            { key:'tarjeta', label:'Tarjeta de propiedad *', file:tarjetaFile, setFile:setTarjetaFile },
-          ].map(({ key,label,file,setFile }) => (
-            <div key={key} style={{ marginBottom:16 }}>
-              <div style={{ fontSize:12,fontWeight:600,color:'#374151',marginBottom:6 }}>{label}</div>
-              <label style={{ display:'flex',alignItems:'center',gap:12,border:`2px dashed ${file?'#2D2A7A':'#e5e7eb'}`,borderRadius:12,padding:'16px',cursor:'pointer',background:file?'#f0f0fd':'#f9fafb',transition:'all 0.2s' }}>
-                <span style={{ fontSize:24 }}>{file ? '📄' : '📎'}</span>
-                <span style={{ fontSize:13,color:file?'#2D2A7A':'#9ca3af',fontWeight:file?700:400 }}>
-                  {file ? file.name : 'Click para adjuntar...'}
-                </span>
-                <input type="file" accept=".pdf,.jpg,.jpeg,.png" style={{ display:'none' }}
-                  onChange={e => setFile(e.target.files?.[0]||null)} />
-              </label>
-            </div>
-          ))}
+          <DragDropFile label="Cédula del titular *" file={cedulaFile} onChange={setCedulaFile} />
+          <DragDropFile label="Tarjeta de propiedad *" file={tarjetaFile} onChange={setTarjetaFile} />
 
           {sendErr && <p style={{ color:'#dc2626',fontSize:13,marginBottom:12 }}>{sendErr}</p>}
           <button type="submit" disabled={sending || !cedulaFile || !tarjetaFile}
