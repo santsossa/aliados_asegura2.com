@@ -47,28 +47,24 @@ function getCoverageTip(name = '') {
 
 function CovTooltip({ name }) {
   const [show, setShow] = useState(false)
-  const tip = getCoverageTip(name)
+  const tip = getCoverageTip(name) || 'Esta cobertura forma parte del plan seleccionado. Consulta a tu asesor de Asegura2 para más detalles sobre sus condiciones específicas.'
   return (
     <span style={{ display:'inline-flex', alignItems:'center', gap:4, position:'relative' }}>
       <span style={{ fontSize:11, color:'#374151' }}>{name}</span>
-      {tip && (
-        <>
-          <span
-            onMouseEnter={() => setShow(true)} onMouseLeave={() => setShow(false)}
-            style={{ width:13, height:13, borderRadius:'50%', background:'#e5e7eb', color:'#6b7280',
-                     fontSize:8, fontWeight:800, display:'inline-flex', alignItems:'center',
-                     justifyContent:'center', cursor:'help', flexShrink:0, lineHeight:1 }}>
-            ?
-          </span>
-          {show && (
-            <span style={{ position:'absolute', bottom:'calc(100% + 6px)', left:0, background:'#111827',
-                           color:'#fff', fontSize:11, padding:'8px 11px', borderRadius:9, zIndex:300,
-                           lineHeight:1.5, width:230, boxShadow:'0 4px 16px rgba(0,0,0,0.2)',
-                           pointerEvents:'none', whiteSpace:'normal' }}>
-              {tip}
-            </span>
-          )}
-        </>
+      <span
+        onMouseEnter={() => setShow(true)} onMouseLeave={() => setShow(false)}
+        style={{ width:13, height:13, borderRadius:'50%', background:'#e5e7eb', color:'#6b7280',
+                 fontSize:8, fontWeight:800, display:'inline-flex', alignItems:'center',
+                 justifyContent:'center', cursor:'help', flexShrink:0, lineHeight:1 }}>
+        ?
+      </span>
+      {show && (
+        <span style={{ position:'absolute', bottom:'calc(100% + 6px)', left:0, background:'#111827',
+                       color:'#fff', fontSize:11, padding:'8px 11px', borderRadius:9, zIndex:300,
+                       lineHeight:1.5, width:240, boxShadow:'0 4px 16px rgba(0,0,0,0.2)',
+                       pointerEvents:'none', whiteSpace:'normal' }}>
+          {tip}
+        </span>
       )}
     </span>
   )
@@ -120,7 +116,12 @@ function getBadge(estado) {
 
 // ── Modal de detalle ──────────────────────────────────────────────────────────
 function CotizacionModal({ cotizacion, token, user, onClose, onDeleted, onEmitida }) {
-  const datos = (() => { try { return JSON.parse(cotizacion.datos_cotizacion || '{}') } catch { return {} } })()
+  const datos = (() => {
+    const raw = cotizacion.datos_cotizacion
+    if (!raw) return {}
+    if (typeof raw === 'object') return raw
+    try { return JSON.parse(raw) } catch { return {} }
+  })()
   const quotes = (datos.quotes || []).sort((a, b) => a.price - b.price)
   const formFull = datos.form_full || {}
 
@@ -549,8 +550,9 @@ export default function Cotizaciones() {
       ) : (
         <div className="space-y-3">
           {cotizaciones.map(c => {
+            const raw = c.datos_cotizacion
             let datos = {}
-            try { datos = JSON.parse(c.datos_cotizacion || '{}') } catch {}
+            if (raw) { if (typeof raw === 'object') datos = raw; else try { datos = JSON.parse(raw) } catch {} }
             const badge = getBadge(c.estado)
             const fecha = new Date(c.created_at)
             const fechaStr = `${fecha.getDate()} ${MESES[fecha.getMonth()]} ${fecha.getFullYear()}`

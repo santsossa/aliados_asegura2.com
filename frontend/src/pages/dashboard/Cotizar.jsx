@@ -1,4 +1,5 @@
 import React, { useState, useEffect, Fragment } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import ComboBox from '../../components/ComboBox'
 
@@ -129,8 +130,7 @@ function getCoverageTip(name = '') {
 
 function CovTooltip({ name }) {
   const [show, setShow] = React.useState(false)
-  const tip = getCoverageTip(name)
-  if (!tip) return <span>{name}</span>
+  const tip = getCoverageTip(name) || 'Esta cobertura forma parte del plan seleccionado. Consulta a tu asesor de Asegura2 para más detalles sobre sus condiciones específicas.'
   return (
     <span style={{ display:'inline-flex', alignItems:'center', gap:4, position:'relative' }}>
       <span>{name}</span>
@@ -145,7 +145,36 @@ function CovTooltip({ name }) {
       {show && (
         <span style={{ position:'absolute', bottom:'calc(100% + 6px)', left:0, background:'#111827',
                        color:'#fff', fontSize:11, padding:'7px 10px', borderRadius:8, zIndex:200,
-                       lineHeight:1.5, maxWidth:220, boxShadow:'0 4px 16px rgba(0,0,0,0.2)',
+                       lineHeight:1.5, maxWidth:240, boxShadow:'0 4px 16px rgba(0,0,0,0.2)',
+                       pointerEvents:'none', whiteSpace:'normal' }}>
+          {tip}
+        </span>
+      )}
+    </span>
+  )
+}
+
+// ── Tooltip Plan Full vs Básico ───────────────────────────────────────────────
+const PLAN_TIPO_TIPS = {
+  full: 'El plan COMPLETO (Full) cubre todo riesgo: protege tu carro contra daños propios por choques, raspones, volcamiento, pérdida total, hurto, cristales y fenómenos naturales. También incluye responsabilidad civil ante terceros y servicios como grúa, auto sustituto y asistencia en carretera. Es la protección más amplia disponible.',
+  basico: 'El plan BÁSICO cubre lo esencial: responsabilidad civil ante terceros (si le causas daño a otra persona o su vehículo) y pérdida total (si el carro queda destruido o es robado y no aparece). No cubre daños propios por choques ni raspones. Ideal para quienes buscan el menor costo con lo mínimo indispensable.',
+}
+function PlanTipoTooltip({ tipo }) {
+  const [show, setShow] = React.useState(false)
+  const tip = PLAN_TIPO_TIPS[tipo]
+  return (
+    <span style={{ position:'relative', display:'inline-flex', alignItems:'center', gap:5 }}>
+      <span
+        onMouseEnter={() => setShow(true)} onMouseLeave={() => setShow(false)}
+        style={{ width:16, height:16, borderRadius:'50%', background:'#e5e7eb', color:'#6b7280',
+                 fontSize:9, fontWeight:800, display:'inline-flex', alignItems:'center',
+                 justifyContent:'center', cursor:'help', flexShrink:0 }}>
+        ?
+      </span>
+      {show && (
+        <span style={{ position:'absolute', bottom:'calc(100% + 8px)', left:0, background:'#111827',
+                       color:'#fff', fontSize:11, padding:'10px 13px', borderRadius:10, zIndex:300,
+                       lineHeight:1.6, width:270, boxShadow:'0 4px 20px rgba(0,0,0,0.25)',
                        pointerEvents:'none', whiteSpace:'normal' }}>
           {tip}
         </span>
@@ -253,6 +282,7 @@ const btnS = { background:'none', border:'1.5px solid #e5e7eb', borderRadius:99,
 ══════════════════════════════════════════════════════════════════════════ */
 export default function Cotizar() {
   const { getToken, user } = useAuth()
+  const navigate = useNavigate()
   const [phase, setPhase] = useState('placa')
   const [plate, setPlate] = useState('')
   const [step,  setStep]  = useState(1)
@@ -525,13 +555,14 @@ export default function Cotizar() {
 
   function reset() {
     quotesLoadedRef.current = false
+    saveRef.current.cotSaved = false
+    cotizacionIdRef.current = null
     setPhase('placa'); setPlate(''); setStep(1)
     setFullPlans([]); setBasicPlans([]); setSelectedPlan(null)
     setCedulaFile(null); setTarjetaFile(null); setSendErr('')
     setVehicleModel(''); setCommercialValue(null)
     setForm({ nombre:'', apellido:'', gender:'', tipoDoc:'CC', numDoc:'', diaNac:'', mesNac:'', anioNac:'', correo:'', ciudad:'', celular:'' })
-    cotizacionIdRef.current = null
-    saveRef.current.cotSaved = false
+    navigate('/dashboard')
   }
 
   const step1Ok = form.nombre.trim().length>=2 && form.apellido.trim().length>=2 && !!form.gender
@@ -673,15 +704,9 @@ export default function Cotizar() {
           <button onClick={() => setPhase('form')} style={{ marginLeft:'auto',fontSize:12,color:'#a5b4fc',background:'none',border:'1px solid rgba(255,255,255,0.3)',borderRadius:99,padding:'4px 12px',cursor:'pointer' }}>← Editar datos</button>
         </div>
 
-        {commercialValue != null && commercialValue > 0 ? (
-          <div style={{ background:'#fef9c3', border:'1px solid #fde68a', borderRadius:10, padding:'8px 16px', marginBottom:12, fontSize:13, color:'#92400e', fontWeight:600 }}>
-            🚗 Valor asegurado del vehículo: {fmt(commercialValue)}
-          </div>
-        ) : !loadingQ && (
-          <div style={{ background:'#f9fafb', border:'1px solid #e5e7eb', borderRadius:10, padding:'7px 16px', marginBottom:12, fontSize:12, color:'#9ca3af' }}>
-            ℹ️ Valor asegurado no disponible para esta placa (se usa el valor de referencia de cada aseguradora)
-          </div>
-        )}
+        <div style={{ background: commercialValue ? '#fef9c3' : '#f9fafb', border:`1px solid ${commercialValue ? '#fde68a' : '#e5e7eb'}`, borderRadius:10, padding:'8px 16px', marginBottom:12, fontSize:13, color: commercialValue ? '#92400e' : '#9ca3af', fontWeight:600 }}>
+          🚗 Valor asegurado del vehículo: {commercialValue ? fmt(commercialValue) : 'No disponible para esta placa — cada aseguradora usa su valor de referencia'}
+        </div>
 
         {/* Cerrar cotización */}
         <div style={{ display:'flex', justifyContent:'flex-end', marginBottom:12 }}>
@@ -730,8 +755,11 @@ export default function Cotizar() {
         {fullPlans.length>0 && <div style={{ marginBottom:20 }}>
           <div style={{ display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:10 }}>
             <div>
-              <h2 style={{ fontSize:15,fontWeight:800,color:'#111827',margin:0 }}>Planes Full</h2>
-              <p style={{ fontSize:12,color:'#9ca3af',margin:0 }}>Cobertura completa con todas las asistencias</p>
+                  <div style={{ display:'flex', alignItems:'center', gap:6 }}>
+                <h2 style={{ fontSize:15,fontWeight:800,color:'#111827',margin:0 }}>Planes Completos (Full)</h2>
+                <PlanTipoTooltip tipo="full" />
+              </div>
+              <p style={{ fontSize:12,color:'#9ca3af',margin:0 }}>Todo riesgo: daños propios, hurto, cristales y más</p>
             </div>
             <span style={{ background:'#ede9fe',color:'#7c3aed',fontSize:12,fontWeight:700,padding:'3px 10px',borderRadius:99 }}>{fullPlans.length} opciones</span>
           </div>
@@ -742,8 +770,11 @@ export default function Cotizar() {
         {basicPlans.length>0 && <div>
           <div style={{ display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:10 }}>
             <div>
-              <h2 style={{ fontSize:15,fontWeight:800,color:'#111827',margin:0 }}>Planes Básicos</h2>
-              <p style={{ fontSize:12,color:'#9ca3af',margin:0 }}>Cobertura esencial al mejor precio</p>
+                  <div style={{ display:'flex', alignItems:'center', gap:6 }}>
+                <h2 style={{ fontSize:15,fontWeight:800,color:'#111827',margin:0 }}>Planes Básicos</h2>
+                <PlanTipoTooltip tipo="basico" />
+              </div>
+              <p style={{ fontSize:12,color:'#9ca3af',margin:0 }}>RC ante terceros y pérdida total — menor costo</p>
             </div>
             <span style={{ background:'#dbeafe',color:'#1d4ed8',fontSize:12,fontWeight:700,padding:'3px 10px',borderRadius:99 }}>{basicPlans.length} opciones</span>
           </div>
