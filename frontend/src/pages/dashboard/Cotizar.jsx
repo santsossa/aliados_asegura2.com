@@ -324,11 +324,15 @@ export default function Cotizar() {
       .catch(() => {})
   }, [])
 
-  // Extrae valor comercial de cualquier objeto de respuesta (múltiples nombres posibles)
+  // Extrae valor comercial — front-A2 confirma que Fasecolda devuelve "valorAsegurado"
   function extractCV(obj) {
     if (!obj) return null
-    return obj.commercialValue || obj.valorAsegurado || obj.insuredValue
-      || obj.vehicleValue || obj.valor || obj.value || null
+    for (const k of ['valorAsegurado','commercialValue','insuredValue','vehicleValue','valor','value']) {
+      if (obj[k] != null && obj[k] !== '' && Number(obj[k]) > 0) return Number(obj[k])
+    }
+    // Buscar en response anidado
+    if (obj.response) return extractCV(obj.response)
+    return null
   }
 
   // Confirmar placa → pedir datos fasecolda
@@ -343,7 +347,7 @@ export default function Cotizar() {
         const info = d?.response || d
         if (info?.modelo) setVehicleModel(/(\d{4})/.exec(info.modelo)?.[1] || info.modelo)
         const cv = extractCV(info)
-        if (cv) setCommercialValue(Number(cv))
+        if (cv != null && cv > 0) setCommercialValue(cv)
       })
       .catch(() => {})
     setPhase('form'); setStep(1)
@@ -393,7 +397,7 @@ export default function Cotizar() {
                   if (plan.company !== 'Seguros del Estado') {
                     // Busca valor asegurado en múltiples campos posibles
                     const cv = extractCV(resp)
-                    if (cv) setCommercialValue(Number(cv))
+                    if (cv != null && cv > 0) setCommercialValue(cv)
                     // Actualiza el estado inmediatamente — stream progresivo
                     if (plan.productFull) { collectedFull.push(plan); setFullPlans(p => [...p, plan].sort((a,b) => a.price-b.price)) }
                     else                  { collectedBasic.push(plan); setBasicPlans(p => [...p, plan].sort((a,b) => a.price-b.price)) }
@@ -463,7 +467,8 @@ export default function Cotizar() {
             logo: p.logo,
             price: p.price,
             productFull: p.productFull,
-            main: p.main,
+            main: p.main || [],
+            extras: p.extras || [],
           })),
           mejor_precio: allQuotes.length > 0 ? Math.min(...allQuotes.map(p => p.price)) : null,
         },

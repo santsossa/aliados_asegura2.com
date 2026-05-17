@@ -9,34 +9,62 @@ const fmtCV = n => n ? new Intl.NumberFormat('es-CO', { style:'currency', curren
 
 // ── Tooltips de coberturas ────────────────────────────────────────────────────
 const COVERAGE_TIPS = {
-  'responsabilidad civil extracontractual': 'Si en un accidente le causas daños al carro de otra persona o la hieres, la aseguradora paga por ti. Sin esto, tendrías que pagarlo de tu bolsillo.',
-  'responsabilidad civil': 'Si chocas y le dañas el carro a alguien, o atropellas a una persona, la aseguradora responde económicamente por ti ante el afectado.',
-  'todo riesgo': 'Si chocas, te rayan el carro o sufre cualquier daño, la aseguradora paga la reparación aunque el accidente haya sido culpa tuya.',
-  'daños propios': 'Si chocas el carro contra otro vehículo o un poste, la aseguradora cubre el costo de reparación de tu propio vehículo.',
-  'colisión': 'Si chocas el carro contra otro objeto o vehículo, la aseguradora paga la reparación, sin importar quién tuvo la culpa.',
-  'pérdida parcial': 'Si el carro sufre daños que se pueden reparar (como un golpe o raspón), la aseguradora paga la reparación.',
-  'pérdida total por accidente': 'Si el carro choca tan fuerte que no vale la pena repararlo, la aseguradora te paga el valor comercial del carro.',
-  'pérdida total': 'Si el carro queda destruido o los daños superan el 75% de su valor, la aseguradora te paga el precio de mercado del vehículo.',
-  'pérdida total por hurto': 'Si te roban el carro y después de 30 días no aparece, la aseguradora te paga el valor comercial del vehículo.',
-  'hurto parcial': 'Si te roban partes del carro (espejos, rines, batería, etc.), la aseguradora cubre el reemplazo de esas piezas.',
-  'hurto': 'Si te roban el carro completamente y no aparece, la aseguradora te paga su valor comercial.',
-  'robo': 'Si te roban el carro, la aseguradora cubre el valor del vehículo si no es recuperado en cierto plazo.',
-  'asistencia en carretera': 'Si el carro se daña lejos de casa, la aseguradora envía un técnico, grúa o combustible para ayudarte donde estés.',
-  'grúa': 'Si el carro no puede moverse por un accidente o daño mecánico, la aseguradora paga el traslado al taller más cercano.',
-  'auto sustituto': 'Mientras tu carro está en el taller, la aseguradora te presta otro vehículo para que no quedes sin transporte.',
-  'cristales': 'Si se rompen el parabrisas o las ventanas del carro, la aseguradora paga su reemplazo aunque no haya habido un choque.',
-  'incendio': 'Si el carro se incendia, ya sea por falla mecánica, cortocircuito u otro motivo, la aseguradora cubre los daños.',
-  'terremoto': 'Si un sismo o erupción volcánica daña tu carro, la aseguradora lo cubre.',
-  'fenómenos naturales': 'Si una inundación, vendaval, granizo o avalancha daña el carro, la aseguradora paga la reparación.',
-  'inundación': 'Si el carro se daña porque quedó bajo el agua por una lluvia intensa o desbordamiento, la aseguradora lo cubre.',
-  'actos mal intencionados': 'Si alguien raya el carro, le rompe vidrios o lo daña intencionalmente, la aseguradora cubre la reparación.',
-  'vandalismo': 'Si desconocidos dañan el carro a propósito (pintura rayada, espejos rotos, etc.), la aseguradora paga la reparación.',
-  'llamada médica': 'Si tienes una urgencia médica en carretera, puedes llamar 24/7 a un médico que te orienta sobre qué hacer o a dónde ir.',
-  'orientación jurídica': 'Si tienes un accidente y necesitas asesoría legal, la aseguradora te conecta con un abogado para guiarte.',
-  'traslado de pasajeros': 'Si el carro se daña lejos de la ciudad, la aseguradora paga el regreso de los pasajeros a su lugar de origen.',
-  'taxi': 'Si el carro está en el taller, la aseguradora te cubre algunos viajes en taxi para que no quedes sin movilidad.',
-  'accesorios': 'Si te roban o dañan elementos del carro como parlantes, rines o pantallas, la aseguradora los reemplaza.',
-  'rc': 'Si en un accidente le causas daños a otra persona o a su vehículo, la aseguradora paga por ti.',
+  // Responsabilidad Civil
+  'responsabilidad civil extracontractual': 'Si en un accidente causas daños al carro de otra persona o la hieres, la aseguradora paga por ti. Ejemplo: chocas un carro en un semáforo — la aseguradora paga los daños del otro vehículo y los gastos médicos del conductor afectado.',
+  'responsabilidad civil': 'Cubre los daños que le causes a terceros (personas o vehículos) en un accidente donde tú tengas culpa. Ejemplo: te pasas un semáforo en rojo y chocas otro carro — la aseguradora paga la reparación del otro vehículo y la atención médica si hay heridos.',
+  'rc': 'Cubre los daños que le causes a terceros en accidentes. Ejemplo: si chocas a otra persona o le dañas su propiedad, la aseguradora responde económicamente por ti sin que tengas que pagar de tu bolsillo.',
+  // Daños propios
+  'todo riesgo': 'La cobertura más completa: protege tu carro contra cualquier daño, sin importar si el accidente fue culpa tuya. Ejemplo: raspas el carro en un poste estacionando, chocas en la autopista o una piedra te rompe el parabrisas — todo lo cubre la aseguradora.',
+  'daños propios': 'Si chocas tu carro contra otro vehículo, un poste o cualquier objeto, la aseguradora paga la reparación de tu propio vehículo. Ejemplo: se te fue el pie del freno y chocaste contra una pared — la aseguradora cubre los daños de tu carro.',
+  'colisión': 'Cubre los daños de tu vehículo cuando choca contra otro objeto o vehículo. Ejemplo: un carro te golpeó por detrás en un trancón — la aseguradora repara los daños de tu carro sin importar quién tuvo la culpa.',
+  'daño': 'Cubre reparaciones de tu vehículo por daños físicos causados por choques, golpes o raspones. Ejemplo: alguien chocó tu carro en el parqueadero y se fue — la aseguradora paga la reparación.',
+  // Pérdidas
+  'pérdida parcial': 'Cuando el carro sufre daños que se pueden reparar (no queda destruido del todo). Ejemplo: un choque moderado abolló la puerta y el capó — la aseguradora paga el taller.',
+  'pérdida total por accidente': 'Si el carro queda tan destruido en un accidente que el costo de reparación supera el 75% de su valor, la aseguradora te paga el valor comercial del vehículo. Ejemplo: en un accidente grave el carro quedó aplastado — te pagan el valor del carro.',
+  'pérdida total': 'Si el carro queda inutilizable por accidente o robo, la aseguradora te paga su valor comercial. Ejemplo: el carro quedó destruido en un choque o fue robado y no apareció — recibes el dinero para comprarte otro.',
+  'pérdida total por hurto': 'Si te roban el carro y después de 30 días no aparece, la aseguradora te paga su valor comercial. Ejemplo: te robaron el carro en el centro y no lo recuperaron — la aseguradora te da el dinero para comprar otro.',
+  // Hurto
+  'hurto parcial': 'Si te roban partes del carro (espejos, rines, batería, pantalla, etc.) sin llevarse el vehículo completo. Ejemplo: amaneciste y te habían robado los 4 rines y los espejos — la aseguradora te los repone.',
+  'hurto': 'Si te roban el carro completo y no aparece en el plazo establecido. Ejemplo: dejaste el carro en la calle y cuando volviste ya no estaba — la aseguradora te paga su valor para que puedas reemplazarlo.',
+  'robo': 'Cubre la pérdida del vehículo por robo. Si te lo robaron y no apareció, la aseguradora te paga el valor del carro para que puedas adquirir otro.',
+  // Asistencia
+  'asistencia en carretera': 'Si el carro se daña lejos de casa (llanta pinchada, daño mecánico, carro varado), la aseguradora envía ayuda al lugar donde estés. Ejemplo: en la vía a Medellín se te pinchó la llanta a las 11pm — llamas a la aseguradora y mandan asistencia.',
+  'grúa': 'Si el carro no puede moverse por un accidente o daño mecánico, la aseguradora paga el transporte al taller. Ejemplo: el carro se apagó en la mitad de la vía — la grúa lo lleva al taller sin costo para ti.',
+  'auxilio vial': 'Servicio de ayuda en carretera que incluye grúa, cambio de llanta, envío de combustible y asistencia básica mecánica. Ideal para emergencias en ruta.',
+  'auto sustituto': 'Mientras tu carro está en el taller siendo reparado, la aseguradora te presta otro para no quedarte sin transporte. Ejemplo: el carro está 5 días en el taller — durante esos días la aseguradora te da un carro prestado.',
+  'vehículo sustituto': 'La aseguradora te entrega un carro de reemplazo mientras el tuyo está en reparación. Muy útil si dependes del carro para trabajar o para tu día a día.',
+  // Cristales y partes
+  'cristales': 'Cubre la rotura del parabrisas, vidrios laterales o trasero, sin necesidad de que haya habido un choque. Ejemplo: una piedra que saltó de un camión rompió tu parabrisas — la aseguradora lo reemplaza.',
+  'vidrios': 'Cubre la rotura de cualquier vidrio del carro (parabrisas, ventanas). Ejemplo: alguien rompió el vidrio de tu ventana para intentar robarte — la aseguradora paga el reemplazo.',
+  // Fenómenos
+  'incendio': 'Si el carro se incendia (por falla eléctrica, cortocircuito o cualquier causa), la aseguradora cubre los daños o te paga el valor si quedó destruido. Ejemplo: el carro se incendió por un problema eléctrico — la aseguradora responde.',
+  'terremoto': 'Si un sismo, erupción volcánica o movimiento telúrico daña tu carro, la aseguradora lo cubre. Ejemplo: un temblor derrumbó una pared sobre el parqueadero donde estaba tu carro.',
+  'fenómenos naturales': 'Cubre daños causados por eventos de la naturaleza: inundaciones, granizadas, vendavales, rayos, deslizamientos. Ejemplo: una granizada abolló todo el capó y el techo del carro.',
+  'inundación': 'Si el carro se daña porque quedó bajo el agua durante una lluvia fuerte o desbordamiento de un río. Ejemplo: el carro quedó inundado por una tormenta y el motor se dañó — la aseguradora cubre la reparación.',
+  'riesgos de la naturaleza': 'Protege el carro contra daños causados por fenómenos naturales como lluvias fuertes, granizo, vendavales, derrumbes o terremotos.',
+  // Actos maliciosos
+  'actos mal intencionados': 'Si alguien daña el carro a propósito: raya la pintura, rompe vidrios, le da un golpe sin robar. Ejemplo: amaneciste con el carro rayado de punta a punta — la aseguradora paga la latonería y pintura.',
+  'vandalismo': 'Cubre daños intencionales al carro por parte de terceros desconocidos. Ejemplo: en una protesta dañaron varios carros del sector incluyendo el tuyo — la aseguradora lo repara.',
+  // Servicios médicos y legales
+  'llamada médica': 'Acceso 24/7 a orientación médica telefónica en caso de emergencia. Ejemplo: tu cliente tuvo un accidente en carretera a medianoche — puede llamar a un médico que le indica qué hacer mientras llega la ambulancia.',
+  'asistencia médica': 'Servicio de atención médica de urgencia o consulta incluido en el seguro. Ante un accidente, la aseguradora coordina o cubre la atención médica inicial.',
+  'orientación jurídica': 'Si tienes un accidente y necesitas asesoría legal (quién tiene la culpa, qué derechos tienes, cómo proceder), la aseguradora te conecta con un abogado. Ejemplo: el otro conductor te está culpando de un accidente que no fue tu culpa — un abogado te orienta.',
+  'defensa jurídica': 'La aseguradora te proporciona representación legal si eres demandado por un accidente. Incluye abogado y cobertura de costos judiciales básicos.',
+  'traslado de pasajeros': 'Si el carro se daña en otra ciudad y no pueden continuar el viaje, la aseguradora paga el regreso de los pasajeros a casa. Ejemplo: el carro se dañó viajando a Cartagena — la aseguradora paga los tiquetes de regreso.',
+  // Transporte y movilidad
+  'taxi': 'Mientras el carro está en el taller, la aseguradora cubre algunos viajes en taxi para que no quedes sin transporte. Muy útil durante los días de reparación.',
+  'transporte': 'Cubre gastos de movilidad alternativa (taxi, bus, etc.) mientras el carro está en taller por un siniestro cubierto.',
+  // Accesorios
+  'accesorios': 'Cubre el robo o daño de elementos instalados en el carro: parlantes, pantallas, rines especiales, cámaras, etc. Ejemplo: te robaron la pantalla multimedia que instalaste — la aseguradora te la repone.',
+  'equipos de sonido': 'Cubre el robo o daño del sistema de audio del carro (parlantes, amplificadores, pantalla de sonido). Ejemplo: te robaron los parlantes y el amplificador — la aseguradora los repone.',
+  'llantas': 'Cubre el daño o robo de las llantas del vehículo. Ejemplo: apareciste con las llantas pinchadas intencionalmente o te las robaron.',
+  // Otros comunes
+  'responsabilidad civil contractual': 'Cubre daños a personas o propiedades que transportas en el vehículo como parte de un contrato de servicio. Aplica principalmente para vehículos de carga o transporte de mercancías.',
+  'responsabilidad civil bienes': 'Cubre daños a objetos o propiedades de terceros causados por el vehículo. Ejemplo: el carro se soltó y chocó contra la vitrina de un local — la aseguradora paga los daños.',
+  'gastos médicos': 'Cubre los gastos médicos del conductor y los ocupantes del vehículo en caso de accidente, sin importar quién tuvo la culpa. Ejemplo: sufriste un accidente y necesitas atención médica — la aseguradora cubre parte de los gastos.',
+  'accidentes personales': 'Cubre lesiones o muerte del conductor y pasajeros en caso de accidente de tránsito. Proporciona una indemnización económica a los afectados o sus familias.',
+  'muerte accidental': 'Si el conductor o un pasajero fallece en un accidente de tránsito, la aseguradora paga una indemnización a sus beneficiarios.',
+  'incapacidad': 'Si el conductor queda incapacitado por un accidente de tránsito, la aseguradora paga una indemnización según el grado de incapacidad.',
 }
 
 function getCoverageTip(name = '') {
@@ -132,6 +160,7 @@ function CotizacionModal({ cotizacion, token, user, onClose, onDeleted, onEmitid
   const puedeEmitir = noEnviada && within24h
 
   const [emitPhase, setEmitPhase] = useState('view') // 'view' | 'select' | 'docs' | 'done'
+  const [expandedPlan, setExpandedPlan] = useState(null) // accordion: índice del plan abierto
   const [selectedPlan, setSelectedPlan] = useState(null)
   const [cedulaFile, setCedulaFile] = useState(null)
   const [tarjetaFile, setTarjetaFile] = useState(null)
@@ -295,28 +324,33 @@ function CotizacionModal({ cotizacion, token, user, onClose, onDeleted, onEmitid
                     </div>
                     <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
                       {plans.map((q, i) => {
+                        const planKey = `${tipo}-${i}`
                         const isSel = selectedPlan?.insuranceCode === q.insuranceCode && selectedPlan?.company === q.company
+                        const isOpen = expandedPlan === planKey
+                        const allCov = [...(q.main || []), ...(q.extras || [])]
                         return (
                           <div
                             key={i}
-                            onClick={() => puedeEmitir && emitPhase === 'select' ? setSelectedPlan(q) : undefined}
                             style={{
                               border: isSel ? '2px solid #2D2A7A' : '1.5px solid #e5e7eb',
-                              borderRadius:12, padding:'12px 14px',
-                              cursor: puedeEmitir && emitPhase === 'select' ? 'pointer' : 'default',
+                              borderRadius:12, overflow:'hidden',
                               background: isSel ? '#f5f4ff' : '#fff',
                               transition:'border-color 0.15s, background 0.15s',
                             }}
                           >
-                            {/* Fila superior: logo + empresa + precio */}
-                            <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom: q.main?.length > 0 ? 8 : 0 }}>
+                            {/* Fila superior: logo + empresa + precio + selección */}
+                            <div
+                              onClick={() => puedeEmitir && emitPhase === 'select' ? setSelectedPlan(q) : undefined}
+                              style={{ display:'flex', alignItems:'center', gap:10, padding:'12px 14px',
+                                       cursor: puedeEmitir && emitPhase === 'select' ? 'pointer' : 'default' }}
+                            >
                               {q.logo && (
                                 <img src={q.logo} alt={q.company}
                                   style={{ width:44, height:26, objectFit:'contain', flexShrink:0 }}
                                   onError={e => e.currentTarget.style.display='none'} />
                               )}
                               <p style={{ margin:0, fontSize:13, fontWeight:700, color:'#111827', flex:1 }}>{q.company}</p>
-                              <div style={{ textAlign:'right', flexShrink:0 }}>
+                              <div style={{ textAlign:'right', flexShrink:0, marginRight:6 }}>
                                 <p style={{ margin:0, fontSize:15, fontWeight:800, color:'#111827' }}>{fmt(q.price)}</p>
                                 <p style={{ margin:0, fontSize:10, color:'#9ca3af' }}>anual</p>
                               </div>
@@ -325,12 +359,27 @@ function CotizacionModal({ cotizacion, token, user, onClose, onDeleted, onEmitid
                                               background: isSel ? '#2D2A7A' : '#fff', flexShrink:0 }} />
                               )}
                             </div>
-                            {/* Coberturas con tooltips */}
-                            {q.main?.length > 0 && (
-                              <div style={{ display:'flex', flexWrap:'wrap', gap:'4px 8px', paddingTop:4,
-                                            borderTop:'1px solid #f3f4f6' }}>
-                                {q.main.map((cov, ci) => (
-                                  <CovTooltip key={ci} name={cov} />
+                            {/* Botón para desplegar coberturas */}
+                            {allCov.length > 0 && (
+                              <button
+                                onClick={() => setExpandedPlan(isOpen ? null : planKey)}
+                                style={{ width:'100%', background: isOpen ? '#f0f0fd' : '#f9fafb',
+                                         border:'none', borderTop:'1px solid #f3f4f6',
+                                         padding:'7px 14px', fontSize:11, color: isOpen ? '#2D2A7A' : '#6b7280',
+                                         fontWeight:600, cursor:'pointer', textAlign:'left',
+                                         display:'flex', alignItems:'center', gap:4 }}>
+                                {isOpen ? '▲ Ocultar' : '▼ Ver'} {allCov.length} cobertura{allCov.length !== 1 ? 's' : ''}
+                              </button>
+                            )}
+                            {/* Coberturas expandidas — solo 1 abierto a la vez */}
+                            {isOpen && (
+                              <div style={{ padding:'10px 14px 12px', borderTop:'1px solid #f3f4f6',
+                                            display:'flex', flexWrap:'wrap', gap:'6px 10px', background:'#fafafa' }}>
+                                {allCov.map((cov, ci) => (
+                                  <span key={ci} style={{ display:'inline-flex', alignItems:'center', gap:3, fontSize:11, color:'#374151' }}>
+                                    <span style={{ color:'#16a34a', fontWeight:700 }}>✓</span>
+                                    <CovTooltip name={cov} />
+                                  </span>
                                 ))}
                               </div>
                             )}
