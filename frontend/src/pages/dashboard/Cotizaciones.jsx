@@ -222,6 +222,17 @@ function CotizacionModal({ cotizacion, token, user, onClose, onDeleted, onEmitid
                 </div>
               )}
 
+              {/* Alerta: ya enviada */}
+              {!noEnviada && (
+                <div style={{ background:'#f0fdf4', border:'1px solid #bbf7d0', borderRadius:10, padding:'12px 14px',
+                              display:'flex', gap:8, alignItems:'center', marginBottom:16 }}>
+                  <span style={{ fontSize:18 }}>✅</span>
+                  <p style={{ margin:0, fontSize:12, color:'#166534', fontWeight:600, lineHeight:1.5 }}>
+                    Ya enviaste esta cotización a emitir. El equipo de Asegura2 está gestionándola.
+                  </p>
+                </div>
+              )}
+
               {/* Alerta 24h vencida */}
               {noEnviada && !within24h && (
                 <div style={{ background:'#fff7ed', border:'1px solid #fed7aa', borderRadius:10, padding:'12px 14px',
