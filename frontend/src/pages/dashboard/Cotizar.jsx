@@ -274,13 +274,33 @@ function Fld({ label, children }) {
   return <div style={{ marginBottom:14 }}><div style={{ fontSize:12,fontWeight:600,color:'#374151',marginBottom:6 }}>{label}</div>{children}</div>
 }
 
-function PlanCard({ plan, onElegir }) {
+function PlanCard({ plan, onElegir, isBest = false }) {
   const [open, setOpen] = useState(false)
   const allCoverages = [...plan.main, ...plan.extras]
   return (
-    <div style={{ background:'#fff', border:'1.5px solid #e5e7eb', borderRadius:14, overflow:'hidden', marginBottom:10, transition:'box-shadow 0.15s' }}
-      onMouseEnter={e => e.currentTarget.style.boxShadow='0 4px 16px rgba(45,42,122,0.12)'}
-      onMouseLeave={e => e.currentTarget.style.boxShadow='none'}>
+    <div style={{
+      background:'#fff',
+      border: isBest ? '2px solid #16a34a' : '1.5px solid #e5e7eb',
+      borderRadius:14, overflow:'hidden', marginBottom:10,
+      transition:'box-shadow 0.15s',
+      boxShadow: isBest ? '0 0 0 3px rgba(22,163,74,0.1)' : 'none',
+    }}
+      onMouseEnter={e => e.currentTarget.style.boxShadow= isBest ? '0 4px 16px rgba(22,163,74,0.2)' : '0 4px 16px rgba(45,42,122,0.12)'}
+      onMouseLeave={e => e.currentTarget.style.boxShadow= isBest ? '0 0 0 3px rgba(22,163,74,0.1)' : 'none'}>
+
+      {/* Banner "Mejor precio" */}
+      {isBest && (
+        <div style={{
+          background:'linear-gradient(90deg,#16a34a,#15803d)',
+          padding:'5px 20px',
+          display:'flex', alignItems:'center', gap:6,
+        }}>
+          <span style={{ fontSize:13 }}>🏆</span>
+          <span style={{ fontSize:11, fontWeight:800, color:'#fff', letterSpacing:'0.04em' }}>
+            MEJOR PRECIO EN ESTE GRUPO
+          </span>
+        </div>
+      )}
 
       {/* ── Fila principal ── */}
       <div style={{ display:'flex', alignItems:'center', gap:16, padding:'16px 20px' }}>
@@ -936,7 +956,10 @@ export default function Cotizar() {
             </div>
             <span style={{ background:'#ede9fe',color:'#7c3aed',fontSize:12,fontWeight:700,padding:'3px 10px',borderRadius:99 }}>{fullPlans.length} opciones</span>
           </div>
-          {fullPlans.map(p => <PlanCard key={p.id} plan={p} onElegir={handleElegir} />)}
+          {(() => {
+            const bestPrice = Math.min(...fullPlans.map(p => p.price))
+            return fullPlans.map(p => <PlanCard key={p.id} plan={p} onElegir={handleElegir} isBest={p.price === bestPrice} />)
+          })()}
         </div>}
 
         {/* Planes Básicos */}
@@ -951,7 +974,10 @@ export default function Cotizar() {
             </div>
             <span style={{ background:'#dbeafe',color:'#1d4ed8',fontSize:12,fontWeight:700,padding:'3px 10px',borderRadius:99 }}>{basicPlans.length} opciones</span>
           </div>
-          {basicPlans.map(p => <PlanCard key={p.id} plan={p} onElegir={handleElegir} />)}
+          {(() => {
+            const bestPrice = Math.min(...basicPlans.map(p => p.price))
+            return basicPlans.map(p => <PlanCard key={p.id} plan={p} onElegir={handleElegir} isBest={p.price === bestPrice} />)
+          })()}
         </div>}
 
         {!loadingQ && allPlans.length===0 && !fetchErr && (
