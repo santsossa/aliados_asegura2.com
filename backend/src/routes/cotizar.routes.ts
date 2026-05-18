@@ -95,20 +95,20 @@ router.post('/fasecolda', async (req: Request, res: Response, next: NextFunction
   try {
     const r = await axios.post(`${INS_BASE}/api/InsuranceQuotation/vehicleFasecolda`, req.body, { headers: INS_HEADERS })
     const raw = r.data
-    // Log para diagnóstico — ver estructura real de la respuesta
-    console.log('[Fasecolda] raw:', JSON.stringify(raw).slice(0, 500))
 
-    // La respuesta puede estar en raw.response, raw.data.response, o en raw directamente
-    const inner = raw?.response ?? raw?.data?.response ?? raw ?? {}
+    // Si Fasecolda reporta fallo (success:false o response:null) → informar al frontend
+    const fasecoldaFallo = raw?.success === false || raw?.response == null
 
-    // Buscar valorAsegurado en todos los campos posibles
+    const inner = raw?.response ?? raw?.data?.response ?? null
+
+    // Buscar valorAsegurado solo si hay respuesta válida
     function findVal(obj: any, depth = 0): number | null {
       if (!obj || typeof obj !== 'object' || depth > 4) return null
-      for (const k of ['valorAsegurado','commercialValue','insuredValue','vehicleValue','valorVehiculo','valor','value','amount']) {
+      for (const k of ['valorAsegurado','commercialValue','insuredValue','vehicleValue','valorVehiculo','valor','value']) {
         const v = obj[k]
         if (v != null && v !== '') {
           const n = Number(String(v).replace(/\./g, '').replace(',', '.').replace(/[^0-9.]/g, ''))
-          if (!isNaN(n) && n > 1000000) return n // valores de vehículo son > 1M COP
+          if (!isNaN(n) && n > 1000000) return n
         }
       }
       for (const k of Object.keys(obj)) {
@@ -120,11 +120,10 @@ router.post('/fasecolda', async (req: Request, res: Response, next: NextFunction
       return null
     }
 
-    const valorAsegurado = findVal(inner) ?? findVal(raw)
-    const modelo = inner?.modelo ?? inner?.model ?? raw?.modelo ?? null
+    const valorAsegurado = inner ? (findVal(inner) ?? findVal(raw)) : null
+    const modelo = inner?.modelo ?? inner?.model ?? null
 
-    console.log('[Fasecolda] valorAsegurado:', valorAsegurado, '| modelo:', modelo)
-    res.json({ ...raw, _valorAsegurado: valorAsegurado, _modelo: modelo })
+    res.json({ ...raw, _valorAsegurado: valorAsegurado, _modelo: modelo, _fasecoldaFallo: fasecoldaFallo })
   } catch (err: any) {
     res.status(err.response?.status || 500).json({ error: 'Error consultando fasecolda' })
   }

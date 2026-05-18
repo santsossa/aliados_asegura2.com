@@ -485,15 +485,16 @@ export default function Cotizar() {
     })
       .then(r => r.json())
       .then(d => {
-        // Backend ahora envía _valorAsegurado y _modelo normalizados en raíz
         if (d._modelo) setVehicleModel(/(\d{4})/.exec(d._modelo)?.[1] || d._modelo)
         else {
           const info = d?.response || d
           if (info?.modelo) setVehicleModel(/(\d{4})/.exec(info.modelo)?.[1] || info.modelo)
         }
-        // Usar campo normalizado del backend primero, luego búsqueda profunda como fallback
-        const cv = d._valorAsegurado ?? extractCV(d)
-        if (cv != null && cv > 0) setCommercialValue(cv)
+        if (d._valorAsegurado != null && d._valorAsegurado > 0) {
+          setCommercialValue(d._valorAsegurado)
+        }
+        // Si Fasecolda falló, marcar para mostrar mensaje apropiado
+        if (d._fasecoldaFallo) setCommercialValue(-1) // -1 = "Fasecolda no disponible, buscar en quotes"
       })
       .catch(() => {})
     setPhase('form'); setStep(1)
@@ -544,8 +545,9 @@ export default function Cotizar() {
               if (resp && !resp.error && price > 0) {
                 const plan = mapPlan(resp)
                 if (plan.company !== 'Seguros del Estado') {
+                  // Tomar valor del quote si Fasecolda falló o aún no tenemos el valor
                   const cv = extractCV(resp)
-                  if (cv != null && cv > 0) setCommercialValue(cv)
+                  if (cv != null && cv > 0) setCommercialValue(prev => (!prev || prev <= 0) ? cv : prev)
                   if (plan.productFull) { collectedFull.push(plan); setFullPlans(p => [...p, plan].sort((a,b) => a.price-b.price)) }
                   else                  { collectedBasic.push(plan); setBasicPlans(p => [...p, plan].sort((a,b) => a.price-b.price)) }
                 }
@@ -855,9 +857,20 @@ export default function Cotizar() {
           <button onClick={() => setPhase('form')} style={{ marginLeft:'auto',fontSize:12,color:'#a5b4fc',background:'none',border:'1px solid rgba(255,255,255,0.3)',borderRadius:99,padding:'4px 12px',cursor:'pointer' }}>← Editar datos</button>
         </div>
 
-        <div style={{ background: commercialValue ? '#fef9c3' : '#f9fafb', border:`1px solid ${commercialValue ? '#fde68a' : '#e5e7eb'}`, borderRadius:10, padding:'8px 16px', marginBottom:12, fontSize:13, color: commercialValue ? '#92400e' : '#9ca3af', fontWeight:600 }}>
-          🚗 Valor asegurado del vehículo: {commercialValue ? fmt(commercialValue) : 'No disponible para esta placa — cada aseguradora usa su valor de referencia'}
-        </div>
+        {/* Valor asegurado — 3 estados: conocido / buscando en quotes / Fasecolda caído */}
+        {commercialValue != null && commercialValue > 0 ? (
+          <div style={{ background:'#fef9c3', border:'1px solid #fde68a', borderRadius:10, padding:'8px 16px', marginBottom:12, fontSize:13, color:'#92400e', fontWeight:600 }}>
+            🚗 Valor asegurado: {fmt(commercialValue)}
+          </div>
+        ) : commercialValue === -1 ? (
+          <div style={{ background:'#fff7ed', border:'1px solid #fed7aa', borderRadius:10, padding:'8px 16px', marginBottom:12, fontSize:12, color:'#9a3412' }}>
+            ⚠️ Fasecolda no está disponible en este momento. El valor asegurado aparecerá si alguna aseguradora lo incluye en su cotización.
+          </div>
+        ) : !loadingQ ? (
+          <div style={{ background:'#f9fafb', border:'1px solid #e5e7eb', borderRadius:10, padding:'8px 16px', marginBottom:12, fontSize:12, color:'#9ca3af' }}>
+            ℹ️ Valor asegurado no disponible — cada aseguradora usa su propio valor de referencia
+          </div>
+        ) : null}
 
         {/* Cerrar cotización */}
         <div style={{ display:'flex', justifyContent:'flex-end', marginBottom:12 }}>
