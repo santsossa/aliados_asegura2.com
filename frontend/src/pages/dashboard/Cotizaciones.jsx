@@ -376,7 +376,9 @@ function CotizacionModal({ cotizacion, token, user, onClose, onDeleted, onEmitid
                     <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
                       {plans.map((q, i) => {
                         const planKey = `${tipo}-${i}`
-                        const isSel = selectedPlan?.insuranceCode === q.insuranceCode && selectedPlan?.company === q.company
+                        const isSel = selectedPlan?.insuranceCode === q.insuranceCode
+                          && selectedPlan?.company === q.company
+                          && selectedPlan?.productFull === q.productFull
                         const isOpen = expandedPlan === planKey
                         const isBest = q.price === bestPrice && bestPrice < Infinity
                         const allCov = q.coverages?.length
