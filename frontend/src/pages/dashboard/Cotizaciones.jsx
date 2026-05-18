@@ -623,6 +623,8 @@ function FileField({ label, file, onChange, accept = '.pdf,.jpg,.jpeg,.png' }) {
   )
 }
 
+const MESES_FULL = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']
+
 // ── Main page ─────────────────────────────────────────────────────────────────
 export default function Cotizaciones() {
   const { getToken, user } = useAuth()
@@ -630,8 +632,15 @@ export default function Cotizaciones() {
   const [loading, setLoading] = useState(true)
   const [modalCot, setModalCot] = useState(null)
 
-  useEffect(() => {
-    fetch(`${API}/api/aliados/me/cotizaciones`, {
+  const hoy = new Date()
+  const [mesVer, setMesVer] = useState(hoy.getMonth() + 1)   // 1-12
+  const [anioVer, setAnioVer] = useState(hoy.getFullYear())
+
+  const esActual = mesVer === hoy.getMonth() + 1 && anioVer === hoy.getFullYear()
+
+  const fetchCotizaciones = () => {
+    setLoading(true)
+    fetch(`${API}/api/aliados/me/cotizaciones?mes=${mesVer}&anio=${anioVer}`, {
       headers: { Authorization: `Bearer ${getToken()}` },
       credentials: 'include',
     })
@@ -639,7 +648,19 @@ export default function Cotizaciones() {
       .then(d => { if (d.status === 'success') setCotizaciones(d.data) })
       .catch(() => {})
       .finally(() => setLoading(false))
-  }, [])
+  }
+
+  useEffect(() => { fetchCotizaciones() }, [mesVer, anioVer])
+
+  const irMesAnterior = () => {
+    if (mesVer === 1) { setMesVer(12); setAnioVer(a => a - 1) }
+    else setMesVer(m => m - 1)
+  }
+  const irMesSiguiente = () => {
+    if (esActual) return // no ir al futuro
+    if (mesVer === 12) { setMesVer(1); setAnioVer(a => a + 1) }
+    else setMesVer(m => m + 1)
+  }
 
   function handleDeleted(id) {
     setCotizaciones(prev => prev.filter(c => c.id !== id))
@@ -653,7 +674,32 @@ export default function Cotizaciones() {
     <div className="p-6 lg:p-8 max-w-5xl mx-auto">
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Cotizaciones</h1>
-        <p className="text-gray-500 text-sm mt-1">Todas las cotizaciones que has realizado. Toca una para ver detalle.</p>
+        <p className="text-gray-500 text-sm mt-1">
+          {esActual
+            ? `Todas las cotizaciones que has realizado este mes — ${MESES_FULL[mesVer-1]} ${anioVer}`
+            : `Cotizaciones de ${MESES_FULL[mesVer-1]} ${anioVer}`}
+        </p>
+        {/* Navegación de mes */}
+        <div style={{ display:'flex', alignItems:'center', gap:8, marginTop:12 }}>
+          <button
+            onClick={irMesAnterior}
+            style={{ background:'#f3f4f6', border:'none', borderRadius:8, padding:'6px 12px',
+                     cursor:'pointer', fontSize:13, color:'#374151', fontWeight:600 }}>
+            ← Anterior
+          </button>
+          <span style={{ fontSize:13, fontWeight:700, color:'#111827', minWidth:140, textAlign:'center' }}>
+            {MESES_FULL[mesVer-1]} {anioVer}
+            {esActual && <span style={{ marginLeft:6, fontSize:11, background:'#dcfce7', color:'#16a34a', borderRadius:99, padding:'2px 8px', fontWeight:600 }}>Mes actual</span>}
+          </span>
+          <button
+            onClick={irMesSiguiente}
+            disabled={esActual}
+            style={{ background: esActual ? '#f9fafb' : '#f3f4f6', border:'none', borderRadius:8,
+                     padding:'6px 12px', cursor: esActual ? 'default' : 'pointer',
+                     fontSize:13, color: esActual ? '#d1d5db' : '#374151', fontWeight:600 }}>
+            Siguiente →
+          </button>
+        </div>
       </div>
 
       {loading ? (

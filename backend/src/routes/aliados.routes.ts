@@ -214,14 +214,21 @@ router.get('/dashboard', async (req, res, next) => {
 
 router.get('/me/cotizaciones', async (req, res, next) => {
   try {
+    const now = new Date()
+    // Permite navegar a un mes específico vía ?mes=5&anio=2026, por defecto el actual
+    const mes  = req.query.mes  ? parseInt(req.query.mes  as string) : now.getMonth() + 1
+    const anio = req.query.anio ? parseInt(req.query.anio as string) : now.getFullYear()
+
     const [rows] = await pool.execute<any[]>(
       `SELECT id, placa, anio, estado, cliente_nombre, cliente_telefono, cliente_correo,
               comercial_value, datos_cotizacion, mes, anio_cot, created_at,
               cliente_cedula, cliente_tipo_doc
-       FROM cotizaciones WHERE aliado_id = ? ORDER BY created_at DESC LIMIT 100`,
-      [req.aliado!.sub]
+       FROM cotizaciones
+       WHERE aliado_id = ? AND mes = ? AND anio_cot = ?
+       ORDER BY created_at DESC`,
+      [req.aliado!.sub, mes, anio]
     )
-    res.json({ status: 'success', data: rows })
+    res.json({ status: 'success', data: rows, mes, anio })
   } catch (err) { next(err) }
 })
 
