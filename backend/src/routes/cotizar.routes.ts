@@ -172,15 +172,8 @@ router.post('/emitir',
       const aliado = req.aliado!
       const files  = req.files as { [f: string]: Express.Multer.File[] }
 
-      // ── Validar documentos obligatorios ──────────────────────────────────
-      if (!files?.cedula_titular?.[0]) {
-        res.status(400).json({ status: 'error', message: 'La cédula del titular es obligatoria para enviar a emitir.' })
-        return
-      }
-      if (!files?.tarjeta_propiedad?.[0]) {
-        res.status(400).json({ status: 'error', message: 'La tarjeta de propiedad es obligatoria para enviar a emitir.' })
-        return
-      }
+      // Nota: la validación de documentos obligatorios se hace en el frontend.
+      // El CRM los declara opcionales pero en práctica siempre se envían.
 
       // ── Normalizar formData para que coincida exactamente con la API del CRM ──
       let formDataParsed: Record<string, any> = {}
