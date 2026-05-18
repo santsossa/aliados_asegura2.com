@@ -94,7 +94,17 @@ router.get('/municipios', async (req: Request, res: Response, next: NextFunction
 router.post('/fasecolda', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const r = await axios.post(`${INS_BASE}/api/InsuranceQuotation/vehicleFasecolda`, req.body, { headers: INS_HEADERS })
-    res.json(r.data)
+    const raw = r.data
+    // Extraer campos clave — la estructura puede venir en raw.response o directo en raw
+    const inner = raw?.response ?? raw?.data?.response ?? raw
+    // valorAsegurado puede venir como número o string con formato colombiano "45.000.000"
+    const rawVal = inner?.valorAsegurado ?? inner?.commercialValue ?? inner?.valor ?? null
+    const valorAsegurado = rawVal != null
+      ? Number(String(rawVal).replace(/\./g, '').replace(',', '.').replace(/[^0-9.]/g, '')) || null
+      : null
+    const modelo = inner?.modelo ?? inner?.model ?? null
+    // Devolver todo el raw más los campos normalizados en raíz para fácil acceso
+    res.json({ ...raw, _valorAsegurado: valorAsegurado, _modelo: modelo })
   } catch (err: any) {
     res.status(err.response?.status || 500).json({ error: 'Error consultando fasecolda' })
   }

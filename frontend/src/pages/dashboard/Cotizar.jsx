@@ -466,12 +466,14 @@ export default function Cotizar() {
     })
       .then(r => r.json())
       .then(d => {
-        // front-A2 usa: res.data.response → info
-        const info = d?.response || d?.data?.response || d
-        if (info?.modelo) setVehicleModel(/(\d{4})/.exec(info.modelo)?.[1] || info.modelo)
-        // Intentar directo primero (como hace front-A2), luego búsqueda profunda
-        const direct = parseNumericCV(info?.valorAsegurado)
-        const cv = direct ?? extractCV(d)
+        // Backend ahora envía _valorAsegurado y _modelo normalizados en raíz
+        if (d._modelo) setVehicleModel(/(\d{4})/.exec(d._modelo)?.[1] || d._modelo)
+        else {
+          const info = d?.response || d
+          if (info?.modelo) setVehicleModel(/(\d{4})/.exec(info.modelo)?.[1] || info.modelo)
+        }
+        // Usar campo normalizado del backend primero, luego búsqueda profunda como fallback
+        const cv = d._valorAsegurado ?? extractCV(d)
         if (cv != null && cv > 0) setCommercialValue(cv)
       })
       .catch(() => {})
@@ -853,21 +855,30 @@ export default function Cotizar() {
 
         {/* Spinner + barra de progreso mientras cargan */}
         {loadingQ && (
-          <div style={{ marginBottom:16 }}>
-            <div style={{ display:'flex',alignItems:'center',gap:12,marginBottom:10 }}>
-              {/* Spinner SVG igual al de front-a2 */}
-              <svg viewBox="3 3 18 18" width={22} height={22} style={{ animation:'spin 0.85s linear infinite', fill:'#2D2A7A', flexShrink:0 }}>
+          <div style={{ marginBottom:16, background:'#f0f0fd', borderRadius:12, padding:'14px 16px' }}>
+            <div style={{ display:'flex',alignItems:'center',gap:12,marginBottom: progress.total > 0 ? 10 : 0 }}>
+              <svg viewBox="3 3 18 18" width={20} height={20} style={{ animation:'spin 0.85s linear infinite', fill:'#2D2A7A', flexShrink:0 }}>
                 <style>{`@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}`}</style>
                 <path d="M12 5C8.13401 5 5 8.13401 5 12C5 15.866 8.13401 19 12 19C15.866 19 19 15.866 19 12C19 8.13401 15.866 5 12 5ZM3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12Z" opacity="0.18"/>
                 <path d="M16.9497 7.05015C14.2161 4.31648 9.78392 4.31648 7.05025 7.05015C6.65973 7.44067 6.02656 7.44067 5.63604 7.05015C5.24551 6.65962 5.24551 6.02646 5.63604 5.63593C9.15076 2.12121 14.8492 2.12121 18.364 5.63593C18.7545 6.02646 18.7545 6.65962 18.364 7.05015C17.9734 7.44067 17.3403 7.44067 16.9497 7.05015Z"/>
               </svg>
-              <span style={{ fontSize:13,color:'#6b7280' }}>
-                Comparando aseguradoras{progress.total > 0 ? ` · ${progress.done} de ${progress.total}` : '...'}
-              </span>
+              <div style={{ flex:1 }}>
+                <span style={{ fontSize:13, fontWeight:600, color:'#2D2A7A' }}>
+                  {progress.total > 0 && progress.done < progress.total
+                    ? `Consultando aseguradoras... ${progress.done} de ${progress.total} respondidas`
+                    : progress.total > 0 && progress.done === progress.total
+                    ? `Procesando cotizaciones finales...`
+                    : 'Consultando aseguradoras...'}
+                </span>
+                <p style={{ margin:'1px 0 0', fontSize:11, color:'#6b7280' }}>
+                  El cargador desaparecerá al recibir todas las respuestas
+                </p>
+              </div>
             </div>
             {progress.total > 0 && (
-              <div style={{ background:'#e5e7eb',borderRadius:99,height:4,overflow:'hidden' }}>
-                <div style={{ height:'100%',background:'#2D2A7A',borderRadius:99,width:`${(progress.done/progress.total)*100}%`,transition:'width 0.3s ease' }} />
+              <div style={{ background:'#c7c5f5',borderRadius:99,height:5,overflow:'hidden' }}>
+                <div style={{ height:'100%',background:'#2D2A7A',borderRadius:99,
+                              width:`${(progress.done/progress.total)*100}%`,transition:'width 0.4s ease' }} />
               </div>
             )}
           </div>
