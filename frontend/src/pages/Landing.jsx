@@ -176,10 +176,44 @@ function CarouselPasos() {
     return () => clearInterval(t)
   }, [active])
 
+  // Móvil: cards apiladas con navegación simple
+  const isMobileView = typeof window !== 'undefined' && window.innerWidth < 640
+
   return (
-    <div style={{ maxWidth:860, margin:'0 auto', padding:'0 24px' }}>
-      {/* Cards row */}
-      <div style={{ display:'flex', gap:10, marginBottom:28, height:300 }}>
+    <div style={{ maxWidth:860, margin:'0 auto', padding:'0 16px' }}>
+
+      {/* Móvil: una card a la vez con flechas */}
+      <div className="sm:hidden mb-6">
+        <div style={{
+          borderRadius:18, overflow:'hidden', background:'#fff',
+          border:'1px solid #e5e7eb', minHeight:340,
+          display:'flex', flexDirection:'column',
+        }}>
+          <div style={{ height:190, flexShrink:0, background:'#fff' }}>
+            {PASOS_DATA[active].illustration}
+          </div>
+          <div style={{ flex:1, background:'#f3f4f6', padding:'16px', display:'flex', flexDirection:'column', justifyContent:'flex-end' }}>
+            {(() => { const Icon = PASOS_DATA[active].icon; return <Icon size={16} style={{ color:'#9ca3af', marginBottom:6 }} /> })()}
+            <h3 style={{ fontSize:15, fontWeight:800, color:'#111827', margin:'0 0 6px' }}>{PASOS_DATA[active].title}</h3>
+            <p style={{ fontSize:13, color:'#6b7280', lineHeight:1.5, margin:0 }}>{PASOS_DATA[active].desc}</p>
+          </div>
+        </div>
+        <div style={{ display:'flex', justifyContent:'center', alignItems:'center', gap:16, marginTop:16 }}>
+          <button onClick={() => setActive(p => (p - 1 + PASOS_DATA.length) % PASOS_DATA.length)}
+            style={{ width:36, height:36, borderRadius:'50%', border:'1.5px solid #e5e7eb', background:'#fff', cursor:'pointer', fontSize:16 }}>‹</button>
+          <div style={{ display:'flex', gap:6 }}>
+            {PASOS_DATA.map((_, i) => (
+              <button key={i} onClick={() => setActive(i)}
+                style={{ width: i === active ? 24 : 7, height:7, borderRadius:99, border:'none', cursor:'pointer', padding:0, background: i === active ? '#2D2A7A' : '#d1d5db', transition:'all 0.3s' }} />
+            ))}
+          </div>
+          <button onClick={() => setActive(p => (p + 1) % PASOS_DATA.length)}
+            style={{ width:36, height:36, borderRadius:'50%', border:'1.5px solid #e5e7eb', background:'#fff', cursor:'pointer', fontSize:16 }}>›</button>
+        </div>
+      </div>
+
+      {/* Desktop: cards expandibles */}
+      <div className="hidden sm:flex" style={{ gap:10, marginBottom:28, height:300 }}>
         {PASOS_DATA.map((paso, i) => {
           const isActive = i === active
           return (
@@ -248,8 +282,10 @@ function CarouselPasos() {
         })}
       </div>
 
-      {/* Progress dots */}
-      <div style={{ display:'flex', justifyContent:'center', gap:8 }}>
+      </div>
+
+      {/* Progress dots (solo desktop) */}
+      <div className="hidden sm:flex" style={{ justifyContent:'center', gap:8 }}>
         {PASOS_DATA.map((_, i) => (
           <button
             key={i}
@@ -402,7 +438,7 @@ export default function Landing() {
               Portal de aliados · Asegura2.com
             </div>
 
-            <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 leading-tight mb-5" style={{ letterSpacing: '-1px' }}>
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight mb-5" style={{ letterSpacing: '-0.5px' }}>
               Vende seguros de vehículos y{' '}
               <span className="text-brand">gana<br />comisiones</span>{' '}
               cada mes
@@ -413,12 +449,12 @@ export default function Landing() {
               Cotiza, vende y recibe comisiones de las mejores aseguradoras. Sin costos, sin límites.
             </p>
 
-            <div className="flex items-center gap-3 mb-8">
-              <Link to="/registro" className="flex items-center gap-2 bg-brand hover:bg-brand-dark text-white font-semibold px-6 py-3.5 rounded-xl text-sm transition-colors shadow-lg shadow-brand/25">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-8">
+              <Link to="/registro" className="flex items-center justify-center gap-2 bg-brand hover:bg-brand-dark text-white font-semibold px-6 py-3.5 rounded-xl text-sm transition-colors shadow-lg shadow-brand/25">
                 Quiero ser aliado
                 <ArrowRight size={16} />
               </Link>
-              <Link to="/login" className="border border-gray-200 bg-white text-gray-600 font-medium px-6 py-3.5 rounded-xl text-sm hover:bg-gray-50 transition-colors">
+              <Link to="/login" className="flex items-center justify-center border border-gray-200 bg-white text-gray-600 font-medium px-6 py-3.5 rounded-xl text-sm hover:bg-gray-50 transition-colors">
                 Ya tengo cuenta
               </Link>
             </div>
@@ -819,7 +855,7 @@ export default function Landing() {
 
       {/* ── CTA final ───────────────────────────────────────────── */}
       <section className="py-20 px-6">
-        <div className="max-w-4xl mx-auto bg-brand rounded-3xl p-12 text-center relative overflow-hidden">
+        <div className="max-w-4xl mx-auto bg-brand rounded-3xl p-8 sm:p-12 text-center relative overflow-hidden">
           <div className="absolute -top-20 -right-20 w-72 h-72 bg-white/5 rounded-full" />
           <div className="absolute -bottom-24 -left-24 w-80 h-80 bg-accent/10 rounded-full" />
           <div className="relative">
