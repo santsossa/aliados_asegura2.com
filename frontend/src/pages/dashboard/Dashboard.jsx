@@ -311,12 +311,14 @@ export default function Dashboard() {
           ) : (
             <div>
               {actividad.map((a, i) => {
-                const isLead = a.tipo === 'lead'
+                const enviada = a.estado === 'enviada'
                 const badge = getBadge(a.estado)
-                const Icon = isLead ? FileText : Shield
-                const iconBg = isLead ? '#dbeafe' : '#ede9fe'
-                const iconColor = isLead ? '#2563eb' : '#7c3aed'
-                const title = isLead ? `Cotización para ${a.cliente_nombre}` : `Póliza ${a.cliente_nombre}`
+                const nombre = a.cliente_nombre || 'Sin nombre'
+                const sub = [
+                  a.cliente_tipo_doc && a.cliente_cedula ? `${a.cliente_tipo_doc} ${a.cliente_cedula}` : null,
+                  a.placa || null
+                ].filter(Boolean).join(' · ') || '—'
+
                 return (
                   <div
                     key={`${a.tipo}-${a.id}-${i}`}
@@ -326,48 +328,35 @@ export default function Dashboard() {
                       borderBottom: i < actividad.length - 1 ? '1px solid #f9fafb' : 'none',
                     }}
                   >
-                    {/* Icon */}
+                    {/* Icono: verde si enviada, azul si activa */}
                     <div style={{
                       width: 36, height: 36, borderRadius: 10, flexShrink: 0,
-                      background: iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      background: enviada ? '#dcfce7' : '#dbeafe',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
                     }}>
-                      <Icon size={16} color={iconColor} />
+                      <FileText size={16} color={enviada ? '#16a34a' : '#2563eb'} />
                     </div>
 
-                    {/* Title + cedula + placa */}
+                    {/* Nombre + cédula + placa */}
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontSize: 13, fontWeight: 600, color: '#111827', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                        {a.cliente_nombre || title}
+                        {nombre}
                       </div>
-                      <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 1 }}>
-                        {a.cliente_tipo_doc && a.cliente_cedula
-                          ? `${a.cliente_tipo_doc} ${a.cliente_cedula}${a.placa ? ' · ' + a.placa : ''}`
-                          : a.placa || a.aseguradora || '—'}
-                      </div>
+                      <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 1 }}>{sub}</div>
                     </div>
 
-                    {/* Time */}
+                    {/* Tiempo */}
                     <div style={{ fontSize: 11, color: '#9ca3af', whiteSpace: 'nowrap', flexShrink: 0 }}>
                       {a.hace}
                     </div>
 
-                    {/* Badge */}
+                    {/* Estado */}
                     <span style={{
                       fontSize: 10, fontWeight: 600, padding: '3px 8px', borderRadius: 99,
                       background: badge.bg, color: badge.color, whiteSpace: 'nowrap', flexShrink: 0,
                     }}>
                       {badge.label}
                     </span>
-
-                    {/* Amount + chevron */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
-                      {a.monto > 0 && (
-                        <span style={{ fontSize: 12, fontWeight: 600, color: '#374151' }}>
-                          {fmt(a.monto)}
-                        </span>
-                      )}
-                      <ChevronRight size={14} color="#d1d5db" />
-                    </div>
                   </div>
                 )
               })}
