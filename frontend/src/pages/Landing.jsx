@@ -282,8 +282,6 @@ function CarouselPasos() {
         })}
       </div>
 
-      </div>
-
       {/* Progress dots (solo desktop) */}
       <div className="hidden sm:flex" style={{ justifyContent:'center', gap:8 }}>
         {PASOS_DATA.map((_, i) => (
