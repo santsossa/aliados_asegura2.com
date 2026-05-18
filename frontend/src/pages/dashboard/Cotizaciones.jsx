@@ -103,23 +103,32 @@ function getCoverageTip(name = '') {
 }
 
 function CovTooltip({ name }) {
-  const [show, setShow] = useState(false)
+  const [pos, setPos] = useState(null)
   const tip = getCoverageTip(name) || 'Esta cobertura forma parte del plan seleccionado. Consulta a tu asesor de Asegura2 para más detalles sobre sus condiciones específicas.'
+
+  const handleEnter = (e) => {
+    const r = e.currentTarget.getBoundingClientRect()
+    setPos({ x: r.left + r.width / 2, y: r.top })
+  }
+
   return (
-    <span style={{ display:'inline-flex', alignItems:'center', gap:4, position:'relative' }}>
+    <span style={{ display:'inline-flex', alignItems:'center', gap:4 }}>
       <span style={{ fontSize:11, color:'#374151' }}>{name}</span>
       <span
-        onMouseEnter={() => setShow(true)} onMouseLeave={() => setShow(false)}
+        onMouseEnter={handleEnter} onMouseLeave={() => setPos(null)}
         style={{ width:13, height:13, borderRadius:'50%', background:'#e5e7eb', color:'#6b7280',
                  fontSize:8, fontWeight:800, display:'inline-flex', alignItems:'center',
                  justifyContent:'center', cursor:'help', flexShrink:0, lineHeight:1 }}>
         ?
       </span>
-      {show && (
-        <span style={{ position:'absolute', bottom:'calc(100% + 6px)', left:0, background:'#111827',
-                       color:'#fff', fontSize:11, padding:'8px 11px', borderRadius:9, zIndex:300,
-                       lineHeight:1.5, width:240, boxShadow:'0 4px 16px rgba(0,0,0,0.2)',
-                       pointerEvents:'none', whiteSpace:'normal' }}>
+      {pos && (
+        <span style={{
+          position:'fixed', left: pos.x, top: pos.y - 8,
+          transform:'translate(-50%, -100%)',
+          background:'#111827', color:'#fff', fontSize:11, padding:'8px 11px',
+          borderRadius:9, zIndex:99999, lineHeight:1.5, width:250,
+          boxShadow:'0 4px 20px rgba(0,0,0,0.3)', pointerEvents:'none', whiteSpace:'normal',
+        }}>
           {tip}
         </span>
       )}
@@ -134,28 +143,37 @@ const PLAN_TIPS = {
 }
 
 function PlanTipoTooltip({ tipo }) {
-  const [show, setShow] = useState(false)
+  const [pos, setPos] = useState(null)
   const tip = PLAN_TIPS[tipo]
   const label = tipo === 'full' ? 'Plan Completo (Full)' : 'Plan Básico'
   const color = tipo === 'full' ? '#7c3aed' : '#2563eb'
   const bg = tipo === 'full' ? '#ede9fe' : '#dbeafe'
+
+  const handleEnter = (e) => {
+    const r = e.currentTarget.getBoundingClientRect()
+    setPos({ x: r.left + r.width / 2, y: r.top })
+  }
+
   return (
-    <span style={{ display:'inline-flex', alignItems:'center', gap:5, position:'relative' }}>
+    <span style={{ display:'inline-flex', alignItems:'center', gap:5 }}>
       <span style={{ background:bg, color, fontSize:11, fontWeight:700, padding:'3px 10px', borderRadius:99 }}>
         {label}
       </span>
       <span
-        onMouseEnter={() => setShow(true)} onMouseLeave={() => setShow(false)}
+        onMouseEnter={handleEnter} onMouseLeave={() => setPos(null)}
         style={{ width:15, height:15, borderRadius:'50%', background:'#e5e7eb', color:'#6b7280',
                  fontSize:9, fontWeight:800, display:'inline-flex', alignItems:'center',
                  justifyContent:'center', cursor:'help', flexShrink:0 }}>
         ?
       </span>
-      {show && (
-        <span style={{ position:'absolute', bottom:'calc(100% + 8px)', left:0, background:'#111827',
-                       color:'#fff', fontSize:11, padding:'10px 13px', borderRadius:10, zIndex:300,
-                       lineHeight:1.6, width:260, boxShadow:'0 4px 20px rgba(0,0,0,0.25)',
-                       pointerEvents:'none', whiteSpace:'normal' }}>
+      {pos && (
+        <span style={{
+          position:'fixed', left: pos.x, top: pos.y - 8,
+          transform:'translate(-50%, -100%)',
+          background:'#111827', color:'#fff', fontSize:11, padding:'10px 13px',
+          borderRadius:10, zIndex:99999, lineHeight:1.6, width:270,
+          boxShadow:'0 4px 20px rgba(0,0,0,0.3)', pointerEvents:'none', whiteSpace:'normal',
+        }}>
           {tip}
         </span>
       )}
