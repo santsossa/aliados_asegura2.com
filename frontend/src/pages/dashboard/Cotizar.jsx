@@ -505,6 +505,10 @@ export default function Cotizar() {
     setProgress({ done:0, total:0 })
     const collectedFull = []; const collectedBasic = []
 
+    // AbortController para cancelar fetches pendientes al terminar
+    const abortCtrl = new AbortController()
+    const signal = abortCtrl.signal
+
     const birthDate = `${form.anioNac}-${String(form.mesNac).padStart(2,'0')}-${String(form.diaNac).padStart(2,'0')}`
     const model = {
       documentTypeId: form.tipoDoc,    identification: form.numDoc,
@@ -517,7 +521,7 @@ export default function Cotizar() {
     }
 
     try {
-      const provR = await fetch(`${API}/api/cotizar/proveedores`, { headers: authH })
+      const provR = await fetch(`${API}/api/cotizar/proveedores`, { headers: authH, signal })
       const provD = await provR.json()
       const providers = provD?.response || provD?.data?.response || []
       if (!providers.length) { setFetchErr('No se encontraron proveedores.'); return }
@@ -526,35 +530,30 @@ export default function Cotizar() {
       let done = 0
 
       await Promise.allSettled(
-        providers.map(provider =>
-          // Timeout de 30s por proveedor — el race solo controla el contador,
-          // el fetch sigue corriendo y actualiza el estado si llega tarde
-          Promise.race([
-            fetch(`${API}/api/cotizar/quote`, {
-              method:'POST', headers: authH,
-              body: JSON.stringify({ ...model, provider }),
-            })
-              .then(r => r.json())
-              .then(d => {
-                const resp = d?.response
-                const price = parseFloat(resp?.yearlyTotal || resp?.monthlyTotal || 0)
-                if (resp && !resp.error && price > 0) {
-                  const plan = mapPlan(resp)
-                  if (plan.company !== 'Seguros del Estado') {
-                    // Busca valor asegurado en múltiples campos posibles
-                    const cv = extractCV(resp)
-                    if (cv != null && cv > 0) setCommercialValue(cv)
-                    // Actualiza el estado inmediatamente — stream progresivo
-                    if (plan.productFull) { collectedFull.push(plan); setFullPlans(p => [...p, plan].sort((a,b) => a.price-b.price)) }
-                    else                  { collectedBasic.push(plan); setBasicPlans(p => [...p, plan].sort((a,b) => a.price-b.price)) }
-                  }
+        providers.map(provider => {
+          const timeoutId = setTimeout(() => { done++; setProgress({ done, total: providers.length }) }, 15000)
+          return fetch(`${API}/api/cotizar/quote`, {
+            method:'POST', headers: authH, signal,
+            body: JSON.stringify({ ...model, provider }),
+          })
+            .then(r => r.json())
+            .then(d => {
+              clearTimeout(timeoutId)
+              const resp = d?.response
+              const price = parseFloat(resp?.yearlyTotal || resp?.monthlyTotal || 0)
+              if (resp && !resp.error && price > 0) {
+                const plan = mapPlan(resp)
+                if (plan.company !== 'Seguros del Estado') {
+                  const cv = extractCV(resp)
+                  if (cv != null && cv > 0) setCommercialValue(cv)
+                  if (plan.productFull) { collectedFull.push(plan); setFullPlans(p => [...p, plan].sort((a,b) => a.price-b.price)) }
+                  else                  { collectedBasic.push(plan); setBasicPlans(p => [...p, plan].sort((a,b) => a.price-b.price)) }
                 }
-              })
-              .catch(() => {})
-              .finally(() => { done++; setProgress({ done, total: providers.length }) }),
-            new Promise(resolve => setTimeout(resolve, 30000))
-          ])
-        )
+              }
+            })
+            .catch(() => { clearTimeout(timeoutId) })
+            .finally(() => { done++; setProgress({ done, total: providers.length }) })
+        })
       )
       // Fallback: si ningún proveedor devolvió el valor, buscarlo en los planes ya recibidos
       setFullPlans(prev => {
@@ -566,9 +565,10 @@ export default function Cotizar() {
         })
         return prev
       })
-    } catch {
-      setFetchErr('No se pudieron obtener cotizaciones. Intenta nuevamente.')
+    } catch (err) {
+      if (err?.name !== 'AbortError') setFetchErr('No se pudieron obtener cotizaciones. Intenta nuevamente.')
     } finally {
+      abortCtrl.abort() // cancela cualquier fetch que todavía no haya respondido
       setLoadingQ(false)
       saveCotizacionWithPlans(collectedFull, collectedBasic)
     }
