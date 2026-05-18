@@ -814,7 +814,7 @@ export default function Cotizar() {
       <div style={card}>
         {step===1 && <>
           <h2 style={{ fontSize:17,fontWeight:800,color:'#111827',marginBottom:20 }}>Datos del cliente</h2>
-          <div style={{ display:'grid',gridTemplateColumns:'1fr 1fr',gap:12 }}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Fld label="Nombre *"><Inp value={form.nombre} onChange={v=>setF('nombre',v)} placeholder="Nombre" /></Fld>
             <Fld label="Apellido *"><Inp value={form.apellido} onChange={v=>setF('apellido',v)} placeholder="Apellido" /></Fld>
           </div>
@@ -824,12 +824,12 @@ export default function Cotizar() {
 
         {step===2 && <>
           <h2 style={{ fontSize:17,fontWeight:800,color:'#111827',marginBottom:20 }}>Documento del cliente</h2>
-          <div style={{ display:'grid',gridTemplateColumns:'1fr 1fr',gap:12 }}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Fld label="Tipo de documento *"><Sel value={form.tipoDoc} onChange={v=>setF('tipoDoc',v)} options={DOC_OPTIONS} /></Fld>
             <Fld label="Número *"><Inp value={form.numDoc} onChange={v=>setF('numDoc',v.replace(/\D/g,''))} placeholder="Ej. 1023456789" /></Fld>
           </div>
           <Fld label="Fecha de nacimiento *">
-            <div style={{ display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:8 }}>
+            <div className="grid grid-cols-3 gap-2">
               <Sel value={form.diaNac} onChange={v=>setF('diaNac',v)} options={DAY_OPTIONS} placeholder="Día" />
               <Sel value={form.mesNac} onChange={v=>setF('mesNac',v)} options={MONTH_OPTIONS} placeholder="Mes" />
               <Sel value={form.anioNac} onChange={v=>setF('anioNac',v)} options={YEAR_OPTIONS} placeholder="Año" />

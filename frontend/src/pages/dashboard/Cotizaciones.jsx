@@ -304,7 +304,8 @@ function CotizacionModal({ cotizacion, token, user, onClose, onDeleted, onEmitid
     >
       <div
         style={{ background:'#fff', borderRadius:20, width:'100%', maxWidth:560,
-                 maxHeight:'90vh', overflowY:'auto', boxShadow:'0 20px 60px rgba(0,0,0,0.2)' }}
+                 maxHeight:'90dvh', overflowY:'auto', boxShadow:'0 20px 60px rgba(0,0,0,0.2)',
+                 margin:'0 8px' }}
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}

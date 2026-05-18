@@ -206,7 +206,7 @@ export default function Dashboard() {
   const tickDias = [1, 8, 15, 22, 29]
 
   return (
-    <div style={{ padding: '24px 32px', height: '100%', overflowY: 'auto' }}>
+    <div className="p-4 lg:p-8" style={{ height: '100%', overflowY: 'auto' }}>
       <div style={{ maxWidth: '72rem', margin: '0 auto' }}>
       {/* Greeting */}
       <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700, color: '#111827' }}>
@@ -217,7 +217,7 @@ export default function Dashboard() {
       </p>
 
       {/* ── Row 1: Stat cards ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 16, marginBottom: 16 }}>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4 mb-4">
         {cards.map((c) => {
           const Icon = c.icon
           return (
@@ -280,7 +280,7 @@ export default function Dashboard() {
       </div>
 
       {/* ── Row 2: Actividad + Rendimiento ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: 16 }}>
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-4">
 
         {/* Actividad reciente */}
         <div style={{
