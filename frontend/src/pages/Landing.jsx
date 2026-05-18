@@ -407,18 +407,18 @@ export default function Landing() {
 
       {/* ── Navbar ──────────────────────────────────────────────── */}
       <div className="flex justify-center px-6 pt-5 sticky top-0 z-20">
-        <nav className="flex items-center justify-between w-full max-w-5xl bg-white/80 backdrop-blur-md border border-gray-200/80 rounded-2xl px-5 py-2 shadow-sm">
-          <LogoFull className="h-11" />
-          <div className="hidden sm:flex items-center gap-6">
+        <nav className="flex items-center justify-between w-full max-w-5xl bg-white/80 backdrop-blur-md border border-gray-200/80 rounded-2xl px-4 sm:px-5 py-2 shadow-sm">
+          <LogoFull className="h-8 sm:h-11" />
+          <div className="hidden md:flex items-center gap-6">
             {NAV_LINKS.map(l => (
               <a key={l.href} href={l.href} className="text-sm text-gray-500 hover:text-brand font-medium transition-colors">{l.label}</a>
             ))}
           </div>
-          <div className="flex items-center gap-2">
-            <Link to="/login" className="text-sm font-medium text-gray-500 hover:text-gray-900 px-3 py-1.5 transition-colors">
-              Iniciar sesión
+          <div className="flex items-center gap-1 sm:gap-2">
+            <Link to="/login" className="text-xs sm:text-sm font-medium text-gray-500 hover:text-gray-900 px-2 sm:px-3 py-1.5 transition-colors">
+              Entrar
             </Link>
-            <Link to="/registro" className="bg-brand hover:bg-brand-dark text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors">
+            <Link to="/registro" className="bg-brand hover:bg-brand-dark text-white text-xs sm:text-sm font-semibold px-3 sm:px-4 py-2 rounded-xl transition-colors whitespace-nowrap">
               Registrarse
             </Link>
           </div>
@@ -426,7 +426,7 @@ export default function Landing() {
       </div>
 
       {/* ── Hero ────────────────────────────────────────────────── */}
-      <section className="max-w-6xl mx-auto px-6 pt-14 pb-20">
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 pt-8 sm:pt-14 pb-12 sm:pb-20">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-10">
 
           {/* Left */}
@@ -442,8 +442,8 @@ export default function Landing() {
               cada mes
             </h1>
 
-            <p className="text-gray-500 text-base leading-relaxed mb-8 max-w-md">
-              Plataforma para asesores de concesionarios y compraventas de carros.<br />
+            <p className="text-gray-500 text-sm sm:text-base leading-relaxed mb-6 sm:mb-8 max-w-md">
+              Plataforma para asesores de concesionarios y compraventas de carros.
               Cotiza, vende y recibe comisiones de las mejores aseguradoras. Sin costos, sin límites.
             </p>
 
@@ -457,10 +457,10 @@ export default function Landing() {
               </Link>
             </div>
 
-            {/* Social proof */}
-            <div className="flex items-center">
+            {/* Social proof — apilado en móvil, horizontal en desktop */}
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-0">
               {/* Avatars + texto */}
-              <div className="flex items-center gap-3 flex-shrink-0">
+              <div className="flex items-center gap-3">
                 <div className="flex flex-shrink-0">
                   {[
                     'https://randomuser.me/api/portraits/men/32.jpg',
@@ -469,28 +469,28 @@ export default function Landing() {
                     'https://randomuser.me/api/portraits/women/68.jpg',
                   ].map((src, i) => (
                     <img key={i} src={src} alt="aliado"
-                      className="w-9 h-9 rounded-full object-cover"
-                      style={{ marginLeft: i === 0 ? 0 : -18, zIndex: 4 - i }} />
+                      className="w-8 h-8 sm:w-9 sm:h-9 rounded-full object-cover"
+                      style={{ marginLeft: i === 0 ? 0 : -14, zIndex: 4 - i }} />
                   ))}
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-gray-800 whitespace-nowrap">+124 aliados activos</p>
-                  <p className="text-xs text-gray-400">vendiendo seguros y<br />ganando comisiones</p>
+                  <p className="text-sm font-bold text-gray-800">+124 aliados activos</p>
+                  <p className="text-xs text-gray-400">vendiendo seguros y ganando comisiones</p>
                 </div>
               </div>
 
-              {/* Divider */}
-              <div className="w-px bg-gray-200 mx-6 flex-shrink-0" style={{ height: 36 }} />
+              {/* Divider solo en desktop */}
+              <div className="hidden sm:block w-px bg-gray-200 mx-6 flex-shrink-0" style={{ height: 36 }} />
 
               {/* Stars */}
-              <div className="flex-shrink-0">
+              <div>
                 <div className="flex items-center gap-0.5 mb-0.5">
                   {[1,2,3,4,5].map(i => (
                     <Star key={i} size={13} className="text-accent fill-accent" />
                   ))}
                   <span className="text-sm font-bold text-gray-800 ml-1.5">4.9/5</span>
                 </div>
-                <p className="text-xs text-gray-400">Nuestros aliados<br />recomiendan Asegura2.com</p>
+                <p className="text-xs text-gray-400">Nuestros aliados recomiendan Asegura2.com</p>
               </div>
             </div>
           </div>
@@ -503,9 +503,9 @@ export default function Landing() {
 
       </section>
 
-      {/* ── Stats card — exactamente en el centro de la transición ── */}
-      <div className="relative z-10 px-6" style={{ marginTop: -44, marginBottom: -44 }}>
-        <div className="max-w-4xl mx-auto bg-white rounded-2xl border border-gray-100 shadow-xl px-8 py-6
+      {/* ── Stats card ── */}
+      <div className="relative z-10 px-4 sm:px-6" style={{ marginTop: -24, marginBottom: -24 }}>
+        <div className="max-w-4xl mx-auto bg-white rounded-2xl border border-gray-100 shadow-xl px-4 sm:px-8 py-4 sm:py-6
           grid grid-cols-2 sm:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-gray-100">
           {[
             { value: '6% de comisión',  desc: 'Sin IVA, sobre el valor de la prima' },
