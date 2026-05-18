@@ -696,12 +696,21 @@ export default function Cotizar() {
     const birthDate = `${form.anioNac}-${String(form.mesNac).padStart(2,'0')}-${String(form.diaNac).padStart(2,'0')}`
     const fd = new FormData()
     fd.append('formData', JSON.stringify({
-      documentTypeId: form.tipoDoc, identification: form.numDoc,
-      firstName: form.nombre,       lastName: form.apellido,
-      birthDate, plate,             municipalityId: form.ciudad,
-      mobileNumber: form.celular,   genderId: form.gender==='M' ? 1 : 2,
-      gender: form.gender,          email: form.correo,
-      city: cityName,               vehicleModel, commercialValue,
+      documentTypeId: form.tipoDoc,           // backend normaliza a número (CC→1, CE→2, etc.)
+      identification: form.numDoc,
+      firstName:      form.nombre,
+      lastName:       form.apellido,
+      birthDate,
+      plate,
+      municipalityId: form.ciudad,
+      mobileNumber:   form.celular,
+      genderId:       form.gender==='M' ? 1 : 2,
+      gender:         form.gender,
+      email:          form.correo,
+      city:           cityName,
+      vehicleModel,
+      vehicleYear:    vehicleModel || null,    // año del vehículo
+      commercialValue: commercialValue || null,
     }))
     fd.append('poliza', JSON.stringify({
       insuranceCode: selectedPlan.insuranceCode || selectedPlan.carrierId,

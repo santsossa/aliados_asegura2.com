@@ -158,6 +158,10 @@ router.post('/quote', async (req: Request, res: Response, next: NextFunction) =>
 // ── Emitir lead al CRM (con documentos) ────────────────────────────────────
 const memUpload = multer({ storage: multer.memoryStorage() })
 
+// Mapeo tipo documento: string del portal → número que espera el CRM
+// CRM: 1=CC, 2=CE, 3=TI, 4=Pasaporte, 5=NIT
+const DOC_STR_TO_NUM: Record<string, number> = { CC: 1, CE: 2, TI: 3, PA: 4, NIT: 5 }
+
 router.post('/emitir',
   memUpload.fields([
     { name: 'cedula_titular',    maxCount: 1 },
@@ -168,20 +172,58 @@ router.post('/emitir',
       const aliado = req.aliado!
       const files  = req.files as { [f: string]: Express.Multer.File[] }
 
+      // ── Validar documentos obligatorios ──────────────────────────────────
+      if (!files?.cedula_titular?.[0]) {
+        res.status(400).json({ status: 'error', message: 'La cédula del titular es obligatoria para enviar a emitir.' })
+        return
+      }
+      if (!files?.tarjeta_propiedad?.[0]) {
+        res.status(400).json({ status: 'error', message: 'La tarjeta de propiedad es obligatoria para enviar a emitir.' })
+        return
+      }
+
+      // ── Normalizar formData para que coincida exactamente con la API del CRM ──
+      let formDataParsed: Record<string, any> = {}
+      try { formDataParsed = JSON.parse(req.body.formData || '{}') } catch {}
+
+      // documentTypeId: convertir 'CC' → 1, 'CE' → 2, etc.
+      const docTypeRaw = formDataParsed.documentTypeId
+      const docTypeNum = typeof docTypeRaw === 'number'
+        ? docTypeRaw
+        : (DOC_STR_TO_NUM[String(docTypeRaw).toUpperCase()] ?? 1)
+
+      // genderId: asegurar que sea número
+      const genderRaw = formDataParsed.genderId ?? (formDataParsed.gender === 'F' ? 2 : 1)
+      const genderNum = Number(genderRaw) || 1
+
+      const formDataNorm = {
+        identification:  String(formDataParsed.identification || ''),
+        documentTypeId:  docTypeNum,
+        firstName:       formDataParsed.firstName || '',
+        lastName:        formDataParsed.lastName  || '',
+        email:           formDataParsed.email     || '',
+        mobileNumber:    String(formDataParsed.mobileNumber || formDataParsed.celular || ''),
+        birthDate:       formDataParsed.birthDate || '',
+        genderId:        genderNum,
+        plate:           String(formDataParsed.plate || '').toUpperCase(),
+        vehicleModel:    formDataParsed.vehicleModel || '',
+        vehicleYear:     formDataParsed.vehicleYear  || formDataParsed.vehicleModel || null,
+        city:            formDataParsed.city         || formDataParsed.cityName     || '',
+        municipalityId:  formDataParsed.municipalityId ? Number(formDataParsed.municipalityId) : null,
+        commercialValue: formDataParsed.commercialValue ? Number(formDataParsed.commercialValue) : null,
+      }
+
       const fd = new FormData()
-      fd.append('formData',      req.body.formData)
+      fd.append('formData',      JSON.stringify(formDataNorm))
       fd.append('poliza',        req.body.poliza)
       fd.append('aliado_id',     aliado.sub)
       fd.append('aliado_nombre', req.body.aliado_nombre || aliado.email)
 
-      if (files?.cedula_titular?.[0]) {
-        const f = files.cedula_titular[0]
-        fd.append('cedula_titular', f.buffer, { filename: f.originalname, contentType: f.mimetype })
-      }
-      if (files?.tarjeta_propiedad?.[0]) {
-        const f = files.tarjeta_propiedad[0]
-        fd.append('tarjeta_propiedad', f.buffer, { filename: f.originalname, contentType: f.mimetype })
-      }
+      const cedulaFile = files.cedula_titular[0]
+      fd.append('cedula_titular', cedulaFile.buffer, { filename: cedulaFile.originalname, contentType: cedulaFile.mimetype })
+
+      const tarjetaFile = files.tarjeta_propiedad[0]
+      fd.append('tarjeta_propiedad', tarjetaFile.buffer, { filename: tarjetaFile.originalname, contentType: tarjetaFile.mimetype })
 
       const r = await axios.post(
         `${env.CRM_URL}/api/quotation/aliado-lead`,
@@ -189,7 +231,7 @@ router.post('/emitir',
         {
           headers: {
             ...fd.getHeaders(),
-            'x-api-key': env.CRM_API_KEY,
+            'X-API-Key': env.CRM_API_KEY,  // coincide exactamente con la documentación
           },
           maxBodyLength: Infinity,
         }
@@ -198,18 +240,16 @@ router.post('/emitir',
       // Save to local DB
       try {
         const cotizacionId = req.body.cotizacion_id || null
-        const fd_parsed = JSON.parse(req.body.formData || '{}')
         const pol_parsed = JSON.parse(req.body.poliza || '{}')
-        const clienteNombre = `${fd_parsed.firstName || ''} ${fd_parsed.lastName || ''}`.trim()
-        const clienteTel = String(fd_parsed.mobileNumber || fd_parsed.celular || '')
+        const clienteNombre = `${formDataNorm.firstName} ${formDataNorm.lastName}`.trim()
+        const clienteTel = formDataNorm.mobileNumber
         const aseguradora = pol_parsed.company || ''
         const valorPrima = pol_parsed.price || 0
 
-        const clienteCedula = String(fd_parsed.identification || '')
-        const docTypeId = Number(fd_parsed.documentTypeId)
-        const DOC_ID_MAP: Record<number,string> = { 1:'CC', 2:'CE', 3:'PA', 4:'NIT' }
-        const clienteTipoDoc = DOC_ID_MAP[docTypeId] || 'CC'
-        const placaEmitir = String(fd_parsed.plate || pol_parsed.plate || '').toUpperCase() || null
+        const clienteCedula = formDataNorm.identification
+        const DOC_NUM_TO_STR: Record<number,string> = { 1:'CC', 2:'CE', 3:'TI', 4:'PA', 5:'NIT' }
+        const clienteTipoDoc = DOC_NUM_TO_STR[formDataNorm.documentTypeId] || 'CC'
+        const placaEmitir = formDataNorm.plate || null
 
         if (cotizacionId) {
           await pool.execute(

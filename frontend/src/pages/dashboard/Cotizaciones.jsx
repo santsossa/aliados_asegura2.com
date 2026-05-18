@@ -253,7 +253,7 @@ function CotizacionModal({ cotizacion, token, user, onClose, onDeleted, onEmitid
 
       const fd = new FormData()
       fd.append('formData', JSON.stringify({
-        documentTypeId: f.tipoDoc || 'CC',
+        documentTypeId: f.tipoDoc || 'CC',   // backend lo normaliza a número
         identification: f.numDoc || cedula || '',
         firstName: f.nombre || nombre.split(' ')[0] || '',
         lastName:  f.apellido || nombre.split(' ').slice(1).join(' ') || '',
@@ -266,7 +266,8 @@ function CotizacionModal({ cotizacion, token, user, onClose, onDeleted, onEmitid
         email: f.correo || cotizacion.cliente_correo || '',
         city: f.cityName || '',
         vehicleModel: cotizacion.anio || '',
-        commercialValue: cotizacion.comercial_value || 0,
+        vehicleYear: cotizacion.anio || null,
+        commercialValue: cotizacion.comercial_value || null,
       }))
       fd.append('poliza', JSON.stringify({
         insuranceCode: selectedPlan.insuranceCode || selectedPlan.carrierId,
