@@ -755,7 +755,8 @@ export default function Cotizar() {
 
   /* ── PLACA ── */
   if (phase === 'placa') return (
-    <div style={{ padding:'24px', height:'100%', overflowY:'auto' }}>
+    <div className="p-6 lg:p-8" style={{ height:'100%', overflowY:'auto' }}>
+      <div className="max-w-5xl mx-auto">
       <h1 style={{ fontSize:22,fontWeight:800,color:'#111827',marginBottom:4 }}>Nueva cotización</h1>
       <p style={{ fontSize:13,color:'#6b7280',marginBottom:24 }}>Ingresa la placa del vehículo del cliente para empezar.</p>
       <div style={card}>
@@ -775,12 +776,14 @@ export default function Cotizar() {
           Continuar con los datos del cliente →
         </button>
       </div>
+      </div>
     </div>
   )
 
   /* ── FORM ── */
   if (phase === 'form') return (
-    <div style={{ padding:'24px', height:'100%', overflowY:'auto' }}>
+    <div className="p-6 lg:p-8" style={{ height:'100%', overflowY:'auto' }}>
+      <div className="max-w-5xl mx-auto">
       {/* Pill placa */}
       <div style={{ display:'flex',alignItems:'center',gap:10,maxWidth:520,margin:'0 auto 16px' }}>
         <span style={{ display:'flex',alignItems:'center',gap:8,background:'#edeef3',borderRadius:99,padding:'6px 14px',fontSize:13,fontWeight:700,color:'#2D2A7A' }}>
@@ -862,6 +865,7 @@ export default function Cotizar() {
           </div>
         </>}
       </div>
+      </div>
     </div>
   )
 
@@ -869,7 +873,8 @@ export default function Cotizar() {
   if (phase === 'results') {
     const allPlans = [...fullPlans, ...basicPlans]
     return (
-      <div style={{ padding:'24px', height:'100%', overflowY:'auto' }}>
+      <div className="p-6 lg:p-8" style={{ height:'100%', overflowY:'auto' }}>
+        <div className="max-w-5xl mx-auto">
         {/* Topbar */}
         <div style={{ background:'#2D2A7A',borderRadius:14,padding:'14px 20px',display:'flex',alignItems:'center',gap:16,marginBottom:20,flexWrap:'wrap' }}>
           <span style={{ color:'#fff',fontWeight:800,fontSize:14 }}>{displayPlate(plate)}</span>
@@ -1023,13 +1028,15 @@ export default function Cotizar() {
             </div>
           </div>
         )}
+        </div>
       </div>
     )
   }
 
   /* ── EMITIR ── */
   if (phase === 'emitir') return (
-    <div style={{ padding:'24px', height:'100%', overflowY:'auto' }}>
+    <div className="p-6 lg:p-8" style={{ height:'100%', overflowY:'auto' }}>
+      <div className="max-w-5xl mx-auto">
       <div style={{ maxWidth:540, margin:'0 auto' }}>
         <div style={{ display:'flex',alignItems:'center',gap:12,marginBottom:20 }}>
           <button onClick={() => setPhase('results')} style={{ fontSize:13,color:'#6b7280',background:'none',border:'none',cursor:'pointer' }}>← Volver</button>
@@ -1077,12 +1084,13 @@ export default function Cotizar() {
           </p>
         </form>
       </div>
+      </div>
     </div>
   )
 
   /* ── DONE ── */
   return (
-    <div style={{ padding:'24px',display:'flex',alignItems:'center',justifyContent:'center',height:'100%' }}>
+    <div className="p-6 lg:p-8" style={{ display:'flex',alignItems:'center',justifyContent:'center',height:'100%' }}>
       <div style={{ ...card,textAlign:'center',maxWidth:440 }}>
         <div style={{ fontSize:64,marginBottom:16 }}>🎉</div>
         <h2 style={{ fontSize:22,fontWeight:800,color:'#111827',marginBottom:10 }}>¡Lead enviado!</h2>
