@@ -149,12 +149,17 @@ router.get('/dashboard', async (req, res, next) => {
     const [[ganTotal]]= await pool.execute<any[]>(`SELECT COALESCE(SUM(monto_total),0) total FROM pagos WHERE aliado_id=? AND estado='procesado'`, [id])
     const [[ganAnt]]  = await pool.execute<any[]>(`SELECT COALESCE(SUM(monto_total),0) total FROM pagos WHERE aliado_id=? AND estado='procesado' AND (anio<? OR (anio=? AND mes<?))`, [id, anio, anio, mes])
 
-    // Actividad reciente: cotizaciones + leads, ordenados por fecha
+    // Actividad reciente:
+    // - cotizaciones con estado 'activa' (no enviadas — las enviadas aparecen como lead)
+    // - leads (representa las que ya se enviaron a emitir)
+    // Así cada cotización aparece UNA sola vez sin importar su estado
     const [actividad] = await pool.execute<any[]>(
       `(SELECT 'cotizacion' tipo, id, COALESCE(cliente_nombre,'Sin nombre') cliente_nombre,
                cliente_cedula, cliente_tipo_doc, placa,
                comercial_value monto, estado, created_at
-        FROM cotizaciones WHERE aliado_id=? ORDER BY created_at DESC LIMIT 5)
+        FROM cotizaciones
+        WHERE aliado_id=? AND estado = 'activa'
+        ORDER BY created_at DESC LIMIT 5)
        UNION ALL
        (SELECT 'lead' tipo, id, cliente_nombre,
                cliente_cedula, cliente_tipo_doc, COALESCE(placa,'') placa,
