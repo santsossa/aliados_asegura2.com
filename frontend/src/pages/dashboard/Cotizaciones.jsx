@@ -365,7 +365,10 @@ function CotizacionModal({ cotizacion, token, user, onClose, onDeleted, onEmitid
               ) : (() => {
                 const fullPlans  = quotes.filter(q => q.productFull)
                 const basicPlans = quotes.filter(q => !q.productFull)
-                const renderGroup = (plans, tipo) => plans.length === 0 ? null : (
+                const renderGroup = (plans, tipo) => {
+                  if (plans.length === 0) return null
+                  const bestPrice = Math.min(...plans.map(q => q.price || Infinity))
+                  return (
                   <div key={tipo} style={{ marginBottom:14 }}>
                     <div style={{ marginBottom:8 }}>
                       <PlanTipoTooltip tipo={tipo} />
@@ -375,6 +378,7 @@ function CotizacionModal({ cotizacion, token, user, onClose, onDeleted, onEmitid
                         const planKey = `${tipo}-${i}`
                         const isSel = selectedPlan?.insuranceCode === q.insuranceCode && selectedPlan?.company === q.company
                         const isOpen = expandedPlan === planKey
+                        const isBest = q.price === bestPrice && bestPrice < Infinity
                         const allCov = q.coverages?.length
                           ? q.coverages
                           : [...(q.main || []), ...(q.extras || [])]
@@ -382,12 +386,23 @@ function CotizacionModal({ cotizacion, token, user, onClose, onDeleted, onEmitid
                           <div
                             key={i}
                             style={{
-                              border: isSel ? '2px solid #2D2A7A' : '1.5px solid #e5e7eb',
+                              border: isSel ? '2px solid #2D2A7A' : isBest ? '2px solid #16a34a' : '1.5px solid #e5e7eb',
                               borderRadius:12, overflow:'hidden',
                               background: isSel ? '#f5f4ff' : '#fff',
+                              boxShadow: isBest && !isSel ? '0 0 0 3px rgba(22,163,74,0.1)' : 'none',
                               transition:'border-color 0.15s, background 0.15s',
                             }}
                           >
+                            {/* Banner mejor precio */}
+                            {isBest && (
+                              <div style={{ background:'linear-gradient(90deg,#16a34a,#15803d)',
+                                            padding:'4px 14px', display:'flex', alignItems:'center', gap:5 }}>
+                                <span style={{ fontSize:11 }}>🏆</span>
+                                <span style={{ fontSize:10, fontWeight:800, color:'#fff', letterSpacing:'0.04em' }}>
+                                  MEJOR PRECIO EN ESTE GRUPO
+                                </span>
+                              </div>
+                            )}
                             {/* Fila superior: logo + empresa + precio + selección */}
                             <div
                               onClick={() => puedeEmitir && emitPhase === 'select' ? setSelectedPlan(q) : undefined}
@@ -401,7 +416,7 @@ function CotizacionModal({ cotizacion, token, user, onClose, onDeleted, onEmitid
                               )}
                               <p style={{ margin:0, fontSize:13, fontWeight:700, color:'#111827', flex:1 }}>{q.company}</p>
                               <div style={{ textAlign:'right', flexShrink:0, marginRight:6 }}>
-                                <p style={{ margin:0, fontSize:15, fontWeight:800, color:'#111827' }}>{fmt(q.price)}</p>
+                                <p style={{ margin:0, fontSize:15, fontWeight:800, color: isBest ? '#16a34a' : '#111827' }}>{fmt(q.price)}</p>
                                 <p style={{ margin:0, fontSize:10, color:'#9ca3af' }}>anual</p>
                               </div>
                               {puedeEmitir && emitPhase === 'select' && (
@@ -438,7 +453,8 @@ function CotizacionModal({ cotizacion, token, user, onClose, onDeleted, onEmitid
                       })}
                     </div>
                   </div>
-                )
+                  )
+                }
                 return (
                   <div style={{ marginBottom:16 }}>
                     {renderGroup(fullPlans, 'full')}
