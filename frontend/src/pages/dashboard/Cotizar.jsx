@@ -612,9 +612,10 @@ export default function Cotizar() {
   // Guardar cotizacion con planes reales (llamado al final de fetchQuotes)
   async function saveCotizacionWithPlans(allFull, allBasic) {
     const s = saveRef.current
-    if (s.cotSaved || !s.plate) return
+    const allQuotes = [...allFull, ...allBasic]
+    // Solo guardar si hay al menos 1 plan con precio — nunca cotizaciones vacías
+    if (s.cotSaved || !s.plate || allQuotes.length === 0) return
     try {
-      const allQuotes = [...allFull, ...allBasic]
       const nombre = `${s.form.nombre} ${s.form.apellido}`.trim() || null
       const body = {
         placa: s.plate,
@@ -653,28 +654,7 @@ export default function Cotizar() {
     } catch {}
   }
 
-  // Guardar al salir sin haber llegado a resultados (respaldo)
-  useEffect(() => {
-    return () => {
-      if (!saveRef.current.cotSaved && saveRef.current.plate) {
-        const s = saveRef.current
-        const nombre = `${s.form.nombre} ${s.form.apellido}`.trim() || null
-        fetch(`${API}/api/cotizar/guardar`, {
-          method: 'POST',
-          headers: { Authorization:`Bearer ${getToken()}`, 'Content-Type':'application/json' },
-          body: JSON.stringify({
-            placa: s.plate, vehicleModel: s.vehicleModel,
-            comercial_value: s.commercialValue,
-            cliente_nombre: nombre, cliente_telefono: s.form.celular || null,
-            cliente_correo: s.form.correo || null,
-            cliente_cedula: s.form.numDoc || null,
-            cliente_tipo_doc: s.form.tipoDoc || null,
-            datos_cotizacion: { form_full: { ...s.form, cityName: s.cityName }, quotes: [] },
-          }),
-        }).catch(() => {})
-      }
-    }
-  }, []) // solo en unmount
+  // No guardar al salir — solo se guarda cuando todos los precios llegan (saveCotizacionWithPlans)
 
   function handleElegir(plan) {
     setPendingPlan(plan)
