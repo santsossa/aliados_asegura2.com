@@ -501,7 +501,7 @@ export default function Landing() {
             <img
               src={imgHeroPhone}
               alt="Portal de aliados Asegura2.com"
-              className="w-full max-w-md object-contain drop-shadow-2xl"
+              className="w-full max-w-xl object-contain drop-shadow-2xl"
             />
           </div>
         </div>
