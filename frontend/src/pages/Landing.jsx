@@ -3,6 +3,7 @@ import { ArrowRight, ChevronDown, ChevronUp, Shield, DollarSign, Zap, BarChart3,
 import { Link } from 'react-router-dom'
 import { LogoFull } from '../components/Logo'
 
+import imgHeroPhone  from '../assets/herophone.png'
 import imgCcManizales from '../assets/ccMANIZALES.png'
 import imgCcCucuta    from '../assets/ccCUCUTA.png'
 
@@ -495,9 +496,13 @@ export default function Landing() {
             </div>
           </div>
 
-          {/* Right — mockup */}
-          <div className="hidden lg:block">
-            <DashboardMockup />
+          {/* Right — hero image */}
+          <div className="hidden lg:flex items-center justify-center">
+            <img
+              src={imgHeroPhone}
+              alt="Portal de aliados Asegura2.com"
+              className="w-full max-w-md object-contain drop-shadow-2xl"
+            />
           </div>
         </div>
 
