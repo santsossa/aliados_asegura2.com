@@ -1,12 +1,21 @@
 import { Link, useNavigate } from 'react-router-dom'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Eye, EyeOff } from 'lucide-react'
 import { LogoFull } from '../../components/Logo'
+import { useAuth } from '../../context/AuthContext'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
 export default function Login() {
   const navigate = useNavigate()
+  const { user, loading: authLoading } = useAuth()
+
+  // Si ya hay sesión activa → redirigir directamente
+  useEffect(() => {
+    if (!authLoading && user) {
+      navigate(user.tipo === 'admin' ? '/admin' : '/dashboard', { replace: true })
+    }
+  }, [user, authLoading])
   const [email,      setEmail]      = useState('')
   const [password,   setPassword]   = useState('')
   const [showPass,   setShowPass]   = useState(false)

@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import { ArrowRight, ChevronDown, ChevronUp, Shield, DollarSign, Zap, BarChart3, Star, UserPlus, Send } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { LogoFull } from '../components/Logo'
+import { useAuth } from '../context/AuthContext'
 
 import imgHeroPhone  from '../assets/herophone.png'
 import imgCcManizales from '../assets/ccMANIZALES.png'
@@ -403,6 +404,15 @@ function DashboardMockup() {
 }
 
 export default function Landing() {
+  const { user } = useAuth()
+  const navigate = useNavigate()
+
+  // Destino del CTA según estado de sesión
+  const ctaHref    = user ? (user.tipo === 'admin' ? '/admin' : '/dashboard') : '/registro'
+  const ctaLabel   = user ? 'Ir a mi dashboard →' : 'Empieza gratis'
+  const loginHref  = user ? (user.tipo === 'admin' ? '/admin' : '/dashboard') : '/login'
+  const loginLabel = user ? 'Mi cuenta' : 'Entrar'
+
   return (
     <div className="min-h-screen font-sans" style={{ background: 'linear-gradient(160deg, #f0f2ff 0%, #faf8ff 40%, #ffffff 100%)' }}>
 
@@ -416,11 +426,11 @@ export default function Landing() {
             ))}
           </div>
           <div className="flex items-center gap-1 sm:gap-2">
-            <Link to="/login" className="text-xs sm:text-sm font-medium text-gray-500 hover:text-gray-900 px-2 sm:px-3 py-1.5 transition-colors">
-              Entrar
+            <Link to={loginHref} className="text-xs sm:text-sm font-medium text-gray-500 hover:text-gray-900 px-2 sm:px-3 py-1.5 transition-colors">
+              {loginLabel}
             </Link>
-            <Link to="/registro" className="bg-brand hover:bg-brand-dark text-white text-xs sm:text-sm font-semibold px-3 sm:px-4 py-2 rounded-xl transition-colors whitespace-nowrap">
-              Registrarse
+            <Link to={ctaHref} className="bg-brand hover:bg-brand-dark text-white text-xs sm:text-sm font-semibold px-3 sm:px-4 py-2 rounded-xl transition-colors whitespace-nowrap">
+              {user ? 'Mi dashboard' : 'Registrarse'}
             </Link>
           </div>
         </nav>
@@ -449,8 +459,8 @@ export default function Landing() {
             </p>
 
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-8">
-              <Link to="/registro" className="flex items-center justify-center gap-2 bg-brand hover:bg-brand-dark text-white font-semibold px-6 py-3.5 rounded-xl text-sm transition-colors shadow-lg shadow-brand/25">
-                Quiero ser aliado
+              <Link to={ctaHref} className="flex items-center justify-center gap-2 bg-brand hover:bg-brand-dark text-white font-semibold px-6 py-3.5 rounded-xl text-sm transition-colors shadow-lg shadow-brand/25">
+                {user ? 'Ir a mi dashboard' : 'Quiero ser aliado'}
                 <ArrowRight size={16} />
               </Link>
               <Link to="/login" className="flex items-center justify-center border border-gray-200 bg-white text-gray-600 font-medium px-6 py-3.5 rounded-xl text-sm hover:bg-gray-50 transition-colors">

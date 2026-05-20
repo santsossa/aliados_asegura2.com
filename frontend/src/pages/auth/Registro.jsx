@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Eye, EyeOff, ArrowRight } from 'lucide-react'
 import { LogoFull } from '../../components/Logo'
+import { useAuth } from '../../context/AuthContext'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
@@ -33,6 +34,19 @@ const labelStyle = (focused, filled) => ({
 
 export default function Registro() {
   const navigate = useNavigate()
+  const { user, loading: authLoading } = useAuth()
+
+  // Si ya hay sesión activa → redirigir directamente
+  useEffect(() => {
+    if (!authLoading && user) {
+      const step = user.onboarding_step
+      if (step !== undefined && step !== null && step < 3) {
+        navigate('/onboarding', { replace: true })
+      } else {
+        navigate(user.tipo === 'admin' ? '/admin' : '/dashboard', { replace: true })
+      }
+    }
+  }, [user, authLoading])
 
   const [email,        setEmail]        = useState('')
   const [password,     setPassword]     = useState('')
