@@ -232,12 +232,16 @@ router.post('/emitir',
       )
 
       // Save to local DB — guardar lead y marcar cotizacion como enviada
+      // Declarar fuera del try para que el bloque de email también los use
+      let clienteNombre = `${formDataNorm.firstName} ${formDataNorm.lastName}`.trim()
+      let aseguradora   = ''
+      let valorPrima    = 0
+
       try {
         const cotizacionId = req.body.cotizacion_id || null
         const pol_parsed   = JSON.parse(req.body.poliza || '{}')
-        const clienteNombre = `${formDataNorm.firstName} ${formDataNorm.lastName}`.trim()
-        const aseguradora   = pol_parsed.company || ''
-        const valorPrima    = pol_parsed.price || 0
+        aseguradora   = pol_parsed.company || ''
+        valorPrima    = pol_parsed.price || 0
 
         // Obtener el ID de cotización en el CRM si fue retornado
         const crmQuotationId = r.data?.data?.quotation_id
