@@ -230,30 +230,32 @@ router.post('/emitir',
         }
       )
 
-      // Save to local DB
+      // Save to local DB — guardar lead y marcar cotizacion como enviada
       try {
         const cotizacionId = req.body.cotizacion_id || null
-        const pol_parsed = JSON.parse(req.body.poliza || '{}')
+        const pol_parsed   = JSON.parse(req.body.poliza || '{}')
         const clienteNombre = `${formDataNorm.firstName} ${formDataNorm.lastName}`.trim()
-        const clienteTel = formDataNorm.mobileNumber
-        const aseguradora = pol_parsed.company || ''
-        const valorPrima = pol_parsed.price || 0
+        const aseguradora   = pol_parsed.company || ''
+        const valorPrima    = pol_parsed.price || 0
 
-        const clienteCedula = formDataNorm.identification
-        const DOC_NUM_TO_STR: Record<number,string> = { 1:'CC', 2:'CE', 3:'TI', 4:'PA', 5:'NIT' }
-        const clienteTipoDoc = DOC_NUM_TO_STR[formDataNorm.documentTypeId] || 'CC'
-        const placaEmitir = formDataNorm.plate || null
+        // Obtener el ID de cotización en el CRM si fue retornado
+        const crmQuotationId = r.data?.data?.quotation_id
+          || r.data?.quotation_id
+          || null
 
+        // Marcar cotizacion como enviada
         if (cotizacionId) {
           await pool.execute(
-            `UPDATE cotizaciones SET estado = 'enviada', cliente_cedula = COALESCE(cliente_cedula, ?), cliente_tipo_doc = COALESCE(cliente_tipo_doc, ?) WHERE id = ? AND aliado_id = ?`,
-            [clienteCedula || null, clienteTipoDoc || null, cotizacionId, aliado.sub]
+            `UPDATE cotizaciones SET estado = 'enviada' WHERE id = ? AND aliado_id = ?`,
+            [cotizacionId, aliado.sub]
           )
         }
+
+        // Crear lead local
         await pool.execute(
-          `INSERT INTO leads (aliado_id, cotizacion_id, cliente_nombre, cliente_telefono, aseguradora, valor_prima, cliente_cedula, cliente_tipo_doc, placa)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-          [aliado.sub, cotizacionId, clienteNombre, clienteTel, aseguradora, valorPrima, clienteCedula || null, clienteTipoDoc || null, placaEmitir]
+          `INSERT INTO leads (aliado_id, cotizacion_id, cliente_nombre, cliente_telefono, aseguradora, valor_prima, crm_lead_id)
+           VALUES (?, ?, ?, ?, ?, ?, ?)`,
+          [aliado.sub, cotizacionId, clienteNombre, formDataNorm.mobileNumber || '', aseguradora, valorPrima, crmQuotationId]
         )
       } catch { /* no interrumpir si falla el guardado local */ }
 

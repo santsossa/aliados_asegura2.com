@@ -14,11 +14,23 @@ function pct(n) {
 }
 
 // ─── Badge colours ───────────────────────────────────────────────────────────
-const BADGE_ENVIADA     = { bg: '#dcfce7', color: '#16a34a', label: 'Enviada a emitir'    }
-const BADGE_NO_ENVIADA  = { bg: '#f3f4f6', color: '#374151', label: 'No enviada a emitir' }
+const BADGE = {
+  // Cotizaciones
+  activa:        { bg: '#dbeafe', color: '#1d4ed8', label: 'Cotizada'          },
+  enviada:       { bg: '#dcfce7', color: '#16a34a', label: 'Enviada a emitir'  },
+  cerrada:       { bg: '#f3f4f6', color: '#6b7280', label: 'Cerrada'           },
+  // Leads
+  lead:          { bg: '#dcfce7', color: '#16a34a', label: 'Enviada a emitir'  },
+  // Pólizas admin
+  en_proceso:    { bg: '#fef3c7', color: '#d97706', label: 'En proceso'        },
+  aprobada:      { bg: '#d1fae5', color: '#065f46', label: 'Aprobada'          },
+  no_convertida: { bg: '#fee2e2', color: '#dc2626', label: 'No convertida'     },
+  procesado:     { bg: '#d1fae5', color: '#065f46', label: 'Completado'        },
+}
 
-function getBadge(estado) {
-  return estado === 'enviada' ? BADGE_ENVIADA : BADGE_NO_ENVIADA
+function getBadge(estado, tipo) {
+  if (tipo === 'lead') return BADGE.lead
+  return BADGE[estado] || { bg: '#f3f4f6', color: '#6b7280', label: estado || '—' }
 }
 
 const MESES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre']
@@ -311,13 +323,12 @@ export default function Dashboard() {
           ) : (
             <div>
               {actividad.map((a, i) => {
-                const enviada = a.estado === 'enviada'
-                const badge = getBadge(a.estado)
+                const badge  = getBadge(a.estado, a.tipo)
                 const nombre = a.cliente_nombre || 'Sin nombre'
-                const sub = [
-                  a.cliente_tipo_doc && a.cliente_cedula ? `${a.cliente_tipo_doc} ${a.cliente_cedula}` : null,
-                  a.placa || null
-                ].filter(Boolean).join(' · ') || '—'
+                // Para cotizaciones la columna "aseguradora" contiene la placa
+                const sub    = (a.tipo === 'cotizacion')
+                  ? (a.aseguradora && a.aseguradora !== '—' ? `Placa: ${a.aseguradora}` : 'Sin placa')
+                  : (a.aseguradora || '—')
 
                 return (
                   <div

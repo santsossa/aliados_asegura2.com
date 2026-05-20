@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Shield, Send, Info } from 'lucide-react'
+import { Shield, X, Info } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
@@ -7,24 +7,168 @@ const MESES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov'
 const fmt = n => n ? ('$' + Math.round(n).toLocaleString('es-CO')) : '—'
 
 const ESTADOS = {
-  en_proceso:    { bg:'#fef3c7', color:'#d97706', label:'En proceso',    desc:'Enviada a Asegura2.com. Nuestro equipo está gestionando la emisión con el cliente.' },
-  aprobada:      { bg:'#dcfce7', color:'#16a34a', label:'Aprobada',      desc:'El cliente realizó el pago. Tu comisión está lista para el próximo pago del 1 del mes.' },
-  no_convertida: { bg:'#fee2e2', color:'#dc2626', label:'No convertida', desc:'La venta no se cerró. No se genera comisión por esta póliza.' },
+  en_proceso:    { bg:'#fef3c7', color:'#d97706', label:'En proceso',    desc:'El equipo de Asegura2.com está gestionando la emisión con tu cliente.' },
+  aprobada:      { bg:'#dcfce7', color:'#16a34a', label:'Aprobada',      desc:'El cliente realizó el pago. Tu comisión se liquidará el 1 del mes.' },
+  no_convertida: { bg:'#fee2e2', color:'#dc2626', label:'No convertida', desc:'La venta no se pudo cerrar. No se genera comisión.' },
 }
 
 function Badge({ estado }) {
   const e = ESTADOS[estado] || ESTADOS.en_proceso
   return (
-    <span style={{ background: e.bg, color: e.color, fontSize: 11, fontWeight: 600, padding: '4px 12px', borderRadius: 99, whiteSpace: 'nowrap' }}>
+    <span style={{ background:e.bg, color:e.color, fontSize:11, fontWeight:700,
+                   padding:'4px 12px', borderRadius:99, whiteSpace:'nowrap' }}>
       {e.label}
     </span>
   )
 }
 
+function fechaStr(d) {
+  const f = new Date(d)
+  return `${f.getDate()} ${MESES[f.getMonth()]} ${f.getFullYear()}`
+}
+
+/* ── Sección del modal ─────────────────────────────────────────────────── */
+function Sec({ title, children }) {
+  return (
+    <div style={{ marginBottom:20 }}>
+      <div style={{ fontSize:11, fontWeight:700, color:'#9ca3af', textTransform:'uppercase',
+                    letterSpacing:'0.08em', marginBottom:8 }}>{title}</div>
+      <div style={{ background:'#f9fafb', borderRadius:12, overflow:'hidden' }}>
+        {children}
+      </div>
+    </div>
+  )
+}
+function Row({ label, value, highlight }) {
+  return (
+    <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center',
+                  padding:'9px 14px', borderBottom:'1px solid #f3f4f6' }}>
+      <span style={{ fontSize:12, color:'#6b7280' }}>{label}</span>
+      <span style={{ fontSize:13, fontWeight: highlight ? 700 : 500,
+                     color: highlight ? '#16a34a' : '#111827' }}>{value || '—'}</span>
+    </div>
+  )
+}
+
+/* ── Modal de detalle ───────────────────────────────────────────────────── */
+function DetalleModal({ item, onClose, token }) {
+  const [det,     setDet]     = useState(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const cotId = item.cotizacion_id || (item._tipo === 'lead' ? null : item.id)
+    if (!cotId) { setLoading(false); return }
+    fetch(`${API}/api/aliados/me/cotizaciones/${cotId}/detalle`, {
+      headers: { Authorization: `Bearer ${token}` },
+      credentials: 'include',
+    })
+      .then(r => r.json())
+      .then(d => { if (d.status === 'success') setDet(d.data) })
+      .catch(() => {})
+      .finally(() => setLoading(false))
+  }, [item])
+
+  const estadoActual = det?.poliza_estado || item.estado || 'en_proceso'
+  const E = ESTADOS[estadoActual] || ESTADOS.en_proceso
+
+  return (
+    <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:500,
+                  display:'flex', alignItems:'center', justifyContent:'center', padding:16 }}
+         onClick={onClose}>
+      <div style={{ background:'#fff', borderRadius:20, width:'100%', maxWidth:520,
+                    maxHeight:'88vh', overflowY:'auto',
+                    boxShadow:'0 24px 64px rgba(0,0,0,0.18)' }}
+           onClick={e => e.stopPropagation()}>
+
+        {/* Cabecera */}
+        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between',
+                      padding:'20px 24px 16px', borderBottom:'1px solid #f3f4f6', position:'sticky', top:0, background:'#fff', zIndex:1 }}>
+          <h2 style={{ fontSize:17, fontWeight:800, color:'#111827', margin:0 }}>Detalle del lead</h2>
+          <button onClick={onClose}
+            style={{ background:'none', border:'none', cursor:'pointer', color:'#9ca3af', padding:4,
+                     display:'flex', alignItems:'center' }}>
+            <X size={20} />
+          </button>
+        </div>
+
+        <div style={{ padding:'20px 24px' }}>
+          {loading ? (
+            <div style={{ textAlign:'center', padding:'32px 0', color:'#9ca3af', fontSize:14 }}>Cargando detalles...</div>
+          ) : (
+            <>
+              {/* Estado actual */}
+              <div style={{ background:E.bg, borderRadius:12, padding:'14px 16px', marginBottom:20 }}>
+                <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:6 }}>
+                  <span style={{ fontSize:11, fontWeight:700, color:E.color, textTransform:'uppercase', letterSpacing:'0.06em' }}>
+                    Estado actual
+                  </span>
+                  <Badge estado={estadoActual} />
+                </div>
+                <p style={{ fontSize:12, color:'#6b7280', margin:0, lineHeight:1.5 }}>{E.desc}</p>
+              </div>
+
+              {/* Cliente */}
+              <Sec title="Datos del cliente">
+                <Row label="Nombre"   value={det?.cliente_nombre   || item.cliente_nombre} />
+                <Row label="Teléfono" value={det?.cliente_telefono || det?.lead_telefono || item.cliente_telefono} />
+                <Row label="Correo"   value={det?.cliente_correo} />
+              </Sec>
+
+              {/* Vehículo */}
+              <Sec title="Vehículo">
+                <Row label="Placa"           value={det?.placa || item.placa} />
+                <Row label="Valor asegurado" value={det?.comercial_value ? fmt(det.comercial_value) : null} />
+              </Sec>
+
+              {/* Póliza enviada */}
+              <Sec title="Póliza enviada a emitir">
+                <Row label="Aseguradora" value={det?.aseguradora || item.aseguradora} />
+                <Row label="Prima anual" value={fmt(det?.valor_prima || item.valor_prima)} />
+                {(det?.valor_comision || item.valor_comision) &&
+                  <Row label="Tu comisión (6%)" value={fmt(det?.valor_comision || item.valor_comision)} highlight />}
+              </Sec>
+
+              {/* Fechas */}
+              <Sec title="Seguimiento">
+                <Row label="Lead enviado"   value={fechaStr(det?.created_at || item.created_at)} />
+                {estadoActual === 'aprobada' && det?.mes && det?.anio &&
+                  <Row label="Pago programado" value={`1 de ${MESES[(det.mes||1) - 1]} ${det.anio}`} highlight />}
+              </Sec>
+
+              {/* Actualizaciones del equipo */}
+              {det?.observaciones ? (
+                <Sec title="Actualización del equipo Asegura2.com">
+                  <div style={{ padding:'12px 14px', fontSize:13, color:'#374151', lineHeight:1.6 }}>
+                    {det.observaciones}
+                  </div>
+                </Sec>
+              ) : estadoActual === 'en_proceso' ? (
+                <div style={{ background:'#eff6ff', borderRadius:10, padding:'12px 14px',
+                              fontSize:12, color:'#1d4ed8', display:'flex', gap:8, alignItems:'flex-start' }}>
+                  <Info size={14} style={{ flexShrink:0, marginTop:1 }} />
+                  <span>Nuestro equipo está contactando a tu cliente. Te notificaremos por correo cuando haya novedades.</span>
+                </div>
+              ) : estadoActual === 'no_convertida' ? (
+                <div style={{ background:'#fef2f2', borderRadius:10, padding:'12px 14px',
+                              fontSize:12, color:'#dc2626', display:'flex', gap:8, alignItems:'flex-start' }}>
+                  <Info size={14} style={{ flexShrink:0, marginTop:1 }} />
+                  <span>El equipo no logró cerrar la venta. Puedes intentar con este cliente en una próxima cotización.</span>
+                </div>
+              ) : null}
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/* ── Main ────────────────────────────────────────────────────────────────── */
 export default function MisPolizas() {
   const { getToken } = useAuth()
-  const [data, setData] = useState({ leads: [], polizas: [] })
+  const [data,    setData]    = useState({ leads: [], polizas: [] })
   const [loading, setLoading] = useState(true)
+  const [modal,   setModal]   = useState(null)
 
   useEffect(() => {
     fetch(`${API}/api/aliados/me/polizas`, {
@@ -37,41 +181,33 @@ export default function MisPolizas() {
       .finally(() => setLoading(false))
   }, [])
 
-  const ahora = new Date()
-  const mesActual = ahora.getMonth()
-  const anioActual = ahora.getFullYear()
-
-  const esDelMesActual = (created_at) => {
-    const f = new Date(created_at)
-    return f.getMonth() === mesActual && f.getFullYear() === anioActual
-  }
-
   const allItems = [
-    ...data.polizas.map(p => ({ ...p, _tipo: 'poliza' })),
-    ...data.leads.map(l => ({ ...l, _tipo: 'lead', estado: 'en_proceso' })),
-  ]
-    .filter(item => esDelMesActual(item.created_at))
-    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+    ...data.polizas.map(p => ({ ...p, _tipo:'poliza' })),
+    ...data.leads.map(l  => ({ ...l,  _tipo:'lead', estado:'en_proceso' })),
+  ].sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
 
   return (
     <div className="p-6 lg:p-8 max-w-5xl mx-auto">
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Mis pólizas</h1>
         <p className="text-gray-500 text-sm mt-1">
-          Pólizas enviadas a emitir este mes · {MESES[new Date().getMonth()]} {new Date().getFullYear()}
+          Pólizas enviadas a emitir — haz click en cualquiera para ver el detalle.
         </p>
       </div>
 
       {/* Leyenda */}
       <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4 mb-6">
         <div className="flex items-center gap-2 mb-3">
-          <Info size={15} className="text-blue-600" />
+          <Info size={14} className="text-blue-600" />
           <p className="text-sm font-semibold text-blue-700">¿Qué significa cada estado?</p>
         </div>
         <div className="space-y-2">
           {Object.values(ESTADOS).map(e => (
             <div key={e.label} className="flex items-start gap-2">
-              <span style={{ background: e.bg, color: e.color, fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 99, whiteSpace: 'nowrap', marginTop: 2 }}>{e.label}</span>
+              <span style={{ background:e.bg, color:e.color, fontSize:10, fontWeight:700,
+                             padding:'2px 8px', borderRadius:99, whiteSpace:'nowrap', marginTop:2 }}>
+                {e.label}
+              </span>
               <p className="text-xs text-gray-500">{e.desc}</p>
             </div>
           ))}
@@ -87,16 +223,18 @@ export default function MisPolizas() {
           <div className="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center mb-4">
             <Shield size={24} className="text-gray-300" />
           </div>
-          <p className="text-gray-400 font-medium text-sm">Sin pólizas este mes</p>
-          <p className="text-gray-300 text-xs mt-1">Las pólizas enviadas a emitir este mes aparecerán aquí</p>
+          <p className="text-gray-400 font-medium text-sm">Sin pólizas aún</p>
+          <p className="text-gray-300 text-xs mt-1">Las pólizas que envíes a emitir aparecerán aquí</p>
         </div>
       ) : (
         <div className="space-y-3">
-          {allItems.map(item => {
-            const fecha = new Date(item.created_at)
-            const fechaStr = `${fecha.getDate()} ${MESES[fecha.getMonth()]} ${fecha.getFullYear()}`
-            return (
-              <div key={`${item._tipo}-${item.id}`} className="bg-white rounded-2xl border border-gray-100 shadow-sm px-5 py-4">
+          {allItems.map(item => (
+            <button
+              key={`${item._tipo}-${item.id}`}
+              onClick={() => setModal(item)}
+              style={{ width:'100%', textAlign:'left', background:'none', border:'none', padding:0, cursor:'pointer' }}
+            >
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm px-5 py-4 hover:border-brand/40 hover:shadow-md transition-all">
                 <div className="flex items-center justify-between gap-4">
                   <div className="flex items-center gap-4">
                     <div className="w-10 h-10 bg-purple-50 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -105,14 +243,13 @@ export default function MisPolizas() {
                     <div>
                       <p className="font-semibold text-gray-900 text-sm">{item.cliente_nombre || 'Cliente'}</p>
                       <p className="text-xs text-gray-400 mt-0.5">
-                        {item.cliente_tipo_doc && item.cliente_cedula
-                          ? `${item.cliente_tipo_doc} ${item.cliente_cedula}`
-                          : item.cliente_cedula || null}
+                        {item.aseguradora || '—'}
                         {item.placa ? ` · ${item.placa}` : ''}
+                        {' · '}{fechaStr(item.created_at)}
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-4 flex-shrink-0">
+                  <div className="flex items-center gap-3 flex-shrink-0">
                     <div className="text-right hidden sm:block">
                       <p className="text-sm font-bold text-gray-900">{fmt(item.valor_prima)}</p>
                       {item.valor_comision && (
@@ -120,12 +257,21 @@ export default function MisPolizas() {
                       )}
                     </div>
                     <Badge estado={item.estado} />
+                    <span style={{ color:'#d1d5db', fontSize:18, lineHeight:1 }}>›</span>
                   </div>
                 </div>
               </div>
-            )
-          })}
+            </button>
+          ))}
         </div>
+      )}
+
+      {modal && (
+        <DetalleModal
+          item={modal}
+          token={getToken()}
+          onClose={() => setModal(null)}
+        />
       )}
     </div>
   )
