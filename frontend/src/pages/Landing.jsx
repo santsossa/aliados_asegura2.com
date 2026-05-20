@@ -507,12 +507,24 @@ export default function Landing() {
           </div>
 
           {/* Right — hero image */}
-          <div className="hidden lg:flex items-center justify-center">
+          <div className="hidden lg:flex items-center justify-center relative">
+            {/* Fondo degradado detrás del PNG */}
+            <div style={{
+              position: 'absolute',
+              inset: '-8% -12%',
+              background: 'radial-gradient(ellipse 80% 80% at 55% 50%, rgba(45,42,122,0.13) 0%, rgba(99,91,220,0.08) 45%, transparent 75%)',
+              borderRadius: '50%',
+              filter: 'blur(8px)',
+            }} />
             <img
               src={imgHeroPhone}
               alt="Portal de aliados Asegura2.com"
-              className="w-full object-contain drop-shadow-2xl"
-              style={{ maxWidth: '110%', marginRight: '-5%' }}
+              className="w-full object-contain relative"
+              style={{
+                maxWidth: '125%',
+                marginRight: '-10%',
+                filter: 'drop-shadow(0 24px 48px rgba(45,42,122,0.22)) drop-shadow(0 8px 20px rgba(45,42,122,0.14))',
+              }}
             />
           </div>
         </div>
