@@ -564,7 +564,10 @@ export default function Cotizar() {
               const price = parseFloat(resp?.yearlyTotal || resp?.monthlyTotal || 0)
               if (resp && !resp.error && price > 0) {
                 const plan = mapPlan(resp)
-                if (plan.company !== 'Seguros del Estado') {
+                // Ocultar Seguros del Estado — no mostrar al aliado
+                const carrierRaw = (resp.insuranceCarrier || '').toLowerCase()
+                const isEstado = carrierRaw.includes('estado') || plan.company.toLowerCase().includes('estado')
+                if (!isEstado) {
                   // Tomar valor del quote si Fasecolda falló o aún no tenemos el valor
                   const cv = extractCV(resp)
                   if (cv != null && cv > 0) setCommercialValue(prev => (!prev || prev <= 0) ? cv : prev)
