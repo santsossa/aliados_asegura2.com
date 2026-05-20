@@ -404,8 +404,15 @@ function DashboardMockup() {
 }
 
 export default function Landing() {
-  const { user } = useAuth()
+  const { user, loading } = useAuth()
   const navigate = useNavigate()
+
+  // Si hay sesión activa → redirigir al dashboard (bloquea el botón "atrás")
+  useEffect(() => {
+    if (!loading && user) {
+      navigate(user.tipo === 'admin' ? '/admin' : '/dashboard', { replace: true })
+    }
+  }, [user, loading])
 
   // Destino del CTA según estado de sesión
   const ctaHref    = user ? (user.tipo === 'admin' ? '/admin' : '/dashboard') : '/registro'
