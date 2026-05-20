@@ -722,7 +722,7 @@ export default function Landing() {
           }}
         >
           <div className="ticker-track">
-            {[...ASEGURADORAS, ...ASEGURADORAS].map((a, i) => (
+            {[...ASEGURADORAS, ...ASEGURADORAS, ...ASEGURADORAS, ...ASEGURADORAS].map((a, i) => (
               <div
                 key={i}
                 className="ticker-item flex items-center gap-2.5 px-8 border-r border-gray-200 cursor-default"

@@ -38,17 +38,21 @@ body {
   color: #2D2A7A;
 }
 @keyframes ticker-scroll {
-  from { transform: translate3d(0, 0, 0); }
-  to   { transform: translate3d(-50%, 0, 0); }
+  0%   { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-25%, 0, 0); }
 }
 
 .ticker-track {
   display: flex;
   align-items: center;
   width: max-content;
-  animation: ticker-scroll 36s linear infinite;
+  /* 4 copias → animamos -25% = exactamente 1 set, loop siempre fluido */
+  animation: ticker-scroll 40s linear infinite;
   will-change: transform;
   backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: translateZ(0);          /* fuerza capa GPU en móvil */
+  -webkit-transform: translateZ(0);
 }
 
 .ticker-track:hover {
