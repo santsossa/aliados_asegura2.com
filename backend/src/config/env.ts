@@ -34,6 +34,9 @@ const envSchema = z.object({
   INSURANCE_API_KEY: z.string().default(''),
   CRM_URL:           z.string().default(''),
   CRM_API_KEY:       z.string().default(''),
+
+  // API key estática para que el CRM llame al backend sin flujo JWT
+  ALIADOS_ADMIN_API_KEY: z.string().default(''),
 })
 
 const parsed = envSchema.safeParse(process.env)

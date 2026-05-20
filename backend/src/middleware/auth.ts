@@ -45,8 +45,22 @@ export function requireAuth(req: Request, res: Response, next: NextFunction): vo
   }
 }
 
-/** Solo permite admins */
+/** Solo permite admins — acepta JWT de admin O x-admin-api-key estático (para el CRM) */
 export function requireAdmin(req: Request, res: Response, next: NextFunction): void {
+  // Opción 1: API key estático para el CRM (sin flujo OTP)
+  const apiKey = req.headers['x-admin-api-key'] as string | undefined
+  if (apiKey && env.ALIADOS_ADMIN_API_KEY && apiKey === env.ALIADOS_ADMIN_API_KEY) {
+    req.aliado = {
+      sub:   'crm-system',
+      email: 'crm@asegura2.com.co',
+      tipo:  'admin',
+      rol:   'super_admin',
+      iat:   0,
+      exp:   9999999999,
+    }
+    return next()
+  }
+  // Opción 2: JWT de admin normal
   requireAuth(req, res, () => {
     if (req.aliado?.tipo !== 'admin') {
       res.status(403).json({ status: 'error', message: 'Acceso denegado. Se requieren permisos de administrador.' })
