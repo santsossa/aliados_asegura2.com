@@ -24,7 +24,7 @@ const BADGE = {
   // Pólizas admin
   en_proceso:    { bg: '#fef3c7', color: '#d97706', label: 'En proceso'        },
   aprobada:      { bg: '#d1fae5', color: '#065f46', label: 'Aprobada'          },
-  no_convertida: { bg: '#fee2e2', color: '#dc2626', label: 'No convertida'     },
+  no_convertida: { bg: '#fee2e2', color: '#dc2626', label: 'No aprobado'       },
   procesado:     { bg: '#d1fae5', color: '#065f46', label: 'Completado'        },
 }
 

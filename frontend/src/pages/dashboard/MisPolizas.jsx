@@ -7,9 +7,9 @@ const MESES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov'
 const fmt = n => n ? ('$' + Math.round(n).toLocaleString('es-CO')) : '—'
 
 const ESTADOS = {
-  en_proceso:    { bg:'#fef3c7', color:'#d97706', label:'En proceso',    desc:'El equipo de Asegura2.com está gestionando la emisión con tu cliente.' },
-  aprobada:      { bg:'#dcfce7', color:'#16a34a', label:'Aprobada',      desc:'El cliente realizó el pago. Tu comisión se liquidará el 1 del mes.' },
-  no_convertida: { bg:'#fee2e2', color:'#dc2626', label:'No convertida', desc:'La venta no se pudo cerrar. No se genera comisión.' },
+  en_proceso:    { bg:'#fef3c7', color:'#d97706', label:'En trámite',    desc:'Tu cliente está siendo contactado por nuestro equipo. Te avisamos cuando haya novedades.' },
+  aprobada:      { bg:'#dcfce7', color:'#16a34a', label:'Aprobado ✓',    desc:'¡El cliente pagó! Tu comisión queda lista para el pago del 1 del mes.' },
+  no_convertida: { bg:'#fee2e2', color:'#dc2626', label:'No aprobado',   desc:'Esta póliza no se pudo emitir. Nuestro equipo dejó el motivo abajo.' },
 }
 
 function Badge({ estado }) {
@@ -83,7 +83,14 @@ function DetalleModal({ item, onClose, token }) {
         {/* Cabecera */}
         <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between',
                       padding:'20px 24px 16px', borderBottom:'1px solid #f3f4f6', position:'sticky', top:0, background:'#fff', zIndex:1 }}>
-          <h2 style={{ fontSize:17, fontWeight:800, color:'#111827', margin:0 }}>Detalle del lead</h2>
+          <div>
+            <h2 style={{ fontSize:17, fontWeight:800, color:'#111827', margin:0 }}>
+              Seguimiento de póliza
+            </h2>
+            <p style={{ fontSize:12, color:'#9ca3af', margin:'2px 0 0' }}>
+              {item.cliente_nombre || 'Cliente'} · {item.aseguradora || '—'}
+            </p>
+          </div>
           <button onClick={onClose}
             style={{ background:'none', border:'none', cursor:'pointer', color:'#9ca3af', padding:4,
                      display:'flex', alignItems:'center' }}>
@@ -120,12 +127,14 @@ function DetalleModal({ item, onClose, token }) {
                 <Row label="Valor asegurado" value={det?.comercial_value ? fmt(det.comercial_value) : null} />
               </Sec>
 
-              {/* Póliza enviada */}
-              <Sec title="Póliza enviada a emitir">
-                <Row label="Aseguradora" value={det?.aseguradora || item.aseguradora} />
-                <Row label="Prima anual" value={fmt(det?.valor_prima || item.valor_prima)} />
-                {(det?.valor_comision || item.valor_comision) &&
-                  <Row label="Tu comisión (6%)" value={fmt(det?.valor_comision || item.valor_comision)} highlight />}
+              {/* Póliza y comisión */}
+              <Sec title="Póliza y tu comisión">
+                <Row label="Aseguradora"  value={det?.aseguradora || item.aseguradora} />
+                <Row label="Prima anual"  value={fmt(det?.valor_prima || item.valor_prima)} />
+                <Row label="Tu comisión (6%)"
+                     value={fmt(det?.valor_comision || item.valor_comision ||
+                            Math.round((det?.valor_prima || item.valor_prima || 0) * 0.06))}
+                     highlight />
               </Sec>
 
               {/* Fechas */}
@@ -135,26 +144,44 @@ function DetalleModal({ item, onClose, token }) {
                   <Row label="Pago programado" value={`1 de ${MESES[(det.mes||1) - 1]} ${det.anio}`} highlight />}
               </Sec>
 
-              {/* Actualizaciones del equipo */}
-              {det?.observaciones ? (
-                <Sec title="Actualización del equipo Asegura2.com">
-                  <div style={{ padding:'12px 14px', fontSize:13, color:'#374151', lineHeight:1.6 }}>
-                    {det.observaciones}
-                  </div>
-                </Sec>
-              ) : estadoActual === 'en_proceso' ? (
-                <div style={{ background:'#eff6ff', borderRadius:10, padding:'12px 14px',
-                              fontSize:12, color:'#1d4ed8', display:'flex', gap:8, alignItems:'flex-start' }}>
-                  <Info size={14} style={{ flexShrink:0, marginTop:1 }} />
-                  <span>Nuestro equipo está contactando a tu cliente. Te notificaremos por correo cuando haya novedades.</span>
+              {/* Mensaje del equipo según estado */}
+              {estadoActual === 'no_convertida' ? (
+                <div>
+                  <div style={{ fontSize:11, fontWeight:700, color:'#9ca3af', textTransform:'uppercase',
+                                letterSpacing:'0.08em', marginBottom:8 }}>Mensaje del equipo Asegura2.com</div>
+                  {det?.observaciones ? (
+                    <div style={{ background:'#fef2f2', border:'1.5px solid #fecaca', borderRadius:12,
+                                  padding:'14px 16px', fontSize:13, color:'#991b1b', lineHeight:1.7 }}>
+                      {det.observaciones}
+                    </div>
+                  ) : (
+                    <div style={{ background:'#fef2f2', borderRadius:12, padding:'14px 16px',
+                                  fontSize:13, color:'#dc2626', lineHeight:1.6 }}>
+                      Esta póliza no se pudo emitir. Nuestro equipo pronto agregará el motivo aquí.
+                    </div>
+                  )}
                 </div>
-              ) : estadoActual === 'no_convertida' ? (
-                <div style={{ background:'#fef2f2', borderRadius:10, padding:'12px 14px',
-                              fontSize:12, color:'#dc2626', display:'flex', gap:8, alignItems:'flex-start' }}>
-                  <Info size={14} style={{ flexShrink:0, marginTop:1 }} />
-                  <span>El equipo no logró cerrar la venta. Puedes intentar con este cliente en una próxima cotización.</span>
+              ) : estadoActual === 'aprobada' ? (
+                <div style={{ background:'#f0fdf4', border:'1.5px solid #bbf7d0', borderRadius:12,
+                              padding:'14px 16px', fontSize:13, color:'#166534',
+                              display:'flex', gap:10, alignItems:'flex-start', lineHeight:1.6 }}>
+                  <span style={{ fontSize:22 }}>🎉</span>
+                  <span>
+                    <strong>¡Felicitaciones!</strong> El cliente pagó la póliza.
+                    Tu comisión quedará incluida en el pago del <strong>1 del próximo mes</strong>.
+                    {det?.observaciones && <><br/><br/><em>{det.observaciones}</em></>}
+                  </span>
                 </div>
-              ) : null}
+              ) : (
+                <div style={{ background:'#eff6ff', borderRadius:12, padding:'14px 16px',
+                              fontSize:13, color:'#1d4ed8', display:'flex', gap:10, alignItems:'flex-start', lineHeight:1.6 }}>
+                  <Info size={16} style={{ flexShrink:0, marginTop:1 }} />
+                  <span>
+                    Nuestro equipo está en contacto con tu cliente para gestionar la emisión.
+                    Recibirás un correo cuando cambie el estado.
+                  </span>
+                </div>
+              )}
             </>
           )}
         </div>
