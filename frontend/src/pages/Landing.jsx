@@ -438,14 +438,14 @@ export default function Landing() {
             </div>
 
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight mb-5" style={{ letterSpacing: '-0.5px' }}>
-              Vende seguros de vehículos y{' '}
-              <span className="text-brand">gana<br />comisiones</span>{' '}
+              Convierte tus contactos en{' '}
+              <span className="text-brand">ingresos<br />extra</span>{' '}
               cada mes
             </h1>
 
             <p className="text-gray-500 text-sm sm:text-base leading-relaxed mb-6 sm:mb-8 max-w-md">
-              Plataforma para asesores de concesionarios y compraventas de carros.
-              Cotiza, vende y recibe comisiones de las mejores aseguradoras. Sin costos, sin límites.
+              Si conoces personas con carros o que están por comprar uno, ya tienes todo lo que necesitas.
+              Cotiza, envíanos el cliente y gana el 6% de comisión por cada póliza emitida — sin experiencia previa, sin costos, sin límites.
             </p>
 
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-8">

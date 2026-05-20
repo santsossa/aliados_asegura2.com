@@ -96,6 +96,16 @@ export default function Registro() {
     <div style={{ minHeight: '100vh', background: '#f4f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
       <div style={{ width: '100%', maxWidth: 400 }}>
 
+        {/* Volver al inicio */}
+        <div style={{ marginBottom: 16 }}>
+          <Link to="/" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#6b7280', textDecoration: 'none', fontWeight: 500 }}
+            onMouseEnter={e => e.currentTarget.style.color = '#2D2A7A'}
+            onMouseLeave={e => e.currentTarget.style.color = '#6b7280'}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            Volver al inicio
+          </Link>
+        </div>
+
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 32 }}>
           <LogoFull className="h-10" />
         </div>
