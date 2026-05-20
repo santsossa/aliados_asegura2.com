@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Car, X, Trash2, Send, Clock, AlertCircle } from 'lucide-react'
+import { Car, X, Send, Clock, AlertCircle } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
@@ -190,7 +190,7 @@ function getBadge(estado) {
 }
 
 // ── Modal de detalle ──────────────────────────────────────────────────────────
-function CotizacionModal({ cotizacion, token, user, onClose, onDeleted, onEmitida }) {
+function CotizacionModal({ cotizacion, token, user, onClose, onEmitida }) {
   const datos = (() => {
     const raw = cotizacion.datos_cotizacion
     if (!raw) return {}
@@ -213,28 +213,12 @@ function CotizacionModal({ cotizacion, token, user, onClose, onDeleted, onEmitid
   const [tarjetaFile, setTarjetaFile] = useState(null)
   const [sending, setSending] = useState(false)
   const [sendErr, setSendErr] = useState('')
-  const [confirmDelete, setConfirmDelete] = useState(false)
-  const [deleting, setDeleting] = useState(false)
 
   const fechaStr = `${createdAt.getDate()} ${MESES[createdAt.getMonth()]} ${createdAt.getFullYear()}`
   const nombre = cotizacion.cliente_nombre || `${formFull.nombre || ''} ${formFull.apellido || ''}`.trim() || 'Sin nombre'
   const cedula = cotizacion.cliente_cedula || formFull.numDoc || null
   const tipoCedula = cotizacion.cliente_tipo_doc || formFull.tipoDoc || null
   const placa = cotizacion.placa || null
-
-  // ── Eliminar ────────────────────────────────────────────────────────────────
-  async function handleDelete() {
-    setDeleting(true)
-    try {
-      const r = await fetch(`${API}/api/cotizaciones/${cotizacion.id}`, {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` },
-        credentials: 'include',
-      })
-      if (r.ok) { onDeleted(cotizacion.id); onClose() }
-    } catch {}
-    finally { setDeleting(false) }
-  }
 
   // ── Emitir ──────────────────────────────────────────────────────────────────
   async function handleEmitir(e) {
@@ -511,29 +495,6 @@ function CotizacionModal({ cotizacion, token, user, onClose, onDeleted, onEmitid
                     Continuar con {selectedPlan?.company || 'plan seleccionado'} →
                   </button>
                 )}
-                {!confirmDelete ? (
-                  <button
-                    onClick={() => setConfirmDelete(true)}
-                    style={{ background:'#fee2e2', color:'#dc2626', border:'none', borderRadius:10,
-                             padding:'10px 14px', fontSize:13, fontWeight:700, cursor:'pointer',
-                             display:'flex', alignItems:'center', gap:6 }}>
-                    <Trash2 size={14} /> Eliminar
-                  </button>
-                ) : (
-                  <div style={{ display:'flex', gap:6, alignItems:'center' }}>
-                    <span style={{ fontSize:12, color:'#374151' }}>¿Confirmar?</span>
-                    <button onClick={handleDelete} disabled={deleting}
-                      style={{ background:'#dc2626', color:'#fff', border:'none', borderRadius:8,
-                               padding:'7px 12px', fontSize:12, fontWeight:700, cursor:'pointer' }}>
-                      {deleting ? '...' : 'Sí, eliminar'}
-                    </button>
-                    <button onClick={() => setConfirmDelete(false)}
-                      style={{ background:'#f3f4f6', color:'#374151', border:'none', borderRadius:8,
-                               padding:'7px 12px', fontSize:12, cursor:'pointer' }}>
-                      Cancelar
-                    </button>
-                  </div>
-                )}
               </div>
               {sendErr && <p style={{ margin:'8px 0 0', fontSize:12, color:'#dc2626' }}>{sendErr}</p>}
             </>
@@ -682,10 +643,6 @@ export default function Cotizaciones() {
     else setMesVer(m => m + 1)
   }
 
-  function handleDeleted(id) {
-    setCotizaciones(prev => prev.filter(c => c.id !== id))
-  }
-
   function handleEmitida(id) {
     setCotizaciones(prev => prev.map(c => c.id === id ? { ...c, estado: 'enviada' } : c))
   }
@@ -810,7 +767,6 @@ export default function Cotizaciones() {
           token={getToken()}
           user={user}
           onClose={() => setModalCot(null)}
-          onDeleted={handleDeleted}
           onEmitida={handleEmitida}
         />
       )}
