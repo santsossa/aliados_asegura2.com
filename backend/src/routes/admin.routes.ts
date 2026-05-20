@@ -3,6 +3,7 @@ import { body } from 'express-validator'
 import { requireAdmin } from '../middleware/auth'
 import { validate } from '../middleware/validate'
 import { pool } from '../config/db'
+import { sendPolizaAprobadaEmail, sendPolizaNoAprobadaEmail, sendLeadRecibidoEmail } from '../services/email.service'
 
 const router = Router()
 router.use(requireAdmin)
@@ -64,13 +65,96 @@ router.patch('/aliados/:id/estado',
 router.get('/leads', async (req, res, next) => {
   try {
     const [rows] = await pool.execute<any[]>(
-      `SELECT l.*, a.nombre as aliado_nombre, a.correo as aliado_correo
-       FROM leads l JOIN aliados a ON a.id=l.aliado_id
+      `SELECT l.*, a.nombre as aliado_nombre, a.correo as aliado_correo,
+              c.placa, c.comercial_value, c.datos_cotizacion
+       FROM leads l
+       JOIN aliados a ON a.id = l.aliado_id
+       LEFT JOIN cotizaciones c ON c.id = l.cotizacion_id
        ORDER BY l.created_at DESC`
     )
     res.json({ status:'success', data: rows })
   } catch(err) { next(err) }
 })
+
+// PATCH /api/admin/leads/:id/estado
+// Cambia el estado de un lead y crea/actualiza la póliza correspondiente
+// body: { estado: 'en_proceso'|'aprobada'|'no_convertida', observaciones?: string }
+router.patch('/leads/:id/estado',
+  [
+    body('estado').isIn(['en_proceso','aprobada','no_convertida']).withMessage('Estado inválido'),
+    body('observaciones').optional().isString().isLength({ max: 1000 }),
+  ],
+  validate,
+  async (req: any, res: any, next: any) => {
+    try {
+      const { estado, observaciones } = req.body
+      const leadId = req.params.id
+
+      // Buscar el lead con datos del aliado y cotización
+      const [leads] = await pool.execute<any[]>(
+        `SELECT l.*, a.nombre as aliado_nombre, a.correo as aliado_correo,
+                c.placa, c.comercial_value
+         FROM leads l
+         JOIN aliados a ON a.id = l.aliado_id
+         LEFT JOIN cotizaciones c ON c.id = l.cotizacion_id
+         WHERE l.id = ?`,
+        [leadId]
+      )
+      if (!leads.length) { res.status(404).json({ status:'error', message:'Lead no encontrado' }); return }
+      const lead = leads[0]
+
+      // Buscar póliza existente vinculada a este lead
+      const [polRows] = await pool.execute<any[]>('SELECT id FROM polizas WHERE lead_id = ? LIMIT 1', [leadId])
+      const now = new Date()
+
+      if (polRows.length) {
+        // Actualizar póliza existente
+        await pool.execute(
+          `UPDATE polizas SET estado=?, observaciones=COALESCE(?,observaciones),
+           primer_pago_at=CASE WHEN ?='aprobada' THEN ? ELSE primer_pago_at END
+           WHERE lead_id=?`,
+          [estado, observaciones || null, estado, now, leadId]
+        )
+      } else {
+        // Crear póliza nueva a partir del lead
+        const mes  = now.getMonth() + 1
+        const anio = now.getFullYear()
+        await pool.execute(
+          `INSERT INTO polizas (aliado_id, lead_id, cliente_nombre, aseguradora, valor_prima, estado, mes, anio, primer_pago_at)
+           VALUES (?,?,?,?,?,?,?,?,?)`,
+          [lead.aliado_id, leadId, lead.cliente_nombre, lead.aseguradora,
+           lead.valor_prima, estado, mes, anio,
+           estado === 'aprobada' ? now : null]
+        )
+      }
+
+      // Enviar email al aliado según el estado
+      const comision = Math.round(parseFloat(lead.valor_prima || 0) * 0.06)
+      if (estado === 'aprobada') {
+        sendPolizaAprobadaEmail({
+          to:             lead.aliado_correo,
+          aliado_nombre:  lead.aliado_nombre,
+          cliente_nombre: lead.cliente_nombre,
+          aseguradora:    lead.aseguradora,
+          valor_prima:    parseFloat(lead.valor_prima || 0),
+          valor_comision: comision,
+          placa:          lead.placa || undefined,
+        }).catch(() => {})
+      } else if (estado === 'no_convertida' && observaciones) {
+        sendPolizaNoAprobadaEmail({
+          to:             lead.aliado_correo,
+          aliado_nombre:  lead.aliado_nombre,
+          cliente_nombre: lead.cliente_nombre,
+          aseguradora:    lead.aseguradora,
+          placa:          lead.placa || undefined,
+          motivo:         observaciones,
+        }).catch(() => {})
+      }
+
+      res.json({ status:'success', message:`Lead marcado como ${estado}.` })
+    } catch(err) { next(err) }
+  }
+)
 
 // ── Pólizas ────────────────────────────────────────────────────────────────
 router.get('/polizas', async (req, res, next) => {
@@ -84,17 +168,62 @@ router.get('/polizas', async (req, res, next) => {
   } catch(err) { next(err) }
 })
 
+// PATCH /api/admin/polizas/:id/estado
+// body: { estado: 'aprobada'|'no_convertida', observaciones?: string }
 router.patch('/polizas/:id/estado',
-  [body('estado').isIn(['en_proceso','aprobada','no_convertida']).withMessage('Estado inválido')],
+  [
+    body('estado').isIn(['en_proceso','aprobada','no_convertida']).withMessage('Estado inválido'),
+    body('observaciones').optional().isString().isLength({ max: 1000 }),
+  ],
   validate,
   async (req: any, res: any, next: any) => {
     try {
-      const { estado } = req.body
-      const primerPago = estado === 'aprobada' ? new Date() : null
-      await pool.execute(
-        'UPDATE polizas SET estado=?, primer_pago_at=? WHERE id=?',
-        [estado, primerPago, req.params.id]
+      const { estado, observaciones } = req.body
+      const now = new Date()
+
+      // Buscar póliza con datos del aliado
+      const [rows] = await pool.execute<any[]>(
+        `SELECT p.*, a.nombre as aliado_nombre, a.correo as aliado_correo,
+                l.placa
+         FROM polizas p
+         JOIN aliados a ON a.id = p.aliado_id
+         LEFT JOIN leads l ON l.id = p.lead_id
+         WHERE p.id = ?`,
+        [req.params.id]
       )
+      if (!rows.length) { res.status(404).json({ status:'error', message:'Póliza no encontrada' }); return }
+      const pol = rows[0]
+
+      await pool.execute(
+        `UPDATE polizas SET estado=?,
+         observaciones=COALESCE(?,observaciones),
+         primer_pago_at=CASE WHEN ?='aprobada' THEN ? ELSE primer_pago_at END
+         WHERE id=?`,
+        [estado, observaciones || null, estado, now, req.params.id]
+      )
+
+      // Email al aliado
+      if (estado === 'aprobada') {
+        sendPolizaAprobadaEmail({
+          to:             pol.aliado_correo,
+          aliado_nombre:  pol.aliado_nombre,
+          cliente_nombre: pol.cliente_nombre,
+          aseguradora:    pol.aseguradora,
+          valor_prima:    parseFloat(pol.valor_prima || 0),
+          valor_comision: parseFloat(pol.valor_comision || 0) || Math.round(parseFloat(pol.valor_prima || 0) * 0.06),
+          placa:          pol.placa || undefined,
+        }).catch(() => {})
+      } else if (estado === 'no_convertida' && observaciones) {
+        sendPolizaNoAprobadaEmail({
+          to:             pol.aliado_correo,
+          aliado_nombre:  pol.aliado_nombre,
+          cliente_nombre: pol.cliente_nombre,
+          aseguradora:    pol.aseguradora,
+          placa:          pol.placa || undefined,
+          motivo:         observaciones,
+        }).catch(() => {})
+      }
+
       res.json({ status:'success', message:`Póliza marcada como ${estado}.` })
     } catch(err) { next(err) }
   }

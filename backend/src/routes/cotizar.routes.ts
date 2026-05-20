@@ -8,6 +8,7 @@ import multer from 'multer'
 import FormData from 'form-data'
 import { requireAuth } from '../middleware/auth'
 import { env } from '../config/env'
+import { sendLeadRecibidoEmail } from '../services/email.service'
 
 const router = Router()
 router.use(requireAuth)   // todas las rutas de cotizar requieren login
@@ -258,6 +259,23 @@ router.post('/emitir',
           [aliado.sub, cotizacionId, clienteNombre, formDataNorm.mobileNumber || '', aseguradora, valorPrima, crmQuotationId]
         )
       } catch { /* no interrumpir si falla el guardado local */ }
+
+      // Email al aliado confirmando recepción del lead
+      try {
+        const [aliadoRows] = await pool.execute<any[]>(
+          'SELECT nombre, correo FROM aliados WHERE id = ?', [aliado.sub]
+        )
+        if (aliadoRows.length) {
+          sendLeadRecibidoEmail({
+            to:             aliadoRows[0].correo,
+            aliado_nombre:  aliadoRows[0].nombre || aliado.email,
+            cliente_nombre: clienteNombre,
+            aseguradora,
+            valor_prima:    valorPrima,
+            placa:          formDataNorm.plate || undefined,
+          }).catch(() => {})
+        }
+      } catch { /* no interrumpir */ }
 
       res.json(r.data)
     } catch (err: any) {
