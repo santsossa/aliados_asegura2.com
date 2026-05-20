@@ -339,13 +339,13 @@ export default function Dashboard() {
                       borderBottom: i < actividad.length - 1 ? '1px solid #f9fafb' : 'none',
                     }}
                   >
-                    {/* Icono: verde si enviada, azul si activa */}
+                    {/* Icono: verde si enviada, azul si activa/cerrada */}
                     <div style={{
                       width: 36, height: 36, borderRadius: 10, flexShrink: 0,
-                      background: enviada ? '#dcfce7' : '#dbeafe',
+                      background: a.estado === 'enviada' ? '#dcfce7' : '#dbeafe',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                     }}>
-                      <FileText size={16} color={enviada ? '#16a34a' : '#2563eb'} />
+                      <FileText size={16} color={a.estado === 'enviada' ? '#16a34a' : '#2563eb'} />
                     </div>
 
                     {/* Nombre + cédula + placa */}
