@@ -196,6 +196,7 @@ export default function MisPolizas() {
   const [data,    setData]    = useState({ leads: [], polizas: [] })
   const [loading, setLoading] = useState(true)
   const [modal,   setModal]   = useState(null)
+  const [tab,     setTab]     = useState('en_proceso')
 
   useEffect(() => {
     fetch(`${API}/api/aliados/me/polizas`, {
@@ -213,83 +214,110 @@ export default function MisPolizas() {
     ...data.leads.map(l  => ({ ...l,  _tipo:'lead', estado:'en_proceso' })),
   ].sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
 
+  const tabs = [
+    { key:'en_proceso',    label:'En trámite',  E: ESTADOS.en_proceso    },
+    { key:'aprobada',      label:'Aprobadas',   E: ESTADOS.aprobada      },
+    { key:'no_convertida', label:'No aprobado', E: ESTADOS.no_convertida },
+  ]
+  const filtered = allItems.filter(it => it.estado === tab)
+
+  function ItemCard({ item }) {
+    return (
+      <button
+        onClick={() => setModal(item)}
+        style={{ width:'100%', textAlign:'left', background:'none', border:'none', padding:0, cursor:'pointer' }}
+      >
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm px-5 py-4 hover:border-brand/40 hover:shadow-md transition-all">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div style={{ width:40, height:40, borderRadius:12, flexShrink:0,
+                            background: ESTADOS[tab]?.bg || '#f3f4f6',
+                            display:'flex', alignItems:'center', justifyContent:'center' }}>
+                <Shield size={18} style={{ color: ESTADOS[tab]?.color || '#6b7280' }} />
+              </div>
+              <div>
+                <p className="font-semibold text-gray-900 text-sm">{item.cliente_nombre || 'Cliente'}</p>
+                <p className="text-xs text-gray-400 mt-0.5">
+                  {item.aseguradora || '—'}
+                  {item.placa ? ` · ${item.placa}` : ''}
+                  {' · '}{fechaStr(item.created_at)}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 flex-shrink-0">
+              <div className="text-right hidden sm:block">
+                <p className="text-sm font-bold text-gray-900">{fmt(item.valor_prima)}</p>
+                {item.valor_comision
+                  ? <p className="text-xs text-green-600 font-medium">Comisión: {fmt(item.valor_comision)}</p>
+                  : <p className="text-xs text-gray-400">Comisión: {fmt(Math.round((item.valor_prima||0)*0.06))}</p>
+                }
+              </div>
+              <span style={{ color:'#d1d5db', fontSize:18, lineHeight:1 }}>›</span>
+            </div>
+          </div>
+        </div>
+      </button>
+    )
+  }
+
   return (
     <div className="p-6 lg:p-8 max-w-5xl mx-auto">
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Mis pólizas</h1>
         <p className="text-gray-500 text-sm mt-1">
-          Pólizas enviadas a emitir — haz click en cualquiera para ver el detalle.
+          Toca cualquier póliza para ver el detalle y las actualizaciones de nuestro equipo.
         </p>
       </div>
 
-      {/* Leyenda */}
-      <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4 mb-6">
-        <div className="flex items-center gap-2 mb-3">
-          <Info size={14} className="text-blue-600" />
-          <p className="text-sm font-semibold text-blue-700">¿Qué significa cada estado?</p>
-        </div>
-        <div className="space-y-2">
-          {Object.values(ESTADOS).map(e => (
-            <div key={e.label} className="flex items-start gap-2">
-              <span style={{ background:e.bg, color:e.color, fontSize:10, fontWeight:700,
-                             padding:'2px 8px', borderRadius:99, whiteSpace:'nowrap', marginTop:2 }}>
-                {e.label}
+      {/* Pestañas */}
+      <div style={{ display:'flex', gap:8, marginBottom:20, flexWrap:'wrap' }}>
+        {tabs.map(t => {
+          const count = allItems.filter(it => it.estado === t.key).length
+          const active = tab === t.key
+          return (
+            <button key={t.key} onClick={() => setTab(t.key)}
+              style={{
+                display:'flex', alignItems:'center', gap:8,
+                padding:'10px 18px', borderRadius:12, border:'none', cursor:'pointer',
+                fontWeight: active ? 700 : 500, fontSize:14,
+                background: active ? t.E.bg : '#f3f4f6',
+                color:      active ? t.E.color : '#6b7280',
+                transition:'all 0.15s',
+                boxShadow:  active ? `0 0 0 2px ${t.E.color}33` : 'none',
+              }}>
+              {t.label}
+              <span style={{
+                background: active ? t.E.color : '#d1d5db',
+                color:'#fff', fontSize:11, fontWeight:700,
+                padding:'1px 7px', borderRadius:99, minWidth:20, textAlign:'center',
+              }}>
+                {count}
               </span>
-              <p className="text-xs text-gray-500">{e.desc}</p>
-            </div>
-          ))}
-        </div>
+            </button>
+          )
+        })}
+      </div>
+
+      {/* Descripción del estado activo */}
+      <div style={{ background: ESTADOS[tab]?.bg, borderRadius:12, padding:'10px 16px',
+                    marginBottom:16, fontSize:13, color: ESTADOS[tab]?.color, lineHeight:1.5 }}>
+        {ESTADOS[tab]?.desc}
       </div>
 
       {loading ? (
         <div className="space-y-3">
           {[1,2,3].map(i => <div key={i} className="bg-white rounded-2xl border border-gray-100 h-20 animate-pulse" />)}
         </div>
-      ) : allItems.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm flex flex-col items-center justify-center py-20 text-center">
+      ) : filtered.length === 0 ? (
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm flex flex-col items-center justify-center py-16 text-center">
           <div className="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center mb-4">
             <Shield size={24} className="text-gray-300" />
           </div>
-          <p className="text-gray-400 font-medium text-sm">Sin pólizas aún</p>
-          <p className="text-gray-300 text-xs mt-1">Las pólizas que envíes a emitir aparecerán aquí</p>
+          <p className="text-gray-400 font-medium text-sm">Sin pólizas en esta categoría</p>
         </div>
       ) : (
         <div className="space-y-3">
-          {allItems.map(item => (
-            <button
-              key={`${item._tipo}-${item.id}`}
-              onClick={() => setModal(item)}
-              style={{ width:'100%', textAlign:'left', background:'none', border:'none', padding:0, cursor:'pointer' }}
-            >
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm px-5 py-4 hover:border-brand/40 hover:shadow-md transition-all">
-                <div className="flex items-center justify-between gap-4">
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 bg-purple-50 rounded-xl flex items-center justify-center flex-shrink-0">
-                      <Shield size={18} className="text-purple-600" />
-                    </div>
-                    <div>
-                      <p className="font-semibold text-gray-900 text-sm">{item.cliente_nombre || 'Cliente'}</p>
-                      <p className="text-xs text-gray-400 mt-0.5">
-                        {item.aseguradora || '—'}
-                        {item.placa ? ` · ${item.placa}` : ''}
-                        {' · '}{fechaStr(item.created_at)}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3 flex-shrink-0">
-                    <div className="text-right hidden sm:block">
-                      <p className="text-sm font-bold text-gray-900">{fmt(item.valor_prima)}</p>
-                      {item.valor_comision && (
-                        <p className="text-xs text-green-600 font-medium">Comisión: {fmt(item.valor_comision)}</p>
-                      )}
-                    </div>
-                    <Badge estado={item.estado} />
-                    <span style={{ color:'#d1d5db', fontSize:18, lineHeight:1 }}>›</span>
-                  </div>
-                </div>
-              </div>
-            </button>
-          ))}
+          {filtered.map(item => <ItemCard key={`${item._tipo}-${item.id}`} item={item} />)}
         </div>
       )}
 
