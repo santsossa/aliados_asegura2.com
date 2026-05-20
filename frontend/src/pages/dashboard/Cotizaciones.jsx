@@ -650,11 +650,13 @@ export default function Cotizaciones() {
   return (
     <div className="p-6 lg:p-8 max-w-5xl mx-auto">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Cotizaciones</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Mis cotizaciones</h1>
         <p className="text-gray-500 text-sm mt-1">
+          Aquí están todas las veces que cotizaste un seguro para un cliente. Puedes ver cuáles ya las enviaste a emitir y cuáles siguen abiertas.
+          {' '}
           {esActual
-            ? `Todas las cotizaciones que has realizado este mes — ${MESES_FULL[mesVer-1]} ${anioVer}`
-            : `Cotizaciones de ${MESES_FULL[mesVer-1]} ${anioVer}`}
+            ? `— ${MESES_FULL[mesVer-1]} ${anioVer}`
+            : `— ${MESES_FULL[mesVer-1]} ${anioVer}`}
         </p>
         {/* Navegación de mes */}
         <div style={{ display:'flex', alignItems:'center', gap:8, marginTop:12 }}>

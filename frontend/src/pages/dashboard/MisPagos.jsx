@@ -9,7 +9,9 @@ export default function MisPagos() {
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Mis pagos</h1>
-        <p className="text-gray-500 text-sm mt-1">Los pagos se realizan el 1 de cada mes por las pólizas aprobadas.</p>
+        <p className="text-gray-500 text-sm mt-1">
+          Acá ves lo que te hemos pagado y lo que está por pagarte. Las comisiones se depositan el 1 de cada mes por las pólizas que tu cliente ya pagó.
+        </p>
       </div>
 
       {/* Próximo pago */}

@@ -115,8 +115,10 @@ export default function InfoFinanciera() {
     <div className="p-6 lg:p-8 max-w-3xl mx-auto">
 
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Información financiera</h1>
-        <p className="text-gray-500 text-sm mt-1">Administra tus datos personales y cuenta bancaria.</p>
+        <h1 className="text-2xl font-bold text-gray-900">Mi información</h1>
+        <p className="text-gray-500 text-sm mt-1">
+          Acá puedes ver y actualizar tus datos personales y la cuenta bancaria donde te depositamos tus comisiones.
+        </p>
       </div>
 
       {/* ── Datos personales ─────────────────────────── */}

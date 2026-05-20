@@ -265,7 +265,7 @@ export default function MisPolizas() {
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Mis pólizas</h1>
         <p className="text-gray-500 text-sm mt-1">
-          Toca cualquier póliza para ver el detalle y las actualizaciones de nuestro equipo.
+          Acá puedes ver el estado de cada póliza que enviaste a emitir. Toca cualquiera para saber qué está pasando con ese cliente y cuánto ganarás si se aprueba.
         </p>
       </div>
 
