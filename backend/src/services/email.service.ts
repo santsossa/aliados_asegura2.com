@@ -115,45 +115,225 @@ export async function sendLeadRecibidoEmail(opts: {
   valor_prima: number
   placa?: string
 }): Promise<void> {
-  const comision = Math.round(opts.valor_prima * 0.06)
+  const comision   = Math.round(opts.valor_prima * 0.06)
+  const baseUrl    = (env.FRONTEND_URL || '').replace(/\/$/, '')
+  const imgSobre   = `${baseUrl}/correoab.png`
+  const imgHandw   = `${baseUrl}/correohandw.png`
+  const portalUrl  = `${baseUrl}/dashboard/mis-polizas`
+
   await sendMail({
     to:      opts.to,
     subject: `✅ Recibimos tu solicitud — ${opts.cliente_nombre}`,
-    html:    baseLayout(`
-      <h2 style="margin:0 0 6px;font-size:22px;font-weight:800;color:#111827">¡Lo recibimos! 🎉</h2>
-      <p style="margin:0 0 24px;color:#6b7280;font-size:14px;line-height:1.6">
-        Hola <strong>${opts.aliado_nombre}</strong>, ya tenemos la solicitud de póliza que enviaste.
-        Nuestro equipo de ventas ya está en contacto con el cliente.
+    html: `<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Asegura2.com</title>
+</head>
+<body style="margin:0;padding:0;background:#f0f0f5;font-family:Inter,Helvetica,Arial,sans-serif">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f0f0f5;padding:32px 16px">
+<tr><td align="center">
+<table width="100%" style="max-width:580px;background:#ffffff;border-radius:20px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08)">
+
+  <!-- HEADER -->
+  <tr>
+    <td style="background:#2D2A7A;padding:0">
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td style="padding:22px 32px">
+            <table cellpadding="0" cellspacing="0">
+              <tr>
+                <td>
+                  <span style="font-size:22px;font-weight:900;color:#ffffff;letter-spacing:-0.5px">Asegura2<span style="color:#F5C400">.com</span></span>
+                  <div style="font-size:11px;color:#a5b4fc;margin-top:2px;font-weight:500">+protección</div>
+                </td>
+                <td style="padding-left:20px;border-left:1px solid rgba(255,255,255,0.25);padding-top:2px">
+                  <span style="font-size:13px;font-weight:600;color:#ffffff">Portal de Aliados</span>
+                </td>
+              </tr>
+            </table>
+          </td>
+          <!-- Franja dorada decorativa -->
+          <td width="80" style="background:linear-gradient(135deg,#F5C400 0%,#f59e0b 100%);border-radius:0 0 0 40px">&nbsp;</td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- HERO -->
+  <tr>
+    <td style="padding:0;background:#f8f8fc">
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td style="padding:36px 36px 28px;vertical-align:middle;width:55%">
+            <h1 style="margin:0 0 14px;font-size:28px;font-weight:900;color:#1a1a2e;line-height:1.2">
+              ¡Lo recibimos! <span style="display:inline-block">🎉</span>
+            </h1>
+            <p style="margin:0;font-size:14px;color:#4b5563;line-height:1.7">
+              Hola <strong style="color:#1a1a2e">${opts.aliado_nombre}</strong>, ya tenemos la solicitud de póliza
+              que enviaste. Nuestro equipo de ventas ya está en contacto con el cliente.
+            </p>
+          </td>
+          <td style="padding:20px 24px 0 0;vertical-align:bottom;text-align:right;width:45%">
+            <img src="${imgSobre}" alt="Solicitud recibida" width="180"
+                 style="display:block;margin-left:auto;max-width:180px" />
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- DETALLE CARD -->
+  <tr>
+    <td style="padding:28px 32px 0">
+      <table width="100%" cellpadding="0" cellspacing="0"
+             style="border:1.5px solid #e8e8f0;border-radius:14px;overflow:hidden">
+        <!-- Card header -->
+        <tr>
+          <td colspan="2" style="padding:16px 20px;border-bottom:1px solid #e8e8f0">
+            <table cellpadding="0" cellspacing="0">
+              <tr>
+                <td style="width:34px;height:34px;background:#ede9fe;border-radius:8px;text-align:center;vertical-align:middle">
+                  <span style="font-size:16px;line-height:34px">📋</span>
+                </td>
+                <td style="padding-left:12px">
+                  <span style="font-size:14px;font-weight:700;color:#2D2A7A">Detalle de la solicitud</span>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <!-- Filas -->
+        <tr>
+          <td style="padding:13px 20px;font-size:13px;color:#6b7280;border-bottom:1px solid #f3f4f6">Cliente</td>
+          <td style="padding:13px 20px;font-size:13px;font-weight:700;color:#111827;text-align:right;border-bottom:1px solid #f3f4f6">${opts.cliente_nombre}</td>
+        </tr>
+        ${opts.placa ? `
+        <tr>
+          <td style="padding:13px 20px;font-size:13px;color:#6b7280;border-bottom:1px solid #f3f4f6">Placa</td>
+          <td style="padding:13px 20px;font-size:13px;font-weight:700;color:#111827;text-align:right;border-bottom:1px solid #f3f4f6">${opts.placa}</td>
+        </tr>` : ''}
+        <tr>
+          <td style="padding:13px 20px;font-size:13px;color:#6b7280;border-bottom:1px solid #f3f4f6">Aseguradora</td>
+          <td style="padding:13px 20px;font-size:13px;font-weight:700;color:#111827;text-align:right;border-bottom:1px solid #f3f4f6">${opts.aseguradora}</td>
+        </tr>
+        <tr>
+          <td style="padding:13px 20px;font-size:13px;color:#6b7280;border-bottom:1px solid #f3f4f6">Prima anual</td>
+          <td style="padding:13px 20px;font-size:13px;font-weight:700;color:#111827;text-align:right;border-bottom:1px solid #f3f4f6">${fmtCOP(opts.valor_prima)}</td>
+        </tr>
+        <!-- Comisión -->
+        <tr>
+          <td style="padding:16px 20px;font-size:14px;font-weight:700;color:#2D2A7A">Tu comisión estimada (6%)</td>
+          <td style="padding:16px 20px;font-size:18px;font-weight:900;color:#2D2A7A;text-align:right">${fmtCOP(comision)}</td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- ¿QUÉ SIGUE? -->
+  <tr>
+    <td style="padding:20px 32px 0">
+      <table width="100%" cellpadding="0" cellspacing="0"
+             style="background:#fffbeb;border:1.5px solid #fde68a;border-radius:14px">
+        <tr>
+          <td style="padding:18px 20px;vertical-align:top;width:44px">
+            <div style="width:36px;height:36px;background:#fef3c7;border-radius:50%;text-align:center;line-height:36px;font-size:18px">🔔</div>
+          </td>
+          <td style="padding:18px 20px 18px 0">
+            <p style="margin:0 0 6px;font-size:14px;font-weight:700;color:#92400e">¿Qué sigue?</p>
+            <p style="margin:0;font-size:13px;color:#78350f;line-height:1.65">
+              Nuestro equipo contactará a <strong>${opts.cliente_nombre}</strong> para cerrar la venta.
+              Te notificaremos por correo cuando la póliza sea aprobada
+              o si hay alguna novedad.
+            </p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- VER ESTADO -->
+  <tr>
+    <td style="padding:18px 32px 28px">
+      <table cellpadding="0" cellspacing="0">
+        <tr>
+          <td style="width:32px;text-align:center;font-size:18px">👁</td>
+          <td style="padding-left:10px;font-size:13px;color:#4b5563">
+            Puedes ver el estado en tu portal en la sección
+            <a href="${portalUrl}" style="color:#2D2A7A;font-weight:700;text-decoration:none">Mis pólizas.</a>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- SEPARADOR -->
+  <tr><td style="padding:0 32px"><div style="height:1px;background:#e8e8f0"></div></td></tr>
+
+  <!-- FOOTER -->
+  <tr>
+    <td style="padding:24px 32px 20px">
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <!-- Soporte -->
+          <td style="vertical-align:top;width:50%">
+            <table cellpadding="0" cellspacing="0">
+              <tr>
+                <td style="width:38px;height:38px;background:#ede9fe;border-radius:50%;text-align:center;vertical-align:middle;font-size:18px">🎧</td>
+                <td style="padding-left:12px">
+                  <div style="font-size:12px;font-weight:700;color:#1a1a2e">¿Dudas? Estamos para ayudarte</div>
+                  <div style="font-size:11px;color:#6b7280;margin-top:2px">
+                    Escríbenos a <a href="mailto:aliados@asegura2.com.co" style="color:#2D2A7A;text-decoration:none;font-weight:600">aliados@asegura2.com.co</a>
+                  </div>
+                </td>
+              </tr>
+            </table>
+          </td>
+          <!-- Handwriting -->
+          <td style="text-align:right;vertical-align:middle">
+            <img src="${imgHandw}" alt="¡Gracias por confiar en asegura2.com!" height="56"
+                 style="display:inline-block;max-height:56px" />
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- BOTTOM BAR -->
+  <tr>
+    <td style="background:#f8f8fc;padding:16px 32px;border-top:1px solid #e8e8f0">
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td style="vertical-align:middle">
+            <span style="font-size:15px;font-weight:900;color:#2D2A7A">Asegura2<span style="color:#F5C400">.com</span></span>
+            <div style="font-size:10px;color:#9ca3af;margin-top:2px">Portal de Aliados · Bogotá, Colombia</div>
+          </td>
+          <!-- Redes sociales -->
+          <td style="text-align:right;vertical-align:middle">
+            <a href="https://facebook.com/asegura2" style="display:inline-block;margin-left:8px">
+              <div style="width:30px;height:30px;border-radius:50%;background:#e8e8f0;text-align:center;line-height:30px;font-size:13px">f</div>
+            </a>
+            <a href="https://instagram.com/asegura2" style="display:inline-block;margin-left:8px">
+              <div style="width:30px;height:30px;border-radius:50%;background:#e8e8f0;text-align:center;line-height:30px;font-size:13px">ig</div>
+            </a>
+            <a href="https://linkedin.com/company/asegura2" style="display:inline-block;margin-left:8px">
+              <div style="width:30px;height:30px;border-radius:50%;background:#e8e8f0;text-align:center;line-height:30px;font-size:13px">in</div>
+            </a>
+          </td>
+        </tr>
+      </table>
+      <p style="margin:10px 0 0;font-size:10px;color:#9ca3af;text-align:center">
+        Si tienes dudas escríbenos a <a href="mailto:aliados@asegura2.com.co" style="color:#2D2A7A;text-decoration:none">aliados@asegura2.com.co</a>
       </p>
+    </td>
+  </tr>
 
-      <div style="background:#f0f4ff;border-radius:12px;padding:20px 24px;margin-bottom:24px">
-        <p style="margin:0 0 12px;font-size:11px;font-weight:700;color:#2D2A7A;text-transform:uppercase;letter-spacing:0.08em">Detalle de la solicitud</p>
-        <table width="100%" cellpadding="0" cellspacing="0">
-          <tr><td style="padding:6px 0;font-size:13px;color:#6b7280">Cliente</td>
-              <td style="padding:6px 0;font-size:13px;font-weight:600;color:#111827;text-align:right">${opts.cliente_nombre}</td></tr>
-          ${opts.placa ? `<tr><td style="padding:6px 0;font-size:13px;color:#6b7280">Placa</td>
-              <td style="padding:6px 0;font-size:13px;font-weight:600;color:#111827;text-align:right">${opts.placa}</td></tr>` : ''}
-          <tr><td style="padding:6px 0;font-size:13px;color:#6b7280">Aseguradora</td>
-              <td style="padding:6px 0;font-size:13px;font-weight:600;color:#111827;text-align:right">${opts.aseguradora}</td></tr>
-          <tr><td style="padding:6px 0;font-size:13px;color:#6b7280">Prima anual</td>
-              <td style="padding:6px 0;font-size:13px;font-weight:600;color:#111827;text-align:right">${fmtCOP(opts.valor_prima)}</td></tr>
-          <tr style="border-top:1px solid #dbeafe">
-            <td style="padding:10px 0 4px;font-size:14px;font-weight:700;color:#2D2A7A">Tu comisión estimada (6%)</td>
-            <td style="padding:10px 0 4px;font-size:16px;font-weight:800;color:#2D2A7A;text-align:right">${fmtCOP(comision)}</td></tr>
-        </table>
-      </div>
-
-      <div style="background:#fef9c3;border-radius:10px;padding:14px 18px;margin-bottom:24px">
-        <p style="margin:0;font-size:13px;color:#92400e;line-height:1.6">
-          ⏳ <strong>¿Qué sigue?</strong> Nuestro equipo contactará a <strong>${opts.cliente_nombre}</strong> para cerrar la venta.
-          Te notificaremos por correo cuando la póliza sea aprobada o si hay alguna novedad.
-        </p>
-      </div>
-
-      <p style="margin:0;font-size:13px;color:#9ca3af;line-height:1.6">
-        Puedes ver el estado en tu portal en la sección <strong>Mis pólizas</strong>.
-      </p>
-    `),
+</table>
+</td></tr>
+</table>
+</body>
+</html>`,
   })
 }
 
