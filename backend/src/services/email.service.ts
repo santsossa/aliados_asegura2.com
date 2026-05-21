@@ -571,7 +571,7 @@ export async function sendOTPEmail(
 
   await sendMail({
     to,
-    subject: `${otp} es tu c&#243;digo — Asegura2.com`,
+    subject: `${otp} - Asegura2.com`,
     html: `<!DOCTYPE html>
 <html lang="es" xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -627,7 +627,7 @@ export async function sendOTPEmail(
 
   <!-- ══ HERO: imagen grande y centrada ══ -->
   <tr>
-    <td style="background:#ffffff;padding:36px 28px 16px;text-align:center">
+    <td style="background:#ffffff;padding:18px 28px 8px;text-align:center">
       <img class="hero-img" src="${imgSobre}" alt="Verificación"
            width="180" style="display:block;width:180px;max-width:70%;
                                margin:0 auto;border:0" />
@@ -636,7 +636,7 @@ export async function sendOTPEmail(
 
   <!-- ══ TÍTULO Y SUBTÍTULO — centrado ══ -->
   <tr>
-    <td class="sec" style="padding:20px 48px 0;text-align:center">
+    <td class="sec" style="padding:10px 48px 0;text-align:center">
       <h1 style="margin:0 0 10px;font-size:20px;font-weight:800;
                  color:#111827;line-height:1.3;font-family:Arial,sans-serif">
         ${titulo}
@@ -675,12 +675,12 @@ export async function sendOTPEmail(
         <tr>
           <td style="vertical-align:middle;padding-right:10px">
             <table cellpadding="0" cellspacing="0">
-              <tr><td width="38" height="38"
-                style="width:38px;height:38px;min-width:38px;
-                       background:#edeef8;border-radius:19px;
+              <tr><td width="52" height="52"
+                style="width:52px;height:52px;min-width:52px;
+                       background:#edeef8;border-radius:26px;
                        text-align:center;vertical-align:middle">
                 <img src="${imgReloj}" alt="Reloj"
-                     width="28" height="28"
+                     width="42" height="42"
                      style="display:block;margin:0 auto;border:0" />
               </td></tr>
             </table>
@@ -725,12 +725,12 @@ export async function sendOTPEmail(
               <tr>
                 <td style="vertical-align:middle">
                   <table cellpadding="0" cellspacing="0">
-                    <tr><td width="48" height="48"
-                      style="width:48px;height:48px;min-width:48px;
-                             background:#edeef8;border-radius:24px;
+                    <tr><td width="64" height="64"
+                      style="width:64px;height:64px;min-width:64px;
+                             background:#edeef8;border-radius:32px;
                              text-align:center;vertical-align:middle">
                       <img src="${imgAuri}" alt="Soporte"
-                           width="38" height="38"
+                           width="52" height="52"
                            style="display:block;margin:0 auto;border:0" />
                     </td></tr>
                   </table>
