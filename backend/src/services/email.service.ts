@@ -399,21 +399,21 @@ export async function sendLeadRecibidoEmail(opts: {
               <tr>
                 <td style="padding:0 3px">
                   <a href="https://web.facebook.com/asegura2col" style="text-decoration:none">
-                    <img src="${base}/icons/facebook.svg" alt="Facebook"
+                    <img src="${base}/icons/facebook.png" alt="Facebook"
                          width="32" height="32"
                          style="display:block;width:32px;height:32px;border:0;border-radius:50%" />
                   </a>
                 </td>
                 <td style="padding:0 3px">
                   <a href="https://www.instagram.com/asegura2col/" style="text-decoration:none">
-                    <img src="${base}/icons/instagram.svg" alt="Instagram"
+                    <img src="${base}/icons/instagram.png" alt="Instagram"
                          width="32" height="32"
                          style="display:block;width:32px;height:32px;border:0;border-radius:50%" />
                   </a>
                 </td>
                 <td style="padding:0 3px">
                   <a href="https://www.linkedin.com/company/asegura2colombia" style="text-decoration:none">
-                    <img src="${base}/icons/linkedin.svg" alt="LinkedIn"
+                    <img src="${base}/icons/linkedin.png" alt="LinkedIn"
                          width="32" height="32"
                          style="display:block;width:32px;height:32px;border:0;border-radius:6px" />
                   </a>
