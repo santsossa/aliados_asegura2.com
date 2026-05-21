@@ -14,10 +14,10 @@ if (!process.env.FRONTEND_URL || process.env.FRONTEND_URL.includes('localhost'))
 import { sendLeadRecibidoEmail, sendOTPEmail } from './services/email.service'
 
 async function main() {
-  // Test OTP registro (sin nombre)
-  console.log('📧 Enviando OTP registro...')
-  await sendOTPEmail('santiagosossaher@gmail.com', null, '871557')
-  console.log('✅ OTP registro enviado')
+  // Test OTP login (con nombre)
+  console.log('📧 Enviando OTP login...')
+  await sendOTPEmail('santiagosossaher@gmail.com', 'Santiago', '871557')
+  console.log('✅ OTP login enviado')
 }
 
 main().catch(e => { console.error('❌ Error:', e.message); process.exit(1) })

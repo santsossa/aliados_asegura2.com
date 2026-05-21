@@ -567,7 +567,7 @@ export async function sendOTPEmail(
     : `Hola <span style="color:#2D2A7A">${nombre}</span> &#128075;`
   const subtitulo = esRegistro
     ? `Para continuar, <strong>verifica tu correo</strong> con el siguiente c&#243;digo:`
-    : `Para continuar con tu acceso, ingresa este c&#243;digo:`
+    : `Para tu seguridad, ingresa el siguiente c&#243;digo de verificaci&#243;n para iniciar sesi&#243;n`
 
   await sendMail({
     to,
