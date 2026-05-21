@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Shield, X, Info } from 'lucide-react'
+import { useSearchParams } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { useSSE } from '../../context/SSEContext'
 
@@ -118,7 +119,61 @@ function DetalleModal({ item, onClose, token }) {
         <div style={{ padding:'20px 24px' }}>
           {loading ? (
             <div style={{ textAlign:'center', padding:'32px 0', color:'#9ca3af', fontSize:14 }}>Cargando detalles...</div>
+          ) : estadoActual === 'no_convertida' ? (
+            /* ── MODAL NO APROBADA: vehículo → cliente → motivo ── */
+            <>
+              {/* Cabecera de estado */}
+              <div style={{ background:E.bg, borderRadius:12, padding:'12px 16px', marginBottom:18,
+                            display:'flex', alignItems:'center', gap:10 }}>
+                <span style={{ fontSize:18 }}>❌</span>
+                <div>
+                  <p style={{ margin:0, fontSize:13, fontWeight:700, color:E.color }}>Póliza no aprobada</p>
+                  <p style={{ margin:'2px 0 0', fontSize:12, color:'#6b7280' }}>
+                    Esta póliza no pudo ser emitida.
+                  </p>
+                </div>
+              </div>
+
+              {/* Vehículo */}
+              <Sec title="Vehículo">
+                <Row label="Placa"           value={placa} />
+                <Row label="Aseguradora"     value={aseguradora} />
+                <Row label="Valor asegurado" value={comercialValue ? fmt(comercialValue) : null} />
+                <Row label="Prima cotizada"  value={fmt(valorPrima)} />
+              </Sec>
+
+              {/* Cliente */}
+              <Sec title="Datos del cliente">
+                <Row label="Nombre"   value={clienteNombre} />
+                {clienteTipoDoc && clienteCedula && (
+                  <Row label="Documento" value={`${clienteTipoDoc} ${clienteCedula}`} />
+                )}
+                <Row label="Teléfono" value={clienteTelefono} />
+                <Row label="Correo"   value={clienteCorreo} />
+              </Sec>
+
+              {/* Motivo */}
+              <div style={{ marginBottom:4 }}>
+                <div style={{ fontSize:11, fontWeight:700, color:'#9ca3af', textTransform:'uppercase',
+                              letterSpacing:'0.08em', marginBottom:8 }}>
+                  Motivo de no aprobación
+                </div>
+                {observaciones ? (
+                  <div style={{ background:'#fef2f2', border:'1.5px solid #fecaca', borderRadius:12,
+                                padding:'16px', fontSize:14, color:'#991b1b', lineHeight:1.75,
+                                fontWeight:500 }}>
+                    {observaciones}
+                  </div>
+                ) : (
+                  <div style={{ background:'#fef2f2', borderRadius:12, padding:'14px 16px',
+                                fontSize:13, color:'#dc2626', lineHeight:1.6 }}>
+                    El equipo de Asegura2 pronto agregará el motivo aquí.
+                  </div>
+                )}
+              </div>
+            </>
           ) : (
+            /* ── MODAL NORMAL (en proceso / aprobada) ── */
             <>
               {/* Estado actual */}
               <div style={{ background:E.bg, borderRadius:12, padding:'14px 16px', marginBottom:20 }}>
@@ -149,8 +204,8 @@ function DetalleModal({ item, onClose, token }) {
 
               {/* Póliza y comisión */}
               <Sec title="Póliza y tu comisión">
-                <Row label="Aseguradora"     value={aseguradora} />
-                <Row label="Prima anual"     value={fmt(valorPrima)} />
+                <Row label="Aseguradora"      value={aseguradora} />
+                <Row label="Prima anual"      value={fmt(valorPrima)} />
                 <Row label="Tu comisión (6%)" value={fmt(valorComision)} highlight />
               </Sec>
 
@@ -163,24 +218,7 @@ function DetalleModal({ item, onClose, token }) {
                        highlight />}
               </Sec>
 
-              {/* Mensaje del equipo según estado */}
-              {estadoActual === 'no_convertida' ? (
-                <div>
-                  <div style={{ fontSize:11, fontWeight:700, color:'#9ca3af', textTransform:'uppercase',
-                                letterSpacing:'0.08em', marginBottom:8 }}>Mensaje del equipo Asegura2.com</div>
-                  {observaciones ? (
-                    <div style={{ background:'#fef2f2', border:'1.5px solid #fecaca', borderRadius:12,
-                                  padding:'14px 16px', fontSize:13, color:'#991b1b', lineHeight:1.7 }}>
-                      {observaciones}
-                    </div>
-                  ) : (
-                    <div style={{ background:'#fef2f2', borderRadius:12, padding:'14px 16px',
-                                  fontSize:13, color:'#dc2626', lineHeight:1.6 }}>
-                      Esta póliza no se pudo emitir. Nuestro equipo pronto agregará el motivo aquí.
-                    </div>
-                  )}
-                </div>
-              ) : estadoActual === 'aprobada' ? (
+              {estadoActual === 'aprobada' ? (
                 <div style={{ background:'#f0fdf4', border:'1.5px solid #bbf7d0', borderRadius:12,
                               padding:'14px 16px', fontSize:13, color:'#166534',
                               display:'flex', gap:10, alignItems:'flex-start', lineHeight:1.6 }}>
@@ -211,14 +249,17 @@ function DetalleModal({ item, onClose, token }) {
 
 /* ── Main ────────────────────────────────────────────────────────────────── */
 export default function MisPolizas() {
-  const { getToken } = useAuth()
-  const { subscribe } = useSSE()
-  const [data,    setData]    = useState({ leads: [], polizas: [] })
+  const { getToken }       = useAuth()
+  const { subscribe }      = useSSE()
+  const [searchParams]     = useSearchParams()
+  const [data,    setData] = useState({ leads: [], polizas: [] })
   const [loading, setLoading] = useState(true)
   const [modal,   setModal]   = useState(null)
-  const [tab,     setTab]     = useState('en_proceso')
+  // Lee el tab desde la URL (?tab=no_convertida etc.), default 'en_proceso'
+  const [tab, setTab] = useState(() => searchParams.get('tab') || 'en_proceso')
 
-  useEffect(() => {
+  const fetchData = useCallback((silent = false) => {
+    if (!silent) setLoading(true)
     fetch(`${API}/api/aliados/me/polizas`, {
       headers: { Authorization: `Bearer ${getToken()}` },
       credentials: 'include',
@@ -226,8 +267,15 @@ export default function MisPolizas() {
       .then(r => r.json())
       .then(d => { if (d.status === 'success') setData(d.data) })
       .catch(() => {})
-      .finally(() => setLoading(false))
-  }, [])
+      .finally(() => { if (!silent) setLoading(false) })
+  }, [getToken])
+
+  useEffect(() => { fetchData() }, [fetchData])
+
+  // Refetch silencioso al volver al tab (fallback ante caída de SSE)
+  useEffect(() => {
+    return subscribe('__refresh', () => fetchData(true))
+  }, [subscribe, fetchData])
 
   // ── Actualizaciones en vivo ───────────────────────────────────────────────
   useEffect(() => {

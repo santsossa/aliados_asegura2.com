@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { Bell, CheckCircle, XCircle, FileText, X } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import { useSSE } from '../context/SSEContext'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
@@ -8,6 +9,13 @@ const TIPO_CONFIG = {
   poliza_aprobada:    { icon: CheckCircle, color: '#16a34a', bg: '#dcfce7' },
   poliza_no_aprobada: { icon: XCircle,     color: '#dc2626', bg: '#fee2e2' },
   lead_recibido:      { icon: FileText,    color: '#2D2A7A', bg: '#edeef3' },
+}
+
+// Determina a dónde navegar al hacer click según el tipo de notificación
+function getLink(tipo) {
+  if (tipo === 'poliza_aprobada')    return '/dashboard/mis-polizas?tab=aprobada'
+  if (tipo === 'poliza_no_aprobada') return '/dashboard/mis-polizas?tab=no_convertida'
+  return '/dashboard'
 }
 
 function timeAgo(dateStr) {
@@ -25,8 +33,9 @@ export default function NotificationBell() {
   const dropdownRef             = useRef(null)
   const token                   = localStorage.getItem('token')
   const { subscribe }           = useSSE()
+  const navigate                = useNavigate()
 
-  // ── Carga inicial ─────────────────────────────────────────────────────────
+  // ── Carga / recarga ───────────────────────────────────────────────────────
   const fetchNotifs = useCallback(async () => {
     if (!token) return
     try {
@@ -42,7 +51,12 @@ export default function NotificationBell() {
 
   useEffect(() => { fetchNotifs() }, [fetchNotifs])
 
-  // ── SSE — evento 'notificacion' desde el contexto compartido ─────────────
+  // Refetch cuando el tab vuelve al foco (fallback ante caída de SSE)
+  useEffect(() => {
+    return subscribe('__refresh', fetchNotifs)
+  }, [subscribe, fetchNotifs])
+
+  // ── SSE: nueva notificación en tiempo real ─────────────────────────────
   useEffect(() => {
     return subscribe('notificacion', (notif) => {
       setNotifs(prev => {
@@ -56,7 +70,7 @@ export default function NotificationBell() {
     })
   }, [subscribe])
 
-  // ── Cierre al hacer clic fuera ────────────────────────────────────────────
+  // ── Cerrar al hacer clic fuera ────────────────────────────────────────
   useEffect(() => {
     if (!open) return
     function handler(e) {
@@ -67,7 +81,7 @@ export default function NotificationBell() {
     return () => document.removeEventListener('mousedown', handler)
   }, [open])
 
-  // ── Abrir dropdown y marcar como leídas ──────────────────────────────────
+  // ── Abrir dropdown → marca como leídas ───────────────────────────────
   async function handleOpen() {
     const next = !open
     setOpen(next)
@@ -81,6 +95,12 @@ export default function NotificationBell() {
         setNoLeidas(0)
       } catch { /* silencioso */ }
     }
+  }
+
+  // ── Click en una notificación → navega y cierra ───────────────────────
+  function handleNotifClick(n) {
+    setOpen(false)
+    navigate(getLink(n.tipo))
   }
 
   return (
@@ -148,11 +168,19 @@ export default function NotificationBell() {
               const cfg  = TIPO_CONFIG[n.tipo] || TIPO_CONFIG['lead_recibido']
               const Icon = cfg.icon
               return (
-                <div key={n.id} style={{
-                  display: 'flex', gap: 12, padding: '12px 16px',
-                  borderBottom: '1px solid #f4f4f6',
-                  background: n.leida ? '#fff' : '#f8f8ff',
-                }}>
+                <button
+                  key={n.id}
+                  onClick={() => handleNotifClick(n)}
+                  style={{
+                    width: '100%', textAlign: 'left', border: 'none', cursor: 'pointer',
+                    display: 'flex', gap: 12, padding: '12px 16px',
+                    borderBottom: '1px solid #f4f4f6',
+                    background: n.leida ? '#fff' : '#f8f8ff',
+                    transition: 'background 0.12s',
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.background = '#f0f0f8'}
+                  onMouseLeave={e => e.currentTarget.style.background = n.leida ? '#fff' : '#f8f8ff'}
+                >
                   <div style={{
                     width: 36, height: 36, borderRadius: 10,
                     background: cfg.bg, flexShrink: 0,
@@ -166,7 +194,9 @@ export default function NotificationBell() {
                         fontWeight: n.leida ? 600 : 700, fontSize: 13, color: '#16151b',
                         overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                       }}>{n.titulo}</span>
-                      {!n.leida && <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#2D2A7A', flexShrink: 0 }} />}
+                      {!n.leida && (
+                        <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#2D2A7A', flexShrink: 0 }} />
+                      )}
                     </div>
                     <p style={{
                       margin: 0, fontSize: 12, color: '#6b7280', lineHeight: '1.45',
@@ -177,7 +207,13 @@ export default function NotificationBell() {
                       {timeAgo(n.created_at)}
                     </span>
                   </div>
-                </div>
+                  {/* Flecha indicador de navegación */}
+                  <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0, color: '#d1d5db' }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <path d="M9 18l6-6-6-6"/>
+                    </svg>
+                  </div>
+                </button>
               )
             })}
           </div>

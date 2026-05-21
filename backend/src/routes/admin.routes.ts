@@ -92,15 +92,16 @@ router.patch('/leads/:id/estado',
       const { estado, observaciones } = req.body
       const leadId = req.params.id
 
-      // Buscar el lead con datos del aliado y cotización
+      // Buscar por id interno O por crm_lead_id (el CRM puede usar cualquiera de los dos)
       const [leads] = await pool.execute<any[]>(
         `SELECT l.*, a.nombre as aliado_nombre, a.correo as aliado_correo,
                 c.placa, c.comercial_value
          FROM leads l
          JOIN aliados a ON a.id = l.aliado_id
          LEFT JOIN cotizaciones c ON c.id = l.cotizacion_id
-         WHERE l.id = ?`,
-        [leadId]
+         WHERE l.id = ? OR l.crm_lead_id = ?
+         LIMIT 1`,
+        [leadId, leadId]
       )
       if (!leads.length) { res.status(404).json({ status:'error', message:'Lead no encontrado' }); return }
       const lead = leads[0]
