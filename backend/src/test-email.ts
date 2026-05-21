@@ -5,8 +5,11 @@
 import dotenv from 'dotenv'
 dotenv.config()
 
-// Forzar producción para que sendMail no corte el envío
 process.env.NODE_ENV = 'production'
+// Usar la URL del frontend en Railway para que las imágenes se vean en el test
+if (!process.env.FRONTEND_URL || process.env.FRONTEND_URL.includes('localhost')) {
+  process.env.FRONTEND_URL = 'https://aliados.asegura2.com.co'
+}
 
 import { sendLeadRecibidoEmail } from './services/email.service'
 
