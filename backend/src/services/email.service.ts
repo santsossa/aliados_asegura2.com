@@ -588,11 +588,9 @@ export async function sendOTPEmail(
       .otp-box { padding:16px 10px !important; }
       .otp-code { font-size:30px !important; letter-spacing:8px !important; }
       .hero-img { width:120px !important; }
-      /* Footer: apila en móvil */
-      .ft-left  { display:block !important; width:100% !important;
-                  padding-bottom:14px !important; }
-      .ft-right { display:block !important; width:100% !important;
-                  text-align:center !important; }
+      /* Footer: 2 columnas siempre, incluso en móvil */
+      .ft-left  { width:50% !important; }
+      .ft-right { width:50% !important; }
     }
   </style>
 </head>
@@ -681,7 +679,7 @@ export async function sendOTPEmail(
                        text-align:center;vertical-align:middle;
                        overflow:hidden">
                 <img src="${imgReloj}" alt="Reloj"
-                     width="38" height="38"
+                     width="44" height="44"
                      style="display:block;margin:0 auto;border:0" />
               </td></tr>
             </table>
@@ -726,9 +724,9 @@ export async function sendOTPEmail(
               <tr>
                 <td style="vertical-align:middle">
                   <table cellpadding="0" cellspacing="0">
-                    <tr><td width="52" height="52"
-                      style="width:52px;height:52px;min-width:52px;
-                             background:#edeef8;border-radius:26px;
+                    <tr><td width="42" height="42"
+                      style="width:42px;height:42px;min-width:42px;
+                             background:#edeef8;border-radius:21px;
                              text-align:center;vertical-align:middle;
                              overflow:hidden">
                       <img src="${imgAuri}" alt="Soporte"
