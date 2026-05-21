@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Shield, X, Info } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
+import { useSSE } from '../../context/SSEContext'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 const MESES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic']
@@ -211,6 +212,7 @@ function DetalleModal({ item, onClose, token }) {
 /* ── Main ────────────────────────────────────────────────────────────────── */
 export default function MisPolizas() {
   const { getToken } = useAuth()
+  const { subscribe } = useSSE()
   const [data,    setData]    = useState({ leads: [], polizas: [] })
   const [loading, setLoading] = useState(true)
   const [modal,   setModal]   = useState(null)
@@ -226,6 +228,48 @@ export default function MisPolizas() {
       .catch(() => {})
       .finally(() => setLoading(false))
   }, [])
+
+  // ── Actualizaciones en vivo ───────────────────────────────────────────────
+  useEffect(() => {
+    return subscribe('poliza_update', (ev) => {
+      setData(prev => {
+        // Actualizar en leads (en_proceso)
+        const leads = prev.leads.map(l =>
+          l.id === ev.lead_id
+            ? { ...l, estado: ev.estado, aseguradora: ev.aseguradora ?? l.aseguradora,
+                valor_prima: ev.valor_prima ?? l.valor_prima }
+            : l
+        )
+        // Actualizar en polizas (aprobada / no_convertida)
+        let polizas = prev.polizas.map(p =>
+          p.id === ev.poliza_id
+            ? { ...p, estado: ev.estado, valor_comision: ev.valor_comision ?? p.valor_comision }
+            : p
+        )
+        // Si la poliza es nueva (recién creada por el admin) y no está en la lista, agregarla
+        if (ev.poliza_id && !polizas.some(p => p.id === ev.poliza_id) && ev.estado !== 'en_proceso') {
+          polizas = [
+            {
+              id: ev.poliza_id, _tipo: 'poliza',
+              cliente_nombre: ev.cliente_nombre, aseguradora: ev.aseguradora,
+              valor_prima: ev.valor_prima, valor_comision: ev.valor_comision,
+              estado: ev.estado, placa: ev.placa,
+              created_at: ev.created_at || new Date().toISOString(),
+            },
+            ...polizas,
+          ]
+        }
+        return { leads, polizas }
+      })
+      // Si el modal abierto es el item que cambió, actualizar su estado también
+      setModal(prev => {
+        if (!prev) return prev
+        if (prev.id === ev.lead_id || prev.id === ev.poliza_id)
+          return { ...prev, estado: ev.estado }
+        return prev
+      })
+    })
+  }, [subscribe])
 
   const allItems = [
     ...data.polizas.map(p => ({ ...p, _tipo:'poliza' })),

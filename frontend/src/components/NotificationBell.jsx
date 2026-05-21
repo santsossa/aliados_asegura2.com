@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { Bell, CheckCircle, XCircle, FileText, X } from 'lucide-react'
+import { useSSE } from '../context/SSEContext'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
@@ -23,6 +24,7 @@ export default function NotificationBell() {
   const [noLeidas, setNoLeidas] = useState(0)
   const dropdownRef             = useRef(null)
   const token                   = localStorage.getItem('token')
+  const { subscribe }           = useSSE()
 
   // ── Carga inicial ─────────────────────────────────────────────────────────
   const fetchNotifs = useCallback(async () => {
@@ -40,32 +42,19 @@ export default function NotificationBell() {
 
   useEffect(() => { fetchNotifs() }, [fetchNotifs])
 
-  // ── SSE — notificaciones en tiempo real ───────────────────────────────────
+  // ── SSE — evento 'notificacion' desde el contexto compartido ─────────────
   useEffect(() => {
-    if (!token) return
-
-    const url = `${API}/api/notificaciones/stream?token=${encodeURIComponent(token)}`
-    const es   = new EventSource(url)
-
-    es.addEventListener('notificacion', (e) => {
-      try {
-        const notif = JSON.parse(e.data)
-        // Añade al inicio de la lista (máx 50) sin duplicados
-        setNotifs(prev => {
-          if (prev.some(n => n.id === notif.id)) return prev
-          return [notif, ...prev].slice(0, 50)
-        })
-        // Solo incrementa badge si el dropdown está cerrado
-        setOpen(isOpen => {
-          if (!isOpen) setNoLeidas(c => c + 1)
-          return isOpen
-        })
-      } catch { /* payload inválido */ }
+    return subscribe('notificacion', (notif) => {
+      setNotifs(prev => {
+        if (prev.some(n => n.id === notif.id)) return prev
+        return [notif, ...prev].slice(0, 50)
+      })
+      setOpen(isOpen => {
+        if (!isOpen) setNoLeidas(c => c + 1)
+        return isOpen
+      })
     })
-
-    // El EventSource reconecta automáticamente en caso de error
-    return () => es.close()
-  }, [token])
+  }, [subscribe])
 
   // ── Cierre al hacer clic fuera ────────────────────────────────────────────
   useEffect(() => {
@@ -138,74 +127,59 @@ export default function NotificationBell() {
           display: 'flex', flexDirection: 'column',
           overflow: 'hidden',
         }}>
-          {/* Header */}
           <div style={{
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             padding: '14px 16px 10px', borderBottom: '1px solid #eeeeef', flexShrink: 0,
           }}>
-            <span style={{ fontWeight: 700, fontSize: 14, color: '#16151b' }}>
-              Notificaciones
-            </span>
+            <span style={{ fontWeight: 700, fontSize: 14, color: '#16151b' }}>Notificaciones</span>
             <button onClick={() => setOpen(false)}
               style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af', display: 'flex' }}>
               <X size={16} />
             </button>
           </div>
 
-          {/* Lista */}
           <div style={{ overflowY: 'auto', flex: 1 }}>
             {notifs.length === 0 ? (
               <div style={{ padding: '36px 20px', textAlign: 'center', color: '#9ca3af', fontSize: 13 }}>
                 <Bell size={28} color="#d1d5db" style={{ marginBottom: 8 }} />
                 <p style={{ margin: 0 }}>Sin notificaciones aún</p>
               </div>
-            ) : (
-              notifs.map(n => {
-                const cfg  = TIPO_CONFIG[n.tipo] || TIPO_CONFIG['lead_recibido']
-                const Icon = cfg.icon
-                return (
-                  <div key={n.id} style={{
-                    display: 'flex', gap: 12, padding: '12px 16px',
-                    borderBottom: '1px solid #f4f4f6',
-                    background: n.leida ? '#fff' : '#f8f8ff',
+            ) : notifs.map(n => {
+              const cfg  = TIPO_CONFIG[n.tipo] || TIPO_CONFIG['lead_recibido']
+              const Icon = cfg.icon
+              return (
+                <div key={n.id} style={{
+                  display: 'flex', gap: 12, padding: '12px 16px',
+                  borderBottom: '1px solid #f4f4f6',
+                  background: n.leida ? '#fff' : '#f8f8ff',
+                }}>
+                  <div style={{
+                    width: 36, height: 36, borderRadius: 10,
+                    background: cfg.bg, flexShrink: 0,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
                   }}>
-                    {/* Icono */}
-                    <div style={{
-                      width: 36, height: 36, borderRadius: 10,
-                      background: cfg.bg, flexShrink: 0,
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    }}>
-                      <Icon size={17} color={cfg.color} />
-                    </div>
-
-                    {/* Texto */}
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
-                        <span style={{
-                          fontWeight: n.leida ? 600 : 700, fontSize: 13, color: '#16151b',
-                          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                        }}>
-                          {n.titulo}
-                        </span>
-                        {!n.leida && (
-                          <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#2D2A7A', flexShrink: 0 }} />
-                        )}
-                      </div>
-                      <p style={{
-                        margin: 0, fontSize: 12, color: '#6b7280', lineHeight: '1.45',
-                        display: '-webkit-box', WebkitLineClamp: 2,
-                        WebkitBoxOrient: 'vertical', overflow: 'hidden',
-                      }}>
-                        {n.mensaje}
-                      </p>
-                      <span style={{ fontSize: 11, color: '#b0b4c1', marginTop: 4, display: 'block' }}>
-                        {timeAgo(n.created_at)}
-                      </span>
-                    </div>
+                    <Icon size={17} color={cfg.color} />
                   </div>
-                )
-              })
-            )}
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
+                      <span style={{
+                        fontWeight: n.leida ? 600 : 700, fontSize: 13, color: '#16151b',
+                        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                      }}>{n.titulo}</span>
+                      {!n.leida && <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#2D2A7A', flexShrink: 0 }} />}
+                    </div>
+                    <p style={{
+                      margin: 0, fontSize: 12, color: '#6b7280', lineHeight: '1.45',
+                      display: '-webkit-box', WebkitLineClamp: 2,
+                      WebkitBoxOrient: 'vertical', overflow: 'hidden',
+                    }}>{n.mensaje}</p>
+                    <span style={{ fontSize: 11, color: '#b0b4c1', marginTop: 4, display: 'block' }}>
+                      {timeAgo(n.created_at)}
+                    </span>
+                  </div>
+                </div>
+              )
+            })}
           </div>
         </div>
       )}

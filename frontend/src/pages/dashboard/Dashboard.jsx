@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { DollarSign, FileText, Shield, TrendingUp, ChevronRight } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
+import { useSSE } from '../../context/SSEContext'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
@@ -125,11 +126,14 @@ function LoadingSkeleton() {
 // ─── Main component ───────────────────────────────────────────────────────────
 export default function Dashboard() {
   const { getToken, user } = useAuth()
-  const navigate = useNavigate()
-  const [data, setData] = useState(null)
+  const { subscribe }      = useSSE()
+  const navigate           = useNavigate()
+  const [data, setData]    = useState(null)
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
+  // Fetch reutilizable — silent=true no muestra skeleton al refrescar en vivo
+  const fetchDashboard = useCallback((silent = false) => {
+    if (!silent) setLoading(true)
     fetch(`${API}/api/aliados/dashboard`, {
       headers: { Authorization: `Bearer ${getToken()}` },
       credentials: 'include',
@@ -137,8 +141,18 @@ export default function Dashboard() {
       .then(r => r.json())
       .then(d => { if (d.status === 'success') setData(d.data) })
       .catch(() => {})
-      .finally(() => setLoading(false))
-  }, [])
+      .finally(() => { if (!silent) setLoading(false) })
+  }, [getToken])
+
+  useEffect(() => { fetchDashboard() }, [fetchDashboard])
+
+  // ── Actualizaciones en vivo: cuando cambia estado de una póliza ───────────
+  useEffect(() => {
+    return subscribe('poliza_update', () => {
+      // Refetch silencioso — stats, actividad y gráficas se actualizan sin parpadeo
+      fetchDashboard(true)
+    })
+  }, [subscribe, fetchDashboard])
 
   if (loading) return <LoadingSkeleton />
 

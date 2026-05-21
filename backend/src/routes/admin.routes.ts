@@ -182,6 +182,20 @@ router.patch('/leads/:id/estado',
             mensaje: notifMsg, leida: false, created_at: notifNow,
           })
         }
+
+        // Evento de actualización de estado (para MisPolizas y Dashboard en tiempo real)
+        const [polRow] = await pool.execute<any[]>('SELECT id, valor_comision FROM polizas WHERE lead_id = ? LIMIT 1', [leadId])
+        ssePush(lead.aliado_id, 'poliza_update', {
+          lead_id:        leadId,
+          poliza_id:      polRow[0]?.id || null,
+          estado,
+          aseguradora:    lead.aseguradora,
+          cliente_nombre: lead.cliente_nombre,
+          valor_prima:    parseFloat(lead.valor_prima || 0),
+          valor_comision: polRow[0] ? parseFloat(polRow[0].valor_comision) : comision,
+          placa:          lead.placa || null,
+          created_at:     new Date().toISOString(),
+        })
       } catch { /* no interrumpir flujo principal */ }
 
       res.json({ status:'success', message:`Lead marcado como ${estado}.` })
@@ -287,6 +301,19 @@ router.patch('/polizas/:id/estado',
             mensaje: notifMsg, leida: false, created_at: notifNow,
           })
         }
+
+        // Evento de actualización de estado (para MisPolizas y Dashboard en tiempo real)
+        ssePush(pol.aliado_id, 'poliza_update', {
+          lead_id:        pol.lead_id || null,
+          poliza_id:      req.params.id,
+          estado,
+          aseguradora:    pol.aseguradora,
+          cliente_nombre: pol.cliente_nombre,
+          valor_prima:    parseFloat(pol.valor_prima || 0),
+          valor_comision: polComision,
+          placa:          pol.placa || null,
+          created_at:     new Date().toISOString(),
+        })
       } catch { /* no interrumpir flujo principal */ }
 
       res.json({ status:'success', message:`Póliza marcada como ${estado}.` })

@@ -7,6 +7,7 @@ import {
 import { LogoFull, LogoIcon } from '../components/Logo'
 import { useIsMobile } from '../hooks/use-mobile'
 import { useAuth } from '../context/AuthContext'
+import { SSEProvider } from '../context/SSEContext'
 import NotificationBell from '../components/NotificationBell'
 
 const NAV_MAIN = [
@@ -39,6 +40,7 @@ export default function DashboardLayout() {
   // ── MÓVIL ─────────────────────────────────────────────────────────────────
   if (isMobile) {
     return (
+      <SSEProvider>
       <div style={{ display:'flex', flexDirection:'column', height:'100dvh', background:'#f4f4f6', fontFamily:'Inter, system-ui, sans-serif' }}>
 
         {/* Topbar móvil */}
@@ -189,11 +191,13 @@ export default function DashboardLayout() {
           </>
         )}
       </div>
+      </SSEProvider>
     )
   }
 
   // ── TABLET / DESKTOP ───────────────────────────────────────────────────────
   return (
+    <SSEProvider>
     <div style={{ display:'flex', flexDirection:'column', height:'100vh', background:'#fff', fontFamily:'Inter, system-ui, sans-serif' }}>
       <div style={{ flex:1, padding:'6px', overflow:'hidden' }}>
         <div style={{
@@ -329,5 +333,6 @@ export default function DashboardLayout() {
         </div>
       </div>
     </div>
+    </SSEProvider>
   )
 }
