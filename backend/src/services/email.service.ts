@@ -551,28 +551,226 @@ export async function sendOTPEmail(
   nombre: string | null | undefined,
   otp: string
 ): Promise<void> {
-  const saludo = nombre
-    ? `<h2 style="color:#2D2A7A;margin-bottom:8px">Hola, ${nombre} 👋</h2>
-       <p style="color:#374151;font-size:15px;line-height:1.6">
-         Este es tu código de acceso al Portal de Aliados de Asegura2.com:
-       </p>`
-    : `<p style="color:#374151;font-size:15px;line-height:1.6;margin-bottom:8px">
-         Tu código de verificación es:
-       </p>`
+  const base      = (env.FRONTEND_URL || '').replace(/\/$/, '')
+  const imgLogo   = `${base}/logo-email.png`
+  const imgSobre  = `${base}/correootp.png`
+  const imgReloj  = `${base}/relojotp.png`
+  const imgAuri   = `${base}/auricularesotp.png`
+
+  // Código formateado con espacios entre dígitos
+  const otpFmt = otp.split('').join(' ')
+
+  // Texto principal según si conocemos el nombre o no
+  const esRegistro = !nombre
+  const titulo = esRegistro
+    ? `&#161;Gracias por registrarte en <span style="color:#2D2A7A">Asegura2.com</span>!`
+    : `Hola <span style="color:#2D2A7A">${nombre}</span> &#128075;`
+  const subtitulo = esRegistro
+    ? `Para continuar, <strong>verifica tu correo</strong> con el siguiente c&#243;digo:`
+    : `Para continuar con tu acceso, ingresa este c&#243;digo:`
 
   await sendMail({
     to,
-    subject: `${otp} es tu código de acceso — Asegura2.com`,
-    html: `
-      <div style="font-family:Inter,sans-serif;max-width:520px;margin:0 auto;padding:32px 24px;background:#fff;border-radius:16px">
-        ${saludo}
-        <div style="background:#eeedf8;border-radius:12px;padding:24px;text-align:center;margin:24px 0">
-          <span style="font-size:36px;font-weight:800;letter-spacing:8px;color:#2D2A7A">${otp}</span>
-        </div>
-        <p style="color:#9ca3af;font-size:12px">
-          Expira en ${env.OTP_EXPIRES_MINUTES} minutos. Si no solicitaste este código, ignora este correo.
-        </p>
-      </div>
-    `,
+    subject: `${otp} es tu c&#243;digo — Asegura2.com`,
+    html: `<!DOCTYPE html>
+<html lang="es" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Asegura2.com</title>
+  <style>
+    body,table,td,p,h1,h2,span,a { margin:0; padding:0; }
+    img { border:0; }
+    @media only screen and (max-width:600px) {
+      .card  { border-radius:0 !important; }
+      .sec   { padding-left:20px !important; padding-right:20px !important; }
+      .otp-code { font-size:32px !important; letter-spacing:10px !important; }
+    }
+  </style>
+</head>
+<body style="margin:0;padding:0;background:#f0f0f5;font-family:Arial,Helvetica,sans-serif">
+
+<table align="center" cellpadding="0" cellspacing="0" width="100%"
+       style="background:#f0f0f5;padding:24px 12px">
+<tr><td align="center">
+
+<table class="card" cellpadding="0" cellspacing="0" width="100%"
+       style="max-width:580px;background:#ffffff;border-radius:16px;
+              overflow:hidden;border:1px solid #e8e8f0">
+
+  <!-- ══ HEADER ══ -->
+  <tr>
+    <td style="background:#ffffff;padding:16px 28px;border-bottom:2px solid #2D2A7A">
+      <table cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+          <td style="vertical-align:middle">
+            <img src="${imgLogo}" alt="Asegura2.com"
+                 height="38" style="display:block;height:38px;border:0" />
+          </td>
+          <td align="right" style="vertical-align:middle">
+            <span style="font-size:12px;font-weight:600;color:#2D2A7A;
+                         font-family:Arial,sans-serif">Portal de Aliados</span>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- ══ HERO: imagen centrada ══ -->
+  <tr>
+    <td style="background:#f4f4f8;padding:36px 28px 28px;text-align:center">
+      <img src="${imgSobre}" alt="Verificación"
+           width="100" style="display:block;width:100px;max-width:100%;
+                               margin:0 auto;border:0" />
+    </td>
+  </tr>
+
+  <!-- ══ TÍTULO Y SUBTÍTULO ══ -->
+  <tr>
+    <td class="sec" style="padding:28px 40px 0;text-align:center">
+      <h1 style="margin:0 0 12px;font-size:20px;font-weight:800;
+                 color:#111827;line-height:1.3;font-family:Arial,sans-serif">
+        ${titulo}
+      </h1>
+      <p style="margin:0;font-size:14px;color:#4b5563;line-height:1.65;
+                font-family:Arial,sans-serif">
+        ${subtitulo}
+      </p>
+    </td>
+  </tr>
+
+  <!-- ══ CÓDIGO OTP ══ -->
+  <tr>
+    <td class="sec" style="padding:24px 40px">
+      <table cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+          <td style="background:#edeef8;border-radius:12px;
+                     padding:22px 20px;text-align:center">
+            <span class="otp-code"
+                  style="font-size:42px;font-weight:900;letter-spacing:14px;
+                         color:#2D2A7A;font-family:Arial,sans-serif">
+              ${otpFmt}
+            </span>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- ══ EXPIRA EN ══ -->
+  <tr>
+    <td class="sec" style="padding:0 40px 14px;text-align:center">
+      <table cellpadding="0" cellspacing="0" align="center">
+        <tr>
+          <td style="vertical-align:middle;padding-right:8px">
+            <!-- Reloj con círculo HTML -->
+            <table cellpadding="0" cellspacing="0">
+              <tr><td width="28" height="28"
+                style="width:28px;height:28px;min-width:28px;
+                       background:#edeef8;border-radius:14px;
+                       text-align:center;vertical-align:middle">
+                <img src="${imgReloj}" alt="Reloj"
+                     width="16" height="16"
+                     style="display:block;margin:0 auto;border:0" />
+              </td></tr>
+            </table>
+          </td>
+          <td style="vertical-align:middle;font-size:13px;color:#374151;
+                     font-family:Arial,sans-serif">
+            Este c&#243;digo expira en
+            <strong style="color:#111827">${env.OTP_EXPIRES_MINUTES} minutos</strong>.
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- ══ NOTA ══ -->
+  <tr>
+    <td class="sec" style="padding:0 40px 28px;text-align:center">
+      <p style="margin:0;font-size:12px;color:#9ca3af;font-family:Arial,sans-serif">
+        Si no solicitaste este c&#243;digo, puedes ignorar este mensaje.
+      </p>
+    </td>
+  </tr>
+
+  <!-- Separador -->
+  <tr>
+    <td style="padding:0 28px">
+      <table cellpadding="0" cellspacing="0" width="100%">
+        <tr><td height="1" style="background:#e8e8f0;font-size:0;line-height:0">&nbsp;</td></tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- ══ FOOTER: auriculares + texto ayuda | estamos aquí ══ -->
+  <tr>
+    <td class="sec" style="padding:20px 28px 16px">
+      <table cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+          <!-- Soporte (izquierda) -->
+          <td style="vertical-align:middle;width:55%">
+            <table cellpadding="0" cellspacing="0">
+              <tr>
+                <!-- Auriculares con círculo HTML -->
+                <td style="vertical-align:middle">
+                  <table cellpadding="0" cellspacing="0">
+                    <tr><td width="44" height="44"
+                      style="width:44px;height:44px;min-width:44px;
+                             background:#edeef8;border-radius:22px;
+                             text-align:center;vertical-align:middle">
+                      <img src="${imgAuri}" alt="Soporte"
+                           width="24" height="24"
+                           style="display:block;margin:0 auto;border:0" />
+                    </td></tr>
+                  </table>
+                </td>
+                <td style="padding-left:12px;vertical-align:middle">
+                  <div style="font-size:13px;font-weight:700;color:#1a1a2e;
+                              font-family:Arial,sans-serif">
+                    &#191;Necesitas ayuda?
+                  </div>
+                  <div style="font-size:12px;color:#6b7280;margin-top:3px;
+                              font-family:Arial,sans-serif">
+                    <a href="mailto:aliados@asegura2.com.co"
+                       style="color:#2D2A7A;text-decoration:none;font-weight:600">
+                      aliados@asegura2.com.co</a>
+                  </div>
+                </td>
+              </tr>
+            </table>
+          </td>
+          <!-- Estamos aquí (derecha) — imagen cuando esté disponible -->
+          <td style="text-align:right;vertical-align:middle;width:45%">
+            <span style="font-family:Georgia,'Times New Roman',serif;
+                         font-style:italic;font-size:15px;
+                         color:#2D2A7A;font-weight:600;line-height:1.4">
+              &#9825;&nbsp;&#161;Estamos aqu&#237;<br>para ayudarte!
+            </span>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- ══ BOTTOM BAR ══ -->
+  <tr>
+    <td style="background:#f8f8fc;border-top:1px solid #e8e8f0;
+               padding:12px 28px;text-align:center">
+      <img src="${imgLogo}" alt="Asegura2.com"
+           height="24" style="display:inline-block;height:24px;border:0;
+                               margin-bottom:4px" />
+      <p style="margin:0;font-size:10px;color:#9ca3af;
+                font-family:Arial,sans-serif">
+        Asegura2.com &middot; Portal de Aliados
+      </p>
+    </td>
+  </tr>
+
+</table>
+</td></tr>
+</table>
+</body>
+</html>`,
   })
 }

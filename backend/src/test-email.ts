@@ -11,19 +11,13 @@ if (!process.env.FRONTEND_URL || process.env.FRONTEND_URL.includes('localhost'))
   process.env.FRONTEND_URL = 'https://aliados.asegura2.com.co'
 }
 
-import { sendLeadRecibidoEmail } from './services/email.service'
+import { sendLeadRecibidoEmail, sendOTPEmail } from './services/email.service'
 
 async function main() {
-  console.log('📧 Enviando correo de prueba...')
-  await sendLeadRecibidoEmail({
-    to:             'santiagosossaher@gmail.com',
-    aliado_nombre:  'Santiago',
-    cliente_nombre: 'Carlos Pérez',
-    aseguradora:    'Seguros Bolívar',
-    valor_prima:    4_317_828,
-    placa:          'GSS026',
-  })
-  console.log('✅ Correo enviado a santiagosossaher@gmail.com')
+  // Test OTP registro (sin nombre)
+  console.log('📧 Enviando OTP registro...')
+  await sendOTPEmail('santiagosossaher@gmail.com', null, '871557')
+  console.log('✅ OTP registro enviado')
 }
 
 main().catch(e => { console.error('❌ Error:', e.message); process.exit(1) })
