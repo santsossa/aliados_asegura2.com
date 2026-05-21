@@ -56,7 +56,8 @@ function DetalleModal({ item, onClose, token }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const cotId = item.cotizacion_id || (item._tipo === 'lead' ? null : item.id)
+    // cotizacion_id viene directo del item (ya incluido en el query de /me/polizas)
+    const cotId = item.cotizacion_id
     if (!cotId) { setLoading(false); return }
     fetch(`${API}/api/aliados/me/cotizaciones/${cotId}/detalle`, {
       headers: { Authorization: `Bearer ${token}` },
@@ -68,8 +69,23 @@ function DetalleModal({ item, onClose, token }) {
       .finally(() => setLoading(false))
   }, [item])
 
+  // Estado: si hay detalle del servidor úsalo, si no el del item
   const estadoActual = det?.poliza_estado || item.estado || 'en_proceso'
   const E = ESTADOS[estadoActual] || ESTADOS.en_proceso
+
+  // Campos con fallback a item (ya enriquecido por el JOIN en /me/polizas)
+  const clienteNombre   = det?.cliente_nombre   || item.cliente_nombre   || '—'
+  const clienteTelefono = det?.cliente_telefono || det?.lead_telefono    || item.cliente_telefono || '—'
+  const clienteCorreo   = det?.cliente_correo   || item.cliente_correo   || '—'
+  const clienteCedula   = det?.cliente_cedula   || item.cliente_cedula
+  const clienteTipoDoc  = det?.cliente_tipo_doc || item.cliente_tipo_doc
+  const placa           = det?.placa            || item.placa
+  const comercialValue  = det?.comercial_value  || item.comercial_value
+  const aseguradora     = det?.aseguradora      || item.aseguradora      || '—'
+  const valorPrima      = det?.valor_prima      || item.valor_prima      || 0
+  const valorComision   = det?.valor_comision   || item.valor_comision   || Math.round(valorPrima * 0.06)
+  const observaciones   = det?.observaciones    || item.observaciones
+  const createdAt       = det?.created_at       || item.created_at
 
   return (
     <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:500,
@@ -88,7 +104,7 @@ function DetalleModal({ item, onClose, token }) {
               Seguimiento de póliza
             </h2>
             <p style={{ fontSize:12, color:'#9ca3af', margin:'2px 0 0' }}>
-              {item.cliente_nombre || 'Cliente'} · {item.aseguradora || '—'}
+              {clienteNombre} · {aseguradora}
             </p>
           </div>
           <button onClick={onClose}
@@ -116,32 +132,34 @@ function DetalleModal({ item, onClose, token }) {
 
               {/* Cliente */}
               <Sec title="Datos del cliente">
-                <Row label="Nombre"   value={det?.cliente_nombre   || item.cliente_nombre} />
-                <Row label="Teléfono" value={det?.cliente_telefono || det?.lead_telefono || item.cliente_telefono} />
-                <Row label="Correo"   value={det?.cliente_correo} />
+                <Row label="Nombre"   value={clienteNombre} />
+                {clienteTipoDoc && clienteCedula && (
+                  <Row label="Documento" value={`${clienteTipoDoc} ${clienteCedula}`} />
+                )}
+                <Row label="Teléfono" value={clienteTelefono} />
+                <Row label="Correo"   value={clienteCorreo} />
               </Sec>
 
               {/* Vehículo */}
               <Sec title="Vehículo">
-                <Row label="Placa"           value={det?.placa || item.placa} />
-                <Row label="Valor asegurado" value={det?.comercial_value ? fmt(det.comercial_value) : null} />
+                <Row label="Placa"           value={placa} />
+                <Row label="Valor asegurado" value={comercialValue ? fmt(comercialValue) : null} />
               </Sec>
 
               {/* Póliza y comisión */}
               <Sec title="Póliza y tu comisión">
-                <Row label="Aseguradora"  value={det?.aseguradora || item.aseguradora} />
-                <Row label="Prima anual"  value={fmt(det?.valor_prima || item.valor_prima)} />
-                <Row label="Tu comisión (6%)"
-                     value={fmt(det?.valor_comision || item.valor_comision ||
-                            Math.round((det?.valor_prima || item.valor_prima || 0) * 0.06))}
-                     highlight />
+                <Row label="Aseguradora"     value={aseguradora} />
+                <Row label="Prima anual"     value={fmt(valorPrima)} />
+                <Row label="Tu comisión (6%)" value={fmt(valorComision)} highlight />
               </Sec>
 
               {/* Fechas */}
               <Sec title="Seguimiento">
-                <Row label="Lead enviado"   value={fechaStr(det?.created_at || item.created_at)} />
-                {estadoActual === 'aprobada' && det?.mes && det?.anio &&
-                  <Row label="Pago programado" value={`1 de ${MESES[(det.mes||1) - 1]} ${det.anio}`} highlight />}
+                <Row label="Lead enviado" value={fechaStr(createdAt)} />
+                {estadoActual === 'aprobada' && (det?.mes || item.mes) &&
+                  <Row label="Pago programado"
+                       value={`1 de ${MESES[((det?.mes || item.mes) - 1)]} ${det?.anio || item.anio}`}
+                       highlight />}
               </Sec>
 
               {/* Mensaje del equipo según estado */}
@@ -149,10 +167,10 @@ function DetalleModal({ item, onClose, token }) {
                 <div>
                   <div style={{ fontSize:11, fontWeight:700, color:'#9ca3af', textTransform:'uppercase',
                                 letterSpacing:'0.08em', marginBottom:8 }}>Mensaje del equipo Asegura2.com</div>
-                  {det?.observaciones ? (
+                  {observaciones ? (
                     <div style={{ background:'#fef2f2', border:'1.5px solid #fecaca', borderRadius:12,
                                   padding:'14px 16px', fontSize:13, color:'#991b1b', lineHeight:1.7 }}>
-                      {det.observaciones}
+                      {observaciones}
                     </div>
                   ) : (
                     <div style={{ background:'#fef2f2', borderRadius:12, padding:'14px 16px',
@@ -169,7 +187,7 @@ function DetalleModal({ item, onClose, token }) {
                   <span>
                     <strong>¡Felicitaciones!</strong> El cliente pagó la póliza.
                     Tu comisión quedará incluida en el pago del <strong>1 del próximo mes</strong>.
-                    {det?.observaciones && <><br/><br/><em>{det.observaciones}</em></>}
+                    {observaciones && <><br/><br/><em>{observaciones}</em></>}
                   </span>
                 </div>
               ) : (

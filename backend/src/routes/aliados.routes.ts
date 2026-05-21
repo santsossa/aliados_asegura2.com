@@ -240,23 +240,25 @@ router.get('/me/cotizaciones', async (req, res, next) => {
 
 router.get('/me/polizas', async (req, res, next) => {
   try {
-    // Cotizaciones enviadas a emitir (leads) — con datos de la cotización relacionada
+    // Cotizaciones enviadas a emitir (leads) — con todos los datos de la cotización
     const [leads] = await pool.execute<any[]>(
-      `SELECT l.id, l.cliente_nombre, l.cliente_telefono, l.aseguradora,
+      `SELECT l.id, l.cotizacion_id, l.cliente_nombre, l.cliente_telefono, l.aseguradora,
               l.valor_prima, l.observaciones, l.crm_lead_id, l.created_at,
-              c.placa, c.comercial_value, c.datos_cotizacion, c.cliente_correo,
+              c.placa, c.comercial_value, c.datos_cotizacion,
+              c.cliente_correo, c.cliente_cedula, c.cliente_tipo_doc,
               'en_proceso' as estado, 'lead' as tipo
        FROM leads l
        LEFT JOIN cotizaciones c ON c.id = l.cotizacion_id
        WHERE l.aliado_id = ? ORDER BY l.created_at DESC`,
       [req.aliado!.sub]
     )
-    // Pólizas procesadas por el equipo admin
+    // Pólizas procesadas por el equipo admin — con datos de cotización vía lead
     const [polizas] = await pool.execute<any[]>(
       `SELECT p.id, p.cliente_nombre, p.aseguradora, p.valor_prima, p.valor_comision,
               p.estado, p.created_at, p.mes, p.anio, 'poliza' as tipo,
-              c.placa, c.datos_cotizacion, c.cliente_correo, c.cliente_telefono,
-              l.observaciones
+              l.cotizacion_id, l.observaciones,
+              c.placa, c.comercial_value, c.datos_cotizacion,
+              c.cliente_correo, c.cliente_telefono, c.cliente_cedula, c.cliente_tipo_doc
        FROM polizas p
        LEFT JOIN leads l ON l.id = p.lead_id
        LEFT JOIN cotizaciones c ON c.id = l.cotizacion_id
