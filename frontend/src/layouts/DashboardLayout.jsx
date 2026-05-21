@@ -2,11 +2,12 @@ import { Outlet, NavLink, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import {
   Home, FileText, Shield, DollarSign, CreditCard,
-  AlignJustify, Car, Bell, X, LogOut, HelpCircle, Settings,
+  AlignJustify, Car, X, LogOut, HelpCircle, Settings,
 } from 'lucide-react'
 import { LogoFull, LogoIcon } from '../components/Logo'
 import { useIsMobile } from '../hooks/use-mobile'
 import { useAuth } from '../context/AuthContext'
+import NotificationBell from '../components/NotificationBell'
 
 const NAV_MAIN = [
   { to: '/dashboard',                        icon: Home,       label: 'Home'             },
@@ -54,11 +55,7 @@ export default function DashboardLayout() {
             </div>
           </div>
           <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-            <button
-              style={{ width:36, height:36, borderRadius:'50%', background:'#f3f4f6', border:'none', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center' }}
-            >
-              <Bell size={16} color="#374151" />
-            </button>
+            <NotificationBell />
             <button
               onClick={() => setDrawerOpen(true)}
               style={{ width:36, height:36, borderRadius:'50%', background:'#f3f4f6', border:'none', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center' }}
@@ -322,13 +319,7 @@ export default function DashboardLayout() {
                 </div>
               </div>
               <div style={{ display:'flex', alignItems:'center', gap:10 }}>
-                <div
-                  style={{ background:'#e2e3e8', borderRadius:'50%', width:40, height:40, display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', transition:'background 0.15s' }}
-                  onMouseEnter={e=>e.currentTarget.style.background='#d5d6dc'}
-                  onMouseLeave={e=>e.currentTarget.style.background='#e2e3e8'}
-                >
-                  <Bell size={17} color="#374151" />
-                </div>
+                <NotificationBell />
               </div>
             </div>
             <div style={{ flex:1, overflow:'auto' }}>

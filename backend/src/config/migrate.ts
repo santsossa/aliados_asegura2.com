@@ -178,6 +178,17 @@ CREATE TABLE IF NOT EXISTS auth_logs (
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS notificaciones (
+  id         VARCHAR(36)  PRIMARY KEY DEFAULT (UUID()),
+  aliado_id  VARCHAR(36)  NOT NULL,
+  tipo       VARCHAR(50)  NOT NULL,
+  titulo     VARCHAR(200) NOT NULL,
+  mensaje    TEXT         NOT NULL,
+  leida      BOOLEAN      NOT NULL DEFAULT FALSE,
+  created_at TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (aliado_id) REFERENCES aliados(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 `
 
 // ── Columnas adicionales (v2) — se ignoran si ya existen ─────────────────

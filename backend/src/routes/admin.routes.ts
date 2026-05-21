@@ -151,6 +151,26 @@ router.patch('/leads/:id/estado',
         }).catch(() => {})
       }
 
+      // Crear notificación para el aliado
+      try {
+        const placaStr = lead.placa ? ` · Placa ${lead.placa}` : ''
+        if (estado === 'aprobada') {
+          await pool.execute(
+            `INSERT INTO notificaciones (aliado_id, tipo, titulo, mensaje) VALUES (?, ?, ?, ?)`,
+            [lead.aliado_id, 'poliza_aprobada',
+             `¡Póliza aprobada!${placaStr}`,
+             `La póliza de ${lead.cliente_nombre} con ${lead.aseguradora}${placaStr} fue aprobada. Tu comisión es $${comision.toLocaleString('es-CO')}.`]
+          )
+        } else if (estado === 'no_convertida') {
+          await pool.execute(
+            `INSERT INTO notificaciones (aliado_id, tipo, titulo, mensaje) VALUES (?, ?, ?, ?)`,
+            [lead.aliado_id, 'poliza_no_aprobada',
+             `Póliza no aprobada${placaStr}`,
+             `La póliza de ${lead.cliente_nombre} con ${lead.aseguradora}${placaStr} no fue aprobada.${observaciones ? ' Motivo: ' + observaciones : ''}`]
+          )
+        }
+      } catch { /* no interrumpir */ }
+
       res.json({ status:'success', message:`Lead marcado como ${estado}.` })
     } catch(err) { next(err) }
   }
@@ -203,6 +223,7 @@ router.patch('/polizas/:id/estado',
       )
 
       // Email al aliado
+      const polComision = parseFloat(pol.valor_comision || 0) || Math.round(parseFloat(pol.valor_prima || 0) * 0.06)
       if (estado === 'aprobada') {
         sendPolizaAprobadaEmail({
           to:             pol.aliado_correo,
@@ -210,7 +231,7 @@ router.patch('/polizas/:id/estado',
           cliente_nombre: pol.cliente_nombre,
           aseguradora:    pol.aseguradora,
           valor_prima:    parseFloat(pol.valor_prima || 0),
-          valor_comision: parseFloat(pol.valor_comision || 0) || Math.round(parseFloat(pol.valor_prima || 0) * 0.06),
+          valor_comision: polComision,
           placa:          pol.placa || undefined,
         }).catch(() => {})
       } else if (estado === 'no_convertida' && observaciones) {
@@ -223,6 +244,26 @@ router.patch('/polizas/:id/estado',
           motivo:         observaciones,
         }).catch(() => {})
       }
+
+      // Crear notificación para el aliado
+      try {
+        const placaStr = pol.placa ? ` · Placa ${pol.placa}` : ''
+        if (estado === 'aprobada') {
+          await pool.execute(
+            `INSERT INTO notificaciones (aliado_id, tipo, titulo, mensaje) VALUES (?, ?, ?, ?)`,
+            [pol.aliado_id, 'poliza_aprobada',
+             `¡Póliza aprobada!${placaStr}`,
+             `La póliza de ${pol.cliente_nombre} con ${pol.aseguradora}${placaStr} fue aprobada. Tu comisión es $${polComision.toLocaleString('es-CO')}.`]
+          )
+        } else if (estado === 'no_convertida') {
+          await pool.execute(
+            `INSERT INTO notificaciones (aliado_id, tipo, titulo, mensaje) VALUES (?, ?, ?, ?)`,
+            [pol.aliado_id, 'poliza_no_aprobada',
+             `Póliza no aprobada${placaStr}`,
+             `La póliza de ${pol.cliente_nombre} con ${pol.aseguradora}${placaStr} no fue aprobada.${observaciones ? ' Motivo: ' + observaciones : ''}`]
+          )
+        }
+      } catch { /* no interrumpir */ }
 
       res.json({ status:'success', message:`Póliza marcada como ${estado}.` })
     } catch(err) { next(err) }
