@@ -331,6 +331,19 @@ export default function MisPolizas() {
   const filtered = allItems.filter(it => it.estado === tab)
 
   function ItemCard({ item }) {
+    // Extraer logo de la aseguradora desde datos_cotizacion
+    const aseguradoraLogo = (() => {
+      try {
+        const raw = item.datos_cotizacion
+        const datos = typeof raw === 'object' ? raw : JSON.parse(raw || '{}')
+        const quotes = datos?.quotes || []
+        const match = quotes.find(q =>
+          q.company?.toLowerCase().trim() === item.aseguradora?.toLowerCase().trim()
+        )
+        return match?.logo || null
+      } catch { return null }
+    })()
+
     return (
       <button
         onClick={() => setModal(item)}
@@ -340,9 +353,17 @@ export default function MisPolizas() {
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-4">
               <div style={{ width:40, height:40, borderRadius:12, flexShrink:0,
-                            background: ESTADOS[tab]?.bg || '#f3f4f6',
-                            display:'flex', alignItems:'center', justifyContent:'center' }}>
-                <Shield size={18} style={{ color: ESTADOS[tab]?.color || '#6b7280' }} />
+                            background: aseguradoraLogo ? '#fff' : (ESTADOS[tab]?.bg || '#f3f4f6'),
+                            border: aseguradoraLogo ? '1px solid #e5e7eb' : 'none',
+                            display:'flex', alignItems:'center', justifyContent:'center',
+                            overflow:'hidden', padding: aseguradoraLogo ? 4 : 0 }}>
+                {aseguradoraLogo
+                  ? <img src={aseguradoraLogo} alt={item.aseguradora}
+                         style={{ width:'100%', height:'100%', objectFit:'contain' }}
+                         onError={e => { e.currentTarget.style.display='none'; e.currentTarget.nextSibling.style.display='flex' }} />
+                  : null}
+                <Shield size={18} style={{ color: ESTADOS[tab]?.color || '#6b7280',
+                                           display: aseguradoraLogo ? 'none' : 'block' }} />
               </div>
               <div>
                 <p className="font-semibold text-gray-900 text-sm">{item.cliente_nombre || 'Cliente'}</p>
