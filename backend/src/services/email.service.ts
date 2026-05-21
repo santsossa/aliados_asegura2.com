@@ -397,19 +397,25 @@ export async function sendLeadRecibidoEmail(opts: {
           <td align="right" style="vertical-align:middle">
             <table cellpadding="0" cellspacing="4">
               <tr>
-                <td>
+                <td style="padding:0 3px">
                   <a href="https://web.facebook.com/asegura2col" style="text-decoration:none">
-                    ${svgCircle(FB_PATH, '#1877f2', 32, 16)}
+                    <img src="${base}/icons/facebook.svg" alt="Facebook"
+                         width="32" height="32"
+                         style="display:block;width:32px;height:32px;border:0;border-radius:50%" />
                   </a>
                 </td>
-                <td>
+                <td style="padding:0 3px">
                   <a href="https://www.instagram.com/asegura2col/" style="text-decoration:none">
-                    ${svgCircle(IG_PATH, '#e1306c', 32, 16)}
+                    <img src="${base}/icons/instagram.svg" alt="Instagram"
+                         width="32" height="32"
+                         style="display:block;width:32px;height:32px;border:0;border-radius:50%" />
                   </a>
                 </td>
-                <td>
+                <td style="padding:0 3px">
                   <a href="https://www.linkedin.com/company/asegura2colombia" style="text-decoration:none">
-                    ${svgCircle(LI_PATH, '#0a66c2', 32, 16)}
+                    <img src="${base}/icons/linkedin.svg" alt="LinkedIn"
+                         width="32" height="32"
+                         style="display:block;width:32px;height:32px;border:0;border-radius:6px" />
                   </a>
                 </td>
               </tr>
