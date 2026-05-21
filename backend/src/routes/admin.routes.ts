@@ -4,6 +4,8 @@ import { requireAdmin } from '../middleware/auth'
 import { validate } from '../middleware/validate'
 import { pool } from '../config/db'
 import { sendPolizaAprobadaEmail, sendPolizaNoAprobadaEmail, sendLeadRecibidoEmail } from '../services/email.service'
+import { ssePush } from '../lib/sse'
+import { randomUUID } from 'crypto'
 
 const router = Router()
 router.use(requireAdmin)
@@ -151,25 +153,36 @@ router.patch('/leads/:id/estado',
         }).catch(() => {})
       }
 
-      // Crear notificación para el aliado
+      // Crear notificación y empujar en tiempo real al aliado
       try {
         const placaStr = lead.placa ? ` · Placa ${lead.placa}` : ''
+        let notifTipo   = ''
+        let notifTitulo = ''
+        let notifMsg    = ''
+
         if (estado === 'aprobada') {
-          await pool.execute(
-            `INSERT INTO notificaciones (aliado_id, tipo, titulo, mensaje) VALUES (?, ?, ?, ?)`,
-            [lead.aliado_id, 'poliza_aprobada',
-             `¡Póliza aprobada!${placaStr}`,
-             `La póliza de ${lead.cliente_nombre} con ${lead.aseguradora}${placaStr} fue aprobada. Tu comisión es $${comision.toLocaleString('es-CO')}.`]
-          )
+          notifTipo   = 'poliza_aprobada'
+          notifTitulo = `¡Póliza aprobada!${placaStr}`
+          notifMsg    = `La póliza de ${lead.cliente_nombre} con ${lead.aseguradora}${placaStr} fue aprobada. Tu comisión es $${comision.toLocaleString('es-CO')}.`
         } else if (estado === 'no_convertida') {
-          await pool.execute(
-            `INSERT INTO notificaciones (aliado_id, tipo, titulo, mensaje) VALUES (?, ?, ?, ?)`,
-            [lead.aliado_id, 'poliza_no_aprobada',
-             `Póliza no aprobada${placaStr}`,
-             `La póliza de ${lead.cliente_nombre} con ${lead.aseguradora}${placaStr} no fue aprobada.${observaciones ? ' Motivo: ' + observaciones : ''}`]
-          )
+          notifTipo   = 'poliza_no_aprobada'
+          notifTitulo = `Póliza no aprobada${placaStr}`
+          notifMsg    = `La póliza de ${lead.cliente_nombre} con ${lead.aseguradora}${placaStr} no fue aprobada.${observaciones ? ' Motivo: ' + observaciones : ''}`
         }
-      } catch { /* no interrumpir */ }
+
+        if (notifTipo) {
+          const notifId  = randomUUID()
+          const notifNow = new Date().toISOString()
+          await pool.execute(
+            `INSERT INTO notificaciones (id, aliado_id, tipo, titulo, mensaje) VALUES (?, ?, ?, ?, ?)`,
+            [notifId, lead.aliado_id, notifTipo, notifTitulo, notifMsg]
+          )
+          ssePush(lead.aliado_id, 'notificacion', {
+            id: notifId, tipo: notifTipo, titulo: notifTitulo,
+            mensaje: notifMsg, leida: false, created_at: notifNow,
+          })
+        }
+      } catch { /* no interrumpir flujo principal */ }
 
       res.json({ status:'success', message:`Lead marcado como ${estado}.` })
     } catch(err) { next(err) }
@@ -245,25 +258,36 @@ router.patch('/polizas/:id/estado',
         }).catch(() => {})
       }
 
-      // Crear notificación para el aliado
+      // Crear notificación y empujar en tiempo real al aliado
       try {
         const placaStr = pol.placa ? ` · Placa ${pol.placa}` : ''
+        let notifTipo   = ''
+        let notifTitulo = ''
+        let notifMsg    = ''
+
         if (estado === 'aprobada') {
-          await pool.execute(
-            `INSERT INTO notificaciones (aliado_id, tipo, titulo, mensaje) VALUES (?, ?, ?, ?)`,
-            [pol.aliado_id, 'poliza_aprobada',
-             `¡Póliza aprobada!${placaStr}`,
-             `La póliza de ${pol.cliente_nombre} con ${pol.aseguradora}${placaStr} fue aprobada. Tu comisión es $${polComision.toLocaleString('es-CO')}.`]
-          )
+          notifTipo   = 'poliza_aprobada'
+          notifTitulo = `¡Póliza aprobada!${placaStr}`
+          notifMsg    = `La póliza de ${pol.cliente_nombre} con ${pol.aseguradora}${placaStr} fue aprobada. Tu comisión es $${polComision.toLocaleString('es-CO')}.`
         } else if (estado === 'no_convertida') {
-          await pool.execute(
-            `INSERT INTO notificaciones (aliado_id, tipo, titulo, mensaje) VALUES (?, ?, ?, ?)`,
-            [pol.aliado_id, 'poliza_no_aprobada',
-             `Póliza no aprobada${placaStr}`,
-             `La póliza de ${pol.cliente_nombre} con ${pol.aseguradora}${placaStr} no fue aprobada.${observaciones ? ' Motivo: ' + observaciones : ''}`]
-          )
+          notifTipo   = 'poliza_no_aprobada'
+          notifTitulo = `Póliza no aprobada${placaStr}`
+          notifMsg    = `La póliza de ${pol.cliente_nombre} con ${pol.aseguradora}${placaStr} no fue aprobada.${observaciones ? ' Motivo: ' + observaciones : ''}`
         }
-      } catch { /* no interrumpir */ }
+
+        if (notifTipo) {
+          const notifId  = randomUUID()
+          const notifNow = new Date().toISOString()
+          await pool.execute(
+            `INSERT INTO notificaciones (id, aliado_id, tipo, titulo, mensaje) VALUES (?, ?, ?, ?, ?)`,
+            [notifId, pol.aliado_id, notifTipo, notifTitulo, notifMsg]
+          )
+          ssePush(pol.aliado_id, 'notificacion', {
+            id: notifId, tipo: notifTipo, titulo: notifTitulo,
+            mensaje: notifMsg, leida: false, created_at: notifNow,
+          })
+        }
+      } catch { /* no interrumpir flujo principal */ }
 
       res.json({ status:'success', message:`Póliza marcada como ${estado}.` })
     } catch(err) { next(err) }

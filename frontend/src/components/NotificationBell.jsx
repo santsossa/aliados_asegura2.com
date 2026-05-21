@@ -11,19 +11,20 @@ const TIPO_CONFIG = {
 
 function timeAgo(dateStr) {
   const diff = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000)
-  if (diff < 60)   return 'hace un momento'
-  if (diff < 3600) return `hace ${Math.floor(diff / 60)} min`
+  if (diff < 60)    return 'hace un momento'
+  if (diff < 3600)  return `hace ${Math.floor(diff / 60)} min`
   if (diff < 86400) return `hace ${Math.floor(diff / 3600)} h`
   return `hace ${Math.floor(diff / 86400)} d`
 }
 
 export default function NotificationBell() {
-  const [open, setOpen]                 = useState(false)
-  const [notificaciones, setNotifs]     = useState([])
-  const [noLeidas, setNoLeidas]         = useState(0)
-  const dropdownRef                     = useRef(null)
-  const token                           = localStorage.getItem('token')
+  const [open, setOpen]         = useState(false)
+  const [notifs, setNotifs]     = useState([])
+  const [noLeidas, setNoLeidas] = useState(0)
+  const dropdownRef             = useRef(null)
+  const token                   = localStorage.getItem('token')
 
+  // ── Carga inicial ─────────────────────────────────────────────────────────
   const fetchNotifs = useCallback(async () => {
     if (!token) return
     try {
@@ -37,35 +38,56 @@ export default function NotificationBell() {
     } catch { /* silencioso */ }
   }, [token])
 
-  // Cargar al montar y cada 60 s
-  useEffect(() => {
-    fetchNotifs()
-    const id = setInterval(fetchNotifs, 60_000)
-    return () => clearInterval(id)
-  }, [fetchNotifs])
+  useEffect(() => { fetchNotifs() }, [fetchNotifs])
 
-  // Cerrar al hacer clic fuera
+  // ── SSE — notificaciones en tiempo real ───────────────────────────────────
+  useEffect(() => {
+    if (!token) return
+
+    const url = `${API}/api/notificaciones/stream?token=${encodeURIComponent(token)}`
+    const es   = new EventSource(url)
+
+    es.addEventListener('notificacion', (e) => {
+      try {
+        const notif = JSON.parse(e.data)
+        // Añade al inicio de la lista (máx 50) sin duplicados
+        setNotifs(prev => {
+          if (prev.some(n => n.id === notif.id)) return prev
+          return [notif, ...prev].slice(0, 50)
+        })
+        // Solo incrementa badge si el dropdown está cerrado
+        setOpen(isOpen => {
+          if (!isOpen) setNoLeidas(c => c + 1)
+          return isOpen
+        })
+      } catch { /* payload inválido */ }
+    })
+
+    // El EventSource reconecta automáticamente en caso de error
+    return () => es.close()
+  }, [token])
+
+  // ── Cierre al hacer clic fuera ────────────────────────────────────────────
   useEffect(() => {
     if (!open) return
     function handler(e) {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target))
         setOpen(false)
-      }
     }
     document.addEventListener('mousedown', handler)
     return () => document.removeEventListener('mousedown', handler)
   }, [open])
 
+  // ── Abrir dropdown y marcar como leídas ──────────────────────────────────
   async function handleOpen() {
-    setOpen(v => !v)
-    if (!open && noLeidas > 0) {
-      // Marcar como leídas en el servidor
+    const next = !open
+    setOpen(next)
+    if (next && noLeidas > 0) {
       try {
         await fetch(`${API}/api/notificaciones/marcar-leidas`, {
           method: 'PATCH',
           headers: { Authorization: `Bearer ${token}` },
         })
-        // Actualizar estado local sin refetch
         setNotifs(prev => prev.map(n => ({ ...n, leida: true })))
         setNoLeidas(0)
       } catch { /* silencioso */ }
@@ -79,8 +101,7 @@ export default function NotificationBell() {
         onClick={handleOpen}
         style={{
           position: 'relative',
-          width: 40, height: 40,
-          borderRadius: '50%',
+          width: 40, height: 40, borderRadius: '50%',
           background: open ? '#d5d6dc' : '#e2e3e8',
           border: 'none', cursor: 'pointer',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -110,8 +131,7 @@ export default function NotificationBell() {
         <div style={{
           position: 'absolute', top: 48, right: 0,
           width: 340, maxHeight: 440,
-          background: '#fff',
-          borderRadius: 16,
+          background: '#fff', borderRadius: 16,
           boxShadow: '0 8px 32px rgba(0,0,0,0.14)',
           border: '1px solid #eeeeef',
           zIndex: 100,
@@ -121,45 +141,34 @@ export default function NotificationBell() {
           {/* Header */}
           <div style={{
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-            padding: '14px 16px 10px',
-            borderBottom: '1px solid #eeeeef',
-            flexShrink: 0,
+            padding: '14px 16px 10px', borderBottom: '1px solid #eeeeef', flexShrink: 0,
           }}>
             <span style={{ fontWeight: 700, fontSize: 14, color: '#16151b' }}>
               Notificaciones
             </span>
-            <button
-              onClick={() => setOpen(false)}
-              style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af', display: 'flex' }}
-            >
+            <button onClick={() => setOpen(false)}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af', display: 'flex' }}>
               <X size={16} />
             </button>
           </div>
 
           {/* Lista */}
           <div style={{ overflowY: 'auto', flex: 1 }}>
-            {notificaciones.length === 0 ? (
-              <div style={{
-                padding: '36px 20px', textAlign: 'center',
-                color: '#9ca3af', fontSize: 13,
-              }}>
+            {notifs.length === 0 ? (
+              <div style={{ padding: '36px 20px', textAlign: 'center', color: '#9ca3af', fontSize: 13 }}>
                 <Bell size={28} color="#d1d5db" style={{ marginBottom: 8 }} />
                 <p style={{ margin: 0 }}>Sin notificaciones aún</p>
               </div>
             ) : (
-              notificaciones.map(n => {
-                const cfg = TIPO_CONFIG[n.tipo] || TIPO_CONFIG['lead_recibido']
+              notifs.map(n => {
+                const cfg  = TIPO_CONFIG[n.tipo] || TIPO_CONFIG['lead_recibido']
                 const Icon = cfg.icon
                 return (
-                  <div
-                    key={n.id}
-                    style={{
-                      display: 'flex', gap: 12, padding: '12px 16px',
-                      borderBottom: '1px solid #f4f4f6',
-                      background: n.leida ? '#fff' : '#f8f8ff',
-                      transition: 'background 0.15s',
-                    }}
-                  >
+                  <div key={n.id} style={{
+                    display: 'flex', gap: 12, padding: '12px 16px',
+                    borderBottom: '1px solid #f4f4f6',
+                    background: n.leida ? '#fff' : '#f8f8ff',
+                  }}>
                     {/* Icono */}
                     <div style={{
                       width: 36, height: 36, borderRadius: 10,
@@ -173,26 +182,19 @@ export default function NotificationBell() {
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
                         <span style={{
-                          fontWeight: n.leida ? 600 : 700,
-                          fontSize: 13, color: '#16151b',
+                          fontWeight: n.leida ? 600 : 700, fontSize: 13, color: '#16151b',
                           overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                         }}>
                           {n.titulo}
                         </span>
                         {!n.leida && (
-                          <span style={{
-                            width: 7, height: 7, borderRadius: '50%',
-                            background: '#2D2A7A', flexShrink: 0,
-                          }} />
+                          <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#2D2A7A', flexShrink: 0 }} />
                         )}
                       </div>
                       <p style={{
-                        margin: 0, fontSize: 12, color: '#6b7280',
-                        lineHeight: '1.45',
-                        display: '-webkit-box',
-                        WebkitLineClamp: 2,
-                        WebkitBoxOrient: 'vertical',
-                        overflow: 'hidden',
+                        margin: 0, fontSize: 12, color: '#6b7280', lineHeight: '1.45',
+                        display: '-webkit-box', WebkitLineClamp: 2,
+                        WebkitBoxOrient: 'vertical', overflow: 'hidden',
                       }}>
                         {n.mensaje}
                       </p>
