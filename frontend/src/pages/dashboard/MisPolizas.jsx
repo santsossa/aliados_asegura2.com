@@ -352,19 +352,20 @@ export default function MisPolizas() {
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm px-5 py-4 hover:border-brand/40 hover:shadow-md transition-all">
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-4">
-              <div style={{ width:40, height:40, borderRadius:12, flexShrink:0,
-                            background: aseguradoraLogo ? '#fff' : (ESTADOS[tab]?.bg || '#f3f4f6'),
-                            border: aseguradoraLogo ? '1px solid #e5e7eb' : 'none',
-                            display:'flex', alignItems:'center', justifyContent:'center',
-                            overflow:'hidden', padding: aseguradoraLogo ? 4 : 0 }}>
-                {aseguradoraLogo
-                  ? <img src={aseguradoraLogo} alt={item.aseguradora}
-                         style={{ width:'100%', height:'100%', objectFit:'contain' }}
-                         onError={e => { e.currentTarget.style.display='none'; e.currentTarget.nextSibling.style.display='flex' }} />
-                  : null}
-                <Shield size={18} style={{ color: ESTADOS[tab]?.color || '#6b7280',
-                                           display: aseguradoraLogo ? 'none' : 'block' }} />
-              </div>
+              {/* Logo aseguradora + separador vertical */}
+              {aseguradoraLogo ? (
+                <div style={{ display:'flex', alignItems:'center', gap:14, flexShrink:0 }}>
+                  <img src={aseguradoraLogo} alt={item.aseguradora}
+                       style={{ height:28, maxWidth:64, objectFit:'contain', display:'block' }}
+                       onError={e => e.currentTarget.style.display='none'} />
+                  <div style={{ width:1, height:32, background:'#e5e7eb', flexShrink:0 }} />
+                </div>
+              ) : (
+                <div style={{ display:'flex', alignItems:'center', gap:14, flexShrink:0 }}>
+                  <Shield size={18} style={{ color: ESTADOS[tab]?.color || '#9ca3af' }} />
+                  <div style={{ width:1, height:32, background:'#e5e7eb', flexShrink:0 }} />
+                </div>
+              )}
               <div>
                 <p className="font-semibold text-gray-900 text-sm">{item.cliente_nombre || 'Cliente'}</p>
                 <p className="text-xs text-gray-400 mt-0.5">
