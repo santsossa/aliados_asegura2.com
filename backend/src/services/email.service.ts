@@ -579,18 +579,26 @@ export async function sendOTPEmail(
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Asegura2.com</title>
   <style>
-    body,table,td,p,h1,h2,span,a { margin:0; padding:0; }
+    body,table,td,p,h1,span,a { margin:0;padding:0; }
     img { border:0; }
     @media only screen and (max-width:600px) {
+      .wrap  { padding:0 !important; }
       .card  { border-radius:0 !important; }
-      .sec   { padding-left:20px !important; padding-right:20px !important; }
-      .otp-code { font-size:32px !important; letter-spacing:10px !important; }
+      .sec   { padding-left:16px !important; padding-right:16px !important; }
+      .otp-box { padding:16px 10px !important; }
+      .otp-code { font-size:30px !important; letter-spacing:8px !important; }
+      .hero-img { width:120px !important; }
+      /* Footer: apila en móvil */
+      .ft-left  { display:block !important; width:100% !important;
+                  padding-bottom:14px !important; }
+      .ft-right { display:block !important; width:100% !important;
+                  text-align:center !important; }
     }
   </style>
 </head>
 <body style="margin:0;padding:0;background:#f0f0f5;font-family:Arial,Helvetica,sans-serif">
 
-<table align="center" cellpadding="0" cellspacing="0" width="100%"
+<table class="wrap" align="center" cellpadding="0" cellspacing="0" width="100%"
        style="background:#f0f0f5;padding:24px 12px">
 <tr><td align="center">
 
@@ -617,19 +625,19 @@ export async function sendOTPEmail(
     </td>
   </tr>
 
-  <!-- ══ HERO: imagen centrada — fondo blanco para no generar franja ══ -->
+  <!-- ══ HERO: imagen grande y centrada ══ -->
   <tr>
-    <td style="background:#ffffff;padding:32px 28px 20px;text-align:center">
-      <img src="${imgSobre}" alt="Verificación"
-           width="150" style="display:block;width:150px;max-width:80%;
+    <td style="background:#ffffff;padding:36px 28px 16px;text-align:center">
+      <img class="hero-img" src="${imgSobre}" alt="Verificación"
+           width="180" style="display:block;width:180px;max-width:70%;
                                margin:0 auto;border:0" />
     </td>
   </tr>
 
-  <!-- ══ TÍTULO Y SUBTÍTULO ══ -->
+  <!-- ══ TÍTULO Y SUBTÍTULO — centrado ══ -->
   <tr>
-    <td class="sec" style="padding:16px 40px 0;text-align:center">
-      <h1 style="margin:0 0 12px;font-size:20px;font-weight:800;
+    <td class="sec" style="padding:20px 48px 0;text-align:center">
+      <h1 style="margin:0 0 10px;font-size:20px;font-weight:800;
                  color:#111827;line-height:1.3;font-family:Arial,sans-serif">
         ${titulo}
       </h1>
@@ -640,15 +648,16 @@ export async function sendOTPEmail(
     </td>
   </tr>
 
-  <!-- ══ CÓDIGO OTP ══ -->
+  <!-- ══ CÓDIGO OTP — centrado ══ -->
   <tr>
-    <td class="sec" style="padding:24px 40px">
+    <td class="sec" style="padding:22px 40px">
       <table cellpadding="0" cellspacing="0" width="100%">
         <tr>
-          <td style="background:#edeef8;border-radius:12px;
+          <td class="otp-box"
+              style="background:#edeef8;border-radius:12px;
                      padding:22px 20px;text-align:center">
             <span class="otp-code"
-                  style="font-size:42px;font-weight:900;letter-spacing:14px;
+                  style="font-size:44px;font-weight:900;letter-spacing:16px;
                          color:#2D2A7A;font-family:Arial,sans-serif">
               ${otpFmt}
             </span>
@@ -658,26 +667,26 @@ export async function sendOTPEmail(
     </td>
   </tr>
 
-  <!-- ══ EXPIRA EN ══ -->
+  <!-- ══ EXPIRA EN — centrado con reloj en círculo ══ -->
   <tr>
-    <td class="sec" style="padding:0 40px 14px;text-align:center">
-      <table cellpadding="0" cellspacing="0" align="center">
+    <td style="padding:0 40px 10px;text-align:center">
+      <table cellpadding="0" cellspacing="0" align="center"
+             style="margin:0 auto">
         <tr>
           <td style="vertical-align:middle;padding-right:10px">
-            <!-- Reloj con círculo HTML — icono casi llena el círculo -->
             <table cellpadding="0" cellspacing="0">
-              <tr><td width="36" height="36"
-                style="width:36px;height:36px;min-width:36px;
-                       background:#edeef8;border-radius:18px;
+              <tr><td width="38" height="38"
+                style="width:38px;height:38px;min-width:38px;
+                       background:#edeef8;border-radius:19px;
                        text-align:center;vertical-align:middle">
                 <img src="${imgReloj}" alt="Reloj"
-                     width="26" height="26"
+                     width="28" height="28"
                      style="display:block;margin:0 auto;border:0" />
               </td></tr>
             </table>
           </td>
           <td style="vertical-align:middle;font-size:13px;color:#374151;
-                     font-family:Arial,sans-serif">
+                     font-family:Arial,sans-serif;white-space:nowrap">
             Este c&#243;digo expira en
             <strong style="color:#111827">${env.OTP_EXPIRES_MINUTES} minutos</strong>.
           </td>
@@ -686,10 +695,11 @@ export async function sendOTPEmail(
     </td>
   </tr>
 
-  <!-- ══ NOTA ══ -->
+  <!-- ══ NOTA — centrada ══ -->
   <tr>
-    <td class="sec" style="padding:0 40px 28px;text-align:center">
-      <p style="margin:0;font-size:12px;color:#9ca3af;font-family:Arial,sans-serif">
+    <td style="padding:8px 40px 28px;text-align:center">
+      <p style="margin:0;font-size:12px;color:#9ca3af;
+                font-family:Arial,sans-serif">
         Si no solicitaste este c&#243;digo, puedes ignorar este mensaje.
       </p>
     </td>
@@ -704,24 +714,23 @@ export async function sendOTPEmail(
     </td>
   </tr>
 
-  <!-- ══ FOOTER: auriculares + texto ayuda | estamos aquí ══ -->
+  <!-- ══ FOOTER: auriculares+ayuda izq | ayudarteotp der ══ -->
   <tr>
     <td class="sec" style="padding:20px 28px 16px">
       <table cellpadding="0" cellspacing="0" width="100%">
         <tr>
           <!-- Soporte (izquierda) -->
-          <td style="vertical-align:middle;width:55%">
+          <td class="ft-left" style="vertical-align:middle;width:52%">
             <table cellpadding="0" cellspacing="0">
               <tr>
-                <!-- Auriculares con círculo HTML -->
                 <td style="vertical-align:middle">
                   <table cellpadding="0" cellspacing="0">
-                    <tr><td width="46" height="46"
-                      style="width:46px;height:46px;min-width:46px;
-                             background:#edeef8;border-radius:23px;
+                    <tr><td width="48" height="48"
+                      style="width:48px;height:48px;min-width:48px;
+                             background:#edeef8;border-radius:24px;
                              text-align:center;vertical-align:middle">
                       <img src="${imgAuri}" alt="Soporte"
-                           width="36" height="36"
+                           width="38" height="38"
                            style="display:block;margin:0 auto;border:0" />
                     </td></tr>
                   </table>
@@ -731,7 +740,7 @@ export async function sendOTPEmail(
                               font-family:Arial,sans-serif">
                     &#191;Necesitas ayuda?
                   </div>
-                  <div style="font-size:12px;color:#6b7280;margin-top:3px;
+                  <div style="font-size:11px;color:#6b7280;margin-top:3px;
                               font-family:Arial,sans-serif">
                     <a href="mailto:aliados@asegura2.com.co"
                        style="color:#2D2A7A;text-decoration:none;font-weight:600">
@@ -741,13 +750,12 @@ export async function sendOTPEmail(
               </tr>
             </table>
           </td>
-          <!-- Estamos aquí (derecha) — imagen cuando esté disponible -->
-          <td style="text-align:right;vertical-align:middle;width:45%">
-            <span style="font-family:Georgia,'Times New Roman',serif;
-                         font-style:italic;font-size:15px;
-                         color:#2D2A7A;font-weight:600;line-height:1.4">
-              &#9825;&nbsp;&#161;Estamos aqu&#237;<br>para ayudarte!
-            </span>
+          <!-- Imagen ayudarteotp (derecha) -->
+          <td class="ft-right" style="text-align:right;vertical-align:middle;width:48%">
+            <img src="${base}/ayudarteotp.png"
+                 alt="Estamos aqui para ayudarte"
+                 height="72" style="display:inline-block;max-height:72px;
+                                    max-width:100%;border:0" />
           </td>
         </tr>
       </table>
