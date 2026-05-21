@@ -673,9 +673,9 @@ export async function sendOTPEmail(
         <tr>
           <td style="vertical-align:middle;padding-right:10px">
             <table cellpadding="0" cellspacing="0">
-              <tr><td width="40" height="40"
-                style="width:40px;height:40px;min-width:40px;
-                       background:#edeef8;border-radius:20px;
+              <tr><td width="34" height="34"
+                style="width:34px;height:34px;min-width:34px;
+                       background:#edeef8;border-radius:17px;
                        text-align:center;vertical-align:middle;
                        overflow:hidden">
                 <img src="${imgReloj}" alt="Reloj"
