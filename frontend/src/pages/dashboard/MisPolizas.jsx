@@ -9,10 +9,22 @@ const MESES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov'
 const fmt = n => n ? ('$' + Math.round(n).toLocaleString('es-CO')) : '—'
 
 const ESTADOS = {
-  en_proceso:    { bg:'#fef3c7', color:'#d97706', label:'En trámite',    desc:'Tu cliente está siendo contactado por nuestro equipo. Te avisamos cuando haya novedades.' },
-  aprobada:      { bg:'#dcfce7', color:'#16a34a', label:'Aprobado ✓',    desc:'¡El cliente pagó! Tu comisión queda lista para el pago del 1 del mes.' },
-  no_convertida: { bg:'#fee2e2', color:'#dc2626', label:'No aprobado',   desc:'Esta póliza no se pudo emitir. Nuestro equipo dejó el motivo abajo.' },
+  // Sub-estados de "En trámite"
+  lead:           { bg:'#f0f9ff', color:'#0284c7', label:'En contacto',
+                    desc:'Nuestro equipo está gestionando el proceso con el cliente para poder emitirle la póliza.' },
+  en_proceso:     { bg:'#fef3c7', color:'#d97706', label:'En gestión',
+                    desc:'El equipo está coordinando los pasos finales con el cliente antes de la emisión.' },
+  poliza_emitida: { bg:'#ede9fe', color:'#7c3aed', label:'Póliza emitida',
+                    desc:'Se emitió la póliza en el CRM. Estamos a la espera de que el cliente realice el primer pago.' },
+  // Estados finales
+  aprobada:       { bg:'#dcfce7', color:'#16a34a', label:'Aprobado ✓',
+                    desc:'¡El cliente pagó! Tu comisión queda lista para el pago del 1 del mes.' },
+  no_convertida:  { bg:'#fee2e2', color:'#dc2626', label:'No aprobado',
+                    desc:'Esta póliza no se pudo emitir. Nuestro equipo dejó el motivo abajo.' },
 }
+
+// Estados que se muestran en la pestaña "En trámite"
+const EN_TRAMITE = new Set(['lead', 'en_proceso', 'poliza_emitida'])
 
 function Badge({ estado }) {
   const e = ESTADOS[estado] || ESTADOS.en_proceso
@@ -229,6 +241,16 @@ function DetalleModal({ item, onClose, token }) {
                     {observaciones && <><br/><br/><em>{observaciones}</em></>}
                   </span>
                 </div>
+              ) : estadoActual === 'poliza_emitida' ? (
+                <div style={{ background:'#f5f3ff', border:'1.5px solid #ddd6fe', borderRadius:12,
+                              padding:'14px 16px', fontSize:13, color:'#5b21b6',
+                              display:'flex', gap:10, alignItems:'flex-start', lineHeight:1.6 }}>
+                  <span style={{ fontSize:22 }}>📋</span>
+                  <span>
+                    <strong>Póliza emitida.</strong> Se emitió la póliza en el sistema.
+                    Estamos a la espera de que el cliente realice el primer pago para confirmar la aprobación.
+                  </span>
+                </div>
               ) : (
                 <div style={{ background:'#eff6ff', borderRadius:12, padding:'14px 16px',
                               fontSize:13, color:'#1d4ed8', display:'flex', gap:10, alignItems:'flex-start', lineHeight:1.6 }}>
@@ -256,7 +278,7 @@ export default function MisPolizas() {
   const [loading, setLoading] = useState(true)
   const [modal,   setModal]   = useState(null)
   // Lee el tab desde la URL (?tab=no_convertida etc.), default 'en_proceso'
-  const [tab, setTab] = useState(() => searchParams.get('tab') || 'en_proceso')
+  const [tab, setTab] = useState(() => searchParams.get('tab') || 'en_tramite')
 
   const fetchData = useCallback((silent = false) => {
     if (!silent) setLoading(true)
@@ -320,15 +342,20 @@ export default function MisPolizas() {
 
   const allItems = [
     ...data.polizas.map(p => ({ ...p, _tipo:'poliza' })),
-    ...data.leads.map(l  => ({ ...l,  _tipo:'lead', estado:'en_proceso' })),
+    // Leads sin póliza → sub-estado 'lead' dentro de "En trámite"
+    ...data.leads.map(l  => ({ ...l, _tipo:'lead', estado:'lead' })),
   ].sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
 
   const tabs = [
-    { key:'en_proceso',    label:'En trámite',  E: ESTADOS.en_proceso    },
+    { key:'en_tramite',    label:'En trámite',  E: ESTADOS.en_proceso    },
     { key:'aprobada',      label:'Aprobadas',   E: ESTADOS.aprobada      },
     { key:'no_convertida', label:'No aprobado', E: ESTADOS.no_convertida },
   ]
-  const filtered = allItems.filter(it => it.estado === tab)
+
+  // "En trámite" agrupa: leads, en_proceso y poliza_emitida
+  const filtered = tab === 'en_tramite'
+    ? allItems.filter(it => EN_TRAMITE.has(it.estado))
+    : allItems.filter(it => it.estado === tab)
 
   function ItemCard({ item }) {
     // Extraer logo de la aseguradora desde datos_cotizacion
@@ -376,11 +403,22 @@ export default function MisPolizas() {
               </div>
             </div>
             <div className="flex items-center gap-3 flex-shrink-0">
+              {/* Badge sub-estado individual — visible en "En trámite" */}
+              {tab === 'en_tramite' && (
+                <span style={{
+                  background: ESTADOS[item.estado]?.bg || '#f3f4f6',
+                  color:      ESTADOS[item.estado]?.color || '#6b7280',
+                  fontSize: 10, fontWeight: 700,
+                  padding: '3px 8px', borderRadius: 99, whiteSpace: 'nowrap',
+                }}>
+                  {ESTADOS[item.estado]?.label || 'En trámite'}
+                </span>
+              )}
               <div className="text-right hidden sm:block">
                 <p className="text-sm font-bold text-gray-900">{fmt(item.valor_prima)}</p>
-                {item.valor_comision
+                {item.estado === 'aprobada' && item.valor_comision
                   ? <p className="text-xs text-green-600 font-medium">Comisión: {fmt(item.valor_comision)}</p>
-                  : <p className="text-xs text-gray-400">Comisión: {fmt(Math.round((item.valor_prima||0)*0.06))}</p>
+                  : null
                 }
               </div>
               <span style={{ color:'#d1d5db', fontSize:18, lineHeight:1 }}>›</span>
@@ -403,7 +441,9 @@ export default function MisPolizas() {
       {/* Pestañas */}
       <div style={{ display:'flex', gap:8, marginBottom:20, flexWrap:'wrap' }}>
         {tabs.map(t => {
-          const count = allItems.filter(it => it.estado === t.key).length
+          const count = t.key === 'en_tramite'
+            ? allItems.filter(it => EN_TRAMITE.has(it.estado)).length
+            : allItems.filter(it => it.estado === t.key).length
           const active = tab === t.key
           return (
             <button key={t.key} onClick={() => setTab(t.key)}
@@ -430,10 +470,12 @@ export default function MisPolizas() {
       </div>
 
       {/* Descripción del estado activo */}
-      <div style={{ background: ESTADOS[tab]?.bg, borderRadius:12, padding:'10px 16px',
-                    marginBottom:16, fontSize:13, color: ESTADOS[tab]?.color, lineHeight:1.5 }}>
-        {ESTADOS[tab]?.desc}
-      </div>
+      {tab !== 'en_tramite' && (
+        <div style={{ background: ESTADOS[tab]?.bg, borderRadius:12, padding:'10px 16px',
+                      marginBottom:16, fontSize:13, color: ESTADOS[tab]?.color, lineHeight:1.5 }}>
+          {ESTADOS[tab]?.desc}
+        </div>
+      )}
 
       {loading ? (
         <div className="space-y-3">

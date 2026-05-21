@@ -223,6 +223,8 @@ const MODIFY_STMTS = [
   `ALTER TABLE aliados MODIFY COLUMN ciudad VARCHAR(80) NULL`,
   `ALTER TABLE aliados MODIFY COLUMN tipo_aliado ENUM('Asesor de concesionario','Vendedor de carros usados','Agente independiente','Otro') NULL`,
   `ALTER TABLE aliados MODIFY COLUMN estado ENUM('pendiente','onboarding','activo','inactivo') NOT NULL DEFAULT 'pendiente'`,
+  // v4 — nuevo sub-estado 'poliza_emitida': póliza emitida en CRM, pendiente de pago
+  `ALTER TABLE polizas MODIFY COLUMN estado ENUM('en_proceso','poliza_emitida','aprobada','no_convertida') NOT NULL DEFAULT 'en_proceso'`,
 ]
 
 export async function runMigrations(): Promise<void> {
