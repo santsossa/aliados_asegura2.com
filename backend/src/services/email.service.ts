@@ -616,18 +616,18 @@ export async function sendOTPEmail(
     </td>
   </tr>
 
-  <!-- ══ HERO: imagen centrada ══ -->
+  <!-- ══ HERO: imagen centrada — fondo blanco para no generar franja ══ -->
   <tr>
-    <td style="background:#f4f4f8;padding:36px 28px 28px;text-align:center">
+    <td style="background:#ffffff;padding:32px 28px 20px;text-align:center">
       <img src="${imgSobre}" alt="Verificación"
-           width="100" style="display:block;width:100px;max-width:100%;
+           width="150" style="display:block;width:150px;max-width:80%;
                                margin:0 auto;border:0" />
     </td>
   </tr>
 
   <!-- ══ TÍTULO Y SUBTÍTULO ══ -->
   <tr>
-    <td class="sec" style="padding:28px 40px 0;text-align:center">
+    <td class="sec" style="padding:16px 40px 0;text-align:center">
       <h1 style="margin:0 0 12px;font-size:20px;font-weight:800;
                  color:#111827;line-height:1.3;font-family:Arial,sans-serif">
         ${titulo}
@@ -662,15 +662,15 @@ export async function sendOTPEmail(
     <td class="sec" style="padding:0 40px 14px;text-align:center">
       <table cellpadding="0" cellspacing="0" align="center">
         <tr>
-          <td style="vertical-align:middle;padding-right:8px">
-            <!-- Reloj con círculo HTML -->
+          <td style="vertical-align:middle;padding-right:10px">
+            <!-- Reloj con círculo HTML — icono casi llena el círculo -->
             <table cellpadding="0" cellspacing="0">
-              <tr><td width="28" height="28"
-                style="width:28px;height:28px;min-width:28px;
-                       background:#edeef8;border-radius:14px;
+              <tr><td width="36" height="36"
+                style="width:36px;height:36px;min-width:36px;
+                       background:#edeef8;border-radius:18px;
                        text-align:center;vertical-align:middle">
                 <img src="${imgReloj}" alt="Reloj"
-                     width="16" height="16"
+                     width="26" height="26"
                      style="display:block;margin:0 auto;border:0" />
               </td></tr>
             </table>
@@ -715,12 +715,12 @@ export async function sendOTPEmail(
                 <!-- Auriculares con círculo HTML -->
                 <td style="vertical-align:middle">
                   <table cellpadding="0" cellspacing="0">
-                    <tr><td width="44" height="44"
-                      style="width:44px;height:44px;min-width:44px;
-                             background:#edeef8;border-radius:22px;
+                    <tr><td width="46" height="46"
+                      style="width:46px;height:46px;min-width:46px;
+                             background:#edeef8;border-radius:23px;
                              text-align:center;vertical-align:middle">
                       <img src="${imgAuri}" alt="Soporte"
-                           width="24" height="24"
+                           width="36" height="36"
                            style="display:block;margin:0 auto;border:0" />
                     </td></tr>
                   </table>
