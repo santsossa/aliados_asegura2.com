@@ -281,27 +281,26 @@ export default function MisPolizas() {
   useEffect(() => {
     return subscribe('poliza_update', (ev) => {
       setData(prev => {
-        // Actualizar en leads (en_proceso)
-        const leads = prev.leads.map(l =>
-          l.id === ev.lead_id
-            ? { ...l, estado: ev.estado, aseguradora: ev.aseguradora ?? l.aseguradora,
-                valor_prima: ev.valor_prima ?? l.valor_prima }
-            : l
-        )
-        // Actualizar en polizas (aprobada / no_convertida)
+        // Si se creó una póliza para este lead → sacarlo de "En trámite"
+        // (ya no debe aparecer en leads; ahora vive como poliza)
+        const leads = ev.lead_id
+          ? prev.leads.filter(l => l.id !== ev.lead_id)
+          : prev.leads
+
+        // Actualizar póliza existente o añadir la nueva
         let polizas = prev.polizas.map(p =>
           p.id === ev.poliza_id
             ? { ...p, estado: ev.estado, valor_comision: ev.valor_comision ?? p.valor_comision }
             : p
         )
-        // Si la poliza es nueva (recién creada por el admin) y no está en la lista, agregarla
-        if (ev.poliza_id && !polizas.some(p => p.id === ev.poliza_id) && ev.estado !== 'en_proceso') {
+        if (ev.poliza_id && !polizas.some(p => p.id === ev.poliza_id)) {
           polizas = [
             {
               id: ev.poliza_id, _tipo: 'poliza',
               cliente_nombre: ev.cliente_nombre, aseguradora: ev.aseguradora,
               valor_prima: ev.valor_prima, valor_comision: ev.valor_comision,
               estado: ev.estado, placa: ev.placa,
+              cotizacion_id: ev.cotizacion_id || null,
               created_at: ev.created_at || new Date().toISOString(),
             },
             ...polizas,

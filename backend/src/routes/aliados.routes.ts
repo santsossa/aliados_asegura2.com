@@ -240,7 +240,7 @@ router.get('/me/cotizaciones', async (req, res, next) => {
 
 router.get('/me/polizas', async (req, res, next) => {
   try {
-    // Cotizaciones enviadas a emitir (leads) — con todos los datos de la cotización
+    // Solo leads SIN póliza vinculada — si ya tiene póliza, aparece en la sección de pólizas
     const [leads] = await pool.execute<any[]>(
       `SELECT l.id, l.cotizacion_id, l.cliente_nombre, l.cliente_telefono, l.aseguradora,
               l.valor_prima, l.observaciones, l.crm_lead_id, l.created_at,
@@ -249,7 +249,9 @@ router.get('/me/polizas', async (req, res, next) => {
               'en_proceso' as estado, 'lead' as tipo
        FROM leads l
        LEFT JOIN cotizaciones c ON c.id = l.cotizacion_id
-       WHERE l.aliado_id = ? ORDER BY l.created_at DESC`,
+       WHERE l.aliado_id = ?
+         AND NOT EXISTS (SELECT 1 FROM polizas p WHERE p.lead_id = l.id)
+       ORDER BY l.created_at DESC`,
       [req.aliado!.sub]
     )
     // Pólizas procesadas por el equipo admin — con datos de cotización vía lead
