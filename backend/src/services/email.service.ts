@@ -675,12 +675,13 @@ export async function sendOTPEmail(
         <tr>
           <td style="vertical-align:middle;padding-right:10px">
             <table cellpadding="0" cellspacing="0">
-              <tr><td width="52" height="52"
-                style="width:52px;height:52px;min-width:52px;
-                       background:#edeef8;border-radius:26px;
-                       text-align:center;vertical-align:middle">
+              <tr><td width="40" height="40"
+                style="width:40px;height:40px;min-width:40px;
+                       background:#edeef8;border-radius:20px;
+                       text-align:center;vertical-align:middle;
+                       overflow:hidden">
                 <img src="${imgReloj}" alt="Reloj"
-                     width="42" height="42"
+                     width="38" height="38"
                      style="display:block;margin:0 auto;border:0" />
               </td></tr>
             </table>
@@ -725,12 +726,13 @@ export async function sendOTPEmail(
               <tr>
                 <td style="vertical-align:middle">
                   <table cellpadding="0" cellspacing="0">
-                    <tr><td width="64" height="64"
-                      style="width:64px;height:64px;min-width:64px;
-                             background:#edeef8;border-radius:32px;
-                             text-align:center;vertical-align:middle">
+                    <tr><td width="52" height="52"
+                      style="width:52px;height:52px;min-width:52px;
+                             background:#edeef8;border-radius:26px;
+                             text-align:center;vertical-align:middle;
+                             overflow:hidden">
                       <img src="${imgAuri}" alt="Soporte"
-                           width="52" height="52"
+                           width="50" height="50"
                            style="display:block;margin:0 auto;border:0" />
                     </td></tr>
                   </table>
@@ -754,8 +756,8 @@ export async function sendOTPEmail(
           <td class="ft-right" style="text-align:right;vertical-align:middle;width:48%">
             <img src="${base}/ayudarteotp.png"
                  alt="Estamos aqui para ayudarte"
-                 height="72" style="display:inline-block;max-height:72px;
-                                    max-width:100%;border:0" />
+                 height="140" style="display:inline-block;max-height:140px;
+                                     max-width:100%;border:0" />
           </td>
         </tr>
       </table>
