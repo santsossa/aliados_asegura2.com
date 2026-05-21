@@ -69,15 +69,21 @@ router.post('/guardar', async (req: Request, res: Response, next: NextFunction) 
     const aliadoId = req.aliado!.sub
     const { placa, vehicleModel, datos_cotizacion, cliente_nombre, cliente_telefono, cliente_correo, comercial_value, cliente_cedula, cliente_tipo_doc } = req.body
     const now = new Date()
-    const [result] = await pool.execute<any>(
-      `INSERT INTO cotizaciones (aliado_id, placa, anio, datos_cotizacion, mes, anio_cot, cliente_nombre, cliente_telefono, cliente_correo, comercial_value, cliente_cedula, cliente_tipo_doc)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [aliadoId, placa || null, vehicleModel || null,
+
+    // La tabla usa UUID como PK — result.insertId sería 0.
+    // Generamos el UUID aquí para poder devolverlo.
+    const { randomUUID } = await import('crypto')
+    const newId = randomUUID()
+
+    await pool.execute(
+      `INSERT INTO cotizaciones (id, aliado_id, placa, anio, datos_cotizacion, mes, anio_cot, cliente_nombre, cliente_telefono, cliente_correo, comercial_value, cliente_cedula, cliente_tipo_doc)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [newId, aliadoId, placa || null, vehicleModel || null,
        JSON.stringify(datos_cotizacion || {}), now.getMonth() + 1, now.getFullYear(),
        cliente_nombre || null, cliente_telefono || null, cliente_correo || null,
        comercial_value || null, cliente_cedula || null, cliente_tipo_doc || null]
     )
-    res.json({ status: 'success', id: result.insertId })
+    res.json({ status: 'success', id: newId })
   } catch (err) { next(err) }
 })
 
