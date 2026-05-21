@@ -190,11 +190,11 @@ export async function sendLeadRecibidoEmail(opts: {
               Nuestro equipo de ventas ya est&#225; en contacto con el cliente.
             </p>
           </td>
-          <td style="vertical-align:bottom;text-align:right;
-                     padding:0 12px 0 0;width:46%">
+          <td style="vertical-align:middle;text-align:center;
+                     padding:20px 12px 20px 0;width:46%">
             <img src="${imgSobre}" alt="Solicitud recibida"
                  width="240" style="display:block;width:240px;
-                                    max-width:100%;margin-left:auto;border:0" />
+                                    max-width:100%;margin:0 auto;border:0" />
           </td>
         </tr>
       </table>
