@@ -17,5 +17,6 @@ COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile --prod
 
 COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/assets ./assets
 
 CMD ["node", "dist/app.js"]

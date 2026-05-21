@@ -1,4 +1,5 @@
 import nodemailer from 'nodemailer'
+import path from 'path'
 import { env } from '../config/env'
 
 // Usa Resend como SMTP (o cualquier proveedor SMTP)
@@ -12,25 +13,45 @@ const transporter = nodemailer.createTransport({
   },
 })
 
+// Rutas a los assets de email — disponibles tanto en dev (src/) como en prod (dist/ + assets/)
+const ASSETS_DIR = path.join(process.cwd(), 'assets', 'email')
+
+// Adjuntos CID reutilizables en todos los emails de marca
+const BRAND_ATTACHMENTS = [
+  { filename: 'logo.png',       path: path.join(ASSETS_DIR, 'logo.png'),       cid: 'emaillogo'   },
+  { filename: 'correoab.png',   path: path.join(ASSETS_DIR, 'correoab.png'),   cid: 'correoab'    },
+  { filename: 'correohandw.png',path: path.join(ASSETS_DIR, 'correohandw.png'),cid: 'correohandw' },
+]
+
 interface MailOptions {
-  to:      string
-  subject: string
-  html:    string
+  to:          string
+  subject:     string
+  html:        string
+  attachments?: typeof BRAND_ATTACHMENTS
 }
 
 async function sendMail(opts: MailOptions): Promise<void> {
-  // En desarrollo sin API key configurada, solo loguea en consola
   if (env.NODE_ENV === 'development' && (!env.RESEND_API_KEY || env.RESEND_API_KEY.startsWith('re_xxx'))) {
-    // En desarrollo sin API key: no enviar email ni exponer OTP en logs
-    // Configura RESEND_API_KEY en .env para habilitar el envío real
     return
   }
   await transporter.sendMail({
-    from:    `"${env.EMAIL_FROM_NAME}" <${env.EMAIL_FROM}>`,
-    to:      opts.to,
-    subject: opts.subject,
-    html:    opts.html,
+    from:        `"${env.EMAIL_FROM_NAME}" <${env.EMAIL_FROM}>`,
+    to:          opts.to,
+    subject:     opts.subject,
+    html:        opts.html,
+    attachments: opts.attachments,
   })
+}
+
+// ── SVG icons inline (únicos que funcionan en todos los clientes de email) ──
+const ICON = {
+  clipboard: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2D2A7A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg>`,
+  bell:      `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#92400e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>`,
+  eye:       `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2D2A7A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`,
+  headset:   `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2D2A7A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3z"/><path d="M3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>`,
+  facebook:  `<svg width="16" height="16" viewBox="0 0 24 24" fill="#2D2A7A"><path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.41c0-3.025 1.791-4.697 4.533-4.697 1.312 0 2.686.236 2.686.236v2.97h-1.513c-1.491 0-1.956.93-1.956 1.886v2.268h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/></svg>`,
+  instagram: `<svg width="16" height="16" viewBox="0 0 24 24" fill="#2D2A7A"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>`,
+  linkedin:  `<svg width="16" height="16" viewBox="0 0 24 24" fill="#2D2A7A"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>`,
 }
 
 // ── Correo de verificación ─────────────────────────────────────────────────
@@ -115,15 +136,13 @@ export async function sendLeadRecibidoEmail(opts: {
   valor_prima: number
   placa?: string
 }): Promise<void> {
-  const comision   = Math.round(opts.valor_prima * 0.06)
-  const baseUrl    = (env.FRONTEND_URL || '').replace(/\/$/, '')
-  const imgSobre   = `${baseUrl}/correoab.png`
-  const imgHandw   = `${baseUrl}/correohandw.png`
-  const portalUrl  = `${baseUrl}/dashboard/mis-polizas`
+  const comision  = Math.round(opts.valor_prima * 0.06)
+  const portalUrl = `${(env.FRONTEND_URL || '').replace(/\/$/, '')}/dashboard/mis-polizas`
 
   await sendMail({
-    to:      opts.to,
-    subject: `✅ Recibimos tu solicitud — ${opts.cliente_nombre}`,
+    to:          opts.to,
+    subject:     `✅ Recibimos tu solicitud — ${opts.cliente_nombre}`,
+    attachments: BRAND_ATTACHMENTS,
     html: `<!DOCTYPE html>
 <html lang="es">
 <head>
@@ -141,21 +160,20 @@ export async function sendLeadRecibidoEmail(opts: {
     <td style="background:#2D2A7A;padding:0">
       <table width="100%" cellpadding="0" cellspacing="0">
         <tr>
-          <td style="padding:22px 32px">
+          <td style="padding:18px 28px;vertical-align:middle">
             <table cellpadding="0" cellspacing="0">
               <tr>
-                <td>
-                  <span style="font-size:22px;font-weight:900;color:#ffffff;letter-spacing:-0.5px">Asegura2<span style="color:#F5C400">.com</span></span>
-                  <div style="font-size:11px;color:#a5b4fc;margin-top:2px;font-weight:500">+protección</div>
+                <td style="vertical-align:middle;padding-right:18px">
+                  <img src="cid:emaillogo" alt="Asegura2.com" height="38"
+                       style="display:block;height:38px;max-height:38px" />
                 </td>
-                <td style="padding-left:20px;border-left:1px solid rgba(255,255,255,0.25);padding-top:2px">
-                  <span style="font-size:13px;font-weight:600;color:#ffffff">Portal de Aliados</span>
+                <td style="border-left:1px solid rgba(255,255,255,0.3);padding-left:18px;vertical-align:middle">
+                  <span style="font-size:13px;font-weight:600;color:#ffffff;letter-spacing:0.01em">Portal de Aliados</span>
                 </td>
               </tr>
             </table>
           </td>
-          <!-- Franja dorada decorativa -->
-          <td width="80" style="background:linear-gradient(135deg,#F5C400 0%,#f59e0b 100%);border-radius:0 0 0 40px">&nbsp;</td>
+          <td width="72" style="background:linear-gradient(135deg,#F5C400,#f59e0b);border-radius:0 0 0 36px">&nbsp;</td>
         </tr>
       </table>
     </td>
@@ -166,18 +184,18 @@ export async function sendLeadRecibidoEmail(opts: {
     <td style="padding:0;background:#f8f8fc">
       <table width="100%" cellpadding="0" cellspacing="0">
         <tr>
-          <td style="padding:36px 36px 28px;vertical-align:middle;width:55%">
+          <td style="padding:36px 32px 28px;vertical-align:middle;width:54%">
             <h1 style="margin:0 0 14px;font-size:28px;font-weight:900;color:#1a1a2e;line-height:1.2">
-              ¡Lo recibimos! <span style="display:inline-block">🎉</span>
+              ¡Lo recibimos! 🎉
             </h1>
             <p style="margin:0;font-size:14px;color:#4b5563;line-height:1.7">
-              Hola <strong style="color:#1a1a2e">${opts.aliado_nombre}</strong>, ya tenemos la solicitud de póliza
-              que enviaste. Nuestro equipo de ventas ya está en contacto con el cliente.
+              Hola <strong style="color:#1a1a2e">${opts.aliado_nombre}</strong>, ya tenemos la solicitud
+              de póliza que enviaste. Nuestro equipo de ventas ya está en contacto con el cliente.
             </p>
           </td>
-          <td style="padding:20px 24px 0 0;vertical-align:bottom;text-align:right;width:45%">
-            <img src="${imgSobre}" alt="Solicitud recibida" width="180"
-                 style="display:block;margin-left:auto;max-width:180px" />
+          <td style="padding:20px 20px 0 0;vertical-align:bottom;text-align:right;width:46%">
+            <img src="cid:correoab" alt="Solicitud recibida" width="190"
+                 style="display:block;margin-left:auto;max-width:190px" />
           </td>
         </tr>
       </table>
@@ -186,46 +204,43 @@ export async function sendLeadRecibidoEmail(opts: {
 
   <!-- DETALLE CARD -->
   <tr>
-    <td style="padding:28px 32px 0">
+    <td style="padding:28px 28px 0">
       <table width="100%" cellpadding="0" cellspacing="0"
              style="border:1.5px solid #e8e8f0;border-radius:14px;overflow:hidden">
         <!-- Card header -->
         <tr>
-          <td colspan="2" style="padding:16px 20px;border-bottom:1px solid #e8e8f0">
+          <td colspan="2" style="padding:14px 18px;border-bottom:1px solid #e8e8f0;background:#fafafd">
             <table cellpadding="0" cellspacing="0">
               <tr>
                 <td style="width:34px;height:34px;background:#ede9fe;border-radius:8px;text-align:center;vertical-align:middle">
-                  <span style="font-size:16px;line-height:34px">📋</span>
+                  ${ICON.clipboard}
                 </td>
-                <td style="padding-left:12px">
+                <td style="padding-left:10px">
                   <span style="font-size:14px;font-weight:700;color:#2D2A7A">Detalle de la solicitud</span>
                 </td>
               </tr>
             </table>
           </td>
         </tr>
-        <!-- Filas -->
         <tr>
-          <td style="padding:13px 20px;font-size:13px;color:#6b7280;border-bottom:1px solid #f3f4f6">Cliente</td>
-          <td style="padding:13px 20px;font-size:13px;font-weight:700;color:#111827;text-align:right;border-bottom:1px solid #f3f4f6">${opts.cliente_nombre}</td>
+          <td style="padding:12px 18px;font-size:13px;color:#6b7280;border-bottom:1px solid #f3f4f6">Cliente</td>
+          <td style="padding:12px 18px;font-size:13px;font-weight:700;color:#111827;text-align:right;border-bottom:1px solid #f3f4f6">${opts.cliente_nombre}</td>
         </tr>
-        ${opts.placa ? `
-        <tr>
-          <td style="padding:13px 20px;font-size:13px;color:#6b7280;border-bottom:1px solid #f3f4f6">Placa</td>
-          <td style="padding:13px 20px;font-size:13px;font-weight:700;color:#111827;text-align:right;border-bottom:1px solid #f3f4f6">${opts.placa}</td>
+        ${opts.placa ? `<tr>
+          <td style="padding:12px 18px;font-size:13px;color:#6b7280;border-bottom:1px solid #f3f4f6">Placa</td>
+          <td style="padding:12px 18px;font-size:13px;font-weight:700;color:#111827;text-align:right;border-bottom:1px solid #f3f4f6">${opts.placa}</td>
         </tr>` : ''}
         <tr>
-          <td style="padding:13px 20px;font-size:13px;color:#6b7280;border-bottom:1px solid #f3f4f6">Aseguradora</td>
-          <td style="padding:13px 20px;font-size:13px;font-weight:700;color:#111827;text-align:right;border-bottom:1px solid #f3f4f6">${opts.aseguradora}</td>
+          <td style="padding:12px 18px;font-size:13px;color:#6b7280;border-bottom:1px solid #f3f4f6">Aseguradora</td>
+          <td style="padding:12px 18px;font-size:13px;font-weight:700;color:#111827;text-align:right;border-bottom:1px solid #f3f4f6">${opts.aseguradora}</td>
         </tr>
         <tr>
-          <td style="padding:13px 20px;font-size:13px;color:#6b7280;border-bottom:1px solid #f3f4f6">Prima anual</td>
-          <td style="padding:13px 20px;font-size:13px;font-weight:700;color:#111827;text-align:right;border-bottom:1px solid #f3f4f6">${fmtCOP(opts.valor_prima)}</td>
+          <td style="padding:12px 18px;font-size:13px;color:#6b7280;border-bottom:1.5px solid #e8e8f0">Prima anual</td>
+          <td style="padding:12px 18px;font-size:13px;font-weight:700;color:#111827;text-align:right;border-bottom:1.5px solid #e8e8f0">${fmtCOP(opts.valor_prima)}</td>
         </tr>
-        <!-- Comisión -->
-        <tr>
-          <td style="padding:16px 20px;font-size:14px;font-weight:700;color:#2D2A7A">Tu comisión estimada (6%)</td>
-          <td style="padding:16px 20px;font-size:18px;font-weight:900;color:#2D2A7A;text-align:right">${fmtCOP(comision)}</td>
+        <tr style="background:#f5f4ff">
+          <td style="padding:15px 18px;font-size:14px;font-weight:700;color:#2D2A7A">Tu comisión estimada (6%)</td>
+          <td style="padding:15px 18px;font-size:18px;font-weight:900;color:#2D2A7A;text-align:right">${fmtCOP(comision)}</td>
         </tr>
       </table>
     </td>
@@ -233,19 +248,20 @@ export async function sendLeadRecibidoEmail(opts: {
 
   <!-- ¿QUÉ SIGUE? -->
   <tr>
-    <td style="padding:20px 32px 0">
+    <td style="padding:18px 28px 0">
       <table width="100%" cellpadding="0" cellspacing="0"
              style="background:#fffbeb;border:1.5px solid #fde68a;border-radius:14px">
         <tr>
-          <td style="padding:18px 20px;vertical-align:top;width:44px">
-            <div style="width:36px;height:36px;background:#fef3c7;border-radius:50%;text-align:center;line-height:36px;font-size:18px">🔔</div>
+          <td style="padding:16px 16px 16px 18px;vertical-align:top;width:40px">
+            <div style="width:36px;height:36px;background:#fef3c7;border-radius:50%;display:flex;align-items:center;justify-content:center;text-align:center;line-height:36px">
+              ${ICON.bell}
+            </div>
           </td>
-          <td style="padding:18px 20px 18px 0">
-            <p style="margin:0 0 6px;font-size:14px;font-weight:700;color:#92400e">¿Qué sigue?</p>
+          <td style="padding:16px 18px 16px 4px">
+            <p style="margin:0 0 5px;font-size:14px;font-weight:700;color:#92400e">¿Qué sigue?</p>
             <p style="margin:0;font-size:13px;color:#78350f;line-height:1.65">
               Nuestro equipo contactará a <strong>${opts.cliente_nombre}</strong> para cerrar la venta.
-              Te notificaremos por correo cuando la póliza sea aprobada
-              o si hay alguna novedad.
+              Te notificaremos por correo cuando la póliza sea aprobada o si hay alguna novedad.
             </p>
           </td>
         </tr>
@@ -255,11 +271,11 @@ export async function sendLeadRecibidoEmail(opts: {
 
   <!-- VER ESTADO -->
   <tr>
-    <td style="padding:18px 32px 28px">
+    <td style="padding:16px 28px 24px">
       <table cellpadding="0" cellspacing="0">
         <tr>
-          <td style="width:32px;text-align:center;font-size:18px">👁</td>
-          <td style="padding-left:10px;font-size:13px;color:#4b5563">
+          <td style="vertical-align:middle;padding-right:10px">${ICON.eye}</td>
+          <td style="font-size:13px;color:#4b5563;vertical-align:middle">
             Puedes ver el estado en tu portal en la sección
             <a href="${portalUrl}" style="color:#2D2A7A;font-weight:700;text-decoration:none">Mis pólizas.</a>
           </td>
@@ -269,31 +285,31 @@ export async function sendLeadRecibidoEmail(opts: {
   </tr>
 
   <!-- SEPARADOR -->
-  <tr><td style="padding:0 32px"><div style="height:1px;background:#e8e8f0"></div></td></tr>
+  <tr><td style="padding:0 28px"><div style="height:1px;background:#e8e8f0"></div></td></tr>
 
-  <!-- FOOTER -->
+  <!-- FOOTER: soporte + handwriting -->
   <tr>
-    <td style="padding:24px 32px 20px">
+    <td style="padding:22px 28px 18px">
       <table width="100%" cellpadding="0" cellspacing="0">
         <tr>
-          <!-- Soporte -->
-          <td style="vertical-align:top;width:50%">
+          <td style="vertical-align:middle;width:50%">
             <table cellpadding="0" cellspacing="0">
               <tr>
-                <td style="width:38px;height:38px;background:#ede9fe;border-radius:50%;text-align:center;vertical-align:middle;font-size:18px">🎧</td>
+                <td style="width:40px;height:40px;background:#ede9fe;border-radius:50%;text-align:center;vertical-align:middle">
+                  ${ICON.headset}
+                </td>
                 <td style="padding-left:12px">
                   <div style="font-size:12px;font-weight:700;color:#1a1a2e">¿Dudas? Estamos para ayudarte</div>
-                  <div style="font-size:11px;color:#6b7280;margin-top:2px">
+                  <div style="font-size:11px;color:#6b7280;margin-top:3px">
                     Escríbenos a <a href="mailto:aliados@asegura2.com.co" style="color:#2D2A7A;text-decoration:none;font-weight:600">aliados@asegura2.com.co</a>
                   </div>
                 </td>
               </tr>
             </table>
           </td>
-          <!-- Handwriting -->
           <td style="text-align:right;vertical-align:middle">
-            <img src="${imgHandw}" alt="¡Gracias por confiar en asegura2.com!" height="56"
-                 style="display:inline-block;max-height:56px" />
+            <img src="cid:correohandw" alt="¡Gracias por confiar en asegura2.com!" height="54"
+                 style="display:inline-block;max-height:54px" />
           </td>
         </tr>
       </table>
@@ -302,29 +318,31 @@ export async function sendLeadRecibidoEmail(opts: {
 
   <!-- BOTTOM BAR -->
   <tr>
-    <td style="background:#f8f8fc;padding:16px 32px;border-top:1px solid #e8e8f0">
+    <td style="background:#f8f8fc;padding:14px 28px 16px;border-top:1px solid #e8e8f0">
       <table width="100%" cellpadding="0" cellspacing="0">
         <tr>
           <td style="vertical-align:middle">
-            <span style="font-size:15px;font-weight:900;color:#2D2A7A">Asegura2<span style="color:#F5C400">.com</span></span>
-            <div style="font-size:10px;color:#9ca3af;margin-top:2px">Portal de Aliados · Bogotá, Colombia</div>
+            <img src="cid:emaillogo" alt="Asegura2.com" height="28"
+                 style="display:block;height:28px;max-height:28px;margin-bottom:3px" />
+            <div style="font-size:10px;color:#9ca3af">Portal de Aliados · Bogotá, Colombia</div>
           </td>
-          <!-- Redes sociales -->
+          <!-- Redes sociales con SVG reales -->
           <td style="text-align:right;vertical-align:middle">
-            <a href="https://facebook.com/asegura2" style="display:inline-block;margin-left:8px">
-              <div style="width:30px;height:30px;border-radius:50%;background:#e8e8f0;text-align:center;line-height:30px;font-size:13px">f</div>
+            <a href="https://web.facebook.com/asegura2col" style="display:inline-block;margin-left:8px;width:32px;height:32px;background:#edeef3;border-radius:50%;text-align:center;line-height:32px;text-decoration:none">
+              ${ICON.facebook}
             </a>
-            <a href="https://instagram.com/asegura2" style="display:inline-block;margin-left:8px">
-              <div style="width:30px;height:30px;border-radius:50%;background:#e8e8f0;text-align:center;line-height:30px;font-size:13px">ig</div>
+            <a href="https://www.instagram.com/asegura2col/" style="display:inline-block;margin-left:8px;width:32px;height:32px;background:#edeef3;border-radius:50%;text-align:center;line-height:32px;text-decoration:none">
+              ${ICON.instagram}
             </a>
-            <a href="https://linkedin.com/company/asegura2" style="display:inline-block;margin-left:8px">
-              <div style="width:30px;height:30px;border-radius:50%;background:#e8e8f0;text-align:center;line-height:30px;font-size:13px">in</div>
+            <a href="https://www.linkedin.com/company/asegura2colombia" style="display:inline-block;margin-left:8px;width:32px;height:32px;background:#edeef3;border-radius:50%;text-align:center;line-height:32px;text-decoration:none">
+              ${ICON.linkedin}
             </a>
           </td>
         </tr>
       </table>
-      <p style="margin:10px 0 0;font-size:10px;color:#9ca3af;text-align:center">
-        Si tienes dudas escríbenos a <a href="mailto:aliados@asegura2.com.co" style="color:#2D2A7A;text-decoration:none">aliados@asegura2.com.co</a>
+      <p style="margin:10px 0 0;font-size:10px;color:#b0b4c1;text-align:center">
+        Si tienes dudas escríbenos a
+        <a href="mailto:aliados@asegura2.com.co" style="color:#2D2A7A;text-decoration:none">aliados@asegura2.com.co</a>
       </p>
     </td>
   </tr>
