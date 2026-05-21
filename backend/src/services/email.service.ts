@@ -595,8 +595,9 @@ export async function sendOTPEmail(
 <tr><td align="center">
 
 <table class="card" cellpadding="0" cellspacing="0" width="100%"
-       style="max-width:580px;background:#ffffff;border-radius:16px;
-              overflow:hidden;border:1px solid #e8e8f0">
+       style="max-width:580px;background:#ffffff;border-radius:20px;
+              overflow:hidden;border:1px solid #e8e8f0;
+              box-shadow:0 4px 24px rgba(0,0,0,0.08)">
 
   <!-- ══ HEADER ══ -->
   <tr>
