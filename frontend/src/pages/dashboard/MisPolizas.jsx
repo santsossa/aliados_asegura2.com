@@ -262,12 +262,15 @@ function DetalleModal({ item, onClose, token }) {
                   </span>
                 </div>
               ) : (
-                <div style={{ background:'#eff6ff', borderRadius:12, padding:'14px 16px',
-                              fontSize:13, color:'#1d4ed8', display:'flex', gap:10, alignItems:'flex-start', lineHeight:1.6 }}>
-                  <Info size={16} style={{ flexShrink:0, marginTop:1 }} />
+                /* Estado inicial (lead recién enviado) */
+                <div style={{ background:'#f0f9ff', border:'1.5px solid #bae6fd', borderRadius:12,
+                              padding:'14px 16px', fontSize:13, color:'#0369a1',
+                              display:'flex', gap:10, alignItems:'flex-start', lineHeight:1.6 }}>
+                  <span style={{ fontSize:22 }}>✅</span>
                   <span>
-                    Nuestro equipo está intentando contactarse con el cliente para seguir con su proceso.
-                    Recibirás un correo cuando cambie el estado.
+                    <strong>¡Lo recibimos!</strong> Ya tenemos al cliente en nuestro sistema.
+                    Nuestro equipo de ventas se pondrá en contacto con él para continuar con los trámites
+                    y cerrar la póliza. Te notificaremos cuando haya novedades.
                   </span>
                 </div>
               )}
