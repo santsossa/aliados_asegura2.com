@@ -75,49 +75,49 @@ export default function IAAssistant() {
 
   return (
     <>
-      {/* Botón de apertura — card estilo "Need Help?" */}
+      {/* Botón de apertura — card pill derecha */}
       <button
         onClick={() => setOpen(v => !v)}
         style={{
-          position: 'fixed', bottom: 28, left: 24, zIndex: 300,
+          position: 'fixed', bottom: 28, right: 24, zIndex: 300,
           display: 'flex', alignItems: 'center', gap: 12,
           background: '#fff', border: 'none', cursor: 'pointer',
-          borderRadius: 18, padding: '12px 14px',
-          boxShadow: '0 4px 24px rgba(0,0,0,0.13)',
+          borderRadius: 999, padding: '10px 10px 10px 16px',
+          boxShadow: '0 4px 24px rgba(0,0,0,0.15), 0 1px 4px rgba(0,0,0,0.08)',
           transition: 'transform 0.2s, box-shadow 0.2s',
-          width: 230,
+          width: 240,
         }}
-        onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 32px rgba(0,0,0,0.18)' }}
-        onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)';    e.currentTarget.style.boxShadow = '0 4px 24px rgba(0,0,0,0.13)' }}
+        onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 32px rgba(0,0,0,0.2)' }}
+        onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)';    e.currentTarget.style.boxShadow = '0 4px 24px rgba(0,0,0,0.15), 0 1px 4px rgba(0,0,0,0.08)' }}
       >
-        {/* Avatar / emoji */}
-        <span style={{ fontSize: 30, lineHeight: 1, flexShrink: 0 }}>👋</span>
+        {/* Emoji */}
+        <span style={{ fontSize: 28, lineHeight: 1, flexShrink: 0 }}>👋</span>
 
         {/* Texto */}
         <div style={{ flex: 1, textAlign: 'left', minWidth: 0 }}>
-          <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: '#16151b', lineHeight: 1.2 }}>
+          <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: '#16151b', lineHeight: 1.25 }}>
             ¿Necesitas ayuda?
           </p>
-          <p style={{ margin: '2px 0 0', fontSize: 11, color: '#8b8fa8', lineHeight: 1.4, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-            Chatea con Alia, tu asistente
+          <p style={{ margin: '1px 0 0', fontSize: 11, color: '#8b8fa8', lineHeight: 1.4 }}>
+            Chatea con Alia ahora
           </p>
         </div>
 
         {/* Círculo de acción */}
         <div style={{
-          width: 38, height: 38, borderRadius: '50%',
+          width: 42, height: 42, borderRadius: '50%',
           background: '#2D2A7A', flexShrink: 0,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          boxShadow: '0 2px 10px rgba(45,42,122,0.35)',
+          boxShadow: '0 2px 10px rgba(45,42,122,0.4)',
         }}>
-          <MessageCircleMore size={18} color="#fff" />
+          <MessageCircleMore size={20} color="#fff" />
         </div>
       </button>
 
-      {/* Barra de chat — desliza desde la izquierda */}
+      {/* Panel de chat — desliza desde la derecha */}
       <div style={{
-        position: 'fixed', bottom: 80, left: 28, zIndex: 299,
-        width: 310,
+        position: 'fixed', bottom: 88, right: 24, zIndex: 299,
+        width: 320,
         background: '#fff',
         borderRadius: 18,
         boxShadow: '0 8px 40px rgba(0,0,0,0.13)',
@@ -125,7 +125,7 @@ export default function IAAssistant() {
         display: 'flex', flexDirection: 'column',
         overflow: 'hidden',
         // Animación slide desde izquierda + fade
-        transform: open ? 'translateX(0) scale(1)' : 'translateX(-24px) scale(0.97)',
+        transform: open ? 'translateX(0) scale(1)' : 'translateX(24px) scale(0.97)',
         opacity: open ? 1 : 0,
         pointerEvents: open ? 'auto' : 'none',
         transition: 'transform 0.3s cubic-bezier(0.34,1.2,0.64,1), opacity 0.25s ease',
