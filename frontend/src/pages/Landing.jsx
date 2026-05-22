@@ -441,7 +441,7 @@ export default function Landing() {
   }, [])
 
   return (
-    <div className="min-h-screen font-sans" style={{ background: 'linear-gradient(160deg, #f0f2ff 0%, #faf8ff 40%, #ffffff 100%)' }}>
+    <div className="min-h-screen font-sans" style={{ background: 'linear-gradient(160deg, #f0f2ff 0%, #faf8ff 40%, #ffffff 100%)', overflowX: 'hidden' }}>
 
       {/* ── Navbar ──────────────────────────────────────────────── */}
       <div
@@ -489,7 +489,7 @@ export default function Landing() {
             </h1>
 
             {/* Imagen del celular — solo visible en móvil/tablet, sin contenedor visible */}
-            <div className="lg:hidden mt-8 mb-10" style={{ position:'relative', textAlign:'center', overflowX:'clip' }}>
+            <div className="lg:hidden mt-8 mb-10" style={{ position:'relative', textAlign:'center' }}>
               {/* Degradado detrás — libre, sin recortar */}
               <div style={{
                 position: 'absolute',
