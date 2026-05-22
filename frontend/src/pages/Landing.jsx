@@ -621,16 +621,18 @@ export default function Landing() {
                     <span className="text-[9px] bg-green-50 text-green-600 font-semibold px-2 py-0.5 rounded-full">↑ 18%</span>
                   </div>
                   <p className="text-2xl font-black text-gray-900 mb-3">$388.000</p>
-                  <div className="grid grid-cols-3 gap-3 mt-1">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-1">
                     {[
                       { label: 'Póliza Qualitas', sub: 'Honda Civic',  val: '+$150.000' },
-                      { label: 'Póliza HDI',     sub: 'Mazda 3',      val: '+$126.000' },
-                      { label: 'Póliza Allianz', sub: 'Sandero',      val: '+$112.000' },
+                      { label: 'Póliza HDI',      sub: 'Mazda 3',      val: '+$126.000' },
+                      { label: 'Póliza Allianz',  sub: 'Sandero',      val: '+$112.000' },
                     ].map(r => (
-                      <div key={r.label} className="bg-white rounded-xl border border-gray-100 px-3 py-2.5">
-                        <p className="text-[10px] font-semibold text-gray-600">{r.label}</p>
-                        <p className="text-[9px] text-gray-400 mb-1">{r.sub}</p>
-                        <p className="text-sm font-black text-green-600">{r.val}</p>
+                      <div key={r.label} className="bg-white rounded-xl border border-gray-100 px-3 py-2.5 flex sm:flex-col items-center sm:items-start justify-between sm:justify-start gap-2 sm:gap-0">
+                        <div>
+                          <p className="text-[10px] font-semibold text-gray-600">{r.label}</p>
+                          <p className="text-[9px] text-gray-400 sm:mb-1">{r.sub}</p>
+                        </div>
+                        <p className="text-sm font-black text-green-600 flex-shrink-0">{r.val}</p>
                       </div>
                     ))}
                   </div>
