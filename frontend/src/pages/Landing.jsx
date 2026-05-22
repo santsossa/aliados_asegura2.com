@@ -424,19 +424,19 @@ export default function Landing() {
     <div className="min-h-screen font-sans" style={{ background: 'linear-gradient(160deg, #f0f2ff 0%, #faf8ff 40%, #ffffff 100%)' }}>
 
       {/* ── Navbar ──────────────────────────────────────────────── */}
-      <div className="flex justify-center px-6 pt-5 sticky top-0 z-20">
-        <nav className="flex items-center justify-between w-full max-w-5xl bg-white/80 backdrop-blur-md border border-gray-200/80 rounded-2xl px-4 sm:px-5 py-2 shadow-sm">
-          <LogoFull className="h-8 sm:h-11" />
+      <div className="flex justify-center px-3 sm:px-6 pt-3 sm:pt-5 sticky top-0 z-20">
+        <nav className="flex items-center justify-between w-full max-w-5xl bg-white/90 backdrop-blur-md border border-gray-200/80 rounded-2xl px-4 sm:px-5 py-3 sm:py-2 shadow-md sm:shadow-sm">
+          <LogoFull className="h-10 sm:h-11" />
           <div className="hidden md:flex items-center gap-6">
             {NAV_LINKS.map(l => (
               <a key={l.href} href={l.href} className="text-sm text-gray-500 hover:text-brand font-medium transition-colors">{l.label}</a>
             ))}
           </div>
-          <div className="flex items-center gap-1 sm:gap-2">
-            <Link to={loginHref} className="text-xs sm:text-sm font-medium text-gray-500 hover:text-gray-900 px-2 sm:px-3 py-1.5 transition-colors">
+          <div className="flex items-center gap-2">
+            <Link to={loginHref} className="text-sm font-medium text-gray-500 hover:text-gray-900 px-3 py-1.5 transition-colors">
               {loginLabel}
             </Link>
-            <Link to={ctaHref} className="bg-brand hover:bg-brand-dark text-white text-xs sm:text-sm font-semibold px-3 sm:px-4 py-2 rounded-xl transition-colors whitespace-nowrap">
+            <Link to={ctaHref} className="bg-brand hover:bg-brand-dark text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors whitespace-nowrap shadow-sm">
               {user ? 'Mi dashboard' : 'Registrarse'}
             </Link>
           </div>
