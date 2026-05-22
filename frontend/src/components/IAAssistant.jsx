@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { Send, Loader2, Sparkles, X } from 'lucide-react'
+import { Send, Loader2, MessageCircleMore, X } from 'lucide-react'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
@@ -75,23 +75,43 @@ export default function IAAssistant() {
 
   return (
     <>
-      {/* Botón de apertura — esquina inferior izquierda */}
+      {/* Botón de apertura — card estilo "Need Help?" */}
       <button
         onClick={() => setOpen(v => !v)}
         style={{
-          position: 'fixed', bottom: 28, left: 28, zIndex: 300,
-          display: 'flex', alignItems: 'center', gap: 8,
-          background: '#2D2A7A', border: 'none', cursor: 'pointer',
-          borderRadius: 99, padding: '10px 18px 10px 14px',
-          boxShadow: '0 4px 20px rgba(45,42,122,0.4)',
-          color: '#fff', fontSize: 13, fontWeight: 600,
+          position: 'fixed', bottom: 28, left: 24, zIndex: 300,
+          display: 'flex', alignItems: 'center', gap: 12,
+          background: '#fff', border: 'none', cursor: 'pointer',
+          borderRadius: 18, padding: '12px 14px',
+          boxShadow: '0 4px 24px rgba(0,0,0,0.13)',
           transition: 'transform 0.2s, box-shadow 0.2s',
+          width: 230,
         }}
-        onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.04)'; e.currentTarget.style.boxShadow = '0 6px 28px rgba(45,42,122,0.5)' }}
-        onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)';    e.currentTarget.style.boxShadow = '0 4px 20px rgba(45,42,122,0.4)' }}
+        onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 32px rgba(0,0,0,0.18)' }}
+        onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)';    e.currentTarget.style.boxShadow = '0 4px 24px rgba(0,0,0,0.13)' }}
       >
-        <Sparkles size={16} />
-        Alia IA
+        {/* Avatar / emoji */}
+        <span style={{ fontSize: 30, lineHeight: 1, flexShrink: 0 }}>👋</span>
+
+        {/* Texto */}
+        <div style={{ flex: 1, textAlign: 'left', minWidth: 0 }}>
+          <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: '#16151b', lineHeight: 1.2 }}>
+            ¿Necesitas ayuda?
+          </p>
+          <p style={{ margin: '2px 0 0', fontSize: 11, color: '#8b8fa8', lineHeight: 1.4, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            Chatea con Alia, tu asistente
+          </p>
+        </div>
+
+        {/* Círculo de acción */}
+        <div style={{
+          width: 38, height: 38, borderRadius: '50%',
+          background: '#2D2A7A', flexShrink: 0,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          boxShadow: '0 2px 10px rgba(45,42,122,0.35)',
+        }}>
+          <MessageCircleMore size={18} color="#fff" />
+        </div>
       </button>
 
       {/* Barra de chat — desliza desde la izquierda */}
@@ -118,18 +138,19 @@ export default function IAAssistant() {
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           flexShrink: 0,
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            {/* Avatar de Anto — reemplazar src cuando esté el asset */}
             <div style={{
-              width: 28, height: 28, borderRadius: '50%',
+              width: 32, height: 32, borderRadius: '50%',
               background: 'linear-gradient(135deg, #2D2A7A, #6366f1)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              flexShrink: 0,
+              flexShrink: 0, fontSize: 16,
             }}>
-              <Sparkles size={13} color="#fff" />
+              👋
             </div>
             <div>
               <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: '#16151b', lineHeight: 1.2 }}>Alia</p>
-              <p style={{ margin: 0, fontSize: 10, color: '#a2a8c0' }}>Asistente Asegura2.com</p>
+              <p style={{ margin: 0, fontSize: 10, color: '#a2a8c0' }}>Asistente de Asegura2.com</p>
             </div>
           </div>
           <button onClick={() => setOpen(false)}
