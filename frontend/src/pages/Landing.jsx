@@ -8,7 +8,7 @@ import imgHeroPhone  from '../assets/herophone.png'
 import imgCcManizales from '../assets/ccMANIZALES.png'
 import imgCcCucuta    from '../assets/ccCUCUTA.png'
 
-import imgSura      from '../assets/sura.webp'
+import imgQualitas  from '../assets/qualitas.png'
 import imgAxa       from '../assets/axa.webp'
 import imgBolivar   from '../assets/bolivar.webp'
 import imgAllianz   from '../assets/allianz.webp'
@@ -20,7 +20,7 @@ import imgSbs       from '../assets/sbs.webp'
 import imgSolidaria from '../assets/solidaria.webp'
 
 const ASEGURADORAS = [
-  { name: 'Sura',      img: imgSura      },
+  { name: 'Qualitas',  img: imgQualitas  },
   { name: 'AXA',       img: imgAxa       },
   { name: 'Bolívar',   img: imgBolivar   },
   { name: 'Allianz',   img: imgAllianz   },
@@ -56,7 +56,7 @@ const FAQS = [
   { q: '¿Cómo me registro como aliado?',           a: 'Crea tu cuenta gratis en minutos. Solo necesitas tus datos personales, número de cédula y cuenta bancaria para recibir tus pagos. Una vez verificado, tienes acceso inmediato a la plataforma.' },
   { q: '¿Cuándo recibo mis comisiones?',            a: 'Los pagos se realizan el 1 de cada mes. Solo se pagan las pólizas en las que el cliente haya pagado la primera cuota o haya pagado de contado ese mes.' },
   { q: '¿Puedo ver el estado de mis pólizas?',      a: 'Sí. Desde tu dashboard puedes ver en tiempo real si cada póliza está en proceso, aprobada o no convertida, con la explicación de cada estado.' },
-  { q: '¿Con cuántas aseguradoras trabajan?',       a: 'Actualmente comparamos entre 10 aseguradoras: Sura, AXA, Bolívar, Allianz, HDI, Mapfre, Equidad, Estado, SBS y Solidaria.' },
+  { q: '¿Con cuántas aseguradoras trabajan?',       a: 'Actualmente comparamos entre 10 aseguradoras: Qualitas, AXA, Bolívar, Allianz, HDI, Mapfre, Equidad, Estado, SBS y Solidaria.' },
   { q: '¿Hay algún costo por registrarse?',         a: 'No. El registro y el uso de la plataforma son completamente gratuitos. Solo ganas cuando vendes.' },
 ]
 
@@ -620,7 +620,7 @@ export default function Landing() {
                   <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-3">Resultados · Honda Civic 2023</p>
                   <div className="space-y-2">
                     {[
-                      { img: imgSura,    name: 'SURA',    price: '$98.000/mes',  best: true  },
+                      { img: imgQualitas, name: 'Qualitas', price: '$98.000/mes', best: true  },
                       { img: imgAllianz, name: 'Allianz', price: '$104.000/mes', best: false },
                       { img: imgBolivar, name: 'Bolívar', price: '$112.000/mes', best: false },
                     ].map(r => (
@@ -683,7 +683,7 @@ export default function Landing() {
                   </div>
                   <div className="flex items-center gap-2 flex-wrap">
                     {[
-                      { img: imgSura,      name: 'Sura'      },
+                      { img: imgQualitas,  name: 'Qualitas'  },
                       { img: imgAxa,       name: 'AXA'       },
                       { img: imgBolivar,   name: 'Bolívar'   },
                       { img: imgAllianz,   name: 'Allianz'   },

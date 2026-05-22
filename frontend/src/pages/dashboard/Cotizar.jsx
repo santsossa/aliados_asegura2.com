@@ -38,7 +38,7 @@ const COMPANY_MAP = [
   { keys:['mapfre'],            name:'Mapfre',            logo:'/logos/mapfre.png'    },
   { keys:['sbs'],               name:'SBS Seguros',       logo:'/logos/sbs.png'       },
   { keys:['solidaria'],         name:'Seguros Solidaria', logo:'/logos/solidaria.png' },
-  { keys:['sura'],              name:'Sura',              logo:'/logos/sura.png'      },
+  { keys:['qualitas'],          name:'Qualitas',           logo:'/logos/qualitas.png'  },
 ]
 function resolveCompany(apiName = '') {
   const lower = apiName.toLowerCase()
