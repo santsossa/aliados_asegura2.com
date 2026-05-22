@@ -37,6 +37,9 @@ const envSchema = z.object({
 
   // API key estática para que el CRM llame al backend sin flujo JWT
   ALIADOS_ADMIN_API_KEY: z.string().default(''),
+
+  // Anthropic Claude — asistente IA para aliados
+  ANTHROPIC_API_KEY: z.string().default(''),
 })
 
 const parsed = envSchema.safeParse(process.env)

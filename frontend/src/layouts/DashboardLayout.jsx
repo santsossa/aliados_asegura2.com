@@ -9,6 +9,7 @@ import { useIsMobile } from '../hooks/use-mobile'
 import { useAuth } from '../context/AuthContext'
 import { SSEProvider } from '../context/SSEContext'
 import NotificationBell from '../components/NotificationBell'
+import IAAssistant from '../components/IAAssistant'
 
 const NAV_MAIN = [
   { to: '/dashboard',                        icon: Home,       label: 'Home'             },
@@ -191,6 +192,7 @@ export default function DashboardLayout() {
           </>
         )}
       </div>
+      <IAAssistant />
       </SSEProvider>
     )
   }
@@ -333,6 +335,7 @@ export default function DashboardLayout() {
         </div>
       </div>
     </div>
+    <IAAssistant />
     </SSEProvider>
   )
 }

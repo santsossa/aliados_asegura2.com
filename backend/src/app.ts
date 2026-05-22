@@ -17,6 +17,7 @@ import polizasRoutes     from './routes/polizas.routes'
 import pagosRoutes       from './routes/pagos.routes'
 import cotizarRoutes          from './routes/cotizar.routes'
 import notificacionesRoutes   from './routes/notificaciones.routes'
+import iaRoutes               from './routes/ia.routes'
 
 const app = express()
 
@@ -48,6 +49,7 @@ app.use('/api/polizas',      polizasRoutes)
 app.use('/api/pagos',        pagosRoutes)
 app.use('/api/cotizar',          cotizarRoutes)
 app.use('/api/notificaciones',   notificacionesRoutes)
+app.use('/api/ia',               iaRoutes)
 
 // ── 404 ───────────────────────────────────────────────────────────────────
 app.use((_req, res) => res.status(404).json({ status: 'error', message: 'Ruta no encontrada' }))
