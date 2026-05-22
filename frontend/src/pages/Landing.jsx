@@ -471,7 +471,7 @@ export default function Landing() {
       </div>
 
       {/* ── Hero ────────────────────────────────────────────────── */}
-      <section className="max-w-6xl mx-auto px-4 sm:px-6 pt-8 sm:pt-14 pb-12 sm:pb-20" style={{ overflowX:'hidden' }}>
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 pt-8 sm:pt-14 pb-12 sm:pb-20">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-10">
 
           {/* Left */}
@@ -489,7 +489,7 @@ export default function Landing() {
             </h1>
 
             {/* Imagen del celular — solo visible en móvil/tablet, sin contenedor visible */}
-            <div className="lg:hidden mt-8 mb-10" style={{ position:'relative', textAlign:'center' }}>
+            <div className="lg:hidden mt-8 mb-10" style={{ position:'relative', textAlign:'center', overflowX:'clip' }}>
               {/* Degradado detrás — libre, sin recortar */}
               <div style={{
                 position: 'absolute',
@@ -573,7 +573,7 @@ export default function Landing() {
           </div>
 
           {/* Right — hero image */}
-          <div className="hidden lg:flex items-center justify-center relative">
+          <div className="hidden lg:flex items-center justify-center relative" style={{ overflow:'hidden' }}>
             {/* Fondo degradado detrás del PNG */}
             <div style={{
               position: 'absolute',
