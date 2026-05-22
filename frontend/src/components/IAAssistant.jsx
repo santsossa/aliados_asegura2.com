@@ -75,42 +75,43 @@ export default function IAAssistant() {
 
   return (
     <>
-      {/* Botón de apertura — card pill derecha */}
+      {/* Botón de apertura — pill exactamente como referencia */}
       <button
         onClick={() => setOpen(v => !v)}
         style={{
           position: 'fixed', bottom: 28, right: 24, zIndex: 300,
-          display: 'flex', alignItems: 'center', gap: 12,
-          background: '#fff', border: 'none', cursor: 'pointer',
-          borderRadius: 999, padding: '10px 10px 10px 16px',
-          boxShadow: '0 4px 24px rgba(0,0,0,0.15), 0 1px 4px rgba(0,0,0,0.08)',
-          transition: 'transform 0.2s, box-shadow 0.2s',
-          width: 240,
+          display: 'flex', alignItems: 'center', gap: 14,
+          background: '#f5f5f7', border: 'none', cursor: 'pointer',
+          borderRadius: 999,
+          padding: '14px 14px 14px 20px',
+          boxShadow: '0 2px 16px rgba(0,0,0,0.12), 0 1px 4px rgba(0,0,0,0.06)',
+          transition: 'transform 0.18s, box-shadow 0.18s',
+          minWidth: 260,
         }}
-        onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 32px rgba(0,0,0,0.2)' }}
-        onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)';    e.currentTarget.style.boxShadow = '0 4px 24px rgba(0,0,0,0.15), 0 1px 4px rgba(0,0,0,0.08)' }}
+        onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 6px 28px rgba(0,0,0,0.18)' }}
+        onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)';    e.currentTarget.style.boxShadow = '0 2px 16px rgba(0,0,0,0.12), 0 1px 4px rgba(0,0,0,0.06)' }}
       >
-        {/* Emoji */}
-        <span style={{ fontSize: 28, lineHeight: 1, flexShrink: 0 }}>👋</span>
+        {/* Emoji grande */}
+        <span style={{ fontSize: 38, lineHeight: 1, flexShrink: 0 }}>👋</span>
 
-        {/* Texto */}
-        <div style={{ flex: 1, textAlign: 'left', minWidth: 0 }}>
-          <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: '#16151b', lineHeight: 1.25 }}>
+        {/* Texto — 2 líneas como en la referencia */}
+        <div style={{ flex: 1, textAlign: 'left' }}>
+          <p style={{ margin: 0, fontSize: 15, fontWeight: 800, color: '#111', lineHeight: 1.2 }}>
             ¿Necesitas ayuda?
           </p>
-          <p style={{ margin: '1px 0 0', fontSize: 11, color: '#8b8fa8', lineHeight: 1.4 }}>
-            Chatea con Anto ahora
+          <p style={{ margin: '3px 0 0', fontSize: 12, color: '#888', lineHeight: 1.4 }}>
+            Haz clic aquí para chatear<br />con Anto
           </p>
         </div>
 
-        {/* Círculo de acción */}
+        {/* Círculo rojo sólido con icono blanco */}
         <div style={{
-          width: 42, height: 42, borderRadius: '50%',
+          width: 52, height: 52, borderRadius: '50%',
           background: '#2D2A7A', flexShrink: 0,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          boxShadow: '0 2px 10px rgba(45,42,122,0.4)',
+          boxShadow: '0 4px 14px rgba(45,42,122,0.45)',
         }}>
-          <MessageCircleMore size={20} color="#fff" />
+          <MessageCircleMore size={24} color="#fff" />
         </div>
       </button>
 
