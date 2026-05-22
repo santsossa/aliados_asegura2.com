@@ -113,11 +113,15 @@ router.post('/chat', async (req: Request, res: Response, next: NextFunction) => 
 
     const client = new Anthropic({ apiKey: env.ANTHROPIC_API_KEY })
 
+    // Límite de historial: máximo 10 mensajes para controlar costos
+    const limited = messages.slice(-10)
+
     const response = await client.messages.create({
       model:      'claude-haiku-4-5',
       max_tokens: 1024,
-      system:     SYSTEM_PROMPT,
-      messages,
+      // Prompt Caching: el system prompt se cachea → 90% descuento en tokens repetidos
+      system: [{ type: 'text', text: SYSTEM_PROMPT, cache_control: { type: 'ephemeral' } }] as any,
+      messages: limited,
     })
 
     const text = response.content[0].type === 'text'
