@@ -462,9 +462,9 @@ export default function Landing() {
             </h1>
 
             {/* Imagen del celular — solo visible en móvil/tablet, entre título y texto */}
-            <div className="flex lg:hidden justify-center mb-6">
+            <div className="flex lg:hidden justify-center mt-8 mb-10">
               <img src={imgHeroPhone} alt="Portal aliados"
-                className="w-56 sm:w-64 object-contain drop-shadow-xl" />
+                className="w-72 sm:w-80 object-contain drop-shadow-xl" />
             </div>
 
             {/* Texto descriptivo — centrado en móvil */}
