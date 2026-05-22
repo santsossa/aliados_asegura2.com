@@ -1,8 +1,8 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import {
-  Home, FileText, Shield, DollarSign, CreditCard,
-  AlignJustify, Car, X, LogOut, Sparkles,
+  Home, FileText, Shield, DollarSign,
+  AlignJustify, Car, X, LogOut, Sparkles, Settings,
 } from 'lucide-react'
 import { LogoFull, LogoIcon } from '../components/Logo'
 import { useIsMobile } from '../hooks/use-mobile'
@@ -12,12 +12,17 @@ import NotificationBell from '../components/NotificationBell'
 import IAAssistant from '../components/IAAssistant'
 
 const NAV_MAIN = [
-  { to: '/dashboard',                        icon: Home,       label: 'Inicio'          },
-  { to: '/dashboard/cotizaciones',           icon: FileText,   label: 'Cotizaciones'    },
-  { to: '/dashboard/mis-polizas',            icon: Shield,     label: 'Mis pólizas'     },
-  { to: '/dashboard/mis-pagos',              icon: DollarSign, label: 'Comisiones'      },
-  { to: '/dashboard/informacion-financiera', icon: CreditCard, label: 'Cuenta bancaria' },
+  { to: '/dashboard',              icon: Home,       label: 'Inicio'       },
+  { to: '/dashboard/cotizaciones', icon: FileText,   label: 'Cotizaciones' },
+  { to: '/dashboard/mis-polizas',  icon: Shield,     label: 'Mis pólizas'  },
+  { to: '/dashboard/mis-pagos',    icon: DollarSign, label: 'Comisiones'   },
 ]
+
+// Cotizar — nav item destacado (fondo sólido de marca)
+const NAV_COTIZAR = { to: '/dashboard/cotizar', icon: Car, label: 'Cotizar' }
+
+// Configuración — al fondo, antes de logout
+const NAV_CONFIG = { to: '/dashboard/informacion-financiera', icon: Settings, label: 'Configuración' }
 
 const NAV_ANTO = { icon: Sparkles, label: 'Anto IA' }
 
@@ -221,35 +226,17 @@ export default function DashboardLayout() {
             display:'flex', flexDirection:'column', overflow:'hidden',
             transition:'width 0.25s cubic-bezier(0.4,0,0.2,1)',
           }}>
-            <nav style={{ padding:'16px 10px', display:'flex', flexDirection:'column', gap:2, flex:1 }}>
+            <nav style={{ padding:'20px 10px', display:'flex', flexDirection:'column', gap:2, flex:1 }}>
 
-              {/* Toggle + CTA Cotizar — siempre visibles arriba */}
-              <div style={{ display:'flex', alignItems:'center', gap:6, marginBottom:16 }}>
+              {/* Toggle */}
+              <div style={{ paddingBottom:20, paddingLeft:2 }}>
                 <button
                   onClick={() => setSideOpen(v => !v)}
-                  style={{ width:36, height:36, display:'flex', alignItems:'center', justifyContent:'center', background:'transparent', border:'none', borderRadius:50, cursor:'pointer', transition:'background 0.15s', flexShrink:0 }}
+                  style={{ width:40, height:40, display:'flex', alignItems:'center', justifyContent:'center', background:'transparent', border:'none', borderRadius:50, cursor:'pointer', transition:'background 0.15s' }}
                   onMouseEnter={e=>e.currentTarget.style.background='#edeef3'}
                   onMouseLeave={e=>e.currentTarget.style.background='transparent'}
                 >
-                  <AlignJustify size={18} color="#2D2A7A" />
-                </button>
-                {/* Botón cotizar — protagonista, aparece solo cuando sidebar abierto */}
-                <button
-                  onClick={() => navigate('/dashboard/cotizar')}
-                  style={{
-                    flex:1, display:'flex', alignItems:'center', gap:7,
-                    height:36, padding:'0 14px', borderRadius:50, border:'none',
-                    background:'#2D2A7A', color:'#fff', fontWeight:700, fontSize:13,
-                    cursor:'pointer', overflow:'hidden', whiteSpace:'nowrap',
-                    opacity: sideOpen ? 1 : 0,
-                    maxWidth: sideOpen ? 200 : 0,
-                    transition:'opacity 0.2s ease, max-width 0.25s ease, background 0.15s',
-                  }}
-                  onMouseEnter={e=>e.currentTarget.style.background='#201D5F'}
-                  onMouseLeave={e=>e.currentTarget.style.background='#2D2A7A'}
-                >
-                  <Car size={14} style={{ flexShrink:0 }} />
-                  Cotizar
+                  <AlignJustify size={20} color="#2D2A7A" />
                 </button>
               </div>
 
@@ -283,6 +270,34 @@ export default function DashboardLayout() {
                 </NavLink>
               ))}
 
+              {/* Cotizar — destacado, integrado en el nav */}
+              <NavLink
+                to={NAV_COTIZAR.to}
+                style={({ isActive }) => ({
+                  display:'flex', alignItems:'center', gap:12,
+                  height:40, padding:'0 6px', borderRadius:50,
+                  textDecoration:'none', fontWeight:700, fontSize:14,
+                  color: isActive ? '#fff' : '#fff',
+                  background: isActive ? '#201D5F' : '#2D2A7A',
+                  transition:'background 0.15s',
+                  overflow:'hidden', whiteSpace:'nowrap', flexShrink:0,
+                  marginTop:4,
+                })}
+                onMouseEnter={e=>e.currentTarget.style.background='#201D5F'}
+                onMouseLeave={e=>{ if(!e.currentTarget.classList.contains('active')) e.currentTarget.style.background='#2D2A7A' }}
+              >
+                {() => (
+                  <>
+                    <span style={{ display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, width:28 }}>
+                      <Car size={19} color="#fff" />
+                    </span>
+                    <span style={{ opacity:sideOpen?1:0, maxWidth:sideOpen?140:0, overflow:'hidden', transition:'opacity 0.2s ease, max-width 0.25s ease' }}>
+                      Cotizar
+                    </span>
+                  </>
+                )}
+              </NavLink>
+
               <div style={{ margin:'10px 6px', borderTop:'1px solid #eeeeef' }} />
 
               {/* Anto IA */}
@@ -306,6 +321,33 @@ export default function DashboardLayout() {
             </nav>
 
             <div style={{ padding:'10px', borderTop:'1px solid #eeeeef' }}>
+              {/* Configuración */}
+              <NavLink
+                to={NAV_CONFIG.to}
+                style={({ isActive }) => ({
+                  display:'flex', alignItems:'center', gap:12,
+                  height:40, padding:'0 6px', borderRadius:50,
+                  textDecoration:'none', fontWeight:600, fontSize:14,
+                  color: isActive ? '#2D2A7A' : '#6b7280',
+                  background: isActive ? '#edeef3' : 'transparent',
+                  transition:'background 0.15s',
+                  overflow:'hidden', whiteSpace:'nowrap', marginBottom:2,
+                })}
+                onMouseEnter={e=>{ if(!e.currentTarget.classList.contains('active')) e.currentTarget.style.background='#edeef3' }}
+                onMouseLeave={e=>{ if(!e.currentTarget.classList.contains('active')) e.currentTarget.style.background='transparent' }}
+              >
+                {({ isActive }) => (
+                  <>
+                    <span style={{ display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, width:28 }}>
+                      <Settings size={18} color={isActive ? '#2D2A7A' : '#9ca3af'} />
+                    </span>
+                    <span style={{ opacity:sideOpen?1:0, maxWidth:sideOpen?140:0, overflow:'hidden', transition:'opacity 0.2s ease, max-width 0.25s ease' }}>
+                      Configuración
+                    </span>
+                  </>
+                )}
+              </NavLink>
+              {/* Cerrar sesión */}
               <button
                 onClick={() => { logout(); navigate('/login') }}
                 style={{ width:'100%', display:'flex', alignItems:'center', gap:12, height:40, padding:'0 6px', borderRadius:50, border:'none', background:'transparent', color:'#dc2626', fontWeight:600, fontSize:14, cursor:'pointer', overflow:'hidden', whiteSpace:'nowrap', transition:'background 0.15s', flexShrink:0 }}
