@@ -502,6 +502,44 @@ export default function MisPolizas() {
         </div>
       )}
 
+      {/* Guía de sub-estados — solo visible en "En trámite" */}
+      {tab === 'en_tramite' && (
+        <div style={{ background:'#f8f9fc', border:'1px solid #e8e8f0', borderRadius:14,
+                      padding:'16px 18px', marginBottom:18 }}>
+          <p style={{ fontSize:11, fontWeight:700, color:'#9ca3af', textTransform:'uppercase',
+                      letterSpacing:'0.08em', marginBottom:12 }}>
+            ¿Qué significa cada estado?
+          </p>
+          <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
+            {[
+              { key:'lead',           emoji:'📥', title:'Recibido',        text:'Enviaste la solicitud. Ya la tenemos y pronto nuestro equipo la gestiona.' },
+              { key:'en_contacto',    emoji:'📞', title:'En contacto',     text:'Nuestro asesor está intentando comunicarse con el cliente para avanzar.' },
+              { key:'en_proceso',     emoji:'📋', title:'En gestión',      text:'El cliente quiere la póliza. Estamos haciendo los trámites para emitirla.' },
+              { key:'poliza_emitida', emoji:'✍️',  title:'Póliza emitida', text:'Ya se emitió la póliza. Esperamos que el cliente realice su primer pago.' },
+            ].map(s => {
+              const E = ESTADOS[s.key]
+              return (
+                <div key={s.key} style={{ display:'flex', alignItems:'flex-start', gap:10 }}>
+                  {/* Badge del estado */}
+                  <span style={{
+                    background: E?.bg, color: E?.color,
+                    fontSize: 10, fontWeight: 700,
+                    padding: '3px 9px', borderRadius: 99,
+                    whiteSpace: 'nowrap', flexShrink: 0, marginTop: 1,
+                    minWidth: 96, textAlign: 'center',
+                  }}>
+                    {s.emoji} {s.title}
+                  </span>
+                  <span style={{ fontSize:12, color:'#6b7280', lineHeight:1.55 }}>
+                    {s.text}
+                  </span>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
       {loading ? (
         <div className="space-y-3">
           {[1,2,3].map(i => <div key={i} className="bg-white rounded-2xl border border-gray-100 h-20 animate-pulse" />)}
