@@ -444,7 +444,7 @@ export default function Landing() {
       </div>
 
       {/* ── Hero ────────────────────────────────────────────────── */}
-      <section className="max-w-6xl mx-auto px-4 sm:px-6 pt-8 sm:pt-14 pb-12 sm:pb-20">
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 pt-8 sm:pt-14 pb-12 sm:pb-20" style={{ overflowX:'hidden' }}>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-10">
 
           {/* Left */}
@@ -461,19 +461,26 @@ export default function Landing() {
               cada mes
             </h1>
 
-            {/* Imagen del celular — solo visible en móvil/tablet, entre título y texto */}
-            <div className="lg:hidden mt-8 mb-10"
-                 style={{ position:'relative', overflow:'hidden', borderRadius:24 }}>
-              {/* Degradado de fondo — confinado dentro del contenedor */}
+            {/* Imagen del celular — solo visible en móvil/tablet, sin contenedor visible */}
+            <div className="lg:hidden mt-8 mb-10" style={{ position:'relative', textAlign:'center' }}>
+              {/* Degradado detrás — libre, sin recortar */}
               <div style={{
                 position: 'absolute',
-                inset: 0,
-                background: 'radial-gradient(ellipse 90% 80% at 50% 60%, rgba(45,42,122,0.18) 0%, rgba(99,91,220,0.10) 55%, transparent 85%)',
+                top: '10%', left: '50%',
+                transform: 'translateX(-50%)',
+                width: '120%', height: '90%',
+                background: 'radial-gradient(ellipse 80% 80% at 50% 50%, rgba(45,42,122,0.16) 0%, rgba(99,91,220,0.08) 55%, transparent 80%)',
+                filter: 'blur(24px)',
                 zIndex: 0,
+                pointerEvents: 'none',
               }} />
               <img src={imgHeroPhone} alt="Portal aliados"
-                className="object-contain drop-shadow-2xl mx-auto block"
-                style={{ width: '82%', maxWidth: 340, position: 'relative', zIndex: 1 }} />
+                className="drop-shadow-2xl"
+                style={{
+                  width: '95%', maxWidth: 380,
+                  position: 'relative', zIndex: 1,
+                  display: 'inline-block',
+                }} />
             </div>
 
             {/* Texto descriptivo — centrado en móvil */}
