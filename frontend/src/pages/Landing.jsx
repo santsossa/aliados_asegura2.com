@@ -475,6 +475,7 @@ export default function Landing() {
                 pointerEvents: 'none',
               }} />
               <img src={imgHeroPhone} alt="Portal aliados"
+                fetchpriority="high" decoding="async"
                 className="drop-shadow-2xl"
                 style={{
                   width: '95%', maxWidth: 380,
@@ -501,6 +502,8 @@ export default function Landing() {
                     'https://randomuser.me/api/portraits/women/68.jpg',
                   ].map((src, i) => (
                     <img key={i} src={src} alt="aliado"
+                      decoding="async" loading="lazy"
+                      width={36} height={36}
                       className="w-8 h-8 sm:w-9 sm:h-9 rounded-full object-cover"
                       style={{ marginLeft: i === 0 ? 0 : -14, zIndex: 4 - i }} />
                   ))}
@@ -555,6 +558,7 @@ export default function Landing() {
             <img
               src={imgHeroPhone}
               alt="Portal de aliados Asegura2.com"
+              fetchpriority="high" decoding="async"
               className="w-full object-contain relative"
               style={{
                 maxWidth: '125%',
@@ -657,7 +661,7 @@ export default function Landing() {
                     ].map(r => (
                       <div key={r.name} className={`flex items-center gap-2.5 rounded-xl px-3 py-2 ${r.best ? 'bg-brand text-white' : 'bg-white border border-gray-100'}`}>
                         <div className="w-6 h-6 rounded-md bg-white flex items-center justify-center p-0.5 flex-shrink-0">
-                          <img src={r.img} alt={r.name} className="w-full h-full object-contain" />
+                          <img src={r.img} alt={r.name} loading="lazy" decoding="async" className="w-full h-full object-contain" />
                         </div>
                         <span className={`text-[10px] font-semibold flex-1 ${r.best ? 'text-white' : 'text-gray-700'}`}>{r.name}</span>
                         <span className={`text-[10px] font-bold ${r.best ? 'text-white' : 'text-gray-500'}`}>{r.price}</span>
@@ -769,6 +773,8 @@ export default function Landing() {
                 <img
                   src={a.img}
                   alt={a.name}
+                  decoding="async"
+                  width={80} height={24}
                   className="h-6 w-auto object-contain"
                 />
                 <span className="text-sm font-semibold">{a.name}</span>
@@ -1000,8 +1006,8 @@ export default function Landing() {
           <div className="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-center gap-6">
             <span className="text-xs font-semibold text-gray-400 uppercase tracking-widest">Asociados a</span>
             <div className="flex items-center gap-6">
-              <img src={imgCcManizales} alt="Cámara de Comercio de Manizales" className="h-10 object-contain opacity-70 hover:opacity-100 transition-opacity" />
-              <img src={imgCcCucuta}    alt="Cámara de Comercio de Cúcuta"    className="h-10 object-contain opacity-70 hover:opacity-100 transition-opacity" />
+              <img src={imgCcManizales} alt="Cámara de Comercio de Manizales" loading="lazy" decoding="async" className="h-10 object-contain opacity-70 hover:opacity-100 transition-opacity" />
+              <img src={imgCcCucuta}    alt="Cámara de Comercio de Cúcuta"    loading="lazy" decoding="async" className="h-10 object-contain opacity-70 hover:opacity-100 transition-opacity" />
             </div>
           </div>
         </div>
