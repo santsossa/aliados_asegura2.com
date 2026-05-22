@@ -75,41 +75,40 @@ export default function IAAssistant() {
 
   return (
     <>
-      {/* Botón de apertura — pill exactamente como referencia */}
+      {/* Botón — pill que abraza el círculo con margen mínimo */}
       <button
         onClick={() => setOpen(v => !v)}
         style={{
           position: 'fixed', bottom: 28, right: 24, zIndex: 300,
-          display: 'flex', alignItems: 'center', gap: 14,
+          display: 'flex', alignItems: 'center', gap: 12,
           background: '#f5f5f7', border: 'none', cursor: 'pointer',
           borderRadius: 999,
-          padding: '14px 14px 14px 20px',
-          boxShadow: '0 2px 16px rgba(0,0,0,0.12), 0 1px 4px rgba(0,0,0,0.06)',
+          padding: '5px 5px 5px 18px',   /* 5px top/bottom → círculo casi llena el alto */
+          boxShadow: '0 2px 14px rgba(0,0,0,0.13)',
           transition: 'transform 0.18s, box-shadow 0.18s',
-          minWidth: 260,
         }}
-        onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 6px 28px rgba(0,0,0,0.18)' }}
-        onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)';    e.currentTarget.style.boxShadow = '0 2px 16px rgba(0,0,0,0.12), 0 1px 4px rgba(0,0,0,0.06)' }}
+        onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 6px 24px rgba(0,0,0,0.18)' }}
+        onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)';    e.currentTarget.style.boxShadow = '0 2px 14px rgba(0,0,0,0.13)' }}
       >
-        {/* Emoji grande */}
-        <span style={{ fontSize: 38, lineHeight: 1, flexShrink: 0 }}>👋</span>
+        {/* Emoji */}
+        <span style={{ fontSize: 30, lineHeight: 1, flexShrink: 0 }}>👋</span>
 
-        {/* Texto — 2 líneas como en la referencia */}
-        <div style={{ flex: 1, textAlign: 'left' }}>
-          <p style={{ margin: 0, fontSize: 15, fontWeight: 800, color: '#111', lineHeight: 1.2 }}>
+        {/* Texto */}
+        <div style={{ textAlign: 'left', marginRight: 4 }}>
+          <p style={{ margin: 0, fontSize: 14, fontWeight: 800, color: '#111', lineHeight: 1.2 }}>
             ¿Necesitas ayuda?
           </p>
-          <p style={{ margin: '3px 0 0', fontSize: 12, color: '#888', lineHeight: 1.4 }}>
+          <p style={{ margin: '2px 0 0', fontSize: 11, color: '#999', lineHeight: 1.35 }}>
             Haz clic aquí para chatear<br />con Anto
           </p>
         </div>
 
-        {/* Círculo rojo sólido con icono blanco */}
+        {/* Círculo — 54px, padding del pill es 5px → margen de 5px entre círculo y borde */}
         <div style={{
-          width: 52, height: 52, borderRadius: '50%',
+          width: 54, height: 54, borderRadius: '50%',
           background: '#2D2A7A', flexShrink: 0,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          boxShadow: '0 4px 14px rgba(45,42,122,0.45)',
+          boxShadow: '0 3px 12px rgba(45,42,122,0.4)',
         }}>
           <MessageCircleMore size={24} color="#fff" />
         </div>
