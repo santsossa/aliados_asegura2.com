@@ -73,6 +73,7 @@ export default function IAAssistant() {
     <>
       {/* ── Botón pill ── */}
       <button
+        data-anto-pill
         onClick={() => setOpen(v => !v)}
         style={{
           position: 'fixed', bottom: 28, right: 24, zIndex: 300,

@@ -2,7 +2,7 @@ import { Outlet, NavLink, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import {
   Home, FileText, Shield, DollarSign, CreditCard,
-  AlignJustify, Car, X, LogOut, HelpCircle, Settings,
+  AlignJustify, Car, X, LogOut, HelpCircle, Settings, Sparkles,
 } from 'lucide-react'
 import { LogoFull, LogoIcon } from '../components/Logo'
 import { useIsMobile } from '../hooks/use-mobile'
@@ -12,12 +12,14 @@ import NotificationBell from '../components/NotificationBell'
 import IAAssistant from '../components/IAAssistant'
 
 const NAV_MAIN = [
-  { to: '/dashboard',                        icon: Home,       label: 'Home'             },
+  { to: '/dashboard',                        icon: Home,       label: 'Inicio'           },
   { to: '/dashboard/cotizaciones',           icon: FileText,   label: 'Cotizaciones'     },
   { to: '/dashboard/mis-polizas',            icon: Shield,     label: 'Mis pólizas'      },
   { to: '/dashboard/mis-pagos',              icon: DollarSign, label: 'Mis pagos'        },
   { to: '/dashboard/informacion-financiera', icon: CreditCard, label: 'Info. financiera' },
 ]
+
+const NAV_ANTO = { icon: Sparkles, label: 'Anto IA' }
 
 // ── Bottom nav para móvil (4 ítems + botón central cotizar) ─────────────────
 const NAV_BOTTOM = [
@@ -259,6 +261,27 @@ export default function DashboardLayout() {
                   )}
                 </NavLink>
               ))}
+
+              <div style={{ margin:'10px 6px', borderTop:'1px solid #eeeeef' }} />
+
+              {/* Anto IA — botón especial en sidebar */}
+              <button
+                data-anto-trigger
+                onClick={() => document.querySelector('[data-anto-pill]')?.click()}
+                style={{ display:'flex', alignItems:'center', gap:12, height:40, padding:'0 6px', borderRadius:50, border:'none',
+                  background:'linear-gradient(135deg,#ede9fe,#ddd6fe)', color:'#4f46e5',
+                  fontWeight:700, fontSize:14, cursor:'pointer', width:'100%', overflow:'hidden',
+                  whiteSpace:'nowrap', transition:'background 0.15s', flexShrink:0, textAlign:'left' }}
+                onMouseEnter={e=>e.currentTarget.style.background='linear-gradient(135deg,#ddd6fe,#c4b5fd)'}
+                onMouseLeave={e=>e.currentTarget.style.background='linear-gradient(135deg,#ede9fe,#ddd6fe)'}
+              >
+                <span style={{ display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, width:28 }}>
+                  <Sparkles size={18} color="#4f46e5" />
+                </span>
+                <span style={{ opacity:sideOpen?1:0, maxWidth:sideOpen?140:0, overflow:'hidden', transition:'opacity 0.2s ease, max-width 0.25s ease' }}>
+                  Anto IA
+                </span>
+              </button>
 
               <div style={{ margin:'10px 6px', borderTop:'1px solid #eeeeef' }} />
 

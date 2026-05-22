@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { DollarSign, FileText, Shield, TrendingUp, ChevronRight } from 'lucide-react'
+import { DollarSign, FileText, Shield, TrendingUp, ChevronRight, Sparkles, Car } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { useSSE } from '../../context/SSEContext'
@@ -231,15 +231,104 @@ export default function Dashboard() {
   // X-axis tick labels for bar chart
   const tickDias = [1, 8, 15, 22, 29]
 
+  const nombreAliado = [user?.nombre, user?.apellido].filter(Boolean).join(' ') || 'aliado'
+  const hora = new Date().getHours()
+  const saludo = hora < 12 ? 'Buenos días' : hora < 18 ? 'Buenas tardes' : 'Buenas noches'
+
   return (
     <div className="p-4 lg:p-8" style={{ height: '100%', overflowY: 'auto' }}>
       <div style={{ maxWidth: '72rem', margin: '0 auto' }}>
-      {/* Greeting */}
-      <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700, color: '#111827' }}>
-        Hola, {[user?.nombre, user?.apellido].filter(Boolean).join(' ') || 'aliado'} 👋
-      </h1>
-      <p style={{ margin: '4px 0 20px', fontSize: 13, color: '#9ca3af' }}>
-        Resumen de tu actividad · {mesLabel} {anioLabel}
+
+      {/* ── Hero ── */}
+      <div style={{
+        background: 'linear-gradient(135deg, #2D2A7A 0%, #1e1b6e 50%, #16144f 100%)',
+        borderRadius: 20, padding: '28px 28px 24px', marginBottom: 20, position: 'relative', overflow: 'hidden',
+      }}>
+        {/* Glow decorativo */}
+        <div style={{ position:'absolute', top:-40, right:-40, width:200, height:200, borderRadius:'50%',
+          background:'rgba(99,91,220,0.3)', filter:'blur(60px)', pointerEvents:'none' }} />
+        <div style={{ position:'absolute', bottom:-20, left:80, width:140, height:140, borderRadius:'50%',
+          background:'rgba(79,70,229,0.2)', filter:'blur(40px)', pointerEvents:'none' }} />
+
+        <div style={{ position:'relative', zIndex:1 }}>
+          <p style={{ margin:'0 0 4px', fontSize:13, color:'rgba(255,255,255,0.55)', fontWeight:500 }}>
+            {saludo} 👋
+          </p>
+          <h1 style={{ margin:'0 0 16px', fontSize:24, fontWeight:800, color:'#fff', lineHeight:1.2 }}>
+            {nombreAliado}, <span style={{ color:'#a5b4fc' }}>¿qué vas a vender hoy?</span>
+          </h1>
+
+          {/* Acciones rápidas */}
+          <div style={{ display:'flex', flexWrap:'wrap', gap:10 }}>
+            {[
+              { icon: Car,         label: 'Nueva cotización',     to: '/dashboard/cotizar',      bg:'rgba(255,255,255,0.15)', primary: true },
+              { icon: Sparkles,    label: 'Preguntarle a Anto',   to: null,                       bg:'rgba(165,180,252,0.15)', anto: true },
+              { icon: Shield,      label: 'Mis pólizas',          to: '/dashboard/mis-polizas',   bg:'rgba(255,255,255,0.08)' },
+              { icon: FileText,    label: 'Cotizaciones',         to: '/dashboard/cotizaciones',  bg:'rgba(255,255,255,0.08)' },
+            ].map(a => {
+              const Icon = a.icon
+              return (
+                <button key={a.label}
+                  onClick={() => {
+                    if (a.anto) { document.querySelector('[data-anto-pill]')?.click(); return }
+                    navigate(a.to)
+                  }}
+                  style={{
+                    display:'flex', alignItems:'center', gap:7,
+                    background: a.primary ? 'rgba(255,255,255,0.95)' : a.bg,
+                    border: 'none', borderRadius:10, cursor:'pointer',
+                    padding:'9px 16px',
+                    color: a.primary ? '#2D2A7A' : '#fff',
+                    fontSize:13, fontWeight: a.primary ? 700 : 500,
+                    transition:'background 0.15s',
+                  }}
+                >
+                  <Icon size={15} />
+                  {a.label}
+                </button>
+              )
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* ── Card Anto — el copiloto IA ── */}
+      <div style={{
+        background:'linear-gradient(135deg,#f5f3ff 0%,#ede9fe 100%)',
+        border:'1.5px solid #ddd6fe', borderRadius:18, padding:'20px 22px', marginBottom:20,
+        display:'flex', alignItems:'center', justifyContent:'space-between', flexWrap:'wrap', gap:16,
+      }}>
+        <div style={{ display:'flex', alignItems:'flex-start', gap:14, flex:1, minWidth:220 }}>
+          <div style={{ width:44, height:44, borderRadius:14, background:'#2D2A7A',
+            display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+            <Sparkles size={20} color="#fff" />
+          </div>
+          <div>
+            <p style={{ margin:'0 0 3px', fontSize:15, fontWeight:800, color:'#1e1b6e' }}>
+              ✨ Vende seguros aunque no seas experto
+            </p>
+            <p style={{ margin:0, fontSize:13, color:'#6d28d9', lineHeight:1.55 }}>
+              Anto explica coberturas, compara aseguradoras y responde las preguntas de tus clientes en segundos.
+            </p>
+          </div>
+        </div>
+        <div style={{ display:'flex', gap:8, flexShrink:0 }}>
+          <button
+            onClick={() => document.querySelector('[data-anto-pill]')?.click()}
+            style={{ background:'#2D2A7A', color:'#fff', border:'none', borderRadius:10,
+              padding:'9px 18px', fontSize:13, fontWeight:700, cursor:'pointer' }}>
+            Preguntarle a Anto
+          </button>
+          <button onClick={() => navigate('/dashboard/cotizar')}
+            style={{ background:'#ede9fe', color:'#5b21b6', border:'none', borderRadius:10,
+              padding:'9px 18px', fontSize:13, fontWeight:600, cursor:'pointer' }}>
+            Iniciar cotización
+          </button>
+        </div>
+      </div>
+
+      <p style={{ margin: '0 0 16px', fontSize: 12, color: '#9ca3af' }}>
+        Resumen · {mesLabel} {anioLabel}
       </p>
 
       {/* ── Row 1: Stat cards ── */}
@@ -331,8 +420,19 @@ export default function Dashboard() {
 
           {/* List */}
           {actividad.length === 0 ? (
-            <div style={{ padding: '40px 20px', textAlign: 'center', color: '#9ca3af', fontSize: 13 }}>
-              Sin actividad reciente
+            <div style={{ padding: '36px 20px', textAlign: 'center' }}>
+              <div style={{ fontSize: 32, marginBottom: 10 }}>🚘</div>
+              <p style={{ margin:'0 0 4px', fontSize:14, fontWeight:600, color:'#374151' }}>
+                Aquí verás tu actividad reciente
+              </p>
+              <p style={{ margin:'0 0 16px', fontSize:12, color:'#9ca3af', lineHeight:1.5 }}>
+                Empieza creando tu primera cotización<br />en menos de 2 minutos.
+              </p>
+              <button onClick={() => navigate('/dashboard/cotizar')}
+                style={{ background:'#2D2A7A', color:'#fff', border:'none', borderRadius:10,
+                  padding:'8px 20px', fontSize:13, fontWeight:600, cursor:'pointer' }}>
+                Nueva cotización →
+              </button>
             </div>
           ) : (
             <div>
