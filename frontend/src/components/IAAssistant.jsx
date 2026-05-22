@@ -12,6 +12,7 @@ const SUGERENCIAS = [
 
 export default function IAAssistant() {
   const [open, setOpen]         = useState(false)
+  const [hovered, setHovered]   = useState(false)
   const [messages, setMessages] = useState([])
   const [input, setInput]       = useState('')
   const [loading, setLoading]   = useState(false)
@@ -85,11 +86,10 @@ export default function IAAssistant() {
           borderRadius: 999,
           padding: '5px 5px 5px 18px',   /* 5px top/bottom → círculo casi llena el alto */
           boxShadow: '0 2px 14px rgba(0,0,0,0.13)',
-          border: '2px dashed transparent',
-          transition: 'border-color 0.2s',
+          position: 'relative', overflow: 'visible',
         }}
-        onMouseEnter={e => e.currentTarget.style.borderColor = '#2D2A7A'}
-        onMouseLeave={e => e.currentTarget.style.borderColor = 'transparent'}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
       >
         {/* Emoji */}
         <span style={{ fontSize: 30, lineHeight: 1, flexShrink: 0 }}>👋</span>
@@ -113,6 +113,31 @@ export default function IAAssistant() {
         }}>
           <MessageCircleMore size={24} color="#fff" />
         </div>
+
+        {/* Marching ants — SVG border animado al hacer hover */}
+        <svg
+          style={{
+            position: 'absolute',
+            inset: -4,
+            width: 'calc(100% + 8px)',
+            height: 'calc(100% + 8px)',
+            pointerEvents: 'none',
+            overflow: 'visible',
+            opacity: hovered ? 1 : 0,
+            transition: 'opacity 0.2s ease',
+          }}
+        >
+          <rect
+            x="2" y="2"
+            width="calc(100% - 4px)" height="calc(100% - 4px)"
+            rx="999" ry="999"
+            fill="none"
+            stroke="#2D2A7A"
+            strokeWidth="2.5"
+            strokeDasharray="14 5 5 5"
+            style={{ animation: hovered ? 'marchAnts 1.4s linear infinite' : 'none' }}
+          />
+        </svg>
       </button>
 
       {/* Panel de chat — desliza desde la derecha */}
@@ -274,6 +299,9 @@ export default function IAAssistant() {
       </div>
 
       <style>{`
+        @keyframes marchAnts {
+          to { stroke-dashoffset: -29; }
+        }
         @keyframes dotPulse {
           0%, 80%, 100% { transform: scale(0.7); opacity: 0.4; }
           40%            { transform: scale(1);   opacity: 1;   }
