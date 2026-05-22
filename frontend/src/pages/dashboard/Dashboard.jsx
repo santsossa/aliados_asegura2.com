@@ -176,7 +176,7 @@ export default function Dashboard() {
       iconBg: '#dcfce7',
       iconColor: '#16a34a',
       label: 'Próximo pago',
-      value: stats.proximo_pago.monto > 0 ? fmt(stats.proximo_pago.monto) : '—',
+      value: fmt(stats.proximo_pago.monto ?? 0),
       badge: stats.proximo_pago.dias_restantes !== null ? `En ${stats.proximo_pago.dias_restantes} días` : null,
       badgeBg: '#dcfce7',
       badgeColor: '#16a34a',
