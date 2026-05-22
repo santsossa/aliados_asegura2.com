@@ -132,7 +132,7 @@ const PASOS_DATA = [
     illustration: (
       <div style={{ width:'100%', height:'100%', background:'#ffffff', display:'flex', alignItems:'center', justifyContent:'center', padding:20 }}>
         <div style={{ background:'#fff', borderRadius:16, padding:'16px 18px', width:220, boxShadow:'0 12px 40px rgba(124,58,237,0.2)', transform:'translateY(20px)' }}>
-          <p style={{ fontSize:9, color:'#7c3aed', fontWeight:800, marginBottom:8 }}>Emitir póliza · SURA</p>
+          <p style={{ fontSize:9, color:'#7c3aed', fontWeight:800, marginBottom:8 }}>Emitir póliza · QUALITAS</p>
           <div style={{ background:'#f5f3ff', borderRadius:8, padding:'6px 10px', marginBottom:8 }}>
             <p style={{ fontSize:8, color:'#7c3aed', fontWeight:600 }}>✅ Honda Civic · $142.000/mes</p>
           </div>
