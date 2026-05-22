@@ -83,7 +83,7 @@ router.get('/leads', async (req, res, next) => {
 // body: { estado: 'en_proceso'|'aprobada'|'no_convertida', observaciones?: string }
 router.patch('/leads/:id/estado',
   [
-    body('estado').isIn(['en_proceso','poliza_emitida','aprobada','no_convertida']).withMessage('Estado inválido'),
+    body('estado').isIn(['en_proceso','en_contacto','poliza_emitida','aprobada','no_convertida']).withMessage('Estado inválido'),
     body('observaciones').optional().isString().isLength({ max: 1000 }),
   ],
   validate,
@@ -220,7 +220,7 @@ router.get('/polizas', async (req, res, next) => {
 // body: { estado: 'aprobada'|'no_convertida', observaciones?: string }
 router.patch('/polizas/:id/estado',
   [
-    body('estado').isIn(['en_proceso','poliza_emitida','aprobada','no_convertida']).withMessage('Estado inválido'),
+    body('estado').isIn(['en_proceso','en_contacto','poliza_emitida','aprobada','no_convertida']).withMessage('Estado inválido'),
     body('observaciones').optional().isString().isLength({ max: 1000 }),
   ],
   validate,
@@ -391,6 +391,22 @@ router.get('/reportes/resumen', async (_req, res, next) => {
        GROUP BY a.id ORDER BY comisiones DESC LIMIT 10`
     )
     res.json({ status:'success', data: { por_mes: porMes, top_aliados: topAliados } })
+  } catch(err) { next(err) }
+})
+
+// ── CLEANUP TEMPORAL — borrar después de usar ─────────────────────────────
+router.delete('/cleanup-transaccional', async (_req, res, next) => {
+  try {
+    const tables = ['notificaciones','pago_detalles','pagos','polizas','leads','cotizaciones']
+    const result: Record<string, number> = {}
+    for (const t of tables) {
+      try {
+        const [[row]] = await pool.execute<any[]>(`SELECT COUNT(*) as n FROM ${t}`)
+        await pool.execute(`DELETE FROM ${t}`)
+        result[t] = Number(row.n)
+      } catch { result[t] = -1 }
+    }
+    res.json({ status: 'success', deleted: result })
   } catch(err) { next(err) }
 })
 

@@ -10,7 +10,9 @@ const fmt = n => n ? ('$' + Math.round(n).toLocaleString('es-CO')) : '—'
 
 const ESTADOS = {
   // Sub-estados de "En trámite"
-  lead:           { bg:'#f0f9ff', color:'#0284c7', label:'En contacto',
+  lead:           { bg:'#f0f9ff', color:'#0ea5e9', label:'Recibido',
+                    desc:'Recibimos tu solicitud. Ya tenemos al cliente en nuestro sistema.' },
+  en_contacto:    { bg:'#e0f2fe', color:'#0284c7', label:'En contacto',
                     desc:'Nuestro equipo está intentando contactarse con el cliente para seguir con su proceso.' },
   en_proceso:     { bg:'#fef3c7', color:'#d97706', label:'En gestión',
                     desc:'El cliente muestra interés en tomar la póliza y estamos haciendo los trámites para que la pueda tomar.' },
@@ -24,7 +26,7 @@ const ESTADOS = {
 }
 
 // Estados que se muestran en la pestaña "En trámite"
-const EN_TRAMITE = new Set(['lead', 'en_proceso', 'poliza_emitida'])
+const EN_TRAMITE = new Set(['lead', 'en_contacto', 'en_proceso', 'poliza_emitida'])
 
 function Badge({ estado }) {
   const e = ESTADOS[estado] || ESTADOS.en_proceso
@@ -251,6 +253,16 @@ function DetalleModal({ item, onClose, token }) {
                     con <strong>{aseguradora}</strong>. Estamos a la espera de recibir el primer pago del cliente.
                   </span>
                 </div>
+              ) : estadoActual === 'en_contacto' ? (
+                <div style={{ background:'#e0f2fe', border:'1.5px solid #7dd3fc', borderRadius:12,
+                              padding:'14px 16px', fontSize:13, color:'#0369a1',
+                              display:'flex', gap:10, alignItems:'flex-start', lineHeight:1.6 }}>
+                  <Info size={16} style={{ flexShrink:0, marginTop:1 }} />
+                  <span>
+                    Nuestro equipo está intentando contactarse con el cliente para seguir con su proceso.
+                    Te notificaremos cuando haya novedades.
+                  </span>
+                </div>
               ) : estadoActual === 'en_proceso' ? (
                 <div style={{ background:'#fffbeb', border:'1.5px solid #fde68a', borderRadius:12,
                               padding:'14px 16px', fontSize:13, color:'#92400e',
@@ -262,7 +274,7 @@ function DetalleModal({ item, onClose, token }) {
                   </span>
                 </div>
               ) : (
-                /* Estado inicial (lead recién enviado) */
+                /* Estado inicial — lead recién enviado */
                 <div style={{ background:'#f0f9ff', border:'1.5px solid #bae6fd', borderRadius:12,
                               padding:'14px 16px', fontSize:13, color:'#0369a1',
                               display:'flex', gap:10, alignItems:'flex-start', lineHeight:1.6 }}>
