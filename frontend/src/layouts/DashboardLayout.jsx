@@ -21,15 +21,13 @@ const NAV_MAIN = [
 
 const NAV_CONFIG = { to: '/dashboard/informacion-financiera', icon: SlidersHorizontal, label: 'Configuración' }
 
-const NAV_ANTO = { icon: Sparkles, label: 'Anto IA' }
-
 // ── Bottom nav para móvil (4 ítems + botón central cotizar) ─────────────────
 const NAV_BOTTOM = [
-  { to: '/dashboard',              icon: Home,       label: 'Home'        },
-  { to: '/dashboard/cotizaciones', icon: FileText,   label: 'Cotizaciones'},
+  { to: '/dashboard',              icon: LayoutDashboard, label: 'Inicio'       },
+  { to: '/dashboard/cotizaciones', icon: FileText,        label: 'Cotizaciones' },
   null, // espacio para el botón central
-  { to: '/dashboard/mis-polizas',  icon: Shield,     label: 'Pólizas'     },
-  { to: '/dashboard/mis-pagos',    icon: DollarSign, label: 'Pagos'       },
+  { to: '/dashboard/mis-polizas',  icon: ShieldCheck,     label: 'Pólizas'      },
+  { to: '/dashboard/mis-pagos',    icon: Wallet,          label: 'Comisiones'   },
 ]
 
 export default function DashboardLayout() {
