@@ -85,10 +85,11 @@ export default function IAAssistant() {
           borderRadius: 999,
           padding: '5px 5px 5px 18px',   /* 5px top/bottom → círculo casi llena el alto */
           boxShadow: '0 2px 14px rgba(0,0,0,0.13)',
-          transition: 'transform 0.18s, box-shadow 0.18s',
+          border: '2px dashed transparent',
+          transition: 'border-color 0.2s',
         }}
-        onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 6px 24px rgba(0,0,0,0.18)' }}
-        onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)';    e.currentTarget.style.boxShadow = '0 2px 14px rgba(0,0,0,0.13)' }}
+        onMouseEnter={e => e.currentTarget.style.borderColor = '#2D2A7A'}
+        onMouseLeave={e => e.currentTarget.style.borderColor = 'transparent'}
       >
         {/* Emoji */}
         <span style={{ fontSize: 30, lineHeight: 1, flexShrink: 0 }}>👋</span>
