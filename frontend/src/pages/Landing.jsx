@@ -462,19 +462,18 @@ export default function Landing() {
             </h1>
 
             {/* Imagen del celular — solo visible en móvil/tablet, entre título y texto */}
-            <div className="lg:hidden flex justify-center mt-8 mb-10" style={{ position:'relative' }}>
-              {/* Degradado de fondo */}
+            <div className="lg:hidden mt-8 mb-10"
+                 style={{ position:'relative', overflow:'hidden', borderRadius:24 }}>
+              {/* Degradado de fondo — confinado dentro del contenedor */}
               <div style={{
                 position: 'absolute',
-                inset: '-15% -20%',
-                background: 'radial-gradient(ellipse 75% 75% at 50% 55%, rgba(45,42,122,0.18) 0%, rgba(99,91,220,0.10) 50%, transparent 80%)',
-                borderRadius: '50%',
-                filter: 'blur(18px)',
+                inset: 0,
+                background: 'radial-gradient(ellipse 90% 80% at 50% 60%, rgba(45,42,122,0.18) 0%, rgba(99,91,220,0.10) 55%, transparent 85%)',
                 zIndex: 0,
               }} />
               <img src={imgHeroPhone} alt="Portal aliados"
-                className="object-contain drop-shadow-2xl"
-                style={{ width: '88%', maxWidth: 360, position: 'relative', zIndex: 1 }} />
+                className="object-contain drop-shadow-2xl mx-auto block"
+                style={{ width: '82%', maxWidth: 340, position: 'relative', zIndex: 1 }} />
             </div>
 
             {/* Texto descriptivo — centrado en móvil */}
