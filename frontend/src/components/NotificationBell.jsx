@@ -162,9 +162,9 @@ export default function NotificationBell() {
 
           <div style={{ overflowY: 'auto', flex: 1 }}>
             {notifs.length === 0 ? (
-              <div style={{ padding: '36px 20px', textAlign: 'center', color: '#9ca3af', fontSize: 13 }}>
-                <Bell size={28} color="#d1d5db" style={{ marginBottom: 8 }} />
-                <p style={{ margin: 0 }}>Sin notificaciones aún</p>
+              <div style={{ padding: '20px 20px 22px', display:'flex', flexDirection:'column', alignItems:'center', gap:6 }}>
+                <Bell size={20} color="#d1d5db" />
+                <p style={{ margin: 0, fontSize: 12, color: '#9ca3af' }}>Sin notificaciones aún</p>
               </div>
             ) : notifs.map(n => {
               const cfg  = TIPO_CONFIG[n.tipo] || TIPO_CONFIG['lead_recibido']
