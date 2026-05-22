@@ -573,7 +573,7 @@ export default function Landing() {
           </div>
 
           {/* Right — hero image */}
-          <div className="hidden lg:flex items-center justify-center relative" style={{ overflow:'hidden' }}>
+          <div className="hidden lg:flex items-center justify-center relative">
             {/* Fondo degradado detrás del PNG */}
             <div style={{
               position: 'absolute',
