@@ -454,30 +454,42 @@ export default function Landing() {
               Portal de aliados · Asegura2.com
             </div>
 
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight mb-5" style={{ letterSpacing: '-0.5px' }}>
+            {/* Título — centrado en móvil, izquierda en desktop */}
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight mb-5 text-center lg:text-left" style={{ letterSpacing: '-0.5px' }}>
               Convierte tus contactos en{' '}
               <span className="text-brand">ingresos<br />extra</span>{' '}
               cada mes
             </h1>
 
-            <p className="text-gray-500 text-sm sm:text-base leading-relaxed mb-6 sm:mb-8 max-w-md">
+            {/* Imagen del celular — solo visible en móvil/tablet, entre título y texto */}
+            <div className="flex lg:hidden justify-center mb-6">
+              <img src={imgHeroPhone} alt="Portal aliados"
+                className="w-56 sm:w-64 object-contain drop-shadow-xl" />
+            </div>
+
+            {/* Texto descriptivo — centrado en móvil */}
+            <p className="text-gray-500 text-sm sm:text-base leading-relaxed mb-6 sm:mb-8 max-w-md text-center lg:text-left mx-auto lg:mx-0">
               Si conoces personas con carros o que están por comprar uno, ya tienes todo lo que necesitas.
               Cotiza, envíanos el cliente y gana el 6% de comisión por cada póliza emitida — sin experiencia previa, sin costos, sin límites.
             </p>
 
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-8">
-              <Link to={ctaHref} className="flex items-center justify-center gap-2 bg-brand hover:bg-brand-dark text-white font-semibold px-6 py-3.5 rounded-xl text-sm transition-colors shadow-lg shadow-brand/25">
-                {user ? 'Ir a mi dashboard' : 'Quiero ser aliado'}
-                <ArrowRight size={16} />
-              </Link>
-              <Link to="/login" className="flex items-center justify-center border border-gray-200 bg-white text-gray-600 font-medium px-6 py-3.5 rounded-xl text-sm hover:bg-gray-50 transition-colors">
-                Ya tengo cuenta
-              </Link>
-            </div>
+            {/* Social proof — en móvil: stars izq · aliados der | en desktop: horizontal */}
+            <div className="flex items-center justify-between lg:justify-start lg:gap-0 mb-6 lg:mb-8">
+              {/* Stars (izquierda en móvil) */}
+              <div>
+                <div className="flex items-center gap-0.5 mb-0.5">
+                  {[1,2,3,4,5].map(i => (
+                    <Star key={i} size={13} className="text-accent fill-accent" />
+                  ))}
+                  <span className="text-sm font-bold text-gray-800 ml-1.5">4.9/5</span>
+                </div>
+                <p className="text-xs text-gray-400">Nuestros aliados recomiendan</p>
+              </div>
 
-            {/* Social proof — apilado en móvil, horizontal en desktop */}
-            <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-0">
-              {/* Avatars + texto */}
+              {/* Divider solo en desktop */}
+              <div className="hidden lg:block w-px bg-gray-200 mx-6 flex-shrink-0" style={{ height: 36 }} />
+
+              {/* Avatars + aliados activos (derecha en móvil) */}
               <div className="flex items-center gap-3">
                 <div className="flex flex-shrink-0">
                   {[
@@ -493,23 +505,24 @@ export default function Landing() {
                 </div>
                 <div>
                   <p className="text-sm font-bold text-gray-800">+124 aliados activos</p>
-                  <p className="text-xs text-gray-400">vendiendo seguros y ganando comisiones</p>
+                  <p className="text-xs text-gray-400 hidden sm:block">vendiendo seguros</p>
                 </div>
               </div>
+            </div>
 
-              {/* Divider solo en desktop */}
-              <div className="hidden sm:block w-px bg-gray-200 mx-6 flex-shrink-0" style={{ height: 36 }} />
-
-              {/* Stars */}
-              <div>
-                <div className="flex items-center gap-0.5 mb-0.5">
-                  {[1,2,3,4,5].map(i => (
-                    <Star key={i} size={13} className="text-accent fill-accent" />
-                  ))}
-                  <span className="text-sm font-bold text-gray-800 ml-1.5">4.9/5</span>
-                </div>
-                <p className="text-xs text-gray-400">Nuestros aliados recomiendan Asegura2.com</p>
-              </div>
+            {/* Botones */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+              {/* "Quiero ser aliado" — outline azul en móvil, filled en desktop */}
+              <Link to={ctaHref}
+                className="flex items-center justify-center gap-2 font-semibold px-6 py-3.5 rounded-xl text-sm transition-colors
+                           border-2 border-brand text-brand bg-white hover:bg-brand-light
+                           lg:bg-brand lg:text-white lg:hover:bg-brand-dark lg:shadow-lg lg:shadow-brand/25">
+                {user ? 'Ir a mi dashboard' : 'Quiero ser aliado'}
+                <ArrowRight size={16} />
+              </Link>
+              <Link to="/login" className="flex items-center justify-center border border-gray-200 bg-white text-gray-600 font-medium px-6 py-3.5 rounded-xl text-sm hover:bg-gray-50 transition-colors">
+                Ya tengo cuenta
+              </Link>
             </div>
           </div>
 
