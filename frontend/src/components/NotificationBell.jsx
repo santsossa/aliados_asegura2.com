@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { Bell, CheckCircle, XCircle, FileText, X } from 'lucide-react'
+import { Bell, CheckCircle, XCircle, FileText, Clock, X } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useSSE } from '../context/SSEContext'
 
@@ -8,6 +8,7 @@ const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 const TIPO_CONFIG = {
   poliza_aprobada:    { icon: CheckCircle, color: '#16a34a', bg: '#dcfce7' },
   poliza_no_aprobada: { icon: XCircle,     color: '#dc2626', bg: '#fee2e2' },
+  estado_actualizado: { icon: Clock,       color: '#7c3aed', bg: '#ede9fe' },
   lead_recibido:      { icon: FileText,    color: '#2D2A7A', bg: '#edeef3' },
 }
 
@@ -15,7 +16,8 @@ const TIPO_CONFIG = {
 function getLink(tipo) {
   if (tipo === 'poliza_aprobada')    return '/dashboard/mis-polizas?tab=aprobada'
   if (tipo === 'poliza_no_aprobada') return '/dashboard/mis-polizas?tab=no_convertida'
-  return '/dashboard'
+  if (tipo === 'estado_actualizado') return '/dashboard/mis-polizas?tab=en_tramite'
+  return '/dashboard/mis-polizas'
 }
 
 function timeAgo(dateStr) {
