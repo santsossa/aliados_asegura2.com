@@ -106,8 +106,8 @@ router.patch('/leads/:id/estado',
       if (!leads.length) { res.status(404).json({ status:'error', message:'Lead no encontrado' }); return }
       const lead = leads[0]
 
-      // Buscar póliza existente vinculada a este lead
-      const [polRows] = await pool.execute<any[]>('SELECT id FROM polizas WHERE lead_id = ? LIMIT 1', [leadId])
+      // Buscar póliza existente vinculada a este lead (siempre por lead.id, no por el param del CRM)
+      const [polRows] = await pool.execute<any[]>('SELECT id FROM polizas WHERE lead_id = ? LIMIT 1', [lead.id])
       const now = new Date()
 
       if (polRows.length) {
@@ -116,7 +116,7 @@ router.patch('/leads/:id/estado',
           `UPDATE polizas SET estado=?, observaciones=COALESCE(?,observaciones),
            primer_pago_at=CASE WHEN ?='aprobada' THEN ? ELSE primer_pago_at END
            WHERE lead_id=?`,
-          [estado, observaciones || null, estado, now, leadId]
+          [estado, observaciones || null, estado, now, lead.id]
         )
       } else {
         // Crear póliza nueva a partir del lead
@@ -125,7 +125,7 @@ router.patch('/leads/:id/estado',
         await pool.execute(
           `INSERT INTO polizas (aliado_id, lead_id, cliente_nombre, aseguradora, valor_prima, estado, mes, anio, primer_pago_at)
            VALUES (?,?,?,?,?,?,?,?,?)`,
-          [lead.aliado_id, leadId, lead.cliente_nombre, lead.aseguradora,
+          [lead.aliado_id, lead.id, lead.cliente_nombre, lead.aseguradora,
            lead.valor_prima, estado, mes, anio,
            estado === 'aprobada' ? now : null]
         )
@@ -156,7 +156,7 @@ router.patch('/leads/:id/estado',
 
       // Crear notificación y empujar en tiempo real al aliado
       try {
-        const placaStr = lead.placa ? ` · Placa ${lead.placa}` : ''
+        const placaStr = lead.placa ? ` · ${lead.placa}` : ''
         let notifTipo   = ''
         let notifTitulo = ''
         let notifMsg    = ''
@@ -169,6 +169,18 @@ router.patch('/leads/:id/estado',
           notifTipo   = 'poliza_no_aprobada'
           notifTitulo = `Póliza no aprobada${placaStr}`
           notifMsg    = `La póliza de ${lead.cliente_nombre} con ${lead.aseguradora}${placaStr} no fue aprobada.${observaciones ? ' Motivo: ' + observaciones : ''}`
+        } else if (estado === 'en_contacto') {
+          notifTipo   = 'estado_actualizado'
+          notifTitulo = `Estamos contactando al cliente${placaStr}`
+          notifMsg    = `Tu solicitud para ${lead.cliente_nombre} con ${lead.aseguradora}${placaStr} avanza. Nuestro asesor está intentando comunicarse con el cliente.`
+        } else if (estado === 'en_proceso') {
+          notifTipo   = 'estado_actualizado'
+          notifTitulo = `¡El cliente quiere la póliza!${placaStr}`
+          notifMsg    = `El cliente de ${lead.cliente_nombre}${placaStr} está interesado en la póliza con ${lead.aseguradora}. Estamos haciendo los trámites para emitirla.`
+        } else if (estado === 'poliza_emitida') {
+          notifTipo   = 'estado_actualizado'
+          notifTitulo = `Póliza emitida ✍️${placaStr}`
+          notifMsg    = `Se emitió la póliza para ${lead.cliente_nombre} con ${lead.aseguradora}${placaStr}. Esperamos el primer pago del cliente para confirmar tu comisión.`
         }
 
         if (notifTipo) {
@@ -184,10 +196,10 @@ router.patch('/leads/:id/estado',
           })
         }
 
-        // Evento de actualización de estado (para MisPolizas y Dashboard en tiempo real)
-        const [polRow] = await pool.execute<any[]>('SELECT id, valor_comision FROM polizas WHERE lead_id = ? LIMIT 1', [leadId])
+        // Evento de actualización de estado (usa lead.id, no el param del CRM)
+        const [polRow] = await pool.execute<any[]>('SELECT id, valor_comision FROM polizas WHERE lead_id = ? LIMIT 1', [lead.id])
         ssePush(lead.aliado_id, 'poliza_update', {
-          lead_id:        leadId,
+          lead_id:        lead.id,
           poliza_id:      polRow[0]?.id || null,
           estado,
           aseguradora:    lead.aseguradora,
@@ -275,7 +287,7 @@ router.patch('/polizas/:id/estado',
 
       // Crear notificación y empujar en tiempo real al aliado
       try {
-        const placaStr = pol.placa ? ` · Placa ${pol.placa}` : ''
+        const placaStr = pol.placa ? ` · ${pol.placa}` : ''
         let notifTipo   = ''
         let notifTitulo = ''
         let notifMsg    = ''
@@ -288,6 +300,18 @@ router.patch('/polizas/:id/estado',
           notifTipo   = 'poliza_no_aprobada'
           notifTitulo = `Póliza no aprobada${placaStr}`
           notifMsg    = `La póliza de ${pol.cliente_nombre} con ${pol.aseguradora}${placaStr} no fue aprobada.${observaciones ? ' Motivo: ' + observaciones : ''}`
+        } else if (estado === 'en_contacto') {
+          notifTipo   = 'estado_actualizado'
+          notifTitulo = `Estamos contactando al cliente${placaStr}`
+          notifMsg    = `Tu solicitud para ${pol.cliente_nombre} con ${pol.aseguradora}${placaStr} avanza. Nuestro asesor está intentando comunicarse con el cliente.`
+        } else if (estado === 'en_proceso') {
+          notifTipo   = 'estado_actualizado'
+          notifTitulo = `¡El cliente quiere la póliza!${placaStr}`
+          notifMsg    = `El cliente de ${pol.cliente_nombre}${placaStr} está interesado en la póliza con ${pol.aseguradora}. Estamos haciendo los trámites para emitirla.`
+        } else if (estado === 'poliza_emitida') {
+          notifTipo   = 'estado_actualizado'
+          notifTitulo = `Póliza emitida ✍️${placaStr}`
+          notifMsg    = `Se emitió la póliza para ${pol.cliente_nombre} con ${pol.aseguradora}${placaStr}. Esperamos el primer pago del cliente para confirmar tu comisión.`
         }
 
         if (notifTipo) {
