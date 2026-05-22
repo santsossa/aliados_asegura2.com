@@ -1,7 +1,7 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import {
-  Home, FileText, ShieldCheck, Banknote, Calculator,
+  Home, FileText, ShieldCheck, Wallet, Calculator,
   AlignJustify, X, LogOut, Sparkles, Settings, Headphones,
 } from 'lucide-react'
 import { LogoIcon } from '../components/Logo'
@@ -15,7 +15,7 @@ const NAV_MAIN = [
   { to: '/dashboard',              icon: Home,        label: 'Inicio'       },
   { to: '/dashboard/cotizaciones', icon: FileText,    label: 'Cotizaciones' },
   { to: '/dashboard/mis-polizas',  icon: ShieldCheck, label: 'Mis pólizas'  },
-  { to: '/dashboard/mis-pagos',    icon: Banknote,    label: 'Comisiones'   },
+  { to: '/dashboard/mis-pagos',    icon: Wallet,      label: 'Comisiones'   },
   { to: '/dashboard/cotizar',      icon: Calculator,  label: 'Cotizar'      },
 ]
 
@@ -41,9 +41,9 @@ const HOVER_BG = '#f3f4f6'
 const hoverOn  = e => { if (!e.currentTarget.style.background.includes('1a1a2e')) e.currentTarget.style.background = HOVER_BG }
 const hoverOff = e => { if (!e.currentTarget.style.background.includes('1a1a2e')) e.currentTarget.style.background = 'transparent' }
 
-// Línea divisoria parcial
+// Línea divisoria: más corta que el ancho total pero no a la mitad
 function Divider() {
-  return <div style={{ margin: '5px 8px', width: '45%', borderTop: '1px solid #eeeeef' }} />
+  return <div style={{ margin: '6px 8px', width: '68%', borderTop: '1px solid #e5e7eb' }} />
 }
 
 // Nav item ícono + texto (para la sección colapsable del sidebar desktop)
@@ -133,8 +133,8 @@ export default function DashboardLayout() {
         {/* Drawer lateral */}
         {drawerOpen && (
           <>
-            <div onClick={() => setDrawerOpen(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 40 }} />
-            <div style={{ position: 'fixed', top: 0, right: 0, bottom: 0, width: 272, background: '#fff', zIndex: 50, display: 'flex', flexDirection: 'column', boxShadow: '-4px 0 24px rgba(0,0,0,0.12)' }}>
+            <div onClick={() => setDrawerOpen(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 310 }} />
+            <div style={{ position: 'fixed', top: 0, right: 0, bottom: 0, width: 272, background: '#fff', zIndex: 320, display: 'flex', flexDirection: 'column', boxShadow: '-4px 0 24px rgba(0,0,0,0.12)' }}>
 
               {/* Drawer header */}
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px', borderBottom: '1px solid #f0f0f2' }}>
@@ -149,18 +149,18 @@ export default function DashboardLayout() {
 
               {/* Nav items */}
               <nav style={{ flex: 1, padding: '10px 10px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 1 }}>
+                {/* Nav principal */}
                 {NAV_MAIN.map(({ to, icon: Icon, label }) => (
                   <NavLink
                     key={to} to={to}
                     end={to === '/dashboard'}
                     onClick={() => setDrawerOpen(false)}
-                    style={({ isActive }) => navItemStyle(isActive)}
-                    onMouseEnter={hoverOn}
-                    onMouseLeave={hoverOff}
+                    style={({ isActive }) => ({ ...navItemStyle(isActive), marginBottom: 2 })}
+                    onMouseEnter={hoverOn} onMouseLeave={hoverOff}
                   >
                     {({ isActive }) => (
                       <>
-                        <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, width: 26 }}>
+                        <span style={{ display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, width:26 }}>
                           <Icon size={17} color={isActive ? '#fff' : '#6b7280'} />
                         </span>
                         <span>{label}</span>
@@ -171,15 +171,20 @@ export default function DashboardLayout() {
 
                 <Divider />
 
-                {/* Anto IA */}
+                {/* Anto IA — morado igual que desktop */}
                 <button
                   onClick={() => { setDrawerOpen(false); document.querySelector('[data-anto-pill]')?.click() }}
-                  style={navItemStyle(false)}
-                  onMouseEnter={hoverOn}
-                  onMouseLeave={hoverOff}
+                  style={{
+                    display:'flex', alignItems:'center', gap:10, height:38, padding:'0 8px', borderRadius:9, border:'none',
+                    background:'linear-gradient(135deg,#ede9fe,#ddd6fe)', color:'#4f46e5',
+                    fontWeight:700, fontSize:13.5, cursor:'pointer', width:'100%', overflow:'hidden',
+                    whiteSpace:'nowrap', transition:'background 0.15s', flexShrink:0, textAlign:'left', marginBottom:2,
+                  }}
+                  onMouseEnter={e=>e.currentTarget.style.background='linear-gradient(135deg,#ddd6fe,#c4b5fd)'}
+                  onMouseLeave={e=>e.currentTarget.style.background='linear-gradient(135deg,#ede9fe,#ddd6fe)'}
                 >
-                  <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, width: 26 }}>
-                    <Sparkles size={17} color="#6b7280" />
+                  <span style={{ display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, width:26 }}>
+                    <Sparkles size={17} color="#4f46e5" />
                   </span>
                   <span>Anto IA</span>
                 </button>
@@ -189,11 +194,10 @@ export default function DashboardLayout() {
                 {/* Soporte */}
                 <button
                   onClick={() => window.open('mailto:soporte@asegura2.com', '_blank')}
-                  style={navItemStyle(false)}
-                  onMouseEnter={hoverOn}
-                  onMouseLeave={hoverOff}
+                  style={{ ...navItemStyle(false), marginBottom: 2 }}
+                  onMouseEnter={hoverOn} onMouseLeave={hoverOff}
                 >
-                  <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, width: 26 }}>
+                  <span style={{ display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, width:26 }}>
                     <Headphones size={17} color="#6b7280" />
                   </span>
                   <span>Soporte</span>
@@ -203,13 +207,12 @@ export default function DashboardLayout() {
                 <NavLink
                   to={NAV_CONFIG.to}
                   onClick={() => setDrawerOpen(false)}
-                  style={({ isActive }) => navItemStyle(isActive)}
-                  onMouseEnter={hoverOn}
-                  onMouseLeave={hoverOff}
+                  style={({ isActive }) => ({ ...navItemStyle(isActive), marginBottom: 2 })}
+                  onMouseEnter={hoverOn} onMouseLeave={hoverOff}
                 >
                   {({ isActive }) => (
                     <>
-                      <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, width: 26 }}>
+                      <span style={{ display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, width:26 }}>
                         <Settings size={17} color={isActive ? '#fff' : '#6b7280'} />
                       </span>
                       <span>Configuración</span>
@@ -220,22 +223,28 @@ export default function DashboardLayout() {
 
               {/* Perfil + logout */}
               <div style={{ padding: '10px', borderTop: '1px solid #f0f0f2' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '6px 8px 10px' }}>
-                  <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'linear-gradient(135deg,#4f46e5,#2D2A7A)', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <span style={{ fontSize: 12, fontWeight: 800, color: '#fff', textTransform: 'uppercase' }}>{initials || '?'}</span>
+                <div style={{ display:'flex', alignItems:'center', gap:10, padding:'6px 8px 10px' }}>
+                  <div style={{ width:32, height:32, borderRadius:'50%', background:'linear-gradient(135deg,#4f46e5,#2D2A7A)', flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
+                    <span style={{ fontSize:12, fontWeight:800, color:'#fff', textTransform:'uppercase' }}>{initials || '?'}</span>
                   </div>
-                  <div style={{ minWidth: 0 }}>
-                    <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: '#111827' }}>{display}</p>
-                    <p style={{ margin: 0, fontSize: 11, color: '#9ca3af' }}>{correo}</p>
+                  <div style={{ minWidth:0 }}>
+                    <p style={{ margin:0, fontSize:13, fontWeight:700, color:'#111827' }}>{display}</p>
+                    <p style={{ margin:0, fontSize:11, color:'#9ca3af' }}>{correo}</p>
                   </div>
                 </div>
+                {/* Cerrar sesión — solo hover rojo */}
                 <button
                   onClick={() => { logout(); navigate('/login') }}
-                  style={{ ...navItemStyle(false), color: '#ef4444', width: '100%' }}
-                  onMouseEnter={e => e.currentTarget.style.background = '#fef2f2'}
-                  onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                  style={{
+                    display:'flex', alignItems:'center', gap:10, height:38, padding:'0 8px', borderRadius:9,
+                    border:'none', background:'transparent', color:'#ef4444',
+                    fontWeight:600, fontSize:13.5, cursor:'pointer', width:'100%',
+                    overflow:'hidden', whiteSpace:'nowrap', transition:'background 0.13s',
+                  }}
+                  onMouseEnter={e=>e.currentTarget.style.background='#fef2f2'}
+                  onMouseLeave={e=>e.currentTarget.style.background='transparent'}
                 >
-                  <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, width: 26 }}>
+                  <span style={{ display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, width:26 }}>
                     <LogOut size={17} color="#ef4444" />
                   </span>
                   <span>Cerrar sesión</span>
@@ -283,7 +292,7 @@ export default function DashboardLayout() {
               {/* Nav principal */}
               {NAV_MAIN.map(({ to, icon: Icon, label }) => (
                 <NavLink key={to} to={to} end={to === '/dashboard'}
-                  style={({ isActive }) => navItemStyle(isActive)}
+                  style={({ isActive }) => ({ ...navItemStyle(isActive), marginBottom: 2 })}
                   onMouseEnter={hoverOn} onMouseLeave={hoverOff}
                 >
                   {({ isActive }) => (
@@ -297,14 +306,22 @@ export default function DashboardLayout() {
 
               <Divider />
 
-              {/* Anto IA */}
+              {/* Anto IA — destaque morado */}
               <button
                 data-anto-trigger
                 onClick={() => document.querySelector('[data-anto-pill]')?.click()}
-                style={navItemStyle(false)}
-                onMouseEnter={hoverOn} onMouseLeave={hoverOff}
+                style={{
+                  display:'flex', alignItems:'center', gap:10, height:38, padding:'0 8px', borderRadius:9, border:'none',
+                  background:'linear-gradient(135deg,#ede9fe,#ddd6fe)', color:'#4f46e5',
+                  fontWeight:700, fontSize:13.5, cursor:'pointer', width:'100%', overflow:'hidden',
+                  whiteSpace:'nowrap', transition:'background 0.15s', flexShrink:0, textAlign:'left', marginBottom:2,
+                }}
+                onMouseEnter={e=>e.currentTarget.style.background='linear-gradient(135deg,#ddd6fe,#c4b5fd)'}
+                onMouseLeave={e=>e.currentTarget.style.background='linear-gradient(135deg,#ede9fe,#ddd6fe)'}
               >
-                <NavIcon icon={Sparkles} isActive={false} />
+                <span style={{ display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, width:26 }}>
+                  <Sparkles size={17} color="#4f46e5" />
+                </span>
                 <NavLabel label="Anto IA" sideOpen={sideOpen} />
               </button>
             </nav>
@@ -315,7 +332,7 @@ export default function DashboardLayout() {
               {/* Soporte */}
               <button
                 onClick={() => window.open('mailto:soporte@asegura2.com', '_blank')}
-                style={navItemStyle(false)}
+                style={{ ...navItemStyle(false), marginBottom: 2 }}
                 onMouseEnter={hoverOn} onMouseLeave={hoverOff}
               >
                 <NavIcon icon={Headphones} isActive={false} />
@@ -324,7 +341,7 @@ export default function DashboardLayout() {
 
               {/* Configuración */}
               <NavLink to={NAV_CONFIG.to}
-                style={({ isActive }) => navItemStyle(isActive)}
+                style={({ isActive }) => ({ ...navItemStyle(isActive), marginBottom: 2 })}
                 onMouseEnter={hoverOn} onMouseLeave={hoverOff}
               >
                 {({ isActive }) => (
@@ -341,14 +358,20 @@ export default function DashboardLayout() {
               {/* Perfil */}
               <UserProfile user={user} sideOpen={sideOpen} />
 
-              {/* Cerrar sesión */}
+              {/* Cerrar sesión — solo hover rojo, sin estados oscuros */}
               <button
                 onClick={() => { logout(); navigate('/login') }}
-                style={{ ...navItemStyle(false), color: '#ef4444', marginTop: 2 }}
+                style={{
+                  display:'flex', alignItems:'center', gap:10, height:38, padding:'0 8px', borderRadius:9,
+                  border:'none', background:'transparent', color:'#ef4444',
+                  fontWeight:600, fontSize:13.5, cursor:'pointer', width:'100%',
+                  overflow:'hidden', whiteSpace:'nowrap', transition:'background 0.13s',
+                  flexShrink:0, textAlign:'left', marginTop:2,
+                }}
                 onMouseEnter={e => e.currentTarget.style.background = '#fef2f2'}
                 onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
               >
-                <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, width: 26 }}>
+                <span style={{ display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, width:26 }}>
                   <LogOut size={17} color="#ef4444" />
                 </span>
                 <NavLabel label="Cerrar sesión" sideOpen={sideOpen} />
