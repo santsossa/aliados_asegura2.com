@@ -2,7 +2,7 @@ import { Outlet, NavLink, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import {
   Home, FileText, Shield, DollarSign,
-  AlignJustify, Car, X, LogOut, Sparkles, Settings,
+  AlignJustify, Car, X, LogOut, Sparkles, Settings, Headphones,
 } from 'lucide-react'
 import { LogoFull, LogoIcon } from '../components/Logo'
 import { useIsMobile } from '../hooks/use-mobile'
@@ -38,7 +38,7 @@ const NAV_BOTTOM = [
 export default function DashboardLayout() {
   const navigate    = useNavigate()
   const isMobile    = useIsMobile()
-  const { logout }  = useAuth()
+  const { logout, user } = useAuth()
   const [sideOpen, setSideOpen] = useState(true)
   const [drawerOpen, setDrawerOpen] = useState(false)
 
@@ -321,6 +321,24 @@ export default function DashboardLayout() {
             </nav>
 
             <div style={{ padding:'10px', borderTop:'1px solid #eeeeef' }}>
+
+              {/* Soporte */}
+              <button
+                onClick={() => window.open('mailto:soporte@asegura2.com', '_blank')}
+                style={{ width:'100%', display:'flex', alignItems:'center', gap:12, height:40, padding:'0 6px', borderRadius:50, border:'none', background:'transparent', color:'#374151', fontWeight:600, fontSize:14, cursor:'pointer', overflow:'hidden', whiteSpace:'nowrap', transition:'background 0.15s', flexShrink:0, textAlign:'left', marginBottom:2 }}
+                onMouseEnter={e=>e.currentTarget.style.background='#edeef3'}
+                onMouseLeave={e=>e.currentTarget.style.background='transparent'}
+              >
+                <span style={{ display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, width:28 }}>
+                  <Headphones size={18} color="#9ca3af" />
+                </span>
+                <span style={{ opacity:sideOpen?1:0, maxWidth:sideOpen?140:0, overflow:'hidden', transition:'opacity 0.2s ease, max-width 0.25s ease' }}>
+                  Soporte
+                </span>
+              </button>
+
+              <div style={{ margin:'6px 6px 6px', borderTop:'1px solid #eeeeef' }} />
+
               {/* Configuración */}
               <NavLink
                 to={NAV_CONFIG.to}
@@ -328,7 +346,7 @@ export default function DashboardLayout() {
                   display:'flex', alignItems:'center', gap:12,
                   height:40, padding:'0 6px', borderRadius:50,
                   textDecoration:'none', fontWeight:600, fontSize:14,
-                  color: isActive ? '#2D2A7A' : '#6b7280',
+                  color: isActive ? '#2D2A7A' : '#374151',
                   background: isActive ? '#edeef3' : 'transparent',
                   transition:'background 0.15s',
                   overflow:'hidden', whiteSpace:'nowrap', marginBottom:2,
@@ -347,6 +365,27 @@ export default function DashboardLayout() {
                   </>
                 )}
               </NavLink>
+
+              {/* Perfil de usuario */}
+              {(() => {
+                const nombre   = user?.nombre   || ''
+                const apellido = user?.apellido || ''
+                const initials = (nombre[0] || '') + (apellido[0] || nombre[1] || '')
+                const display  = [nombre, apellido].filter(Boolean).join(' ') || user?.email?.split('@')[0] || 'Aliado'
+                return (
+                  <div style={{ display:'flex', alignItems:'center', gap:12, height:44, padding:'0 6px', overflow:'hidden', whiteSpace:'nowrap', marginTop:4 }}>
+                    <div style={{ width:28, height:28, borderRadius:'50%', background:'linear-gradient(135deg,#4f46e5,#2D2A7A)', flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
+                      <span style={{ fontSize:11, fontWeight:800, color:'#fff', textTransform:'uppercase', lineHeight:1 }}>
+                        {initials || '?'}
+                      </span>
+                    </div>
+                    <span style={{ opacity:sideOpen?1:0, maxWidth:sideOpen?140:0, overflow:'hidden', transition:'opacity 0.2s ease, max-width 0.25s ease', fontSize:13, fontWeight:600, color:'#111827' }}>
+                      {display}
+                    </span>
+                  </div>
+                )
+              })()}
+
               {/* Cerrar sesión */}
               <button
                 onClick={() => { logout(); navigate('/login') }}
