@@ -553,7 +553,6 @@ export async function sendOTPEmail(
 ): Promise<void> {
   const base      = (env.FRONTEND_URL || '').replace(/\/$/, '')
   const imgLogo   = `${base}/logo-email.png`
-  const imgSobre  = `${base}/correootp.png`
   const imgReloj  = `${base}/relojotp.png`
   const imgAuri   = `${base}/auricularesotp.png`
 
@@ -587,7 +586,6 @@ export async function sendOTPEmail(
       .sec   { padding-left:16px !important; padding-right:16px !important; }
       .otp-box { padding:16px 10px !important; }
       .otp-code { font-size:30px !important; letter-spacing:8px !important; }
-      .hero-img { width:120px !important; }
       /* Footer: 2 columnas siempre, incluso en móvil */
       .ft-left  { width:50% !important; }
       .ft-right { width:50% !important; }
@@ -620,15 +618,6 @@ export async function sendOTPEmail(
           </td>
         </tr>
       </table>
-    </td>
-  </tr>
-
-  <!-- ══ HERO: imagen grande y centrada ══ -->
-  <tr>
-    <td style="background:#ffffff;padding:18px 28px 8px;text-align:center">
-      <img class="hero-img" src="${imgSobre}" alt="Verificación"
-           width="180" style="display:block;width:180px;max-width:70%;
-                               margin:0 auto;border:0" />
     </td>
   </tr>
 
