@@ -110,7 +110,7 @@ const PASOS_DATA = [
         <div style={{ background:'#fff', borderRadius:16, padding:'16px 18px', width:220, boxShadow:'0 12px 40px rgba(45,42,122,0.2)', transform:'translateY(20px)' }}>
           <p style={{ fontSize:9, color:'#2D2A7A', fontWeight:800, marginBottom:10 }}>Resultados · Honda Civic</p>
           {[
-            { name:'SURA',    price:'$142.000/mes', best:true  },
+            { name:'Qualitas', price:'$142.000/mes', best:true  },
             { name:'Allianz', price:'$158.000/mes', best:false },
             { name:'Bolívar', price:'$161.000/mes', best:false },
             { name:'HDI',     price:'$167.000/mes', best:false },
@@ -159,7 +159,7 @@ const PASOS_DATA = [
           <p style={{ fontSize:9, color:'#d97706', fontWeight:800, marginBottom:2 }}>Pago depositado ✅</p>
           <p style={{ fontSize:8, color:'#9ca3af', marginBottom:10 }}>1 de junio · Bancolombia</p>
           <p style={{ fontSize:28, fontWeight:900, color:'#1f2937', marginBottom:10, lineHeight:1 }}>$840.000</p>
-          {['SURA · Honda Civic +$142.000','Bolívar · Mazda 3 +$138.000','HDI · Sandero +$118.000'].map(r=>(
+          {['Qualitas · Honda Civic +$142.000','Bolívar · Mazda 3 +$138.000','HDI · Sandero +$118.000'].map(r=>(
             <div key={r} style={{ background:'#fefce8', borderRadius:6, height:22, marginBottom:4, padding:'0 8px', display:'flex', alignItems:'center' }}>
               <span style={{ fontSize:7.5, color:'#92400e', fontWeight:500 }}>{r}</span>
             </div>
@@ -387,7 +387,7 @@ function DashboardMockup() {
         style={{ boxShadow: '0 8px 24px rgba(0,0,0,0.10)' }}>
         <div className="w-6 h-6 bg-green-50 rounded-full flex items-center justify-center text-xs">✅</div>
         <div>
-          <p className="text-[9px] font-bold text-gray-800">Póliza emitida · SURA</p>
+          <p className="text-[9px] font-bold text-gray-800">Póliza emitida · Qualitas</p>
           <p className="text-[8px] text-green-600 font-semibold">+$140.000 comisión</p>
         </div>
       </div>
@@ -594,7 +594,7 @@ export default function Landing() {
                   <p className="text-2xl font-black text-gray-900 mb-3">$388.000</p>
                   <div className="grid grid-cols-3 gap-3 mt-1">
                     {[
-                      { label: 'Póliza SURA',    sub: 'Honda Civic',  val: '+$150.000' },
+                      { label: 'Póliza Qualitas', sub: 'Honda Civic',  val: '+$150.000' },
                       { label: 'Póliza HDI',     sub: 'Mazda 3',      val: '+$126.000' },
                       { label: 'Póliza Allianz', sub: 'Sandero',      val: '+$112.000' },
                     ].map(r => (
@@ -652,7 +652,7 @@ export default function Landing() {
                   </div>
                   <div className="space-y-2">
                     {[
-                      { label: 'Póliza SURA · Carlos M.',  estado: 'Aprobada',   dot: 'bg-green-400',  tag: 'bg-green-50 text-green-700'  },
+                      { label: 'Póliza Qualitas · Carlos M.', estado: 'Aprobada',   dot: 'bg-green-400',  tag: 'bg-green-50 text-green-700'  },
                       { label: 'Póliza HDI · Ana R.',      estado: 'En proceso', dot: 'bg-yellow-400', tag: 'bg-yellow-50 text-yellow-700' },
                       { label: 'Póliza AXA · Luis G.',     estado: 'Aprobada',   dot: 'bg-green-400',  tag: 'bg-green-50 text-green-700'  },
                     ].map(r => (
