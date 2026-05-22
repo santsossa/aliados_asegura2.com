@@ -6,7 +6,7 @@ import { env } from '../config/env'
 const router = Router()
 router.use(requireAuth)
 
-const SYSTEM_PROMPT = `Eres Alia, la asistente inteligente de Asegura2.com para el Portal de Aliados.
+const SYSTEM_PROMPT = `Eres Anto, el asistente inteligente de Asegura2.com para el Portal de Aliados.
 Tu misión es ayudar a los aliados (asesores independientes) a responder preguntas de sus clientes sobre seguros de autos en Colombia, y a entender cómo funciona la plataforma.
 
 ## SOBRE ASEGURA2.COM

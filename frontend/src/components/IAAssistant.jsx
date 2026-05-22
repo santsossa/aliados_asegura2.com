@@ -24,7 +24,7 @@ export default function IAAssistant() {
     if (open && messages.length === 0) {
       setMessages([{
         role: 'assistant',
-        content: '¡Hola! Soy Alia ✨\nPregúntame lo que quieras sobre seguros, coberturas o cómo usar la plataforma.',
+        content: '¡Hola! Soy Anto ✨\nPregúntame lo que quieras sobre seguros, coberturas o cómo usar la plataforma.',
       }])
       setTimeout(() => inputRef.current?.focus(), 300)
     }
@@ -99,7 +99,7 @@ export default function IAAssistant() {
             ¿Necesitas ayuda?
           </p>
           <p style={{ margin: '1px 0 0', fontSize: 11, color: '#8b8fa8', lineHeight: 1.4 }}>
-            Chatea con Alia ahora
+            Chatea con Anto ahora
           </p>
         </div>
 
@@ -149,7 +149,7 @@ export default function IAAssistant() {
               👋
             </div>
             <div>
-              <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: '#16151b', lineHeight: 1.2 }}>Alia</p>
+              <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: '#16151b', lineHeight: 1.2 }}>Anto</p>
               <p style={{ margin: 0, fontSize: 10, color: '#a2a8c0' }}>Asistente de Asegura2.com</p>
             </div>
           </div>
