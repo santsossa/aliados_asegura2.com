@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { DollarSign, FileText, Shield, TrendingUp, ChevronRight, Sparkles, Car } from 'lucide-react'
+import { DollarSign, FileText, Shield, TrendingUp, Sparkles, Car } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { useSSE } from '../../context/SSEContext'
@@ -249,39 +249,21 @@ export default function Dashboard() {
           <span style={{ color:'#6d28d9', fontWeight:600 }}>¿qué vas a vender hoy?</span>
         </h1>
 
-        {/* Acciones rápidas */}
-        <div style={{ display:'flex', flexWrap:'wrap', gap:8 }}>
-          {[
-            { icon: Car,      label: 'Nueva cotización',   to: '/dashboard/cotizar',     primary: true },
-            { icon: Sparkles, label: 'Preguntarle a Anto', to: null,                      anto: true    },
-            { icon: Shield,   label: 'Mis pólizas',        to: '/dashboard/mis-polizas'                },
-            { icon: FileText, label: 'Cotizaciones',       to: '/dashboard/cotizaciones'               },
-          ].map(a => {
-            const Icon = a.icon
-            return (
-              <button key={a.label}
-                onClick={() => {
-                  if (a.anto) { document.querySelector('[data-anto-pill]')?.click(); return }
-                  navigate(a.to)
-                }}
-                style={{
-                  display:'flex', alignItems:'center', gap:7,
-                  background: a.primary ? '#2D2A7A' : a.anto ? '#f5f3ff' : '#f3f4f6',
-                  border: 'none', borderRadius:10, cursor:'pointer',
-                  padding:'9px 16px',
-                  color: a.primary ? '#fff' : a.anto ? '#6d28d9' : '#374151',
-                  fontSize:13, fontWeight: a.primary ? 700 : 600,
-                  transition:'opacity 0.15s',
-                }}
-                onMouseEnter={e => e.currentTarget.style.opacity = '0.85'}
-                onMouseLeave={e => e.currentTarget.style.opacity = '1'}
-              >
-                <Icon size={15} />
-                {a.label}
-              </button>
-            )
-          })}
-        </div>
+        {/* Acción principal */}
+        <button
+          onClick={() => navigate('/dashboard/cotizar')}
+          style={{
+            display:'inline-flex', alignItems:'center', gap:8,
+            background:'#2D2A7A', border:'none', borderRadius:10, cursor:'pointer',
+            padding:'10px 20px', color:'#fff', fontSize:13, fontWeight:700,
+            transition:'opacity 0.15s',
+          }}
+          onMouseEnter={e => e.currentTarget.style.opacity = '0.85'}
+          onMouseLeave={e => e.currentTarget.style.opacity = '1'}
+        >
+          <Car size={15} />
+          Nueva cotización
+        </button>
       </div>
 
       {/* ── Card Anto — el copiloto IA ── */}
@@ -304,19 +286,12 @@ export default function Dashboard() {
             </p>
           </div>
         </div>
-        <div style={{ display:'flex', gap:8, flexShrink:0 }}>
-          <button
-            onClick={() => document.querySelector('[data-anto-pill]')?.click()}
-            style={{ background:'#2D2A7A', color:'#fff', border:'none', borderRadius:10,
-              padding:'9px 18px', fontSize:13, fontWeight:700, cursor:'pointer' }}>
-            Preguntarle a Anto
-          </button>
-          <button onClick={() => navigate('/dashboard/cotizar')}
-            style={{ background:'#ede9fe', color:'#5b21b6', border:'none', borderRadius:10,
-              padding:'9px 18px', fontSize:13, fontWeight:600, cursor:'pointer' }}>
-            Iniciar cotización
-          </button>
-        </div>
+        <button
+          onClick={() => document.querySelector('[data-anto-pill]')?.click()}
+          style={{ background:'#2D2A7A', color:'#fff', border:'none', borderRadius:10,
+            padding:'9px 18px', fontSize:13, fontWeight:700, cursor:'pointer', flexShrink:0 }}>
+          Preguntarle a Anto
+        </button>
       </div>
 
       <p style={{ margin: '0 0 16px', fontSize: 12, color: '#9ca3af' }}>
@@ -529,38 +504,6 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* ── Card ancha: Iniciar cotización ── */}
-      <div
-        onClick={() => navigate('/dashboard/cotizar')}
-        style={{
-          marginTop: 16,
-          background: 'linear-gradient(135deg, #2D2A7A 0%, #4B47B0 100%)',
-          borderRadius: 16,
-          padding: '22px 28px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          cursor: 'pointer',
-          boxShadow: '0 4px 14px rgba(45,42,122,0.25)',
-          transition: 'transform 0.15s, box-shadow 0.15s',
-        }}
-        onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 20px rgba(45,42,122,0.32)' }}
-        onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 14px rgba(45,42,122,0.25)' }}
-      >
-        <div>
-          <p style={{ margin: 0, fontSize: 18, fontWeight: 800, color: '#fff' }}>Iniciar una cotización</p>
-          <p style={{ margin: '4px 0 0', fontSize: 13, color: 'rgba(255,255,255,0.7)' }}>
-            Cotiza seguro de automóvil para tu cliente en segundos
-          </p>
-        </div>
-        <div style={{
-          width: 44, height: 44, borderRadius: 12,
-          background: 'rgba(255,255,255,0.15)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-        }}>
-          <ChevronRight size={22} color="#fff" />
-        </div>
-      </div>
       </div>  {/* max-width wrapper */}
     </div>
   )
