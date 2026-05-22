@@ -483,23 +483,9 @@ export default function Landing() {
               Cotiza, envíanos el cliente y gana el 6% de comisión por cada póliza emitida — sin experiencia previa, sin costos, sin límites.
             </p>
 
-            {/* Social proof — en móvil: stars izq · aliados der | en desktop: horizontal */}
+            {/* Social proof — izq: aliados activos · der: calificaciones */}
             <div className="flex items-center justify-between lg:justify-start lg:gap-0 mb-6 lg:mb-8">
-              {/* Stars (izquierda en móvil) */}
-              <div>
-                <div className="flex items-center gap-0.5 mb-0.5">
-                  {[1,2,3,4,5].map(i => (
-                    <Star key={i} size={13} className="text-accent fill-accent" />
-                  ))}
-                  <span className="text-sm font-bold text-gray-800 ml-1.5">4.9/5</span>
-                </div>
-                <p className="text-xs text-gray-400">Nuestros aliados recomiendan</p>
-              </div>
-
-              {/* Divider solo en desktop */}
-              <div className="hidden lg:block w-px bg-gray-200 mx-6 flex-shrink-0" style={{ height: 36 }} />
-
-              {/* Avatars + aliados activos (derecha en móvil) */}
+              {/* Avatars + aliados activos (IZQUIERDA) */}
               <div className="flex items-center gap-3">
                 <div className="flex flex-shrink-0">
                   {[
@@ -517,6 +503,20 @@ export default function Landing() {
                   <p className="text-sm font-bold text-gray-800">+124 aliados activos</p>
                   <p className="text-xs text-gray-400 hidden sm:block">vendiendo seguros</p>
                 </div>
+              </div>
+
+              {/* Divider solo en desktop */}
+              <div className="hidden lg:block w-px bg-gray-200 mx-6 flex-shrink-0" style={{ height: 36 }} />
+
+              {/* Stars — calificaciones (DERECHA) */}
+              <div className="text-right lg:text-left">
+                <div className="flex items-center justify-end lg:justify-start gap-0.5 mb-0.5">
+                  {[1,2,3,4,5].map(i => (
+                    <Star key={i} size={13} className="text-accent fill-accent" />
+                  ))}
+                  <span className="text-sm font-bold text-gray-800 ml-1.5">4.9/5</span>
+                </div>
+                <p className="text-xs text-gray-400">Nuestros aliados recomiendan</p>
               </div>
             </div>
 
