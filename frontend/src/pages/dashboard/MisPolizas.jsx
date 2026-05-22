@@ -11,11 +11,11 @@ const fmt = n => n ? ('$' + Math.round(n).toLocaleString('es-CO')) : '—'
 const ESTADOS = {
   // Sub-estados de "En trámite"
   lead:           { bg:'#f0f9ff', color:'#0284c7', label:'En contacto',
-                    desc:'Nuestro equipo está gestionando el proceso con el cliente para poder emitirle la póliza.' },
+                    desc:'Nuestro equipo está intentando contactarse con el cliente para seguir con su proceso.' },
   en_proceso:     { bg:'#fef3c7', color:'#d97706', label:'En gestión',
-                    desc:'El equipo está coordinando los pasos finales con el cliente antes de la emisión.' },
+                    desc:'El cliente muestra interés en tomar la póliza y estamos haciendo los trámites para que la pueda tomar.' },
   poliza_emitida: { bg:'#ede9fe', color:'#7c3aed', label:'Póliza emitida',
-                    desc:'Se emitió la póliza en el CRM. Estamos a la espera de que el cliente realice el primer pago.' },
+                    desc:'Se emitió la póliza con la aseguradora y estamos a la espera de recibir el primer pago del cliente.' },
   // Estados finales
   aprobada:       { bg:'#dcfce7', color:'#16a34a', label:'Aprobado ✓',
                     desc:'¡El cliente pagó! Tu comisión queda lista para el pago del 1 del mes.' },
@@ -247,8 +247,18 @@ function DetalleModal({ item, onClose, token }) {
                               display:'flex', gap:10, alignItems:'flex-start', lineHeight:1.6 }}>
                   <span style={{ fontSize:22 }}>📋</span>
                   <span>
-                    <strong>Póliza emitida.</strong> Se emitió la póliza en el sistema.
-                    Estamos a la espera de que el cliente realice el primer pago para confirmar la aprobación.
+                    <strong>Póliza emitida.</strong> Al cliente ya se le emitió la póliza
+                    con <strong>{aseguradora}</strong>. Estamos a la espera de recibir el primer pago del cliente.
+                  </span>
+                </div>
+              ) : estadoActual === 'en_proceso' ? (
+                <div style={{ background:'#fffbeb', border:'1.5px solid #fde68a', borderRadius:12,
+                              padding:'14px 16px', fontSize:13, color:'#92400e',
+                              display:'flex', gap:10, alignItems:'flex-start', lineHeight:1.6 }}>
+                  <Info size={16} style={{ flexShrink:0, marginTop:1 }} />
+                  <span>
+                    El cliente muestra interés en tomar la póliza y estamos haciendo los trámites
+                    para que la pueda tomar. Recibirás una notificación cuando haya novedades.
                   </span>
                 </div>
               ) : (
@@ -256,7 +266,7 @@ function DetalleModal({ item, onClose, token }) {
                               fontSize:13, color:'#1d4ed8', display:'flex', gap:10, alignItems:'flex-start', lineHeight:1.6 }}>
                   <Info size={16} style={{ flexShrink:0, marginTop:1 }} />
                   <span>
-                    Nuestro equipo está en contacto con tu cliente para gestionar la emisión.
+                    Nuestro equipo está intentando contactarse con el cliente para seguir con su proceso.
                     Recibirás un correo cuando cambie el estado.
                   </span>
                 </div>
