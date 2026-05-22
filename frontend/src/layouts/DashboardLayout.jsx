@@ -2,7 +2,7 @@ import { Outlet, NavLink, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import {
   Home, FileText, Shield, DollarSign, CreditCard,
-  AlignJustify, Car, X, LogOut, HelpCircle, Settings, Sparkles,
+  AlignJustify, Car, X, LogOut, Sparkles,
 } from 'lucide-react'
 import { LogoFull, LogoIcon } from '../components/Logo'
 import { useIsMobile } from '../hooks/use-mobile'
@@ -12,11 +12,11 @@ import NotificationBell from '../components/NotificationBell'
 import IAAssistant from '../components/IAAssistant'
 
 const NAV_MAIN = [
-  { to: '/dashboard',                        icon: Home,       label: 'Inicio'           },
-  { to: '/dashboard/cotizaciones',           icon: FileText,   label: 'Cotizaciones'     },
-  { to: '/dashboard/mis-polizas',            icon: Shield,     label: 'Mis pólizas'      },
-  { to: '/dashboard/mis-pagos',              icon: DollarSign, label: 'Mis pagos'        },
-  { to: '/dashboard/informacion-financiera', icon: CreditCard, label: 'Info. financiera' },
+  { to: '/dashboard',                        icon: Home,       label: 'Inicio'          },
+  { to: '/dashboard/cotizaciones',           icon: FileText,   label: 'Cotizaciones'    },
+  { to: '/dashboard/mis-polizas',            icon: Shield,     label: 'Mis pólizas'     },
+  { to: '/dashboard/mis-pagos',              icon: DollarSign, label: 'Comisiones'      },
+  { to: '/dashboard/informacion-financiera', icon: CreditCard, label: 'Cuenta bancaria' },
 ]
 
 const NAV_ANTO = { icon: Sparkles, label: 'Anto IA' }
@@ -221,18 +221,39 @@ export default function DashboardLayout() {
             display:'flex', flexDirection:'column', overflow:'hidden',
             transition:'width 0.25s cubic-bezier(0.4,0,0.2,1)',
           }}>
-            <nav style={{ padding:'20px 10px', display:'flex', flexDirection:'column', gap:2, flex:1 }}>
-              <div style={{ paddingBottom:24, paddingLeft:2 }}>
+            <nav style={{ padding:'16px 10px', display:'flex', flexDirection:'column', gap:2, flex:1 }}>
+
+              {/* Toggle + CTA Cotizar — siempre visibles arriba */}
+              <div style={{ display:'flex', alignItems:'center', gap:6, marginBottom:16 }}>
                 <button
                   onClick={() => setSideOpen(v => !v)}
-                  style={{ width:40, height:40, display:'flex', alignItems:'center', justifyContent:'center', background:'transparent', border:'none', borderRadius:50, cursor:'pointer', transition:'background 0.15s' }}
+                  style={{ width:36, height:36, display:'flex', alignItems:'center', justifyContent:'center', background:'transparent', border:'none', borderRadius:50, cursor:'pointer', transition:'background 0.15s', flexShrink:0 }}
                   onMouseEnter={e=>e.currentTarget.style.background='#edeef3'}
                   onMouseLeave={e=>e.currentTarget.style.background='transparent'}
                 >
-                  <AlignJustify size={20} color="#2D2A7A" />
+                  <AlignJustify size={18} color="#2D2A7A" />
+                </button>
+                {/* Botón cotizar — protagonista, aparece solo cuando sidebar abierto */}
+                <button
+                  onClick={() => navigate('/dashboard/cotizar')}
+                  style={{
+                    flex:1, display:'flex', alignItems:'center', gap:7,
+                    height:36, padding:'0 14px', borderRadius:50, border:'none',
+                    background:'#2D2A7A', color:'#fff', fontWeight:700, fontSize:13,
+                    cursor:'pointer', overflow:'hidden', whiteSpace:'nowrap',
+                    opacity: sideOpen ? 1 : 0,
+                    maxWidth: sideOpen ? 200 : 0,
+                    transition:'opacity 0.2s ease, max-width 0.25s ease, background 0.15s',
+                  }}
+                  onMouseEnter={e=>e.currentTarget.style.background='#201D5F'}
+                  onMouseLeave={e=>e.currentTarget.style.background='#2D2A7A'}
+                >
+                  <Car size={14} style={{ flexShrink:0 }} />
+                  Cotizar
                 </button>
               </div>
 
+              {/* Nav links principales */}
               {NAV_MAIN.map(({ to, icon: Icon, label }) => (
                 <NavLink
                   key={label} to={to}
@@ -264,7 +285,7 @@ export default function DashboardLayout() {
 
               <div style={{ margin:'10px 6px', borderTop:'1px solid #eeeeef' }} />
 
-              {/* Anto IA — botón especial en sidebar */}
+              {/* Anto IA */}
               <button
                 data-anto-trigger
                 onClick={() => document.querySelector('[data-anto-pill]')?.click()}
@@ -282,48 +303,12 @@ export default function DashboardLayout() {
                   Anto IA
                 </span>
               </button>
-
-              <div style={{ margin:'10px 6px', borderTop:'1px solid #eeeeef' }} />
-
-              {sideOpen && (
-                <span style={{ fontSize:10, fontWeight:700, color:'#b0b4c1', textTransform:'uppercase', letterSpacing:'0.08em', padding:'0 6px', marginBottom:2 }}>
-                  Ayuda
-                </span>
-              )}
-              {[{ icon: HelpCircle, label:'Soporte' }, { icon: Settings, label:'Configuración' }].map(({ icon: Icon, label }) => (
-                <button
-                  key={label}
-                  style={{ display:'flex', alignItems:'center', gap:12, height:40, padding:'0 6px', borderRadius:50, border:'none', background:'transparent', color:'#16151b', fontWeight:600, fontSize:14, cursor:'pointer', width:'100%', overflow:'hidden', whiteSpace:'nowrap', transition:'background 0.15s', flexShrink:0, textAlign:'left' }}
-                  onMouseEnter={e=>e.currentTarget.style.background='#edeef3'}
-                  onMouseLeave={e=>e.currentTarget.style.background='transparent'}
-                >
-                  <span style={{ display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, width:28 }}>
-                    <Icon size={19} color="#374151" />
-                  </span>
-                  <span style={{ opacity:sideOpen?1:0, maxWidth:sideOpen?140:0, overflow:'hidden', transition:'opacity 0.2s ease, max-width 0.25s ease' }}>
-                    {label}
-                  </span>
-                </button>
-              ))}
             </nav>
 
             <div style={{ padding:'10px', borderTop:'1px solid #eeeeef' }}>
               <button
-                onClick={() => navigate('/dashboard/cotizar')}
-                style={{ width:'100%', display:'flex', alignItems:'center', gap:12, height:40, padding:'0 6px', borderRadius:50, border:'none', background:'#2D2A7A', color:'#fff', fontWeight:700, fontSize:14, cursor:'pointer', overflow:'hidden', whiteSpace:'nowrap', transition:'background 0.2s', flexShrink:0 }}
-                onMouseEnter={e=>e.currentTarget.style.background='#201D5F'}
-                onMouseLeave={e=>e.currentTarget.style.background='#2D2A7A'}
-              >
-                <span style={{ display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, width:28 }}>
-                  <Car size={18} />
-                </span>
-                <span style={{ opacity:sideOpen?1:0, maxWidth:sideOpen?140:0, overflow:'hidden', transition:'opacity 0.2s ease, max-width 0.25s ease' }}>
-                  Iniciar cotización
-                </span>
-              </button>
-              <button
                 onClick={() => { logout(); navigate('/login') }}
-                style={{ width:'100%', display:'flex', alignItems:'center', gap:12, height:40, padding:'0 6px', borderRadius:50, border:'none', background:'transparent', color:'#dc2626', fontWeight:600, fontSize:14, cursor:'pointer', overflow:'hidden', whiteSpace:'nowrap', transition:'background 0.15s', marginTop:4, flexShrink:0 }}
+                style={{ width:'100%', display:'flex', alignItems:'center', gap:12, height:40, padding:'0 6px', borderRadius:50, border:'none', background:'transparent', color:'#dc2626', fontWeight:600, fontSize:14, cursor:'pointer', overflow:'hidden', whiteSpace:'nowrap', transition:'background 0.15s', flexShrink:0 }}
                 onMouseEnter={e=>e.currentTarget.style.background='#fef2f2'}
                 onMouseLeave={e=>e.currentTarget.style.background='transparent'}
               >

@@ -361,6 +361,25 @@ export default function Dashboard() {
         })}
       </div>
 
+      {/* ── Insights IA ── */}
+      <div style={{ marginBottom: 16 }}>
+        {[
+          { emoji:'🚗', text:'Los SUVs tienen un 23 % más de tasa de aprobación que los carros de ciudad.' },
+          { emoji:'💬', text:'Los clientes preguntan más por cobertura contra hurto y fenómenos naturales.' },
+          { emoji:'📈', text:'Las pólizas cotizadas en la primera semana del mes tienen mayor cierre.' },
+        ].map((ins, i) => (
+          <div key={i} style={{
+            display:'inline-flex', alignItems:'center', gap:8,
+            background:'#f9f7ff', border:'1px solid #ede9fe',
+            borderRadius:10, padding:'7px 14px', marginRight:8, marginBottom:8,
+            fontSize:12, color:'#5b21b6', lineHeight:1.4,
+          }}>
+            <span style={{ fontSize:16, flexShrink:0 }}>{ins.emoji}</span>
+            <span>{ins.text}</span>
+          </div>
+        ))}
+      </div>
+
       {/* ── Row 2: Actividad + Rendimiento ── */}
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-4">
 

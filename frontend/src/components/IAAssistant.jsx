@@ -79,27 +79,26 @@ export default function IAAssistant() {
           position: 'fixed', bottom: 28, right: 24, zIndex: 300,
           display: 'flex', alignItems: 'center', gap: 12,
           background: '#f5f5f7', border: 'none', cursor: 'pointer',
-          borderRadius: 999, padding: '5px 5px 5px 18px',
+          borderRadius: 999, padding: '5px 5px 5px 16px',
           boxShadow: '0 2px 14px rgba(0,0,0,0.13)',
           minWidth: 240,
         }}
       >
-        <span style={{ fontSize: 30, lineHeight: 1, flexShrink: 0 }}>👋</span>
         <div style={{ flex: 1, textAlign: 'left' }}>
           <p style={{ margin: 0, fontSize: 14, fontWeight: 800, color: '#111', lineHeight: 1.2 }}>
-            ¿Necesitas ayuda?
+            Pregúntale a Anto ✨
           </p>
-          <p style={{ margin: '2px 0 0', fontSize: 11, color: '#999', lineHeight: 1.35 }}>
-            Haz clic aquí para chatear<br />con Anto
+          <p style={{ margin: '2px 0 0', fontSize: 11, color: '#6d28d9', lineHeight: 1.35 }}>
+            Coberturas · precios · comparaciones
           </p>
         </div>
         <div style={{
           width: 54, height: 54, borderRadius: '50%',
-          background: '#2D2A7A', flexShrink: 0,
+          background: 'linear-gradient(135deg,#4f46e5,#2D2A7A)', flexShrink: 0,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           boxShadow: '0 3px 12px rgba(45,42,122,0.4)',
         }}>
-          <MessageCircleMore size={24} color="#fff" />
+          <Sparkles size={22} color="#fff" />
         </div>
       </button>
 
