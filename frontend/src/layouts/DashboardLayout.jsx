@@ -33,7 +33,7 @@ const HOVER_BG    = '#f3f4f6'
 
 const navItemStyle = (isActive) => ({
   display: 'flex', alignItems: 'center', gap: 10,
-  height: 38, padding: '0 8px', borderRadius: 9,
+  height: 40, padding: '0 8px', borderRadius: 9,
   textDecoration: 'none', fontWeight: 600, fontSize: 13.5,
   color: isActive ? ACTIVE_TEXT : '#374151',
   background: isActive ? ACTIVE_BG : 'transparent',
@@ -157,7 +157,7 @@ export default function DashboardLayout() {
               </div>
 
               {/* Nav items */}
-              <nav style={{ flex: 1, padding: '10px 10px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 1 }}>
+              <nav style={{ flex: 1, padding: '10px 10px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 4 }}>
                 {/* Nav principal */}
                 {NAV_MAIN.map(({ to, icon: Icon, label }) => (
                   <NavLink
@@ -187,7 +187,7 @@ export default function DashboardLayout() {
                     display:'flex', alignItems:'center', gap:10, height:38, padding:'0 8px', borderRadius:9, border:'none',
                     background:'linear-gradient(135deg,#ede9fe,#ddd6fe)', color:'#4f46e5',
                     fontWeight:700, fontSize:13.5, cursor:'pointer', width:'100%', overflow:'hidden',
-                    whiteSpace:'nowrap', transition:'background 0.15s', flexShrink:0, textAlign:'left', marginBottom:2,
+                    whiteSpace:'nowrap', transition:'background 0.15s', flexShrink:0, textAlign:'left', marginBottom:4,
                   }}
                   onMouseEnter={e=>e.currentTarget.style.background='linear-gradient(135deg,#ddd6fe,#c4b5fd)'}
                   onMouseLeave={e=>e.currentTarget.style.background='linear-gradient(135deg,#ede9fe,#ddd6fe)'}
@@ -203,7 +203,7 @@ export default function DashboardLayout() {
                 {/* Soporte */}
                 <button
                   onClick={() => window.open('mailto:soporte@asegura2.com', '_blank')}
-                  style={{ ...navItemStyle(false), marginBottom: 2 }}
+                  style={{ ...navItemStyle(false), marginBottom: 4 }}
                   onMouseEnter={hoverOn} onMouseLeave={hoverOff}
                 >
                   <span style={{ display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, width:26 }}>
@@ -284,7 +284,7 @@ export default function DashboardLayout() {
 
           {/* Sidebar */}
           <aside style={{ width: sidebarW, height: '100%', background: '#fff', borderRadius: 28, display: 'flex', flexDirection: 'column', overflow: 'hidden', transition: 'width 0.25s cubic-bezier(0.4,0,0.2,1)' }}>
-            <nav style={{ padding: '16px 8px', display: 'flex', flexDirection: 'column', gap: 1, flex: 1 }}>
+            <nav style={{ padding: '16px 8px', display: 'flex', flexDirection: 'column', gap: 4, flex: 1 }}>
 
               {/* Toggle */}
               <div style={{ paddingBottom: 14, paddingLeft: 4 }}>
@@ -323,7 +323,7 @@ export default function DashboardLayout() {
                   display:'flex', alignItems:'center', gap:10, height:38, padding:'0 8px', borderRadius:9, border:'none',
                   background:'linear-gradient(135deg,#ede9fe,#ddd6fe)', color:'#4f46e5',
                   fontWeight:700, fontSize:13.5, cursor:'pointer', width:'100%', overflow:'hidden',
-                  whiteSpace:'nowrap', transition:'background 0.15s', flexShrink:0, textAlign:'left', marginBottom:2,
+                  whiteSpace:'nowrap', transition:'background 0.15s', flexShrink:0, textAlign:'left', marginBottom:4,
                 }}
                 onMouseEnter={e=>e.currentTarget.style.background='linear-gradient(135deg,#ddd6fe,#c4b5fd)'}
                 onMouseLeave={e=>e.currentTarget.style.background='linear-gradient(135deg,#ede9fe,#ddd6fe)'}
@@ -341,7 +341,7 @@ export default function DashboardLayout() {
               {/* Soporte */}
               <button
                 onClick={() => window.open('mailto:soporte@asegura2.com', '_blank')}
-                style={{ ...navItemStyle(false), marginBottom: 2 }}
+                style={{ ...navItemStyle(false), marginBottom: 4 }}
                 onMouseEnter={hoverOn} onMouseLeave={hoverOff}
               >
                 <NavIcon icon={Headphones} isActive={false} />
