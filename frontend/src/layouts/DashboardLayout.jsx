@@ -26,31 +26,40 @@ const NAV_CONFIG = {
 }
 
 // ── Estilos reutilizables ───────────────────────────────────────────────────
+// Activo: gris suave con texto/icono en morado de marca (visible, no negro)
+const ACTIVE_BG   = '#edeef3'
+const ACTIVE_TEXT = '#2D2A7A'
+const HOVER_BG    = '#f3f4f6'
+
 const navItemStyle = (isActive) => ({
   display: 'flex', alignItems: 'center', gap: 10,
   height: 38, padding: '0 8px', borderRadius: 9,
   textDecoration: 'none', fontWeight: 600, fontSize: 13.5,
-  color: isActive ? '#fff' : '#374151',
-  background: isActive ? '#1a1a2e' : 'transparent',
+  color: isActive ? ACTIVE_TEXT : '#374151',
+  background: isActive ? ACTIVE_BG : 'transparent',
   transition: 'background 0.13s, color 0.13s',
   overflow: 'hidden', whiteSpace: 'nowrap', flexShrink: 0,
   border: 'none', cursor: 'pointer', width: '100%', textAlign: 'left',
 })
 
-const HOVER_BG = '#f3f4f6'
-const hoverOn  = e => { if (!e.currentTarget.style.background.includes('1a1a2e')) e.currentTarget.style.background = HOVER_BG }
-const hoverOff = e => { if (!e.currentTarget.style.background.includes('1a1a2e')) e.currentTarget.style.background = 'transparent' }
+// No aplica hover si el ítem ya está activo (edeef3 en background)
+const hoverOn  = e => { if (!e.currentTarget.style.background.includes('edeef3')) e.currentTarget.style.background = HOVER_BG }
+const hoverOff = e => { if (!e.currentTarget.style.background.includes('edeef3')) e.currentTarget.style.background = 'transparent' }
 
-// Línea divisoria: más corta que el ancho total pero no a la mitad
+// Línea divisoria centrada en el eje X del sidebar
 function Divider() {
-  return <div style={{ margin: '6px 8px', width: '68%', borderTop: '1px solid #e5e7eb' }} />
+  return (
+    <div style={{ display:'flex', justifyContent:'center', margin:'5px 0' }}>
+      <div style={{ width:'65%', borderTop:'1px solid #e5e7eb' }} />
+    </div>
+  )
 }
 
 // Nav item ícono + texto (para la sección colapsable del sidebar desktop)
 function NavIcon({ icon: Icon, isActive }) {
   return (
     <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, width: 26 }}>
-      <Icon size={17} color={isActive ? '#fff' : '#6b7280'} />
+      <Icon size={17} color={isActive ? ACTIVE_TEXT : '#6b7280'} />
     </span>
   )
 }
