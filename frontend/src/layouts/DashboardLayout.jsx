@@ -50,7 +50,7 @@ const hoverOff = e => { if (!e.currentTarget.style.background.includes('edeef3')
 function Divider() {
   return (
     <div style={{ display:'flex', justifyContent:'center', margin:'7px 0' }}>
-      <div style={{ width:'82%', borderTop:'1px solid #e5e7eb' }} />
+      <div style={{ width:'90%', borderTop:'1px solid #e5e7eb' }} />
     </div>
   )
 }
