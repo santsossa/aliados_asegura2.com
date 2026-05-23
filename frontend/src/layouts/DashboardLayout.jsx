@@ -49,8 +49,8 @@ const hoverOff = e => { if (!e.currentTarget.style.background.includes('edeef3')
 // Línea divisoria centrada en el eje X del sidebar
 function Divider() {
   return (
-    <div style={{ display:'flex', justifyContent:'center', margin:'5px 0' }}>
-      <div style={{ width:'65%', borderTop:'1px solid #e5e7eb' }} />
+    <div style={{ display:'flex', justifyContent:'center', margin:'7px 0' }}>
+      <div style={{ width:'74%', borderTop:'1px solid #e5e7eb' }} />
     </div>
   )
 }
@@ -248,7 +248,7 @@ export default function DashboardLayout() {
                     display:'flex', alignItems:'center', gap:10, height:38, padding:'0 8px', borderRadius:9,
                     border:'none', background:'transparent', color:'#ef4444',
                     fontWeight:600, fontSize:13.5, cursor:'pointer', width:'100%',
-                    overflow:'hidden', whiteSpace:'nowrap', transition:'background 0.13s',
+                    overflow:'hidden', whiteSpace:'nowrap', transition:'background 0.13s', marginTop:10,
                   }}
                   onMouseEnter={e=>e.currentTarget.style.background='#fef2f2'}
                   onMouseLeave={e=>e.currentTarget.style.background='transparent'}
@@ -375,7 +375,7 @@ export default function DashboardLayout() {
                   border:'none', background:'transparent', color:'#ef4444',
                   fontWeight:600, fontSize:13.5, cursor:'pointer', width:'100%',
                   overflow:'hidden', whiteSpace:'nowrap', transition:'background 0.13s',
-                  flexShrink:0, textAlign:'left', marginTop:2,
+                  flexShrink:0, textAlign:'left', marginTop:10,
                 }}
                 onMouseEnter={e => e.currentTarget.style.background = '#fef2f2'}
                 onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
