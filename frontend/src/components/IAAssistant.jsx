@@ -70,33 +70,36 @@ export default function IAAssistant() {
 
   return (
     <>
-      {/* ── Burbuja (sola cuando el chat está cerrado) ── */}
+      {/* ── Pill flotante (blanco + burbuja) ── */}
       <div
+        onClick={handleOpen}
+        onMouseEnter={() => setHover(true)}
+        onMouseLeave={() => setHover(false)}
         style={{
           position: 'fixed', bottom: 24, right: 24, zIndex: 300,
+          display: 'flex', alignItems: 'center', flexDirection: 'row',
+          cursor: 'pointer',
           opacity:   open ? 0 : 1,
           transform: open ? 'scale(0.55)' : 'scale(1)',
           transition: 'opacity 0.22s ease, transform 0.22s ease',
           pointerEvents: open ? 'none' : 'auto',
         }}
-        onMouseEnter={() => setHover(true)}
-        onMouseLeave={() => setHover(false)}
       >
-        {/* Card de hover — aparece a la izquierda */}
-        <div
-          onClick={handleOpen}
-          style={{
-            position: 'absolute', bottom: 8, right: 70,
-            background: '#fff', borderRadius: 14,
-            padding: '10px 16px',
-            boxShadow: '0 4px 20px rgba(0,0,0,0.13)',
-            whiteSpace: 'nowrap', cursor: 'pointer',
-            opacity:   hover ? 1 : 0,
-            transform: hover ? 'translateX(0) scale(1)' : 'translateX(10px) scale(0.95)',
-            transition: 'opacity 0.18s ease, transform 0.18s ease',
-            pointerEvents: hover ? 'auto' : 'none',
-          }}
-        >
+        {/* Contenedor blanco — siempre presente, se abre a la izquierda en hover */}
+        <div style={{
+          background: '#fff',
+          borderRadius: 14,
+          overflow: 'hidden',
+          whiteSpace: 'nowrap',
+          maxWidth: hover ? 220 : 0,
+          opacity:  hover ? 1 : 0,
+          paddingLeft:  hover ? 16 : 0,
+          paddingRight: hover ? 14 : 0,
+          paddingTop: 10, paddingBottom: 10,
+          marginRight: hover ? 8 : 0,
+          boxShadow: hover ? '0 2px 16px rgba(0,0,0,0.11)' : 'none',
+          transition: 'max-width 0.28s cubic-bezier(0.4,0,0.2,1), opacity 0.2s ease, padding 0.2s ease, margin 0.2s ease',
+        }}>
           <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: '#111', lineHeight: 1.2 }}>
             Pregúntale a Anto ✨
           </p>
@@ -112,12 +115,12 @@ export default function IAAssistant() {
           style={{
             width: 58, height: 58, borderRadius: '50%',
             background: 'linear-gradient(135deg, #4f46e5 0%, #2D2A7A 100%)',
-            border: 'none', cursor: 'pointer',
+            border: 'none', cursor: 'pointer', flexShrink: 0,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             boxShadow: hover
               ? '0 8px 28px rgba(45,42,122,0.55)'
               : '0 4px 18px rgba(45,42,122,0.38)',
-            transform: hover ? 'scale(1.08)' : 'scale(1)',
+            transform: hover ? 'scale(1.06)' : 'scale(1)',
             transition: 'transform 0.2s ease, box-shadow 0.2s ease',
           }}
         >
