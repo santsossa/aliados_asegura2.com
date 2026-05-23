@@ -440,6 +440,132 @@ export async function sendLeadRecibidoEmail(opts: {
   })
 }
 
+// ── Secciones HTML reutilizables ─────────────────────────────────────────
+function emailHeader(imgLogo: string): string {
+  return `
+  <tr>
+    <td style="background:#ffffff;padding:16px 28px;border-bottom:2px solid #2D2A7A">
+      <table cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+          <td style="vertical-align:middle">
+            <img src="${imgLogo}" alt="Asegura2.com"
+                 height="38" style="display:block;height:38px;border:0" />
+          </td>
+          <td align="right" style="vertical-align:middle">
+            <span style="font-size:12px;font-weight:600;color:#2D2A7A;font-family:Arial,sans-serif">
+              Portal de Aliados
+            </span>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>`
+}
+
+function emailVerEstado(portalUrl: string, label = 'Mis p&#243;lizas'): string {
+  return `
+  <tr>
+    <td style="padding:14px 24px 20px">
+      <table cellpadding="0" cellspacing="0">
+        <tr>
+          <td width="26" style="font-size:16px;vertical-align:middle">&#128065;</td>
+          <td style="padding-left:6px;font-size:13px;color:#4b5563;vertical-align:middle;font-family:Arial,sans-serif">
+            Puedes ver el estado en tu portal en la secci&#243;n
+            <a href="${portalUrl}" style="color:#2D2A7A;font-weight:700;text-decoration:none">${label}.</a>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  <tr>
+    <td style="padding:0 24px">
+      <table cellpadding="0" cellspacing="0" width="100%">
+        <tr><td height="1" style="background:#e8e8f0;font-size:0;line-height:0">&nbsp;</td></tr>
+      </table>
+    </td>
+  </tr>`
+}
+
+function emailFooter(imgLogo: string, imgHandw: string, base: string): string {
+  return `
+  <tr>
+    <td style="padding:18px 24px 14px">
+      <table cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+          <td style="vertical-align:middle;width:50%">
+            <table cellpadding="0" cellspacing="0">
+              <tr>
+                <td style="vertical-align:middle">${circle('&#127911;', '#ede9fe', 40, 20)}</td>
+                <td style="padding-left:10px;vertical-align:middle">
+                  <div style="font-size:12px;font-weight:700;color:#1a1a2e;font-family:Arial,sans-serif">
+                    &#191;Dudas? Estamos para ayudarte
+                  </div>
+                  <div style="font-size:11px;color:#6b7280;margin-top:3px;font-family:Arial,sans-serif">
+                    <a href="mailto:aliados@asegura2.com.co"
+                       style="color:#2D2A7A;text-decoration:none;font-weight:600">
+                      aliados@asegura2.com.co</a>
+                  </div>
+                </td>
+              </tr>
+            </table>
+          </td>
+          <td style="text-align:right;vertical-align:middle;width:50%">
+            <img src="${imgHandw}" alt="Gracias por confiar en asegura2.com"
+                 height="130" style="display:inline-block;max-height:130px;max-width:100%;border:0" />
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  <tr>
+    <td style="background:#f8f8fc;border-top:1px solid #e8e8f0;padding:12px 24px 14px">
+      <table cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+          <td style="vertical-align:middle">
+            <img src="${imgLogo}" alt="Asegura2.com"
+                 height="26" style="display:block;height:26px;border:0;margin-bottom:2px" />
+            <div style="font-size:10px;color:#9ca3af;font-family:Arial,sans-serif">
+              Portal de Aliados &middot; Bogot&#225;, Colombia
+            </div>
+          </td>
+          <td align="right" style="vertical-align:middle">
+            <table cellpadding="0" cellspacing="4">
+              <tr>
+                <td style="padding:0 3px">
+                  <a href="https://web.facebook.com/asegura2col" style="text-decoration:none">
+                    <img src="${base}/icons/facebook.png" alt="Facebook"
+                         width="32" height="32"
+                         style="display:block;width:32px;height:32px;border:0;border-radius:50%" />
+                  </a>
+                </td>
+                <td style="padding:0 3px">
+                  <a href="https://www.instagram.com/asegura2col/" style="text-decoration:none">
+                    <img src="${base}/icons/instagram.png" alt="Instagram"
+                         width="32" height="32"
+                         style="display:block;width:32px;height:32px;border:0;border-radius:50%" />
+                  </a>
+                </td>
+                <td style="padding:0 3px">
+                  <a href="https://www.linkedin.com/company/asegura2colombia" style="text-decoration:none">
+                    <img src="${base}/icons/linkedin.png" alt="LinkedIn"
+                         width="32" height="32"
+                         style="display:block;width:32px;height:32px;border:0;border-radius:6px" />
+                  </a>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+      <p style="margin:8px 0 0;font-size:10px;color:#b0b4c1;text-align:center;font-family:Arial,sans-serif">
+        Si tienes dudas escr&#237;benos a
+        <a href="mailto:aliados@asegura2.com.co" style="color:#2D2A7A;text-decoration:none">
+          aliados@asegura2.com.co</a>
+      </p>
+    </td>
+  </tr>`
+}
+
 // ── Email 2: Póliza aprobada 🎉 ───────────────────────────────────────────
 export async function sendPolizaAprobadaEmail(opts: {
   to: string
@@ -450,51 +576,121 @@ export async function sendPolizaAprobadaEmail(opts: {
   valor_comision: number
   placa?: string
 }): Promise<void> {
-  const fechaPago = nextPaymentDate()
+  const fechaPago  = nextPaymentDate()
+  const base       = (env.FRONTEND_URL || '').replace(/\/$/, '')
+  const imgLogo    = `${base}/logo-email.png`
+  const imgHandw   = `${base}/correohandw.png`
+  const portalUrl  = `${base}/dashboard/mis-polizas?tab=aprobada`
+
   await sendMail({
     to:      opts.to,
     subject: `💚 ¡Póliza aprobada! Ganas ${fmtCOP(opts.valor_comision)}`,
-    html:    baseLayout(`
-      <div style="text-align:center;padding:8px 0 24px">
-        <div style="font-size:56px;margin-bottom:12px">🎉</div>
-        <h2 style="margin:0 0 8px;font-size:24px;font-weight:800;color:#111827">¡Póliza aprobada!</h2>
-        <p style="margin:0;color:#6b7280;font-size:14px">
-          Hola <strong>${opts.aliado_nombre}</strong>, el cliente realizó el pago. ¡Ya ganaste tu comisión!
+    html: `<!DOCTYPE html>
+<html lang="es" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Asegura2.com — Póliza aprobada</title>
+</head>
+<body style="margin:0;padding:0;background:#f0f0f5;font-family:Arial,Helvetica,sans-serif">
+<table align="center" cellpadding="0" cellspacing="0" width="100%" style="background:#f0f0f5;padding:24px 12px">
+<tr><td align="center">
+<table cellpadding="0" cellspacing="0" width="100%"
+       style="max-width:580px;background:#ffffff;border-radius:16px;overflow:hidden;border:1px solid #e8e8f0">
+
+  ${emailHeader(imgLogo)}
+
+  <!-- CONTENIDO -->
+  <tr>
+    <td style="padding:28px 24px 0">
+
+      <!-- Título -->
+      <div style="text-align:center;padding-bottom:20px">
+        <div style="font-size:48px;margin-bottom:10px">&#127881;</div>
+        <h2 style="margin:0 0 8px;font-size:24px;font-weight:800;color:#111827;font-family:Arial,sans-serif">
+          &#161;P&#243;liza aprobada!
+        </h2>
+        <p style="margin:0;color:#6b7280;font-size:14px;font-family:Arial,sans-serif">
+          Hola <strong style="color:#111827">${opts.aliado_nombre}</strong>,
+          el cliente realiz&#243; el pago. &#161;Ya ganaste tu comisi&#243;n!
         </p>
       </div>
 
       <!-- Comisión destacada -->
-      <div style="background:linear-gradient(135deg,#2D2A7A 0%,#4338ca 100%);border-radius:16px;padding:24px;text-align:center;margin-bottom:24px">
-        <p style="margin:0 0 4px;color:#c7d2fe;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em">Tu comisión</p>
-        <p style="margin:0;color:#fff;font-size:40px;font-weight:800;letter-spacing:-1px">${fmtCOP(opts.valor_comision)}</p>
-        <p style="margin:8px 0 0;color:#a5b4fc;font-size:13px">Se depositará el <strong style="color:#fff">${fechaPago}</strong></p>
-      </div>
+      <table cellpadding="0" cellspacing="0" width="100%"
+             style="background:#2D2A7A;border-radius:14px;margin-bottom:20px">
+        <tr>
+          <td style="padding:22px;text-align:center">
+            <p style="margin:0 0 4px;color:#c7d2fe;font-size:11px;font-weight:700;
+                      text-transform:uppercase;letter-spacing:0.08em;font-family:Arial,sans-serif">
+              Tu comisi&#243;n
+            </p>
+            <p style="margin:0;color:#ffffff;font-size:38px;font-weight:800;
+                      letter-spacing:-1px;font-family:Arial,sans-serif">
+              ${fmtCOP(opts.valor_comision)}
+            </p>
+            <p style="margin:8px 0 0;color:#a5b4fc;font-size:13px;font-family:Arial,sans-serif">
+              Se depositar&#225; el <strong style="color:#fff">${fechaPago}</strong>
+            </p>
+          </td>
+        </tr>
+      </table>
 
-      <div style="background:#f9fafb;border-radius:12px;padding:20px 24px;margin-bottom:24px">
-        <p style="margin:0 0 12px;font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:0.08em">Detalle de la póliza</p>
-        <table width="100%" cellpadding="0" cellspacing="0">
-          <tr><td style="padding:6px 0;font-size:13px;color:#6b7280">Cliente</td>
-              <td style="padding:6px 0;font-size:13px;font-weight:600;color:#111827;text-align:right">${opts.cliente_nombre}</td></tr>
-          ${opts.placa ? `<tr><td style="padding:6px 0;font-size:13px;color:#6b7280">Placa</td>
-              <td style="padding:6px 0;font-size:13px;font-weight:600;color:#111827;text-align:right">${opts.placa}</td></tr>` : ''}
-          <tr><td style="padding:6px 0;font-size:13px;color:#6b7280">Aseguradora</td>
-              <td style="padding:6px 0;font-size:13px;font-weight:600;color:#111827;text-align:right">${opts.aseguradora}</td></tr>
-          <tr><td style="padding:6px 0;font-size:13px;color:#6b7280">Prima anual</td>
-              <td style="padding:6px 0;font-size:13px;font-weight:600;color:#111827;text-align:right">${fmtCOP(opts.valor_prima)}</td></tr>
-          <tr><td style="padding:6px 0;font-size:13px;color:#6b7280">Comisión (6%)</td>
-              <td style="padding:6px 0;font-size:14px;font-weight:800;color:#16a34a;text-align:right">${fmtCOP(opts.valor_comision)}</td></tr>
-          <tr><td style="padding:6px 0;font-size:13px;color:#6b7280">Fecha de pago</td>
-              <td style="padding:6px 0;font-size:13px;font-weight:700;color:#2D2A7A;text-align:right">${fechaPago}</td></tr>
-        </table>
-      </div>
+      <!-- Detalle -->
+      <table cellpadding="0" cellspacing="0" width="100%"
+             style="background:#f9fafb;border-radius:12px;overflow:hidden;margin-bottom:20px">
+        <tr>
+          <td colspan="2" style="padding:12px 16px;background:#f1f1f7;border-bottom:1px solid #e2e3e8">
+            <span style="font-size:11px;font-weight:700;color:#6b7280;
+                         text-transform:uppercase;letter-spacing:0.08em;font-family:Arial,sans-serif">
+              Detalle de la p&#243;liza
+            </span>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:9px 16px;font-size:13px;color:#6b7280;border-bottom:1px solid #f3f4f6;font-family:Arial,sans-serif">Cliente</td>
+          <td style="padding:9px 16px;font-size:13px;font-weight:600;color:#111827;text-align:right;border-bottom:1px solid #f3f4f6;font-family:Arial,sans-serif">${opts.cliente_nombre}</td>
+        </tr>
+        ${opts.placa ? `<tr>
+          <td style="padding:9px 16px;font-size:13px;color:#6b7280;border-bottom:1px solid #f3f4f6;font-family:Arial,sans-serif">Placa</td>
+          <td style="padding:9px 16px;font-size:13px;font-weight:600;color:#111827;text-align:right;border-bottom:1px solid #f3f4f6;font-family:Arial,sans-serif">${opts.placa}</td>
+        </tr>` : ''}
+        <tr>
+          <td style="padding:9px 16px;font-size:13px;color:#6b7280;border-bottom:1px solid #f3f4f6;font-family:Arial,sans-serif">Aseguradora</td>
+          <td style="padding:9px 16px;font-size:13px;font-weight:600;color:#111827;text-align:right;border-bottom:1px solid #f3f4f6;font-family:Arial,sans-serif">${opts.aseguradora}</td>
+        </tr>
+        <tr>
+          <td style="padding:9px 16px;font-size:13px;color:#6b7280;border-bottom:1px solid #f3f4f6;font-family:Arial,sans-serif">Prima anual</td>
+          <td style="padding:9px 16px;font-size:13px;font-weight:600;color:#111827;text-align:right;border-bottom:1px solid #f3f4f6;font-family:Arial,sans-serif">${fmtCOP(opts.valor_prima)}</td>
+        </tr>
+        <tr style="background:#f0eeff">
+          <td style="padding:12px 16px;font-size:13px;font-weight:700;color:#2D2A7A;font-family:Arial,sans-serif">Comisi&#243;n (6%)</td>
+          <td style="padding:12px 16px;font-size:16px;font-weight:800;color:#16a34a;text-align:right;font-family:Arial,sans-serif">${fmtCOP(opts.valor_comision)}</td>
+        </tr>
+      </table>
 
-      <div style="background:#f0fdf4;border-radius:10px;padding:14px 18px">
-        <p style="margin:0;font-size:13px;color:#166534;line-height:1.6">
-          💡 <strong>Recuerda:</strong> El depósito se hace a la cuenta bancaria registrada en tu portal.
-          Si quieres actualizar tu cuenta, ve a <strong>Mi información</strong>.
-        </p>
-      </div>
-    `),
+      <!-- Nota cuenta bancaria -->
+      <table cellpadding="0" cellspacing="0" width="100%"
+             style="background:#f0fdf4;border-radius:10px;margin-bottom:6px">
+        <tr>
+          <td style="padding:13px 16px;font-size:13px;color:#166534;line-height:1.6;font-family:Arial,sans-serif">
+            &#128161; <strong>Recuerda:</strong> El dep&#243;sito se hace a la cuenta bancaria registrada en tu portal.
+            Si quieres actualizarla, ve a <strong>Configuraci&#243;n</strong>.
+          </td>
+        </tr>
+      </table>
+
+    </td>
+  </tr>
+
+  ${emailVerEstado(portalUrl, 'Mis p&#243;lizas')}
+  ${emailFooter(imgLogo, imgHandw, base)}
+
+</table>
+</td></tr>
+</table>
+</body>
+</html>`,
   })
 }
 
@@ -507,41 +703,106 @@ export async function sendPolizaNoAprobadaEmail(opts: {
   placa?: string
   motivo: string
 }): Promise<void> {
+  const base      = (env.FRONTEND_URL || '').replace(/\/$/, '')
+  const imgLogo   = `${base}/logo-email.png`
+  const imgHandw  = `${base}/correohandw.png`
+  const portalUrl = `${base}/dashboard/mis-polizas?tab=no_convertida`
+
   await sendMail({
     to:      opts.to,
-    subject: `Novedad sobre la póliza de ${opts.cliente_nombre}`,
-    html:    baseLayout(`
-      <h2 style="margin:0 0 6px;font-size:22px;font-weight:800;color:#111827">Novedad en tu póliza</h2>
-      <p style="margin:0 0 24px;color:#6b7280;font-size:14px;line-height:1.6">
-        Hola <strong>${opts.aliado_nombre}</strong>, te informamos que la póliza del siguiente cliente
-        no pudo ser aprobada en esta ocasión.
+    subject: `Novedad sobre la p&#243;liza de ${opts.cliente_nombre}`,
+    html: `<!DOCTYPE html>
+<html lang="es" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Asegura2.com — Novedad en tu póliza</title>
+</head>
+<body style="margin:0;padding:0;background:#f0f0f5;font-family:Arial,Helvetica,sans-serif">
+<table align="center" cellpadding="0" cellspacing="0" width="100%" style="background:#f0f0f5;padding:24px 12px">
+<tr><td align="center">
+<table cellpadding="0" cellspacing="0" width="100%"
+       style="max-width:580px;background:#ffffff;border-radius:16px;overflow:hidden;border:1px solid #e8e8f0">
+
+  ${emailHeader(imgLogo)}
+
+  <!-- CONTENIDO -->
+  <tr>
+    <td style="padding:28px 24px 0">
+
+      <h2 style="margin:0 0 6px;font-size:22px;font-weight:800;color:#111827;font-family:Arial,sans-serif">
+        Novedad en tu p&#243;liza
+      </h2>
+      <p style="margin:0 0 20px;color:#6b7280;font-size:14px;line-height:1.6;font-family:Arial,sans-serif">
+        Hola <strong style="color:#111827">${opts.aliado_nombre}</strong>,
+        te informamos que la p&#243;liza del siguiente cliente
+        no pudo ser aprobada en esta ocasi&#243;n.
       </p>
 
-      <div style="background:#fef2f2;border:1.5px solid #fecaca;border-radius:12px;padding:20px 24px;margin-bottom:24px">
-        <p style="margin:0 0 12px;font-size:11px;font-weight:700;color:#dc2626;text-transform:uppercase;letter-spacing:0.08em">Cliente no aprobado</p>
-        <table width="100%" cellpadding="0" cellspacing="0">
-          <tr><td style="padding:6px 0;font-size:13px;color:#6b7280">Cliente</td>
-              <td style="padding:6px 0;font-size:13px;font-weight:600;color:#111827;text-align:right">${opts.cliente_nombre}</td></tr>
-          ${opts.placa ? `<tr><td style="padding:6px 0;font-size:13px;color:#6b7280">Placa</td>
-              <td style="padding:6px 0;font-size:13px;font-weight:600;color:#111827;text-align:right">${opts.placa}</td></tr>` : ''}
-          <tr><td style="padding:6px 0;font-size:13px;color:#6b7280">Aseguradora</td>
-              <td style="padding:6px 0;font-size:13px;font-weight:600;color:#111827;text-align:right">${opts.aseguradora}</td></tr>
-        </table>
-      </div>
+      <!-- Detalle cliente -->
+      <table cellpadding="0" cellspacing="0" width="100%"
+             style="background:#fef2f2;border:1.5px solid #fecaca;border-radius:12px;overflow:hidden;margin-bottom:20px">
+        <tr>
+          <td colspan="2" style="padding:12px 16px;background:#fee2e2;border-bottom:1px solid #fecaca">
+            <span style="font-size:11px;font-weight:700;color:#dc2626;
+                         text-transform:uppercase;letter-spacing:0.08em;font-family:Arial,sans-serif">
+              Cliente no aprobado
+            </span>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:9px 16px;font-size:13px;color:#6b7280;border-bottom:1px solid #fecaca;font-family:Arial,sans-serif">Cliente</td>
+          <td style="padding:9px 16px;font-size:13px;font-weight:600;color:#111827;text-align:right;border-bottom:1px solid #fecaca;font-family:Arial,sans-serif">${opts.cliente_nombre}</td>
+        </tr>
+        ${opts.placa ? `<tr>
+          <td style="padding:9px 16px;font-size:13px;color:#6b7280;border-bottom:1px solid #fecaca;font-family:Arial,sans-serif">Placa</td>
+          <td style="padding:9px 16px;font-size:13px;font-weight:600;color:#111827;text-align:right;border-bottom:1px solid #fecaca;font-family:Arial,sans-serif">${opts.placa}</td>
+        </tr>` : ''}
+        <tr>
+          <td style="padding:9px 16px;font-size:13px;color:#6b7280;font-family:Arial,sans-serif">Aseguradora</td>
+          <td style="padding:9px 16px;font-size:13px;font-weight:600;color:#111827;text-align:right;font-family:Arial,sans-serif">${opts.aseguradora}</td>
+        </tr>
+      </table>
 
-      <div style="background:#fff7ed;border-left:4px solid #f97316;border-radius:0 10px 10px 0;padding:16px 20px;margin-bottom:24px">
-        <p style="margin:0 0 6px;font-size:12px;font-weight:700;color:#c2410c;text-transform:uppercase;letter-spacing:0.06em">Motivo</p>
-        <p style="margin:0;font-size:14px;color:#374151;line-height:1.7">${opts.motivo}</p>
-      </div>
+      <!-- Motivo -->
+      <table cellpadding="0" cellspacing="0" width="100%"
+             style="border-left:4px solid #f97316;background:#fff7ed;border-radius:0 10px 10px 0;margin-bottom:20px">
+        <tr>
+          <td style="padding:16px 20px">
+            <p style="margin:0 0 6px;font-size:11px;font-weight:700;color:#c2410c;
+                      text-transform:uppercase;letter-spacing:0.06em;font-family:Arial,sans-serif">
+              Motivo
+            </p>
+            <p style="margin:0;font-size:14px;color:#374151;line-height:1.7;font-family:Arial,sans-serif">
+              ${opts.motivo}
+            </p>
+          </td>
+        </tr>
+      </table>
 
-      <div style="background:#eff6ff;border-radius:10px;padding:14px 18px">
-        <p style="margin:0;font-size:13px;color:#1d4ed8;line-height:1.6">
-          💡 <strong>¿Qué puedes hacer?</strong> Puedes intentar con este cliente en una nueva cotización
-          en el futuro, o cotizar con una aseguradora diferente que se ajuste mejor a su perfil.
-          Entra a tu portal y empieza una nueva cotización cuando quieras.
-        </p>
-      </div>
-    `),
+      <!-- Qué puedes hacer -->
+      <table cellpadding="0" cellspacing="0" width="100%"
+             style="background:#eff6ff;border-radius:10px;margin-bottom:6px">
+        <tr>
+          <td style="padding:13px 16px;font-size:13px;color:#1d4ed8;line-height:1.6;font-family:Arial,sans-serif">
+            &#128161; <strong>&#191;Qu&#233; puedes hacer?</strong> Puedes intentar con este cliente
+            en una nueva cotizaci&#243;n en el futuro, o cotizar con una aseguradora diferente
+            que se ajuste mejor a su perfil.
+          </td>
+        </tr>
+      </table>
+
+    </td>
+  </tr>
+
+  ${emailVerEstado(portalUrl, 'Mis p&#243;lizas')}
+  ${emailFooter(imgLogo, imgHandw, base)}
+
+</table>
+</td></tr>
+</table>
+</body>
+</html>`,
   })
 }
 
