@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { DollarSign, FileText, Shield, TrendingUp, Sparkles, Car, ChevronRight } from 'lucide-react'
+import { DollarSign, FileText, Shield, TrendingUp, Sparkles, Car, ChevronRight, MoreHorizontal } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { useSSE } from '../../context/SSEContext'
@@ -277,39 +277,37 @@ export default function Dashboard() {
               </button>
             </div>
 
-            {/* 2. Stats cards */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12 }}>
+            {/* 2. Stats pills — compact horizontal like reference */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 10 }}>
               {cards.map((c, i) => {
                 const Icon = c.icon
                 return (
                   <div key={i} style={{
-                    background: '#fff', borderRadius: 16, border: '1px solid #eeeeef',
-                    boxShadow: '0 1px 3px rgba(0,0,0,0.06)', overflow: 'hidden',
-                    display: 'flex', flexDirection: 'column', minHeight: 130,
+                    background: '#fff',
+                    borderRadius: 999,
+                    border: '1px solid #eeeeef',
+                    boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
+                    padding: '10px 12px 10px 10px',
+                    display: 'flex', alignItems: 'center', gap: 10,
                   }}>
-                    <div style={{ padding: '14px 14px 8px', flex: 1 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-                        <div style={{ width: 32, height: 32, borderRadius: 10, background: c.iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                          <Icon size={15} color={c.iconColor} />
-                        </div>
-                        <span style={{ fontSize: 10, color: '#9ca3af', fontWeight: 500, lineHeight: 1.3 }}>{c.label}</span>
-                      </div>
-                      <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' }}>
-                        <span style={{ fontSize: 19, fontWeight: 700, color: '#111827', lineHeight: 1 }}>{c.value}</span>
-                        {c.badge && (
-                          <span style={{ fontSize: 9.5, fontWeight: 600, padding: '2px 6px', borderRadius: 99, background: c.badgeBg, color: c.badgeColor }}>
-                            {c.badge}
-                          </span>
-                        )}
-                      </div>
-                      <p style={{ margin: '5px 0 0', fontSize: 10.5, color: c.showArrow ? (c.positive ? '#16a34a' : '#dc2626') : '#9ca3af' }}>
-                        {c.showArrow && <span style={{ marginRight: 2 }}>{c.positive ? '↗' : '↘'}</span>}
-                        {c.sub}
+                    <div style={{
+                      width: 40, height: 40, borderRadius: '50%',
+                      background: c.iconBg,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                    }}>
+                      <Icon size={17} color={c.iconColor} />
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <p style={{ margin: '0 0 1px', fontSize: 10, color: '#9ca3af', fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {c.value}{c.badge ? ` · ${c.badge}` : ''}
+                      </p>
+                      <p style={{ margin: 0, fontSize: 11.5, fontWeight: 700, color: '#111827', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {c.label}
                       </p>
                     </div>
-                    <div style={{ height: 44, overflow: 'hidden' }}>
-                      <Sparkline data={c.spark} color={c.sparkColor} height={44} />
-                    </div>
+                    <button style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 2, flexShrink: 0, color: '#d1d5db', display: 'flex' }}>
+                      <MoreHorizontal size={14} />
+                    </button>
                   </div>
                 )
               })}
