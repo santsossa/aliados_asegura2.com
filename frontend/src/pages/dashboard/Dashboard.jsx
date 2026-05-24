@@ -277,14 +277,14 @@ export default function Dashboard() {
               </button>
             </div>
 
-            {/* 2. Stats pills — compact horizontal like reference */}
+            {/* 2. Stats cards — compact horizontal like reference */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 10 }}>
               {cards.map((c, i) => {
                 const Icon = c.icon
                 return (
                   <div key={i} style={{
                     background: '#fff',
-                    borderRadius: 999,
+                    borderRadius: 16,
                     border: '1px solid #eeeeef',
                     boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
                     padding: '10px 12px 10px 10px',
