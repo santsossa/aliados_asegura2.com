@@ -79,15 +79,15 @@ function UserProfile({ user, sideOpen }) {
   const display  = nombre || user?.email?.split('@')[0] || 'Aliado'
   const correo   = user?.correo || user?.email || ''
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '6px 8px', overflow: 'hidden' }}>
-      <div style={{ width: 30, height: 30, borderRadius: '50%', background: 'linear-gradient(135deg,#4f46e5,#2D2A7A)', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '6px 8px', overflow: 'hidden' }}>
+      <div style={{ width: 30, height: 30, borderRadius: '50%', background: 'linear-gradient(135deg,#4f46e5,#2D2A7A)', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 2 }}>
         <span style={{ fontSize: 11, fontWeight: 800, color: '#fff', textTransform: 'uppercase', lineHeight: 1 }}>
           {initials || '?'}
         </span>
       </div>
-      <div style={{ opacity: sideOpen ? 1 : 0, maxWidth: sideOpen ? 130 : 0, overflow: 'hidden', whiteSpace: 'nowrap', transition: 'opacity 0.2s ease, max-width 0.25s ease', minWidth: 0 }}>
-        <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: '#111827', lineHeight: 1.2 }}>{display}</p>
-        <p style={{ margin: 0, fontSize: 11, color: '#9ca3af', lineHeight: 1.3, marginTop: 1 }}>{correo}</p>
+      <div style={{ opacity: sideOpen ? 1 : 0, maxWidth: sideOpen ? 145 : 0, overflow: 'hidden', transition: 'opacity 0.2s ease, max-width 0.25s ease', minWidth: 0 }}>
+        <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: '#111827', lineHeight: 1.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{display}</p>
+        <p style={{ margin: 0, fontSize: 10.5, color: '#9ca3af', lineHeight: 1.35, marginTop: 2, wordBreak: 'break-all' }}>{correo}</p>
       </div>
     </div>
   )
@@ -232,13 +232,13 @@ export default function DashboardLayout() {
 
               {/* Perfil + logout */}
               <div style={{ padding: '10px', borderTop: '1px solid #f0f0f2' }}>
-                <div style={{ display:'flex', alignItems:'center', gap:10, padding:'6px 8px 10px' }}>
-                  <div style={{ width:32, height:32, borderRadius:'50%', background:'linear-gradient(135deg,#4f46e5,#2D2A7A)', flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
+                <div style={{ display:'flex', alignItems:'flex-start', gap:10, padding:'6px 8px 10px' }}>
+                  <div style={{ width:32, height:32, borderRadius:'50%', background:'linear-gradient(135deg,#4f46e5,#2D2A7A)', flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center', marginTop:2 }}>
                     <span style={{ fontSize:12, fontWeight:800, color:'#fff', textTransform:'uppercase' }}>{initials || '?'}</span>
                   </div>
-                  <div style={{ minWidth:0 }}>
-                    <p style={{ margin:0, fontSize:13, fontWeight:700, color:'#111827' }}>{display}</p>
-                    <p style={{ margin:0, fontSize:11, color:'#9ca3af' }}>{correo}</p>
+                  <div style={{ minWidth:0, flex:1 }}>
+                    <p style={{ margin:0, fontSize:13, fontWeight:700, color:'#111827', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{display}</p>
+                    <p style={{ margin:0, fontSize:11, color:'#9ca3af', wordBreak:'break-all', lineHeight:1.35 }}>{correo}</p>
                   </div>
                 </div>
                 {/* Cerrar sesión — solo hover rojo */}

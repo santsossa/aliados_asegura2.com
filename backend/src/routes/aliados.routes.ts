@@ -31,7 +31,17 @@ function buildGraficaMes(rows: any[], mesActual: number, anioActual: number): { 
     : new Date(anioActual, mesActual, 0).getDate()
   const map: Record<number, number> = {}
   for (const r of rows) map[Number(r.dia)] = Number(r.monto)
-  return Array.from({ length: diasHasta }, (_, i) => ({ dia: i + 1, monto: map[i + 1] || 0 }))
+  let acum = 0
+  return Array.from({ length: diasHasta }, (_, i) => {
+    acum += map[i + 1] || 0
+    return { dia: i + 1, monto: acum }
+  })
+}
+
+function padSparkline(rows: any[], minLength = 8): number[] {
+  const vals = rows.map((r: any) => Number(r.total))
+  while (vals.length < minLength) vals.unshift(0)
+  return vals
 }
 
 // GET /api/aliados/me — perfil del aliado autenticado
@@ -189,7 +199,7 @@ router.get('/dashboard', async (req, res, next) => {
       [id]
     )
     const [spGan] = await pool.execute<any[]>(
-      `SELECT WEEK(created_at) semana, SUM(monto_total) total FROM pagos WHERE aliado_id=? AND estado='procesado' AND created_at>=DATE_SUB(NOW(),INTERVAL 8 WEEK) GROUP BY WEEK(created_at) ORDER BY semana`,
+      `SELECT WEEK(created_at) semana, SUM(valor_comision) total FROM polizas WHERE aliado_id=? AND estado='aprobada' AND created_at>=DATE_SUB(NOW(),INTERVAL 8 WEEK) GROUP BY WEEK(created_at) ORDER BY semana`,
       [id]
     )
 
@@ -209,9 +219,9 @@ router.get('/dashboard', async (req, res, next) => {
           grafica: buildGraficaMes(graficaRows, mes, anio),
         },
         sparklines: {
-          cotizaciones: spCot.map((r: any) => Number(r.total)),
-          polizas:      spPol.map((r: any) => Number(r.total)),
-          ganancias:    spGan.map((r: any) => Number(r.total)),
+          cotizaciones: padSparkline(spCot),
+          polizas:      padSparkline(spPol),
+          ganancias:    padSparkline(spGan),
         },
       }
     })
