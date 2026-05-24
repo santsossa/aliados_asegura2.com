@@ -110,8 +110,7 @@ function LoadingSkeleton() {
     borderRadius: 8,
   }
   return (
-    <div style={{ padding: '10px', height: '100%', overflowY: 'auto' }}>
-    <div style={{ background: '#fff', borderRadius: 22, border: '1px solid #e5e7eb', padding: '24px', maxWidth: '72rem', margin: '0 auto' }}>
+    <div style={{ padding: '20px 24px' }}>
       <div style={{ ...pulse, height: 24, width: 180, marginBottom: 6 }} />
       <div style={{ ...pulse, height: 32, width: 320, marginBottom: 20 }} />
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-4">
@@ -132,7 +131,6 @@ function LoadingSkeleton() {
         .hide-scrollbar { -ms-overflow-style:none; scrollbar-width:none; }
         .hide-scrollbar::-webkit-scrollbar { display:none; }
       `}</style>
-    </div>
     </div>
   )
 }
@@ -241,15 +239,8 @@ export default function Dashboard() {
   const saludo       = hora < 12 ? 'Buenos días' : hora < 18 ? 'Buenas tardes' : 'Buenas noches'
 
   return (
-    <div style={{ height: '100%', overflowY: 'auto', padding: '10px' }}>
-      <div style={{
-        background: '#fff',
-        borderRadius: 22,
-        border: '1px solid #e5e7eb',
-        padding: '24px',
-        maxWidth: '72rem',
-        margin: '0 auto',
-      }}>
+    <div className="p-4 lg:p-8" style={{ height: '100%', overflowY: 'auto' }}>
+      <div style={{ maxWidth: '72rem', margin: '0 auto' }}>
 
         {/* ── Greeting ── */}
         <div style={{ marginBottom: 20 }}>
@@ -517,21 +508,21 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* ── RIGHT COLUMN ── */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          {/* ── RIGHT COLUMN — una sola card ── */}
+          <div style={{
+            background: '#fff',
+            borderRadius: 18,
+            border: '1px solid #eeeeef',
+            boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
+            padding: '20px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 0,
+            alignSelf: 'start',
+          }}>
 
-            {/* Statistic — Tu rendimiento */}
-            <div style={{
-              background: '#fff',
-              borderRadius: 18,
-              border: '1px solid #eeeeef',
-              boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
-              padding: '20px 20px 16px',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 0,
-            }}>
-              {/* Header */}
+            {/* Tu rendimiento */}
+            <div style={{ marginBottom: 20 }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
                 <span style={{ fontWeight: 700, fontSize: 14, color: '#111827' }}>Tu rendimiento</span>
                 <span style={{ fontSize: 10.5, fontWeight: 600, padding: '3px 10px', borderRadius: 99, background: '#f3f4f6', color: '#6b7280' }}>
@@ -539,11 +530,8 @@ export default function Dashboard() {
                 </span>
               </div>
 
-              {/* Comisiones big number */}
               <div style={{ textAlign: 'center', marginBottom: 20 }}>
-                <p style={{ margin: '0 0 4px', fontSize: 11, color: '#9ca3af', fontWeight: 500 }}>
-                  Comisiones generadas
-                </p>
+                <p style={{ margin: '0 0 4px', fontSize: 11, color: '#9ca3af', fontWeight: 500 }}>Comisiones generadas</p>
                 <span style={{ fontSize: 30, fontWeight: 800, color: '#111827', letterSpacing: '-1px', lineHeight: 1 }}>
                   {fmt(rendimiento.comisiones_mes)}
                 </span>
@@ -552,7 +540,6 @@ export default function Dashboard() {
                 </p>
               </div>
 
-              {/* Bar chart */}
               <div style={{ marginBottom: 4 }}>
                 <BarChart data={rendimiento.grafica} color="#4f46e5" />
               </div>
@@ -562,7 +549,6 @@ export default function Dashboard() {
                 ))}
               </div>
 
-              {/* Link */}
               <button
                 onClick={() => navigate('/dashboard/pagos')}
                 style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: '#4f46e5', fontWeight: 600, padding: 0, textAlign: 'left' }}
@@ -571,23 +557,26 @@ export default function Dashboard() {
               </button>
             </div>
 
-            {/* Anto — copiloto IA */}
+            {/* Divisor */}
+            <div style={{ borderTop: '1px solid #f3f4f6', margin: '0 -20px 20px' }} />
+
+            {/* Anto */}
             <div style={{
               background: 'linear-gradient(160deg, #f5f3ff 0%, #ede9fe 100%)',
               border: '1.5px solid #ddd6fe',
-              borderRadius: 18,
-              padding: '20px',
+              borderRadius: 14,
+              padding: '16px',
               display: 'flex',
               flexDirection: 'column',
-              gap: 14,
+              gap: 12,
             }}>
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-                <div style={{ width: 42, height: 42, borderRadius: 13, background: '#2D2A7A', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <Sparkles size={19} color="#fff" />
+                <div style={{ width: 40, height: 40, borderRadius: 12, background: '#2D2A7A', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <Sparkles size={18} color="#fff" />
                 </div>
                 <div>
-                  <p style={{ margin: '0 0 4px', fontSize: 14, fontWeight: 800, color: '#1e1b6e' }}>✨ Anto, tu IA</p>
-                  <p style={{ margin: 0, fontSize: 12, color: '#6d28d9', lineHeight: 1.6 }}>
+                  <p style={{ margin: '0 0 3px', fontSize: 13, fontWeight: 800, color: '#1e1b6e' }}>✨ Anto, tu IA</p>
+                  <p style={{ margin: 0, fontSize: 12, color: '#6d28d9', lineHeight: 1.55 }}>
                     Explica coberturas, compara aseguradoras y responde las preguntas de tus clientes en segundos.
                   </p>
                 </div>
