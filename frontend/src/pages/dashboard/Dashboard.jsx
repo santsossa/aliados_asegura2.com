@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { DollarSign, FileText, Shield, TrendingUp, Sparkles, Car, ChevronRight, MoreHorizontal } from 'lucide-react'
+import { DollarSign, FileText, Shield, TrendingUp, Sparkles, ChevronRight, MoreHorizontal } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { useSSE } from '../../context/SSEContext'
@@ -251,9 +251,23 @@ export default function Dashboard() {
               position: 'relative', overflow: 'hidden', minHeight: 148,
               display: 'flex', flexDirection: 'column', justifyContent: 'center',
             }}>
-              <svg style={{ position: 'absolute', right: 24, top: '50%', transform: 'translateY(-50%)', opacity: 0.15, pointerEvents: 'none' }} width="130" height="130" viewBox="0 0 200 200">
+              {/* Sparkles decorativos */}
+              <svg style={{ position: 'absolute', right: 32, top: '50%', transform: 'translateY(-50%)', opacity: 0.18, pointerEvents: 'none' }} width="110" height="110" viewBox="0 0 200 200">
                 <path d="M100 0 C100 0 108 92 200 100 C200 100 108 108 100 200 C100 200 92 108 0 100 C0 100 92 92 100 0Z" fill="white" />
               </svg>
+              <svg style={{ position: 'absolute', right: 70, top: 18, opacity: 0.13, pointerEvents: 'none' }} width="32" height="32" viewBox="0 0 200 200">
+                <path d="M100 0 C100 0 108 92 200 100 C200 100 108 108 100 200 C100 200 92 108 0 100 C0 100 92 92 100 0Z" fill="white" />
+              </svg>
+              <svg style={{ position: 'absolute', right: 150, top: 12, opacity: 0.09, pointerEvents: 'none' }} width="20" height="20" viewBox="0 0 200 200">
+                <path d="M100 0 C100 0 108 92 200 100 C200 100 108 108 100 200 C100 200 92 108 0 100 C0 100 92 92 100 0Z" fill="white" />
+              </svg>
+              <svg style={{ position: 'absolute', right: 18, bottom: 16, opacity: 0.1, pointerEvents: 'none' }} width="26" height="26" viewBox="0 0 200 200">
+                <path d="M100 0 C100 0 108 92 200 100 C200 100 108 108 100 200 C100 200 92 108 0 100 C0 100 92 92 100 0Z" fill="white" />
+              </svg>
+              <svg style={{ position: 'absolute', right: 200, bottom: 20, opacity: 0.07, pointerEvents: 'none' }} width="16" height="16" viewBox="0 0 200 200">
+                <path d="M100 0 C100 0 108 92 200 100 C200 100 108 108 100 200 C100 200 92 108 0 100 C0 100 92 92 100 0Z" fill="white" />
+              </svg>
+
               <p style={{ margin: '0 0 8px', fontSize: 10, fontWeight: 700, color: '#c7d2fe', letterSpacing: 1.2, textTransform: 'uppercase' }}>Portal de aliados</p>
               <h2 style={{ margin: '0 0 20px', fontSize: 22, fontWeight: 800, color: '#fff', lineHeight: 1.25, maxWidth: 340 }}>
                 Cotiza un seguro en segundos y gana tu comisión
@@ -264,16 +278,15 @@ export default function Dashboard() {
                   display: 'inline-flex', alignItems: 'center', gap: 10,
                   width: 'fit-content',
                   background: '#0f0e1a', border: 'none', borderRadius: 999,
-                  cursor: 'pointer', padding: '10px 20px',
+                  cursor: 'pointer', padding: '9px 9px 9px 18px',
                   color: '#fff', fontSize: 13, fontWeight: 700,
                   transition: 'opacity 0.15s',
                 }}
                 onMouseEnter={e => e.currentTarget.style.opacity = '0.8'}
                 onMouseLeave={e => e.currentTarget.style.opacity = '1'}
               >
-                <Car size={14} />
                 Cotizar ahora
-                <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 22, height: 22, borderRadius: '50%', background: 'rgba(255,255,255,0.15)', fontSize: 14 }}>›</span>
+                <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 26, height: 26, borderRadius: '50%', background: '#ffffff', fontSize: 16, color: '#0f0e1a', fontWeight: 900, lineHeight: 1 }}>›</span>
               </button>
             </div>
 
@@ -417,10 +430,10 @@ export default function Dashboard() {
           </div>
 
           {/* ═══ RIGHT COLUMN — container card ═══ */}
-          <div style={{ background: '#fff', borderRadius: 20, border: '1px solid #e5e7eb', padding: 12, display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div style={{ background: '#f5f7fb', borderRadius: 20, border: '1px solid #e5e7eb', padding: 12, display: 'flex', flexDirection: 'column', gap: 12 }}>
 
-            {/* 5. Tu rendimiento — inner card #eeeeef */}
-            <div style={{ background: '#eeeeef', borderRadius: 16, padding: '18px' }}>
+            {/* 5. Tu rendimiento */}
+            <div style={{ background: '#ffffff', borderRadius: 16, padding: '18px', border: '1px solid #e5e7eb' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
                 <span style={{ fontWeight: 700, fontSize: 14, color: '#111827' }}>Tu rendimiento</span>
                 <span style={{ fontSize: 10.5, fontWeight: 600, padding: '3px 9px', borderRadius: 99, background: '#ffffff', color: '#6b7280' }}>
@@ -457,8 +470,8 @@ export default function Dashboard() {
               </button>
             </div>
 
-            {/* 6. Tu copiloto — inner card #eeeeef, original Anto style */}
-            <div style={{ background: '#eeeeef', borderRadius: 16, padding: '18px' }}>
+            {/* 6. Tu copiloto */}
+            <div style={{ background: '#ffffff', borderRadius: 16, padding: '18px', border: '1px solid #e5e7eb' }}>
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 16 }}>
                 <div style={{ width: 42, height: 42, borderRadius: 13, background: '#2D2A7A', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                   <Sparkles size={19} color="#fff" />

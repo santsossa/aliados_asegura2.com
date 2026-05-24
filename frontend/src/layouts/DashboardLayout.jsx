@@ -2,7 +2,7 @@ import { Outlet, NavLink, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import {
   Home, FileText, ShieldCheck, Wallet, Calculator,
-  AlignJustify, X, LogOut, Sparkles, Settings, Headphones,
+  AlignJustify, X, LogOut, Sparkles, Settings, Headphones, Search,
 } from 'lucide-react'
 import { LogoIcon } from '../components/Logo'
 import { useIsMobile } from '../hooks/use-mobile'
@@ -284,19 +284,17 @@ export default function DashboardLayout() {
 
           {/* Sidebar */}
           <aside style={{ width: sidebarW, height: '100%', background: '#fff', borderRadius: 28, display: 'flex', flexDirection: 'column', overflow: 'hidden', transition: 'width 0.25s cubic-bezier(0.4,0,0.2,1)' }}>
-            <nav style={{ padding: '16px 8px', display: 'flex', flexDirection: 'column', gap: 4, flex: 1 }}>
 
-              {/* Toggle */}
-              <div style={{ paddingBottom: 14, paddingLeft: 4 }}>
-                <button
-                  onClick={() => setSideOpen(v => !v)}
-                  style={{ width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'transparent', border: 'none', borderRadius: 8, cursor: 'pointer', transition: 'background 0.15s' }}
-                  onMouseEnter={e => e.currentTarget.style.background = HOVER_BG}
-                  onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-                >
-                  <AlignJustify size={18} color="#6b7280" />
-                </button>
+            {/* Logo en sidebar */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '14px 10px 12px 12px', borderBottom: '1px solid #f0f0f2', flexShrink: 0, overflow: 'hidden' }}>
+              <LogoIcon size={26} style={{ flexShrink: 0 }} />
+              <div style={{ opacity: sideOpen ? 1 : 0, maxWidth: sideOpen ? 130 : 0, overflow: 'hidden', transition: 'opacity 0.2s ease, max-width 0.25s ease', whiteSpace: 'nowrap' }}>
+                <p style={{ fontWeight: 700, fontSize: 13, color: '#16151b', margin: 0, lineHeight: '15px' }}>Asegura2.com</p>
+                <p style={{ fontWeight: 400, fontSize: 9.5, color: '#a2a8c0', margin: 0 }}>Portal de aliados</p>
               </div>
+            </div>
+
+            <nav style={{ padding: '12px 8px', display: 'flex', flexDirection: 'column', gap: 4, flex: 1 }}>
 
               {/* Nav principal */}
               {NAV_MAIN.map(({ to, icon: Icon, label }) => (
@@ -389,16 +387,30 @@ export default function DashboardLayout() {
           </aside>
 
           {/* Contenido principal */}
-          <main style={{ background: '#eeeeef', borderRadius: 24, overflow: 'hidden', height: '100%', display: 'flex', flexDirection: 'column' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 20px', height: 64, background: '#eeeeef', flexShrink: 0 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <LogoIcon size={30} />
-                <div style={{ lineHeight: '17px' }}>
-                  <p style={{ fontWeight: 600, fontSize: 16, color: '#16151b', margin: 0 }}>Asegura2.com</p>
-                  <p style={{ fontWeight: 400, fontSize: 11, color: '#a2a8c0', margin: 0 }}>Portal de aliados</p>
-                </div>
+          <main style={{ background: '#f5f7fb', borderRadius: 24, overflow: 'hidden', height: '100%', display: 'flex', flexDirection: 'column' }}>
+            {/* Topbar: toggle + búsqueda + campana */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '0 20px', height: 64, background: '#f5f7fb', flexShrink: 0 }}>
+              {/* Sidebar toggle — mismo tamaño que la campana */}
+              <button
+                onClick={() => setSideOpen(v => !v)}
+                style={{ width: 36, height: 36, borderRadius: 10, background: '#fff', border: '1px solid #e5e7eb', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, transition: 'background 0.15s' }}
+                onMouseEnter={e => e.currentTarget.style.background = '#f3f4f6'}
+                onMouseLeave={e => e.currentTarget.style.background = '#fff'}
+              >
+                <AlignJustify size={17} color="#6b7280" />
+              </button>
+              {/* Barra de búsqueda */}
+              <div style={{ flex: 1, maxWidth: 400, position: 'relative' }}>
+                <Search size={14} color="#9ca3af" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
+                <input
+                  placeholder="Buscar cliente, placa, póliza..."
+                  style={{ width: '100%', height: 36, padding: '0 14px 0 34px', borderRadius: 999, border: '1px solid #e5e7eb', background: '#fff', fontSize: 13, color: '#111827', outline: 'none', boxSizing: 'border-box' }}
+                  onFocus={e => e.target.style.borderColor = '#a5b4fc'}
+                  onBlur={e => e.target.style.borderColor = '#e5e7eb'}
+                />
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              {/* Campana */}
+              <div style={{ marginLeft: 'auto' }}>
                 <NotificationBell />
               </div>
             </div>
