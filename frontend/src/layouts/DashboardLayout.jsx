@@ -389,7 +389,7 @@ export default function DashboardLayout() {
           </aside>
 
           {/* Contenido principal */}
-          <main style={{ background: '#eeeeef', borderRadius: 24, overflow: 'auto', height: '100%', display: 'flex', flexDirection: 'column' }}>
+          <main style={{ background: '#eeeeef', borderRadius: 24, overflow: 'hidden', height: '100%', display: 'flex', flexDirection: 'column' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 20px', height: 64, background: '#eeeeef', flexShrink: 0 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 <LogoIcon size={30} />

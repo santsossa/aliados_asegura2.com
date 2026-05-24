@@ -198,6 +198,21 @@ router.get('/dashboard', async (req, res, next) => {
       [id]
     )
 
+    // Pólizas enviadas a emitir con estado en vivo (leads + su poliza si existe)
+    const [polizasProceso] = await pool.execute<any[]>(
+      `SELECT l.id, l.cliente_nombre, l.aseguradora, l.valor_prima, l.created_at,
+              c.placa, c.comercial_value,
+              COALESCE(p.estado, 'en_proceso') estado,
+              COALESCE(p.valor_comision, 0) valor_comision
+       FROM leads l
+       LEFT JOIN cotizaciones c ON c.id = l.cotizacion_id
+       LEFT JOIN polizas p ON p.lead_id = l.id
+       WHERE l.aliado_id = ?
+       ORDER BY l.created_at DESC
+       LIMIT 10`,
+      [id]
+    )
+
     res.json({
       status: 'success',
       data: {
@@ -218,6 +233,12 @@ router.get('/dashboard', async (req, res, next) => {
           polizas:      padSparkline(spPol),
           ganancias:    padSparkline(spGan),
         },
+        polizas_proceso: polizasProceso.map(p => ({
+          ...p,
+          hace: tiempoHace(p.created_at),
+          valor_prima:    Number(p.valor_prima),
+          valor_comision: Number(p.valor_comision),
+        })),
       }
     })
   } catch (err) { next(err) }

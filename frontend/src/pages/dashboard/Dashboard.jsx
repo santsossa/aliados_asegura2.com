@@ -127,7 +127,11 @@ function LoadingSkeleton() {
           <div style={{ ...pulse, height: 200, borderRadius: 18 }} />
         </div>
       </div>
-      <style>{`@keyframes pulse { 0%,100%{background-position:200% 0} 50%{background-position:-200% 0} }`}</style>
+      <style>{`
+        @keyframes pulse { 0%,100%{background-position:200% 0} 50%{background-position:-200% 0} }
+        .hide-scrollbar { -ms-overflow-style:none; scrollbar-width:none; }
+        .hide-scrollbar::-webkit-scrollbar { display:none; }
+      `}</style>
     </div>
     </div>
   )
@@ -169,7 +173,7 @@ export default function Dashboard() {
     )
   }
 
-  const { stats, actividad, rendimiento, sparklines } = data
+  const { stats, actividad, rendimiento, sparklines, polizas_proceso = [] } = data
 
   const nowDate   = new Date()
   const mesLabel  = MESES[nowDate.getMonth()]
@@ -368,6 +372,91 @@ export default function Dashboard() {
                   </div>
                 )
               })}
+            </div>
+
+            {/* Pólizas enviadas a emitir */}
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+                <div>
+                  <span style={{ fontWeight: 700, fontSize: 14, color: '#111827' }}>Enviadas a emitir</span>
+                  <span style={{ marginLeft: 8, fontSize: 11, color: '#9ca3af' }}>— estado en vivo</span>
+                </div>
+                <button
+                  onClick={() => navigate('/dashboard/mis-polizas')}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: '#7c3aed', fontWeight: 500 }}
+                >
+                  Ver todas →
+                </button>
+              </div>
+
+              {polizas_proceso.length === 0 ? (
+                <div style={{
+                  background: '#f9fafb', borderRadius: 14, border: '1px dashed #e5e7eb',
+                  padding: '22px 20px', textAlign: 'center',
+                }}>
+                  <p style={{ margin: 0, fontSize: 13, color: '#9ca3af' }}>
+                    Aún no has enviado ninguna cotización a emitir.
+                  </p>
+                </div>
+              ) : (
+                <div style={{ display: 'flex', gap: 12, overflowX: 'auto', paddingBottom: 6 }} className="hide-scrollbar">
+                  {polizas_proceso.map((p) => {
+                    const cfg = {
+                      en_proceso:    { bar: '#f59e0b', bg: '#fef3c7', color: '#92400e', label: 'En proceso'   },
+                      aprobada:      { bar: '#10b981', bg: '#d1fae5', color: '#065f46', label: 'Aprobada'     },
+                      no_convertida: { bar: '#ef4444', bg: '#fee2e2', color: '#991b1b', label: 'No aprobado'  },
+                    }[p.estado] || { bar: '#9ca3af', bg: '#f3f4f6', color: '#374151', label: p.estado }
+
+                    return (
+                      <div
+                        key={p.id}
+                        style={{
+                          minWidth: 200, maxWidth: 200, flexShrink: 0,
+                          background: '#fff', borderRadius: 14,
+                          border: '1px solid #eeeeef',
+                          boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
+                          overflow: 'hidden',
+                        }}
+                      >
+                        {/* Status colour bar */}
+                        <div style={{ height: 4, background: cfg.bar }} />
+
+                        <div style={{ padding: '12px 14px 14px' }}>
+                          {/* Status badge */}
+                          <span style={{
+                            display: 'inline-flex', alignItems: 'center', gap: 5,
+                            fontSize: 10, fontWeight: 700,
+                            padding: '3px 8px', borderRadius: 99,
+                            background: cfg.bg, color: cfg.color, marginBottom: 10,
+                          }}>
+                            <span style={{ width: 5, height: 5, borderRadius: '50%', background: cfg.bar, flexShrink: 0 }} />
+                            {cfg.label}
+                          </span>
+
+                          {/* Client */}
+                          <p style={{ margin: '0 0 3px', fontSize: 13, fontWeight: 700, color: '#111827', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            {p.cliente_nombre || 'Sin nombre'}
+                          </p>
+
+                          {/* Plate · aseguradora */}
+                          <p style={{ margin: '0 0 10px', fontSize: 11, color: '#6b7280', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            {p.placa || '—'} · {p.aseguradora || '—'}
+                          </p>
+
+                          {/* Commission */}
+                          {p.valor_comision > 0
+                            ? <p style={{ margin: '0 0 3px', fontSize: 13, fontWeight: 800, color: '#16a34a' }}>+{fmt(p.valor_comision)}</p>
+                            : <p style={{ margin: '0 0 3px', fontSize: 11, color: '#9ca3af', fontStyle: 'italic' }}>Pendiente de aprobación</p>
+                          }
+
+                          {/* Time */}
+                          <p style={{ margin: 0, fontSize: 10, color: '#9ca3af' }}>{p.hace}</p>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
             </div>
 
             {/* Actividad reciente */}
