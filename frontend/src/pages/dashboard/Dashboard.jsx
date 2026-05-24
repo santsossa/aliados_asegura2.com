@@ -110,7 +110,8 @@ function LoadingSkeleton() {
     borderRadius: 8,
   }
   return (
-    <div style={{ padding: '20px 24px' }}>
+    <div style={{ padding: '10px', height: '100%', overflowY: 'auto' }}>
+    <div style={{ background: '#fff', borderRadius: 22, border: '1px solid #e5e7eb', padding: '24px', maxWidth: '72rem', margin: '0 auto' }}>
       <div style={{ ...pulse, height: 24, width: 180, marginBottom: 6 }} />
       <div style={{ ...pulse, height: 32, width: 320, marginBottom: 20 }} />
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-4">
@@ -127,6 +128,7 @@ function LoadingSkeleton() {
         </div>
       </div>
       <style>{`@keyframes pulse { 0%,100%{background-position:200% 0} 50%{background-position:-200% 0} }`}</style>
+    </div>
     </div>
   )
 }
@@ -235,8 +237,15 @@ export default function Dashboard() {
   const saludo       = hora < 12 ? 'Buenos días' : hora < 18 ? 'Buenas tardes' : 'Buenas noches'
 
   return (
-    <div className="p-4 lg:p-8" style={{ height: '100%', overflowY: 'auto' }}>
-      <div style={{ maxWidth: '72rem', margin: '0 auto' }}>
+    <div style={{ height: '100%', overflowY: 'auto', padding: '10px' }}>
+      <div style={{
+        background: '#fff',
+        borderRadius: 22,
+        border: '1px solid #e5e7eb',
+        padding: '24px',
+        maxWidth: '72rem',
+        margin: '0 auto',
+      }}>
 
         {/* ── Greeting ── */}
         <div style={{ marginBottom: 20 }}>
