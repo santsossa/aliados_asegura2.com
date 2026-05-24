@@ -135,17 +135,15 @@ router.get('/dashboard', async (req, res, next) => {
     const mesAnt = mes === 1 ? 12 : mes - 1
     const anioAnt = mes === 1 ? anio - 1 : anio
 
-    // Próximo pago pendiente
-    const [pagoRows] = await pool.execute<any[]>(
-      `SELECT monto_total, mes, anio FROM pagos WHERE aliado_id=? AND estado='pendiente' ORDER BY anio,mes LIMIT 1`,
-      [id]
+    // Próximo pago = comisiones aprobadas este mes → se pagan el 1 del mes siguiente
+    const [[comisionesMes]] = await pool.execute<any[]>(
+      `SELECT COALESCE(SUM(valor_comision),0) total FROM polizas WHERE aliado_id=? AND estado='aprobada' AND MONTH(created_at)=? AND YEAR(created_at)=?`,
+      [id, mes, anio]
     )
-    const pago = pagoRows[0] || null
-    let diasRestantes: number | null = null
-    if (pago) {
-      const fecha1 = new Date(pago.anio, pago.mes - 1, 1)
-      diasRestantes = Math.max(0, Math.ceil((fecha1.getTime() - now.getTime()) / 86400000))
-    }
+    const proximoMes  = mes === 12 ? 1 : mes + 1
+    const proximoAnio = mes === 12 ? anio + 1 : anio
+    const fechaPago   = new Date(proximoAnio, proximoMes - 1, 1)
+    const diasRestantes = Math.max(0, Math.ceil((fechaPago.getTime() - now.getTime()) / 86400000))
 
     // Cotizaciones este mes y anterior
     const [[cMes]]    = await pool.execute<any[]>(`SELECT COUNT(*) total FROM cotizaciones WHERE aliado_id=? AND mes=? AND anio_cot=?`, [id, mes, anio])
@@ -180,14 +178,11 @@ router.get('/dashboard', async (req, res, next) => {
       [id, id]
     )
 
-    // Comisiones este mes por día (para gráfica de barras)
+    // Comisiones este mes por día (para gráfica de barras) — filtra por fecha real de aprobación
     const [graficaRows] = await pool.execute<any[]>(
-      `SELECT DAY(created_at) dia, SUM(valor_comision) monto FROM polizas WHERE aliado_id=? AND estado='aprobada' AND mes=? AND anio=? GROUP BY DAY(created_at) ORDER BY dia`,
+      `SELECT DAY(created_at) dia, SUM(valor_comision) monto FROM polizas WHERE aliado_id=? AND estado='aprobada' AND MONTH(created_at)=? AND YEAR(created_at)=? GROUP BY DAY(created_at) ORDER BY dia`,
       [id, mes, anio]
     )
-
-    // Comisiones totales este mes (para rendimiento)
-    const [[comMes]]  = await pool.execute<any[]>(`SELECT COALESCE(SUM(valor_comision),0) total FROM polizas WHERE aliado_id=? AND estado='aprobada' AND mes=? AND anio=?`, [id, mes, anio])
 
     // Sparkline cotizaciones: últimas 8 semanas, group by week
     const [spCot] = await pool.execute<any[]>(
@@ -207,14 +202,14 @@ router.get('/dashboard', async (req, res, next) => {
       status: 'success',
       data: {
         stats: {
-          proximo_pago:    { monto: pago?.monto_total ?? 0, mes: pago?.mes ?? null, anio: pago?.anio ?? null, dias_restantes: diasRestantes },
+          proximo_pago:    { monto: Number(comisionesMes.total), mes: proximoMes, anio: proximoAnio, dias_restantes: diasRestantes },
           cotizaciones_mes:{ total: Number(cMes.total),  variacion: variacionPct(Number(cMes.total), Number(cAnt.total)) },
           polizas_mes:     { total: Number(pMes.total),  variacion: variacionPct(Number(pMes.total), Number(pAnt.total)) },
           total_ganado:    { monto: Number(ganTotal.total), variacion: variacionPct(Number(ganTotal.total), Number(ganAnt.total)) },
         },
         actividad: actividad.map(a => ({ ...a, hace: tiempoHace(a.created_at), monto: Number(a.monto) })),
         rendimiento: {
-          comisiones_mes: Number(comMes.total),
+          comisiones_mes: Number(comisionesMes.total),
           meta_mes: 5000000,
           grafica: buildGraficaMes(graficaRows, mes, anio),
         },

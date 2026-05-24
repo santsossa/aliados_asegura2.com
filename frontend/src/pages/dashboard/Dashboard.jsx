@@ -181,9 +181,7 @@ export default function Dashboard() {
       badge: stats.proximo_pago.dias_restantes !== null ? `En ${stats.proximo_pago.dias_restantes} días` : null,
       badgeBg: '#dcfce7',
       badgeColor: '#16a34a',
-      sub: stats.proximo_pago.mes
-        ? `1 de ${MESES[stats.proximo_pago.mes - 1]}, ${stats.proximo_pago.anio}`
-        : 'Sin pagos pendientes',
+      sub: `1 de ${MESES[stats.proximo_pago.mes - 1]}, ${stats.proximo_pago.anio}`,
       showArrow: false,
       spark: sparklines.ganancias,
       sparkColor: '#16a34a',
