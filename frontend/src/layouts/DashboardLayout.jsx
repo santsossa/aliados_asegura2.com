@@ -435,11 +435,23 @@ export default function DashboardLayout() {
           {/* ── Contenido principal ───────────────────────────────────────── */}
           <main style={{ background: PAGE_BG, borderRadius: 24, overflow: 'hidden', height: '100%', display: 'flex', flexDirection: 'column' }}>
 
-            {/* Topbar: buscador + notificaciones */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 20px', height: 64, background: PAGE_BG, flexShrink: 0, gap: 16 }}>
+            {/* Topbar: buscador + notificaciones + perfil */}
+            <div style={{ display: 'flex', alignItems: 'center', padding: '0 20px', height: 64, background: PAGE_BG, flexShrink: 0, gap: 14 }}>
               <TopbarSearch />
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
                 <NotificationBell />
+                <div style={{ width: 1, height: 28, background: '#e5e7eb' }} />
+                {/* User profile chip */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '5px 12px 5px 6px', background: '#fff', borderRadius: 999, border: '1px solid #e5e7eb', cursor: 'default' }}>
+                  <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'linear-gradient(135deg,#4f46e5,#2D2A7A)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <span style={{ fontSize: 10, fontWeight: 800, color: '#fff', textTransform: 'uppercase' }}>
+                      {((user?.nombre?.[0] || '') + (user?.apellido?.[0] || user?.nombre?.[1] || '')).toUpperCase() || '?'}
+                    </span>
+                  </div>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: '#111827', whiteSpace: 'nowrap' }}>
+                    {user?.nombre || user?.email?.split('@')[0] || 'Aliado'}
+                  </span>
+                </div>
               </div>
             </div>
 

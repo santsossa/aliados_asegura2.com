@@ -29,23 +29,30 @@ function getBadge(estado, tipo) {
 }
 
 const POLIZA_CFG = {
-  en_proceso:    { bg: '#fef3c7', color: '#92400e', label: 'En proceso'  },
-  aprobada:      { bg: '#d1fae5', color: '#065f46', label: 'Aprobada'    },
-  no_convertida: { bg: '#fee2e2', color: '#991b1b', label: 'No aprobado' },
+  en_proceso:    { cardBg: '#fffbeb', border: '#fde68a', accent: '#f59e0b', color: '#92400e', label: 'En proceso'  },
+  aprobada:      { cardBg: '#f0fdf4', border: '#bbf7d0', accent: '#10b981', color: '#065f46', label: 'Aprobada'    },
+  no_convertida: { cardBg: '#fff1f2', border: '#fecdd3', accent: '#f43f5e', color: '#991b1b', label: 'No aprobado' },
 }
 function getPcfg(estado) {
-  return POLIZA_CFG[estado] || { bg: '#f3f4f6', color: '#374151', label: estado }
+  return POLIZA_CFG[estado] || { cardBg: '#f9fafb', border: '#e5e7eb', accent: '#9ca3af', color: '#374151', label: estado }
 }
 
 const MESES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre']
 const MESES_CORTO = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic']
 
+const ANTO_ACCIONES = [
+  { label: 'Preguntar por coberturas',     sub: 'Qué cubre la póliza del cliente' },
+  { label: 'Comparar aseguradoras',        sub: 'Diferencias entre opciones'      },
+  { label: 'Explicar exclusiones',         sub: 'Qué NO cubre la póliza'          },
+  { label: 'Responder dudas del cliente',  sub: 'Respuestas rápidas y claras'     },
+]
+
 // ─── Sparkline ───────────────────────────────────────────────────────────────
-function Sparkline({ data = [], color = '#2D2A7A', height = 44 }) {
+function Sparkline({ data = [], color = '#2D2A7A', height = 40 }) {
   if (data.length < 2) {
     return (
-      <svg viewBox="0 0 100 44" width="100%" height={height} preserveAspectRatio="none">
-        <line x1="0" y1="22" x2="100" y2="22" stroke={color} strokeWidth="1.5" strokeOpacity="0.3" />
+      <svg viewBox="0 0 100 40" width="100%" height={height} preserveAspectRatio="none">
+        <line x1="0" y1="20" x2="100" y2="20" stroke={color} strokeWidth="1.5" strokeOpacity="0.25" />
       </svg>
     )
   }
@@ -63,33 +70,33 @@ function Sparkline({ data = [], color = '#2D2A7A', height = 44 }) {
     d += ` C${cx},${pts[i - 1][1]} ${cx},${pts[i][1]} ${pts[i][0]},${pts[i][1]}`
   }
   const area = `${d} L${pts[pts.length - 1][0]},${H} L${pts[0][0]},${H} Z`
-  const gradId = `sg-${color.replace('#', '')}`
+  const gradId = `sg-${color.replace('#', '')}-${height}`
   return (
     <svg viewBox={`0 0 ${W} ${H}`} width="100%" height={height} preserveAspectRatio="none" style={{ display: 'block' }}>
       <defs>
         <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor={color} stopOpacity="0.18" />
+          <stop offset="0%" stopColor={color} stopOpacity="0.15" />
           <stop offset="100%" stopColor={color} stopOpacity="0" />
         </linearGradient>
       </defs>
       <path d={area} fill={`url(#${gradId})`} />
-      <path d={d} fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d={d} fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   )
 }
 
-// ─── Bar chart (one bar per day, cumulative) ──────────────────────────────────
-function BarChart({ data = [], color = '#2D2A7A' }) {
+// ─── Bar chart (daily cumulative) ────────────────────────────────────────────
+function BarChart({ data = [], color = '#4f46e5' }) {
   if (!data.length) {
     return (
-      <div style={{ height: 100, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <span style={{ fontSize: 12, color: '#9ca3af' }}>Sin datos aún</span>
+      <div style={{ height: 90, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <span style={{ fontSize: 11, color: '#9ca3af' }}>Sin datos aún</span>
       </div>
     )
   }
   const max = Math.max(...data.map(d => d.monto), 1)
   return (
-    <div style={{ display: 'flex', alignItems: 'flex-end', gap: 2, height: 100, width: '100%' }}>
+    <div style={{ display: 'flex', alignItems: 'flex-end', gap: 2, height: 90, width: '100%' }}>
       {data.map((d, i) => (
         <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
           <div
@@ -98,9 +105,8 @@ function BarChart({ data = [], color = '#2D2A7A' }) {
               width: '100%',
               height: `${Math.max((d.monto / max) * 100, d.monto > 0 ? 4 : 2)}%`,
               background: color,
-              opacity: d.monto > 0 ? 0.75 + (d.monto / max) * 0.25 : 0.12,
-              borderRadius: '3px 3px 0 0',
-              transition: 'opacity 0.2s',
+              opacity: d.monto > 0 ? 0.6 + (d.monto / max) * 0.4 : 0.1,
+              borderRadius: '2px 2px 0 0',
             }}
           />
         </div>
@@ -109,49 +115,21 @@ function BarChart({ data = [], color = '#2D2A7A' }) {
   )
 }
 
-// ─── DonutRing ────────────────────────────────────────────────────────────────
-function DonutRing({ pct: p = 0, size = 80, stroke = 8, color = '#4f46e5' }) {
-  const r = (size - stroke) / 2
-  const circ = 2 * Math.PI * r
-  const dash = (Math.min(p, 100) / 100) * circ
-  return (
-    <div style={{ position: 'relative', width: size, height: size, display: 'inline-block', flexShrink: 0 }}>
-      <svg width={size} height={size} style={{ display: 'block', transform: 'rotate(-90deg)' }}>
-        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="#d1d5db" strokeWidth={stroke} />
-        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={color} strokeWidth={stroke}
-          strokeDasharray={`${dash} ${circ}`} strokeLinecap="round" />
-      </svg>
-      <div style={{
-        position: 'absolute', top: -5, right: -5,
-        background: color, color: '#fff', fontSize: 8.5, fontWeight: 800,
-        borderRadius: 99, padding: '2px 5px', lineHeight: 1.4,
-      }}>
-        {p}%
-      </div>
-    </div>
-  )
-}
-
 // ─── Loading skeleton ─────────────────────────────────────────────────────────
 function LoadingSkeleton() {
-  const pulse = {
-    background: 'linear-gradient(90deg,#f3f4f6 25%,#e5e7eb 50%,#f3f4f6 75%)',
-    backgroundSize: '200% 100%',
-    animation: 'pulse 1.5s infinite',
-    borderRadius: 8,
-  }
+  const p = { background: 'linear-gradient(90deg,#f3f4f6 25%,#e5e7eb 50%,#f3f4f6 75%)', backgroundSize: '200% 100%', animation: 'pulse 1.5s infinite', borderRadius: 10 }
   return (
-    <div style={{ padding: '20px 24px' }}>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: 20 }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          <div style={{ ...pulse, height: 148, borderRadius: 18 }} />
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12 }}>
-            {[1,2,3,4].map(i => <div key={i} style={{ ...pulse, height: 130, borderRadius: 14 }} />)}
+    <div style={{ padding: '16px 20px' }}>
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-4">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <div style={{ ...p, height: 130, borderRadius: 18 }} />
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
+            {[1,2,3,4].map(i => <div key={i} style={{ ...p, height: 80 }} />)}
           </div>
-          <div style={{ ...pulse, height: 180, borderRadius: 16 }} />
-          <div style={{ ...pulse, height: 240, borderRadius: 16 }} />
+          <div style={{ ...p, height: 200, borderRadius: 16 }} />
+          <div style={{ ...p, height: 200, borderRadius: 16 }} />
         </div>
-        <div style={{ ...pulse, height: 520, borderRadius: 18 }} />
+        <div style={{ ...p, height: 480, borderRadius: 18 }} />
       </div>
       <style>{`@keyframes pulse{0%,100%{background-position:200% 0}50%{background-position:-200% 0}}`}</style>
     </div>
@@ -186,176 +164,186 @@ export default function Dashboard() {
 
   const { stats, actividad, rendimiento, sparklines, polizas_proceso = [] } = data
   const nowDate      = new Date()
-  const mesLabel     = MESES[nowDate.getMonth()]
   const mesCorto     = MESES_CORTO[nowDate.getMonth()]
   const anioLabel    = nowDate.getFullYear()
   const nombreAliado = user?.nombre || 'aliado'
+  const apellido     = user?.apellido || ''
+  const initials     = (nombreAliado[0] || '') + (apellido[0] || nombreAliado[1] || '')
   const hora         = new Date().getHours()
   const saludo       = hora < 12 ? 'Buenos días' : hora < 18 ? 'Buenas tardes' : 'Buenas noches'
-  const metaPct      = Math.min(100, Math.round((rendimiento.comisiones_mes / (rendimiento.meta_mes || 5000000)) * 100))
   const tickDias     = [1, 8, 15, 22, 29]
 
-  const cards = [
+  const statCards = [
     {
       icon: DollarSign, iconBg: '#dcfce7', iconColor: '#16a34a',
       label: 'Próximo pago',
       value: fmt(stats.proximo_pago.monto ?? 0),
-      badge: stats.proximo_pago.dias_restantes !== null ? `En ${stats.proximo_pago.dias_restantes} días` : null,
-      badgeBg: '#dcfce7', badgeColor: '#16a34a',
-      sub: stats.proximo_pago.mes
-        ? `1 de ${MESES[stats.proximo_pago.mes - 1]}, ${stats.proximo_pago.anio}`
-        : 'Sin pagos pendientes',
-      showArrow: false, spark: sparklines.ganancias, sparkColor: '#16a34a',
+      sub: stats.proximo_pago.mes ? `1 de ${MESES[stats.proximo_pago.mes - 1]}` : '—',
+      positive: null,
+      spark: sparklines.ganancias, sparkColor: '#16a34a',
     },
     {
       icon: FileText, iconBg: '#dbeafe', iconColor: '#2563eb',
       label: `Cotizaciones · ${mesCorto}`,
       value: String(stats.cotizaciones_mes.total),
-      badge: null,
-      sub: `${pct(stats.cotizaciones_mes.variacion)} vs. el mes anterior`,
-      showArrow: true, positive: stats.cotizaciones_mes.variacion >= 0,
+      sub: `${pct(stats.cotizaciones_mes.variacion)} vs. anterior`,
+      positive: stats.cotizaciones_mes.variacion >= 0,
       spark: sparklines.cotizaciones, sparkColor: '#2563eb',
     },
     {
       icon: Shield, iconBg: '#ede9fe', iconColor: '#7c3aed',
       label: `Pólizas aprobadas · ${mesCorto}`,
       value: String(stats.polizas_mes.total),
-      badge: null,
-      sub: `${pct(stats.polizas_mes.variacion)} vs. el mes anterior`,
-      showArrow: true, positive: stats.polizas_mes.variacion >= 0,
+      sub: `${pct(stats.polizas_mes.variacion)} vs. anterior`,
+      positive: stats.polizas_mes.variacion >= 0,
       spark: sparklines.polizas, sparkColor: '#7c3aed',
     },
     {
       icon: TrendingUp, iconBg: '#fff7ed', iconColor: '#ea580c',
       label: 'Total ganado histórico',
       value: fmt(stats.total_ganado.monto),
-      badge: null,
-      sub: `${pct(stats.total_ganado.variacion)} vs. el mes anterior`,
-      showArrow: true, positive: stats.total_ganado.variacion >= 0,
+      sub: `${pct(stats.total_ganado.variacion)} vs. anterior`,
+      positive: stats.total_ganado.variacion >= 0,
       spark: sparklines.ganancias, sparkColor: '#ea580c',
     },
   ]
 
   return (
-    <div className="p-4 lg:p-6" style={{ height: '100%', overflowY: 'auto' }}>
-      <div style={{ maxWidth: '72rem', margin: '0 auto' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: 20, alignItems: 'start' }}>
+    <div style={{ padding: '16px 20px', height: '100%', overflowY: 'auto', boxSizing: 'border-box' }}>
+      <div style={{ maxWidth: '80rem', margin: '0 auto' }}>
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-4 lg:gap-5" style={{ alignItems: 'start' }}>
 
           {/* ═══ LEFT COLUMN ═══ */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
 
-            {/* 1. Hero banner */}
+            {/* 1. Hero — white card with greeting + avatar */}
             <div style={{
-              background: 'linear-gradient(135deg, #3730a3 0%, #4f46e5 60%, #6366f1 100%)',
-              borderRadius: 18, padding: '28px 32px',
-              position: 'relative', overflow: 'hidden', minHeight: 148,
-              display: 'flex', flexDirection: 'column', justifyContent: 'center',
+              background: '#fff',
+              borderRadius: 18, padding: '24px 28px',
+              border: '1px solid #eeeeef',
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16,
+              boxShadow: '0 1px 4px rgba(0,0,0,0.05)',
             }}>
-              <svg style={{ position: 'absolute', right: 24, top: '50%', transform: 'translateY(-50%)', opacity: 0.15, pointerEvents: 'none' }} width="130" height="130" viewBox="0 0 200 200">
-                <path d="M100 0 C100 0 108 92 200 100 C200 100 108 108 100 200 C100 200 92 108 0 100 C0 100 92 92 100 0Z" fill="white" />
-              </svg>
-              <p style={{ margin: '0 0 8px', fontSize: 10, fontWeight: 700, color: '#c7d2fe', letterSpacing: 1.2, textTransform: 'uppercase' }}>Portal de aliados</p>
-              <h2 style={{ margin: '0 0 20px', fontSize: 22, fontWeight: 800, color: '#fff', lineHeight: 1.25, maxWidth: 340 }}>
-                Cotiza un seguro en segundos y gana tu comisión
-              </h2>
-              <button
-                onClick={() => navigate('/dashboard/cotizar')}
-                style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 10,
-                  width: 'fit-content',
-                  background: '#0f0e1a', border: 'none', borderRadius: 999,
-                  cursor: 'pointer', padding: '10px 20px',
-                  color: '#fff', fontSize: 13, fontWeight: 700,
-                  transition: 'opacity 0.15s',
-                }}
-                onMouseEnter={e => e.currentTarget.style.opacity = '0.8'}
-                onMouseLeave={e => e.currentTarget.style.opacity = '1'}
-              >
-                <Car size={14} />
-                Cotizar ahora
-                <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 22, height: 22, borderRadius: '50%', background: 'rgba(255,255,255,0.15)', fontSize: 14 }}>›</span>
-              </button>
+              <div style={{ minWidth: 0 }}>
+                <p style={{ margin: '0 0 4px', fontSize: 11, color: '#9ca3af', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.8 }}>
+                  Portal de aliados
+                </p>
+                <h2 style={{ margin: '0 0 4px', fontSize: 20, fontWeight: 800, color: '#111827', lineHeight: 1.25 }}>
+                  {saludo}, {nombreAliado}! 👋
+                </h2>
+                <p style={{ margin: '0 0 18px', fontSize: 13, color: '#6b7280' }}>
+                  ¿Qué vas a vender hoy?
+                </p>
+                <button
+                  onClick={() => navigate('/dashboard/cotizar')}
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: 8, width: 'fit-content', background: '#2D2A7A', border: 'none', borderRadius: 999, cursor: 'pointer', padding: '9px 18px', color: '#fff', fontSize: 13, fontWeight: 700, transition: 'opacity 0.15s' }}
+                  onMouseEnter={e => e.currentTarget.style.opacity = '0.85'}
+                  onMouseLeave={e => e.currentTarget.style.opacity = '1'}
+                >
+                  <Car size={14} />
+                  Cotizar ahora
+                </button>
+              </div>
+              {/* Avatar */}
+              <div style={{ width: 80, height: 80, borderRadius: '50%', background: 'linear-gradient(135deg,#4f46e5,#2D2A7A)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <span style={{ fontSize: 28, fontWeight: 900, color: '#fff', textTransform: 'uppercase', lineHeight: 1 }}>
+                  {(initials || nombreAliado[0] || 'A').toUpperCase()}
+                </span>
+              </div>
             </div>
 
-            {/* 2. Stats cards — compact horizontal like reference */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 10 }}>
-              {cards.map((c, i) => {
+            {/* 2. Stats cards — título arriba, valor abajo */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 lg:gap-3">
+              {statCards.map((c, i) => {
                 const Icon = c.icon
                 return (
                   <div key={i} style={{
-                    background: '#fff',
-                    borderRadius: 16,
-                    border: '1px solid #eeeeef',
-                    boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
-                    padding: '10px 12px 10px 10px',
-                    display: 'flex', alignItems: 'center', gap: 10,
+                    background: '#fff', borderRadius: 14, border: '1px solid #eeeeef',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.05)', overflow: 'hidden',
+                    display: 'flex', flexDirection: 'column',
                   }}>
-                    <div style={{
-                      width: 40, height: 40, borderRadius: '50%',
-                      background: c.iconBg,
-                      display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-                    }}>
-                      <Icon size={17} color={c.iconColor} />
-                    </div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={{ margin: '0 0 1px', fontSize: 10, color: '#9ca3af', fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                        {c.value}{c.badge ? ` · ${c.badge}` : ''}
+                    <div style={{ padding: '12px 12px 8px', flex: 1 }}>
+                      {/* Icono + título */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 8 }}>
+                        <div style={{ width: 28, height: 28, borderRadius: 8, background: c.iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                          <Icon size={13} color={c.iconColor} />
+                        </div>
+                        <span style={{ fontSize: 9.5, color: '#9ca3af', fontWeight: 600, lineHeight: 1.2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.label}</span>
+                        <button style={{ marginLeft: 'auto', background: 'none', border: 'none', cursor: 'pointer', color: '#d1d5db', padding: 0, display: 'flex', flexShrink: 0 }}>
+                          <MoreHorizontal size={12} />
+                        </button>
+                      </div>
+                      {/* Valor (contenido principal) */}
+                      <p style={{ margin: '0 0 3px', fontSize: 17, fontWeight: 800, color: '#111827', lineHeight: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.value}</p>
+                      {/* Sub */}
+                      <p style={{ margin: 0, fontSize: 10, color: c.positive === null ? '#9ca3af' : c.positive ? '#16a34a' : '#dc2626' }}>
+                        {c.positive !== null && <span style={{ marginRight: 2 }}>{c.positive ? '↗' : '↘'}</span>}
+                        {c.sub}
                       </p>
-                      <p style={{ margin: 0, fontSize: 11.5, fontWeight: 700, color: '#111827', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                        {c.label}
-                      </p>
                     </div>
-                    <button style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 2, flexShrink: 0, color: '#d1d5db', display: 'flex' }}>
-                      <MoreHorizontal size={14} />
-                    </button>
+                    {/* Sparkline */}
+                    <div style={{ height: 40, overflow: 'hidden' }}>
+                      <Sparkline data={c.spark} color={c.sparkColor} height={40} />
+                    </div>
                   </div>
                 )
               })}
             </div>
 
-            {/* 3. Enviadas a emitir — full card, row list */}
-            <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #eeeeef', overflow: 'hidden' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', borderBottom: '1px solid #f3f4f6' }}>
+            {/* 3. Enviadas a emitir — mini-cards por estado, sin emojis */}
+            <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #eeeeef', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 18px', borderBottom: '1px solid #f3f4f6' }}>
                 <span style={{ fontWeight: 700, fontSize: 14, color: '#111827' }}>Enviadas a emitir</span>
                 <button onClick={() => navigate('/dashboard/mis-polizas')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: '#7c3aed', fontWeight: 500 }}>
                   Ver todas →
                 </button>
               </div>
+
               {polizas_proceso.length === 0 ? (
-                <div style={{ padding: '28px 20px', textAlign: 'center' }}>
+                <div style={{ padding: '28px 18px', textAlign: 'center' }}>
                   <p style={{ margin: 0, fontSize: 13, color: '#9ca3af' }}>Aún no has enviado ninguna cotización a emitir.</p>
                 </div>
               ) : (
-                <div>
-                  {polizas_proceso.map((p, i) => {
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3" style={{ padding: 14 }}>
+                  {polizas_proceso.map((p) => {
                     const cfg = getPcfg(p.estado)
                     return (
                       <div
                         key={p.id}
                         onClick={() => navigate('/dashboard/mis-polizas')}
-                        style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 20px', borderBottom: i < polizas_proceso.length - 1 ? '1px solid #f9fafb' : 'none', cursor: 'pointer', transition: 'background 0.12s' }}
-                        onMouseEnter={e => e.currentTarget.style.background = '#fafafa'}
-                        onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                        style={{
+                          background: cfg.cardBg,
+                          borderRadius: 12,
+                          border: `1.5px solid ${cfg.border}`,
+                          padding: '12px 14px',
+                          cursor: 'pointer',
+                          transition: 'transform 0.12s, box-shadow 0.12s',
+                        }}
+                        onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.08)' }}
+                        onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = 'none' }}
                       >
-                        <div style={{ width: 36, height: 36, borderRadius: 10, background: cfg.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                          <span style={{ fontSize: 16 }}>🚗</span>
-                        </div>
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <p style={{ margin: '0 0 2px', fontSize: 13, fontWeight: 600, color: '#111827', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                            {p.cliente_nombre || 'Sin nombre'}
-                          </p>
-                          <p style={{ margin: 0, fontSize: 11, color: '#9ca3af' }}>
-                            {p.placa || '—'} · {p.aseguradora || '—'} · {p.hace}
-                          </p>
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-                          {p.valor_comision > 0 && (
-                            <span style={{ fontSize: 12, fontWeight: 600, color: '#16a34a' }}>+{fmt(p.valor_comision)}</span>
-                          )}
-                          <span style={{ fontSize: 10, fontWeight: 600, padding: '3px 8px', borderRadius: 99, background: cfg.bg, color: cfg.color, whiteSpace: 'nowrap' }}>
+                        {/* Estado label */}
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+                          <span style={{ fontSize: 9.5, fontWeight: 800, color: cfg.color, textTransform: 'uppercase', letterSpacing: 0.6 }}>
                             {cfg.label}
                           </span>
-                          <ChevronRight size={14} color="#d1d5db" />
+                          <div style={{ width: 7, height: 7, borderRadius: '50%', background: cfg.accent, flexShrink: 0 }} />
+                        </div>
+                        {/* Cliente */}
+                        <p style={{ margin: '0 0 3px', fontSize: 13, fontWeight: 700, color: '#111827', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {p.cliente_nombre || 'Sin nombre'}
+                        </p>
+                        {/* Placa + aseguradora */}
+                        <p style={{ margin: '0 0 8px', fontSize: 11, color: '#6b7280', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {p.placa || '—'} · {p.aseguradora || '—'}
+                        </p>
+                        {/* Footer */}
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: `1px solid ${cfg.border}`, paddingTop: 8 }}>
+                          <span style={{ fontSize: 11, color: '#9ca3af' }}>{p.hace}</span>
+                          {p.valor_comision > 0
+                            ? <span style={{ fontSize: 12, fontWeight: 700, color: '#16a34a' }}>+{fmt(p.valor_comision)}</span>
+                            : <ChevronRight size={13} color={cfg.color} />
+                          }
                         </div>
                       </div>
                     )
@@ -364,21 +352,19 @@ export default function Dashboard() {
               )}
             </div>
 
-            {/* 4. Actividad reciente — full card, row list */}
-            <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #eeeeef', overflow: 'hidden' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', borderBottom: '1px solid #f3f4f6' }}>
+            {/* 4. Actividad reciente */}
+            <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #eeeeef', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 18px', borderBottom: '1px solid #f3f4f6' }}>
                 <span style={{ fontWeight: 700, fontSize: 14, color: '#111827' }}>Actividad reciente</span>
                 <button onClick={() => navigate('/dashboard/cotizaciones')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: '#7c3aed', fontWeight: 500 }}>
                   Ver todas →
                 </button>
               </div>
+
               {actividad.length === 0 ? (
-                <div style={{ padding: '36px 20px', textAlign: 'center' }}>
-                  <div style={{ fontSize: 32, marginBottom: 10 }}>🚘</div>
+                <div style={{ padding: '36px 18px', textAlign: 'center' }}>
                   <p style={{ margin: '0 0 4px', fontSize: 14, fontWeight: 600, color: '#374151' }}>Aquí verás tu actividad reciente</p>
-                  <p style={{ margin: '0 0 16px', fontSize: 12, color: '#9ca3af', lineHeight: 1.5 }}>
-                    Empieza creando tu primera cotización<br />en menos de 2 minutos.
-                  </p>
+                  <p style={{ margin: '0 0 14px', fontSize: 12, color: '#9ca3af' }}>Empieza creando tu primera cotización.</p>
                   <button onClick={() => navigate('/dashboard/cotizar')} style={{ background: '#2D2A7A', color: '#fff', border: 'none', borderRadius: 10, padding: '8px 20px', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
                     Nueva cotización →
                   </button>
@@ -388,19 +374,19 @@ export default function Dashboard() {
                   {actividad.map((a, i) => {
                     const badge  = getBadge(a.estado, a.tipo)
                     const nombre = a.cliente_nombre || 'Sin nombre'
-                    const sub    = (a.tipo === 'cotizacion')
+                    const sub    = a.tipo === 'cotizacion'
                       ? (a.aseguradora && a.aseguradora !== '—' ? `Placa: ${a.aseguradora}` : 'Sin placa')
                       : (a.aseguradora || '—')
                     return (
                       <div
                         key={`${a.tipo}-${a.id}-${i}`}
-                        style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 20px', borderBottom: i < actividad.length - 1 ? '1px solid #f9fafb' : 'none' }}
+                        style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '11px 18px', borderBottom: i < actividad.length - 1 ? '1px solid #f9fafb' : 'none' }}
                       >
-                        <div style={{ width: 36, height: 36, borderRadius: 10, flexShrink: 0, background: a.estado === 'enviada' ? '#dcfce7' : '#dbeafe', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                          <FileText size={16} color={a.estado === 'enviada' ? '#16a34a' : '#2563eb'} />
+                        <div style={{ width: 34, height: 34, borderRadius: 9, flexShrink: 0, background: a.estado === 'enviada' ? '#dcfce7' : '#dbeafe', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <FileText size={15} color={a.estado === 'enviada' ? '#16a34a' : '#2563eb'} />
                         </div>
                         <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ fontSize: 13, fontWeight: 600, color: '#111827', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{nombre}</div>
+                          <div style={{ fontSize: 13, fontWeight: 600, color: '#111827', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{nombre}</div>
                           <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 1 }}>{sub}</div>
                         </div>
                         <div style={{ fontSize: 11, color: '#9ca3af', whiteSpace: 'nowrap', flexShrink: 0 }}>{a.hace}</div>
@@ -416,58 +402,79 @@ export default function Dashboard() {
 
           </div>
 
-          {/* ═══ RIGHT COLUMN — container card ═══ */}
-          <div style={{ background: '#fff', borderRadius: 20, border: '1px solid #e5e7eb', padding: 12, display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {/* ═══ RIGHT COLUMN ═══ */}
+          <div style={{ background: '#fff', borderRadius: 20, border: '1px solid #e5e7eb', padding: 12, display: 'flex', flexDirection: 'column', gap: 12, boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
 
-            {/* 5. Tu rendimiento — inner card #eeeeef */}
-            <div style={{ background: '#eeeeef', borderRadius: 16, padding: '18px' }}>
+            {/* 5. Tu rendimiento */}
+            <div style={{ background: '#eeeeef', borderRadius: 16, padding: '16px' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
                 <span style={{ fontWeight: 700, fontSize: 14, color: '#111827' }}>Tu rendimiento</span>
-                <span style={{ fontSize: 10.5, fontWeight: 600, padding: '3px 9px', borderRadius: 99, background: '#ffffff', color: '#6b7280' }}>
+                <span style={{ fontSize: 10, fontWeight: 600, padding: '3px 9px', borderRadius: 99, background: '#fff', color: '#6b7280' }}>
                   {mesCorto} {anioLabel}
                 </span>
               </div>
-              {/* Donut + greeting */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 14 }}>
-                <DonutRing pct={metaPct} size={80} stroke={8} color="#4f46e5" />
-                <div>
-                  <p style={{ margin: '0 0 2px', fontSize: 13, fontWeight: 700, color: '#111827' }}>{saludo}, {nombreAliado}!</p>
-                  <p style={{ margin: 0, fontSize: 11, color: '#6b7280', lineHeight: 1.5 }}>
-                    {metaPct >= 100 ? '¡Meta del mes superada! 🔥' : 'Sigue así para alcanzar tu meta'}
-                  </p>
-                </div>
-              </div>
-              {/* Comisiones box */}
-              <div style={{ background: '#ffffff', borderRadius: 10, padding: '10px 14px', marginBottom: 14 }}>
+
+              {/* Comisiones */}
+              <div style={{ background: '#fff', borderRadius: 10, padding: '10px 14px', marginBottom: 12 }}>
                 <p style={{ margin: '0 0 2px', fontSize: 10, color: '#9ca3af', fontWeight: 500 }}>Comisiones generadas · {mesCorto}</p>
                 <span style={{ fontSize: 20, fontWeight: 800, color: '#111827', letterSpacing: '-0.5px' }}>{fmt(rendimiento.comisiones_mes)}</span>
               </div>
+
               {/* Bar chart */}
               <BarChart data={rendimiento.grafica} color="#4f46e5" />
               <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
-                {tickDias.map(dia => (
-                  <span key={dia} style={{ fontSize: 9.5, color: '#9ca3af' }}>{dia}</span>
-                ))}
+                {tickDias.map(dia => <span key={dia} style={{ fontSize: 9, color: '#9ca3af' }}>{dia}</span>)}
               </div>
+
               <button
                 onClick={() => navigate('/dashboard/pagos')}
-                style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 11, color: '#4f46e5', fontWeight: 600, padding: '10px 0 0', display: 'block' }}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 11, color: '#4f46e5', fontWeight: 600, padding: '8px 0 0', display: 'block' }}
               >
                 Ver reporte completo →
               </button>
+
+              {/* Anto quick actions */}
+              <div style={{ marginTop: 14, borderTop: '1px solid #e5e7eb', paddingTop: 12 }}>
+                <p style={{ margin: '0 0 8px', fontSize: 9.5, fontWeight: 700, color: '#9ca3af', letterSpacing: 0.6, textTransform: 'uppercase' }}>
+                  Acciones con Anto IA
+                </p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  {ANTO_ACCIONES.map((a, i) => (
+                    <button
+                      key={i}
+                      onClick={() => document.querySelector('[data-anto-pill]')?.click()}
+                      style={{
+                        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                        background: '#fff', border: '1px solid #e5e7eb', borderRadius: 9,
+                        padding: '8px 10px', cursor: 'pointer', textAlign: 'left',
+                        transition: 'border-color 0.13s, background 0.13s',
+                        gap: 8,
+                      }}
+                      onMouseEnter={e => { e.currentTarget.style.borderColor = '#c4b5fd'; e.currentTarget.style.background = '#faf5ff' }}
+                      onMouseLeave={e => { e.currentTarget.style.borderColor = '#e5e7eb'; e.currentTarget.style.background = '#fff' }}
+                    >
+                      <div style={{ minWidth: 0 }}>
+                        <p style={{ margin: '0 0 1px', fontSize: 11.5, fontWeight: 600, color: '#111827' }}>{a.label}</p>
+                        <p style={{ margin: 0, fontSize: 10, color: '#9ca3af' }}>{a.sub}</p>
+                      </div>
+                      <Sparkles size={12} color="#7c3aed" style={{ flexShrink: 0 }} />
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
 
-            {/* 6. Tu copiloto — inner card #eeeeef, original Anto style */}
-            <div style={{ background: '#eeeeef', borderRadius: 16, padding: '18px' }}>
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 16 }}>
-                <div style={{ width: 42, height: 42, borderRadius: 13, background: '#2D2A7A', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <Sparkles size={19} color="#fff" />
+            {/* 6. Tu copiloto — Anto banner */}
+            <div style={{ background: '#eeeeef', borderRadius: 16, padding: '16px' }}>
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 14 }}>
+                <div style={{ width: 40, height: 40, borderRadius: 12, background: '#2D2A7A', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <Sparkles size={18} color="#fff" />
                 </div>
                 <div>
-                  <p style={{ margin: '0 0 5px', fontSize: 14, fontWeight: 800, color: '#1e1b6e' }}>
+                  <p style={{ margin: '0 0 4px', fontSize: 13, fontWeight: 800, color: '#1e1b6e' }}>
                     ✨ Vende seguros aunque no seas experto
                   </p>
-                  <p style={{ margin: 0, fontSize: 12, color: '#6d28d9', lineHeight: 1.55 }}>
+                  <p style={{ margin: 0, fontSize: 11, color: '#6d28d9', lineHeight: 1.5 }}>
                     Anto explica coberturas, compara aseguradoras y responde las preguntas de tus clientes en segundos.
                   </p>
                 </div>
@@ -483,7 +490,6 @@ export default function Dashboard() {
             </div>
 
           </div>
-
         </div>
       </div>
     </div>
