@@ -109,24 +109,68 @@ function BarChart({ data = [], color = '#2D2A7A' }) {
   )
 }
 
-// ─── DonutRing ────────────────────────────────────────────────────────────────
-function DonutRing({ pct: p = 0, size = 80, stroke = 8, color = '#4f46e5' }) {
+// ─── Donut con avatar dentro ──────────────────────────────────────────────────
+function DonutRingAvatar({ pct: p = 0, size = 96, stroke = 6, color = '#4f46e5', initials = '?' }) {
   const r = (size - stroke) / 2
   const circ = 2 * Math.PI * r
   const dash = (Math.min(p, 100) / 100) * circ
+  const av = size - stroke * 2 - 10
   return (
     <div style={{ position: 'relative', width: size, height: size, display: 'inline-block', flexShrink: 0 }}>
       <svg width={size} height={size} style={{ display: 'block', transform: 'rotate(-90deg)' }}>
-        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="#d1d5db" strokeWidth={stroke} />
-        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={color} strokeWidth={stroke}
+        <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="#e5e7eb" strokeWidth={stroke} />
+        <circle cx={size/2} cy={size/2} r={r} fill="none" stroke={color} strokeWidth={stroke}
           strokeDasharray={`${dash} ${circ}`} strokeLinecap="round" />
       </svg>
       <div style={{
-        position: 'absolute', top: -5, right: -5,
-        background: color, color: '#fff', fontSize: 8.5, fontWeight: 800,
-        borderRadius: 99, padding: '2px 5px', lineHeight: 1.4,
+        position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)',
+        width: av, height: av, borderRadius: '50%',
+        background: 'linear-gradient(135deg,#4f46e5,#2D2A7A)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
       }}>
+        <span style={{ fontSize: Math.round(av * 0.36), fontWeight: 900, color: '#fff', textTransform: 'uppercase' }}>
+          {initials}
+        </span>
+      </div>
+      <div style={{ position: 'absolute', top: 2, right: -6, background: color, color: '#fff', fontSize: 8.5, fontWeight: 800, borderRadius: 99, padding: '2px 6px', lineHeight: 1.4 }}>
         {p}%
+      </div>
+    </div>
+  )
+}
+
+// ─── Period bar chart (3 columnas: 1-10, 11-20, 21-31) ───────────────────────
+function PeriodBarChart({ data = [] }) {
+  const inc = data.map((d, i) => ({ dia: d.dia, monto: i === 0 ? d.monto : d.monto - data[i-1].monto }))
+  const sums = [
+    inc.filter(d => d.dia <= 10).reduce((s, d) => s + d.monto, 0),
+    inc.filter(d => d.dia > 10 && d.dia <= 20).reduce((s, d) => s + d.monto, 0),
+    inc.filter(d => d.dia > 20).reduce((s, d) => s + d.monto, 0),
+  ]
+  const max = Math.max(...sums, 1)
+  const labels = ['1-10', '11-20', '21-31']
+  const yTicks = [max, Math.round(max * 0.5), 0]
+  return (
+    <div style={{ display: 'flex', gap: 4 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', paddingBottom: 18, height: 80 }}>
+        {yTicks.map((v, i) => (
+          <span key={i} style={{ fontSize: 9, color: '#9ca3af', lineHeight: 1 }}>
+            {v >= 1000000 ? `${(v/1000000).toFixed(1)}M` : v >= 1000 ? `${Math.round(v/1000)}K` : v}
+          </span>
+        ))}
+      </div>
+      <div style={{ flex: 1 }}>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end', height: 62 }}>
+          {sums.map((val, i) => (
+            <div key={i} style={{ flex: 1, display: 'flex', gap: 3, alignItems: 'flex-end', height: '100%' }}>
+              <div style={{ flex: 1, background: '#c4b5fd', borderRadius: '3px 3px 0 0', height: `${Math.max((val/max)*65, val>0?8:2)}%` }} />
+              <div style={{ flex: 1, background: '#4f46e5', borderRadius: '3px 3px 0 0', height: `${Math.max((val/max)*100, val>0?12:3)}%` }} />
+            </div>
+          ))}
+        </div>
+        <div style={{ display: 'flex', gap: 8, marginTop: 5 }}>
+          {labels.map((l, i) => <span key={i} style={{ flex: 1, fontSize: 9, color: '#9ca3af', textAlign: 'center' }}>{l}</span>)}
+        </div>
       </div>
     </div>
   )
@@ -190,6 +234,8 @@ export default function Dashboard() {
   const mesCorto     = MESES_CORTO[nowDate.getMonth()]
   const anioLabel    = nowDate.getFullYear()
   const nombreAliado = user?.nombre || 'aliado'
+  const apellido     = user?.apellido || ''
+  const initials     = ((nombreAliado[0] || '') + (apellido[0] || '')).toUpperCase() || '?'
   const hora         = new Date().getHours()
   const saludo       = hora < 12 ? 'Buenos días' : hora < 18 ? 'Buenas tardes' : 'Buenas noches'
   const metaPct      = Math.min(100, Math.round((rendimiento.comisiones_mes / (rendimiento.meta_mes || 5000000)) * 100))
@@ -429,39 +475,38 @@ export default function Dashboard() {
 
           </div>
 
-          {/* ═══ RIGHT COLUMN — container card ═══ */}
-          <div style={{ background: '#f5f7fb', borderRadius: 20, border: '1px solid #e5e7eb', padding: 12, display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {/* ═══ RIGHT COLUMN — container blanco ═══ */}
+          <div style={{ background: '#ffffff', borderRadius: 20, border: '1px solid #e5e7eb', padding: 12, display: 'flex', flexDirection: 'column', gap: 12 }}>
 
-            {/* 5. Tu rendimiento */}
-            <div style={{ background: '#ffffff', borderRadius: 16, padding: '18px', border: '1px solid #e5e7eb' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+            {/* 5. Tu rendimiento — card gris */}
+            <div style={{ background: '#f5f7fb', borderRadius: 16, padding: '18px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
                 <span style={{ fontWeight: 700, fontSize: 14, color: '#111827' }}>Tu rendimiento</span>
-                <span style={{ fontSize: 10.5, fontWeight: 600, padding: '3px 9px', borderRadius: 99, background: '#ffffff', color: '#6b7280' }}>
+                <span style={{ fontSize: 10, fontWeight: 600, padding: '3px 9px', borderRadius: 99, background: '#ffffff', color: '#6b7280', border: '1px solid #e5e7eb' }}>
                   {mesCorto} {anioLabel}
                 </span>
               </div>
-              {/* Donut + greeting */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 14 }}>
-                <DonutRing pct={metaPct} size={80} stroke={8} color="#4f46e5" />
-                <div>
-                  <p style={{ margin: '0 0 2px', fontSize: 13, fontWeight: 700, color: '#111827' }}>{saludo}, {nombreAliado}!</p>
-                  <p style={{ margin: 0, fontSize: 11, color: '#6b7280', lineHeight: 1.5 }}>
-                    {metaPct >= 100 ? '¡Meta del mes superada! 🔥' : 'Sigue así para alcanzar tu meta'}
-                  </p>
-                </div>
+
+              {/* Avatar + donut centrado */}
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 12 }}>
+                <DonutRingAvatar pct={metaPct} size={96} stroke={6} color="#4f46e5" initials={initials} />
+                <p style={{ margin: '10px 0 2px', fontSize: 15, fontWeight: 700, color: '#111827', textAlign: 'center' }}>
+                  {saludo}, {nombreAliado}! 🔥
+                </p>
+                <p style={{ margin: 0, fontSize: 11, color: '#6b7280', textAlign: 'center', lineHeight: 1.5 }}>
+                  {metaPct >= 100 ? '¡Meta del mes superada!' : 'Sigue así para alcanzar tu meta'}
+                </p>
               </div>
-              {/* Comisiones box */}
-              <div style={{ background: '#ffffff', borderRadius: 10, padding: '10px 14px', marginBottom: 14 }}>
+
+              {/* Comisiones */}
+              <div style={{ background: '#ffffff', borderRadius: 10, padding: '10px 14px', marginBottom: 14, border: '1px solid #e9eaed' }}>
                 <p style={{ margin: '0 0 2px', fontSize: 10, color: '#9ca3af', fontWeight: 500 }}>Comisiones generadas · {mesCorto}</p>
                 <span style={{ fontSize: 20, fontWeight: 800, color: '#111827', letterSpacing: '-0.5px' }}>{fmt(rendimiento.comisiones_mes)}</span>
               </div>
-              {/* Bar chart */}
-              <BarChart data={rendimiento.grafica} color="#4f46e5" />
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
-                {tickDias.map(dia => (
-                  <span key={dia} style={{ fontSize: 9.5, color: '#9ca3af' }}>{dia}</span>
-                ))}
-              </div>
+
+              {/* Period bar chart */}
+              <PeriodBarChart data={rendimiento.grafica} />
+
               <button
                 onClick={() => navigate('/dashboard/pagos')}
                 style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 11, color: '#4f46e5', fontWeight: 600, padding: '10px 0 0', display: 'block' }}
@@ -470,29 +515,53 @@ export default function Dashboard() {
               </button>
             </div>
 
-            {/* 6. Tu copiloto */}
-            <div style={{ background: '#ffffff', borderRadius: 16, padding: '18px', border: '1px solid #e5e7eb' }}>
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 16 }}>
-                <div style={{ width: 42, height: 42, borderRadius: 13, background: '#2D2A7A', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <Sparkles size={19} color="#fff" />
-                </div>
-                <div>
-                  <p style={{ margin: '0 0 5px', fontSize: 14, fontWeight: 800, color: '#1e1b6e' }}>
-                    ✨ Vende seguros aunque no seas experto
-                  </p>
-                  <p style={{ margin: 0, fontSize: 12, color: '#6d28d9', lineHeight: 1.55 }}>
-                    Anto explica coberturas, compara aseguradoras y responde las preguntas de tus clientes en segundos.
-                  </p>
-                </div>
+            {/* 6. Tu copiloto — card gris, lista estilo mentor */}
+            <div style={{ background: '#f5f7fb', borderRadius: 16, padding: '18px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+                <span style={{ fontWeight: 700, fontSize: 14, color: '#111827' }}>Tu copiloto</span>
+                <button
+                  onClick={() => document.querySelector('[data-anto-pill]')?.click()}
+                  style={{ width: 26, height: 26, borderRadius: '50%', border: '1px solid #e5e7eb', background: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, color: '#374151', lineHeight: 1 }}
+                >+</button>
               </div>
-              <button
-                onClick={() => document.querySelector('[data-anto-pill]')?.click()}
-                style={{ width: '100%', background: '#2D2A7A', color: '#fff', border: 'none', borderRadius: 10, padding: '10px', fontSize: 13, fontWeight: 700, cursor: 'pointer', transition: 'opacity 0.15s' }}
-                onMouseEnter={e => e.currentTarget.style.opacity = '0.85'}
-                onMouseLeave={e => e.currentTarget.style.opacity = '1'}
-              >
-                Preguntarle a Anto
-              </button>
+
+              {/* Lista de acciones — estilo "Your mentor" */}
+              {[
+                { bg: '#ede9fe', color: '#4f46e5', emoji: '🛡️', title: 'Coberturas',           sub: 'Qué cubre la póliza'      },
+                { bg: '#e0f2fe', color: '#0284c7', emoji: '⚖️', title: 'Comparar aseguradoras', sub: 'Diferencias y precios'    },
+                { bg: '#dcfce7', color: '#16a34a', emoji: '💬', title: 'Responder al cliente',  sub: 'Dudas frecuentes'         },
+                { bg: '#fff7ed', color: '#ea580c', emoji: '📋', title: 'Exclusiones',            sub: 'Qué NO cubre la póliza'  },
+              ].map((item, i, arr) => (
+                <div
+                  key={i}
+                  style={{ display: 'flex', alignItems: 'center', gap: 10, paddingBottom: i < arr.length - 1 ? 12 : 0, marginBottom: i < arr.length - 1 ? 12 : 0, borderBottom: i < arr.length - 1 ? '1px solid #e9eaed' : 'none' }}
+                >
+                  <div style={{ width: 36, height: 36, borderRadius: '50%', background: item.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 16 }}>
+                    {item.emoji}
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <p style={{ margin: '0 0 1px', fontSize: 12, fontWeight: 600, color: '#111827', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.title}</p>
+                    <p style={{ margin: 0, fontSize: 10, color: '#9ca3af' }}>Anto IA</p>
+                  </div>
+                  <button
+                    onClick={() => document.querySelector('[data-anto-pill]')?.click()}
+                    style={{ flexShrink: 0, fontSize: 11, fontWeight: 600, color: item.color, background: item.bg, border: `1px solid ${item.color}22`, borderRadius: 8, padding: '4px 10px', cursor: 'pointer' }}
+                  >
+                    Preguntar
+                  </button>
+                </div>
+              ))}
+
+              <div style={{ borderTop: '1px solid #e5e7eb', paddingTop: 12, marginTop: 12 }}>
+                <button
+                  onClick={() => document.querySelector('[data-anto-pill]')?.click()}
+                  style={{ width: '100%', background: '#2D2A7A', color: '#fff', border: 'none', borderRadius: 10, padding: '10px', fontSize: 13, fontWeight: 700, cursor: 'pointer', transition: 'opacity 0.15s' }}
+                  onMouseEnter={e => e.currentTarget.style.opacity = '0.85'}
+                  onMouseLeave={e => e.currentTarget.style.opacity = '1'}
+                >
+                  Preguntarle a Anto
+                </button>
+              </div>
             </div>
 
           </div>
