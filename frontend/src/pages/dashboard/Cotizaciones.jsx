@@ -648,10 +648,10 @@ export default function Cotizaciones() {
   }
 
   return (
-    <div className="p-6 lg:p-8 max-w-5xl mx-auto">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Mis cotizaciones</h1>
-        <p className="text-gray-500 text-sm mt-1">
+    <div style={{ padding:'0 24px 32px', maxWidth:'72rem', margin:'0 auto' }}>
+      <div style={{ marginBottom:24, paddingTop:8 }}>
+        <h1 style={{ fontFamily:'Poppins', fontSize:22, fontWeight:700, color:'#111827', margin:0 }}>Mis cotizaciones</h1>
+        <p style={{ fontFamily:'Inter', fontSize:13, color:'#9ca3af', margin:'4px 0 0' }}>
           Aquí están todas las veces que cotizaste un seguro para un cliente. Puedes ver cuáles ya las enviaste a emitir y cuáles siguen abiertas.
           {' '}
           {esActual

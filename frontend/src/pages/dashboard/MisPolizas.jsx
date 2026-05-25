@@ -287,8 +287,9 @@ export default function MisPolizas() {
   const { subscribe }      = useSSE()
   const [searchParams]     = useSearchParams()
   const [data,    setData] = useState({ leads: [], polizas: [] })
-  const [loading, setLoading] = useState(true)
-  const [modal,   setModal]   = useState(null)
+  const [loading,      setLoading]      = useState(true)
+  const [modal,        setModal]        = useState(null)
+  const [legendModal,  setLegendModal]  = useState(false)
   const [tab, setTab] = useState(() => searchParams.get('tab') || 'en_tramite')
 
   const fetchData = useCallback((silent = false) => {
@@ -441,8 +442,8 @@ export default function MisPolizas() {
         </p>
       </div>
 
-      {/* Tabs */}
-      <div style={{ display:'flex', gap:8, marginBottom:16, flexWrap:'wrap' }}>
+      {/* Tabs + botón de leyenda */}
+      <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:20, flexWrap:'wrap' }}>
         {tabs.map(t => {
           const count = t.key === 'en_tramite'
             ? allItems.filter(it => EN_TRAMITE.has(it.estado)).length
@@ -470,55 +471,22 @@ export default function MisPolizas() {
             </button>
           )
         })}
-      </div>
-
-      {/* Leyenda de estados — siempre visible, actualiza según tab */}
-      <div style={{ background:'#fff', border:'1.5px solid #e8e8f0', borderRadius:16,
-                    padding:'14px 18px', marginBottom:20 }}>
-        {tab === 'en_tramite' ? (
-          <>
-            <p style={{ fontFamily:'Inter', fontSize:11, fontWeight:700, color:'#9ca3af',
-                        textTransform:'uppercase', letterSpacing:'0.08em', margin:'0 0 12px' }}>
-              ¿Qué significa cada estado?
-            </p>
-            <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(220px, 1fr))', gap:10 }}>
-              {EN_TRAMITE_LEGEND.map(s => {
-                const E = ESTADOS[s.estado]
-                return (
-                  <div key={s.estado} style={{ display:'flex', alignItems:'flex-start', gap:10 }}>
-                    <span style={{
-                      background: E.bg, color: E.color,
-                      fontSize: 11, fontWeight: 700,
-                      padding: '4px 10px', borderRadius: 99,
-                      whiteSpace: 'nowrap', flexShrink: 0,
-                      border: `1px solid ${E.color}22`,
-                    }}>
-                      {s.emoji} {E.label}
-                    </span>
-                    <span style={{ fontFamily:'Inter', fontSize:12, color:'#4b5563', lineHeight:1.5 }}>
-                      {s.text}
-                    </span>
-                  </div>
-                )
-              })}
-            </div>
-          </>
-        ) : (
-          <div style={{ display:'flex', alignItems:'center', gap:12 }}>
-            <span style={{
-              background: ESTADOS[tab]?.bg, color: ESTADOS[tab]?.color,
-              fontSize: 12, fontWeight: 700,
-              padding: '5px 14px', borderRadius: 99,
-              whiteSpace: 'nowrap', flexShrink: 0,
-              border: `1px solid ${ESTADOS[tab]?.color}22`,
-            }}>
-              {ESTADOS[tab]?.label}
-            </span>
-            <span style={{ fontFamily:'Inter', fontSize:13, color:'#4b5563', lineHeight:1.5 }}>
-              {ESTADOS[tab]?.desc}
-            </span>
-          </div>
-        )}
+        {/* Info legend trigger */}
+        <button
+          onClick={() => setLegendModal(true)}
+          style={{
+            marginLeft:'auto', display:'flex', alignItems:'center', gap:6,
+            padding:'9px 14px', borderRadius:12, border:'1.5px solid #e8e8f0',
+            cursor:'pointer', background:'#fff', color:'#6b7280',
+            fontSize:12, fontWeight:600, fontFamily:'Inter',
+            transition:'border-color 0.15s, color 0.15s', whiteSpace:'nowrap',
+          }}
+          onMouseEnter={e => { e.currentTarget.style.borderColor='#a5b4fc'; e.currentTarget.style.color='#4f46e5' }}
+          onMouseLeave={e => { e.currentTarget.style.borderColor='#e8e8f0'; e.currentTarget.style.color='#6b7280' }}
+        >
+          <Info size={13} />
+          ¿Qué significa cada estado?
+        </button>
       </div>
 
       {/* Grid de pólizas */}
@@ -555,6 +523,62 @@ export default function MisPolizas() {
           token={getToken()}
           onClose={() => setModal(null)}
         />
+      )}
+
+      {/* Modal de leyenda de estados */}
+      {legendModal && (
+        <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.45)', zIndex:500,
+                      display:'flex', alignItems:'center', justifyContent:'center', padding:16 }}
+             onClick={() => setLegendModal(false)}>
+          <div style={{ background:'#fff', borderRadius:20, width:'100%', maxWidth:420,
+                        boxShadow:'0 24px 64px rgba(0,0,0,0.18)', overflow:'hidden' }}
+               onClick={e => e.stopPropagation()}>
+
+            {/* Cabecera */}
+            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between',
+                          padding:'18px 20px 14px', borderBottom:'1px solid #f3f4f6' }}>
+              <div>
+                <h3 style={{ margin:0, fontFamily:'Poppins', fontSize:15, fontWeight:700, color:'#111827' }}>
+                  ¿Qué significa cada estado?
+                </h3>
+                <p style={{ margin:'3px 0 0', fontFamily:'Inter', fontSize:12, color:'#9ca3af' }}>
+                  {tab === 'en_tramite' ? 'Etapa: En trámite' : tab === 'aprobada' ? 'Etapa: Aprobadas' : 'Etapa: No aprobado'}
+                </p>
+              </div>
+              <button onClick={() => setLegendModal(false)}
+                style={{ background:'none', border:'none', cursor:'pointer', color:'#9ca3af', padding:4,
+                         display:'flex', alignItems:'center' }}>
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Estados */}
+            {(tab === 'en_tramite' ? EN_TRAMITE_LEGEND : [
+              tab === 'aprobada'
+                ? { estado:'aprobada',      emoji:'✅', text: ESTADOS.aprobada.desc      }
+                : { estado:'no_convertida', emoji:'❌', text: ESTADOS.no_convertida.desc },
+            ]).map((s, i, arr) => {
+              const E = ESTADOS[s.estado]
+              return (
+                <div key={s.estado}
+                  style={{ padding:'16px 20px', borderBottom: i < arr.length - 1 ? '1px solid #f3f4f6' : 'none' }}>
+                  <span style={{
+                    display:'inline-block', marginBottom:8,
+                    background: E.bg, color: E.color,
+                    fontSize: 11, fontWeight: 700,
+                    padding: '4px 12px', borderRadius: 99,
+                    border: `1px solid ${E.color}22`,
+                  }}>
+                    {s.emoji} {E.label}
+                  </span>
+                  <p style={{ margin:0, fontFamily:'Inter', fontSize:13, color:'#4b5563', lineHeight:1.65 }}>
+                    {s.text}
+                  </p>
+                </div>
+              )
+            })}
+          </div>
+        </div>
       )}
     </div>
   )
