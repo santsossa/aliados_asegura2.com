@@ -30,11 +30,8 @@ export default {
   			}
   		},
   		fontFamily: {
-  			sans: [
-  				'Mona Sans',
-  				'system-ui',
-  				'sans-serif'
-  			]
+  			sans: ['Poppins', 'system-ui', 'sans-serif'],
+  			inter: ['Inter', 'system-ui', 'sans-serif'],
   		},
   		boxShadow: {
   			card: '0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)',

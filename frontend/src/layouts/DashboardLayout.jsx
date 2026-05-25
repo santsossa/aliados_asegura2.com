@@ -34,7 +34,7 @@ const HOVER_BG    = '#f3f4f6'
 const navItemStyle = (isActive) => ({
   display: 'flex', alignItems: 'center', gap: 10,
   height: 40, padding: '0 8px', borderRadius: 9,
-  textDecoration: 'none', fontWeight: 600, fontSize: 13.5,
+  textDecoration: 'none', fontFamily: 'Poppins', fontWeight: 500, fontSize: 14, letterSpacing: '0.01em',
   color: isActive ? ACTIVE_TEXT : '#374151',
   background: isActive ? ACTIVE_BG : 'transparent',
   transition: 'background 0.13s, color 0.13s',

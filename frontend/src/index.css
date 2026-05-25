@@ -1,4 +1,4 @@
-@import url('https://api.fontshare.com/v2/css?f[]=mona-sans@400,500,600,700,800,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -15,11 +15,25 @@ html {
 }
 
 body {
-  font-family: 'Mona Sans', system-ui, sans-serif;
+  font-family: 'Poppins', system-ui, sans-serif;
   background-color: #F8F9FB;
   color: #1A1A1A;
   -webkit-font-smoothing: antialiased;
 }
+
+/* ── Jerarquía tipográfica ─────────────────────────────────────────────────── */
+/* Display: Hero titles */
+.t-display { font-family: 'Poppins', sans-serif; font-weight: 700; font-size: clamp(28px, 4vw, 36px); }
+/* H2: Section titles */
+.t-h2      { font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 18px; }
+/* Body: Card titles */
+.t-body    { font-family: 'Poppins', sans-serif; font-weight: 500; font-size: 13px; }
+/* Caption: Metadata / sub-text */
+.t-caption { font-family: 'Inter', sans-serif;   font-weight: 400; font-size: 11px; color: #9ca3af; }
+/* Label: Tags / chips */
+.t-label   { font-family: 'Inter', sans-serif;   font-weight: 700; font-size: 9.5px; text-transform: uppercase; letter-spacing: 0.06em; }
+/* UI: Nav / tables */
+.t-ui      { font-family: 'Poppins', sans-serif; font-weight: 500; font-size: 14px; letter-spacing: 0.01em; }
 
 /* ── Ticker / banda de aseguradoras ── */
 

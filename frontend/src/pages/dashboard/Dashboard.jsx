@@ -156,17 +156,25 @@ function PeriodBarChart({ polizas = [] }) {
       </div>
       {/* Bars */}
       <div style={{ flex: 1 }}>
-        <div style={{ display: 'flex', gap: 10, alignItems: 'flex-end', height: 62 }}>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end', height: 62 }}>
           {counts.map((val, i) => (
-            <div key={i} style={{ flex: 1, display: 'flex', gap: 3, alignItems: 'flex-end', height: '100%' }}>
-              <div style={{ flex: 1, background: '#c4b5fd', borderRadius: 8, height: `${Math.max((val/max)*60, val>0?18:6)}%`, transition: 'height 0.3s' }} />
-              <div style={{ flex: 1, background: '#4f46e5', borderRadius: 8, height: `${Math.max((val/max)*100, val>0?25:6)}%`, transition: 'height 0.3s' }} />
+            <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100%', justifyContent: 'flex-end', gap: 0 }}>
+              {val > 0 && (
+                <span style={{ fontSize: 9, fontFamily: 'Inter', fontWeight: 700, color: '#4f46e5', marginBottom: 3 }}>{val}</span>
+              )}
+              <div style={{
+                width: '60%', background: '#4f46e5', borderRadius: '8px 8px 4px 4px',
+                height: `${Math.max((val / max) * 100, val > 0 ? 20 : 4)}%`,
+                minHeight: val > 0 ? 14 : 3,
+                transition: 'height 0.4s ease',
+                opacity: val > 0 ? 1 : 0.18,
+              }} />
             </div>
           ))}
         </div>
-        <div style={{ display: 'flex', gap: 10, marginTop: 6 }}>
+        <div style={{ display: 'flex', gap: 8, marginTop: 6 }}>
           {labels.map((l, i) => (
-            <span key={i} style={{ flex: 1, fontSize: 9, color: '#9ca3af', textAlign: 'center', fontWeight: 500 }}>{l}</span>
+            <span key={i} className="t-label" style={{ flex: 1, textAlign: 'center', color: '#9ca3af', fontFamily: 'Inter' }}>{l}</span>
           ))}
         </div>
       </div>
@@ -312,8 +320,8 @@ export default function Dashboard() {
                 <path d="M100 0 C100 0 108 92 200 100 C200 100 108 108 100 200 C100 200 92 108 0 100 C0 100 92 92 100 0Z" fill="white" />
               </svg>
 
-              <p style={{ margin: '0 0 8px', fontSize: 10, fontWeight: 700, color: '#c7d2fe', letterSpacing: 1.2, textTransform: 'uppercase' }}>Portal de aliados</p>
-              <h2 style={{ margin: '0 0 20px', fontSize: 22, fontWeight: 800, color: '#fff', lineHeight: 1.25, maxWidth: 340 }}>
+              <p className="t-label" style={{ margin: '0 0 8px', color: '#c7d2fe', letterSpacing: 1.4 }}>Portal de aliados</p>
+              <h2 className="t-display" style={{ margin: '0 0 20px', color: '#fff', lineHeight: 1.2, maxWidth: 340, fontSize: 28 }}>
                 Cotiza un seguro en segundos y gana tu comisión
               </h2>
               <button
@@ -334,7 +342,7 @@ export default function Dashboard() {
               </button>
             </div>
 
-            {/* 2. Stats cards — horizontal pill estilo referencia */}
+            {/* 2. Stats cards — cuadradas, título arriba, valor grande abajo */}
             <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
               {cards.map((c, i) => {
                 const Icon = c.icon
@@ -342,35 +350,33 @@ export default function Dashboard() {
                   <div key={i} style={{
                     background: '#fff',
                     borderRadius: 16,
-                    border: '1px solid #eeeeef',
-                    boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
-                    padding: '12px 14px 12px 12px',
-                    display: 'flex', alignItems: 'center', gap: 10,
+                    boxShadow: '0 1px 6px rgba(0,0,0,0.06)',
+                    padding: '14px 16px',
+                    display: 'flex', flexDirection: 'column', gap: 0,
                   }}>
-                    <div style={{ width: 38, height: 38, borderRadius: '50%', background: c.iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                      <Icon size={16} color={c.iconColor} />
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+                      <div style={{ width: 32, height: 32, borderRadius: 10, background: c.iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <Icon size={14} color={c.iconColor} />
+                      </div>
+                      <button style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 2, color: '#d1d5db', display: 'flex' }}>
+                        <MoreHorizontal size={13} />
+                      </button>
                     </div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={{ margin: '0 0 1px', fontSize: 10.5, color: '#9ca3af', fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                        {c.value}{c.badge ? ` · ${c.badge}` : ''}
-                      </p>
-                      <p style={{ margin: 0, fontSize: 12, fontWeight: 700, color: '#111827', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                        {c.label}
-                      </p>
-                    </div>
-                    <button style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 2, flexShrink: 0, color: '#d1d5db', display: 'flex' }}>
-                      <MoreHorizontal size={14} />
-                    </button>
+                    <p className="t-caption" style={{ margin: '0 0 4px', fontFamily: 'Inter', color: '#9ca3af' }}>{c.label}</p>
+                    <p style={{ margin: 0, fontFamily: 'Poppins', fontSize: 19, fontWeight: 700, color: '#111827', letterSpacing: '-0.4px', lineHeight: 1.1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.value}</p>
+                    <p className="t-caption" style={{ margin: '5px 0 0', fontFamily: 'Inter', color: c.positive === false ? '#dc2626' : '#6b7280' }}>
+                      {c.badge || c.sub}
+                    </p>
                   </div>
                 )
               })}
             </div>
 
             {/* 3. Enviadas a emitir — full card, row list */}
-            <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #eeeeef', overflow: 'hidden' }}>
+            <div style={{ background: '#fff', borderRadius: 16, overflow: 'hidden', boxShadow: '0 1px 6px rgba(0,0,0,0.06)' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', borderBottom: '1px solid #f3f4f6' }}>
-                <span style={{ fontWeight: 700, fontSize: 14, color: '#111827' }}>Enviadas a emitir</span>
-                <button onClick={() => navigate('/dashboard/mis-polizas')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: '#7c3aed', fontWeight: 500 }}>
+                <span style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: 14, color: '#111827' }}>Enviadas a emitir</span>
+                <button onClick={() => navigate('/dashboard/mis-polizas')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'Inter', fontSize: 12, color: '#7c3aed', fontWeight: 500 }}>
                   Ver todas →
                 </button>
               </div>
@@ -418,10 +424,10 @@ export default function Dashboard() {
             </div>
 
             {/* 4. Actividad reciente — full card, row list */}
-            <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #eeeeef', overflow: 'hidden' }}>
+            <div style={{ background: '#fff', borderRadius: 16, overflow: 'hidden', boxShadow: '0 1px 6px rgba(0,0,0,0.06)' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', borderBottom: '1px solid #f3f4f6' }}>
-                <span style={{ fontWeight: 700, fontSize: 14, color: '#111827' }}>Actividad reciente</span>
-                <button onClick={() => navigate('/dashboard/cotizaciones')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: '#7c3aed', fontWeight: 500 }}>
+                <span style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: 14, color: '#111827' }}>Actividad reciente</span>
+                <button onClick={() => navigate('/dashboard/cotizaciones')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'Inter', fontSize: 12, color: '#7c3aed', fontWeight: 500 }}>
                   Ver todas →
                 </button>
               </div>
@@ -469,14 +475,14 @@ export default function Dashboard() {
 
           </div>
 
-          {/* ═══ RIGHT COLUMN — container blanco ═══ */}
-          <div style={{ background: '#ffffff', borderRadius: 20, border: '1px solid #e5e7eb', padding: 12, display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {/* ═══ RIGHT COLUMN — sticky, 100vh ═══ */}
+          <div style={{ background: '#ffffff', borderRadius: 20, padding: 12, display: 'flex', flexDirection: 'column', gap: 12, position: 'sticky', top: 0, height: 'calc(100vh - 64px)', overflowY: 'auto' }}>
 
             {/* 5. Tu rendimiento — fondo blanco, sin card gris */}
             <div style={{ background: '#ffffff', borderRadius: 16, padding: '18px 18px 12px' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-                <span style={{ fontWeight: 700, fontSize: 14, color: '#111827' }}>Tu rendimiento</span>
-                <span style={{ fontSize: 10, fontWeight: 600, padding: '3px 9px', borderRadius: 99, background: '#f5f7fb', color: '#6b7280', border: '1px solid #e5e7eb' }}>
+                <span style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: 14, color: '#111827' }}>Tu rendimiento</span>
+                <span className="t-label" style={{ padding: '3px 9px', borderRadius: 99, background: '#f5f7fb', color: '#9ca3af', fontFamily: 'Inter' }}>
                   {mesCorto} {anioLabel}
                 </span>
               </div>
@@ -496,8 +502,8 @@ export default function Dashboard() {
             {/* 6. Enviadas a emitir — card gris con gráfica de períodos */}
             <div style={{ background: '#f5f7fb', borderRadius: 20, padding: '18px' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-                <span style={{ fontWeight: 700, fontSize: 14, color: '#111827' }}>Enviadas a emitir</span>
-                <span style={{ fontSize: 10, fontWeight: 600, padding: '3px 9px', borderRadius: 99, background: '#ffffff', color: '#6b7280', border: '1px solid #e5e7eb' }}>
+                <span style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: 14, color: '#111827' }}>Enviadas a emitir</span>
+                <span className="t-label" style={{ padding: '3px 9px', borderRadius: 99, background: '#ffffff', color: '#9ca3af', fontFamily: 'Inter' }}>
                   {mesCorto} {anioLabel}
                 </span>
               </div>
@@ -507,10 +513,10 @@ export default function Dashboard() {
             {/* 7. Pregúntale a Anto — card gris, 3 opciones */}
             <div style={{ background: '#f5f7fb', borderRadius: 20, padding: '18px' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-                <span style={{ fontWeight: 700, fontSize: 14, color: '#111827' }}>Pregúntale a Anto</span>
+                <span style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: 14, color: '#111827' }}>Pregúntale a Anto</span>
                 <button
                   onClick={() => document.querySelector('[data-anto-pill]')?.click()}
-                  style={{ width: 26, height: 26, borderRadius: '50%', border: '1px solid #e5e7eb', background: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, color: '#374151', lineHeight: 1 }}
+                  style={{ width: 26, height: 26, borderRadius: '50%', background: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, color: '#374151', lineHeight: 1, border: 'none', boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}
                 >+</button>
               </div>
 
@@ -521,30 +527,30 @@ export default function Dashboard() {
               ].map((item, i, arr) => (
                 <div
                   key={i}
-                  style={{ display: 'flex', alignItems: 'center', gap: 10, paddingBottom: i < arr.length - 1 ? 12 : 0, marginBottom: i < arr.length - 1 ? 12 : 0, borderBottom: i < arr.length - 1 ? '1px solid #e9eaed' : 'none' }}
+                  style={{ display: 'flex', alignItems: 'center', gap: 10, paddingBottom: i < arr.length - 1 ? 12 : 0, marginBottom: i < arr.length - 1 ? 12 : 0, borderBottom: i < arr.length - 1 ? '1px solid #eceef3' : 'none' }}
                 >
                   <div style={{ width: 36, height: 36, borderRadius: '50%', background: item.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 16 }}>
                     {item.emoji}
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <p style={{ margin: '0 0 1px', fontSize: 12, fontWeight: 600, color: '#111827', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.title}</p>
-                    <p style={{ margin: 0, fontSize: 10, color: '#9ca3af' }}>Anto IA</p>
+                    <p style={{ margin: '0 0 1px', fontFamily: 'Poppins', fontSize: 12, fontWeight: 500, color: '#111827', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.title}</p>
+                    <p className="t-caption" style={{ margin: 0, fontFamily: 'Inter' }}>Anto IA</p>
                   </div>
                   <button
                     onClick={() => document.querySelector('[data-anto-pill]')?.click()}
-                    style={{ flexShrink: 0, fontSize: 11, fontWeight: 600, color: item.color, background: `${item.color}18`, border: `1px solid ${item.color}33`, borderRadius: 12, padding: '4px 10px', cursor: 'pointer' }}
+                    style={{ flexShrink: 0, fontFamily: 'Inter', fontSize: 11, fontWeight: 600, color: item.color, background: `${item.color}15`, border: 'none', borderRadius: 12, padding: '4px 10px', cursor: 'pointer' }}
                   >
                     Preguntar
                   </button>
                 </div>
               ))}
 
-              <div style={{ borderTop: '1px solid #e5e7eb', paddingTop: 12, marginTop: 12 }}>
+              <div style={{ borderTop: '1px solid #eceef3', paddingTop: 12, marginTop: 12 }}>
                 <button
                   onClick={() => document.querySelector('[data-anto-pill]')?.click()}
-                  style={{ width: '100%', background: '#2D2A7A26', color: '#2D2A7A', border: '1px solid #2D2A7A33', borderRadius: 14, padding: '10px', fontSize: 13, fontWeight: 700, cursor: 'pointer', transition: 'background 0.15s' }}
-                  onMouseEnter={e => e.currentTarget.style.background = '#2D2A7A40'}
-                  onMouseLeave={e => e.currentTarget.style.background = '#2D2A7A26'}
+                  style={{ width: '100%', fontFamily: 'Poppins', background: '#2D2A7A1a', color: '#2D2A7A', border: 'none', borderRadius: 14, padding: '10px', fontSize: 13, fontWeight: 600, cursor: 'pointer', transition: 'background 0.15s' }}
+                  onMouseEnter={e => e.currentTarget.style.background = '#2D2A7A33'}
+                  onMouseLeave={e => e.currentTarget.style.background = '#2D2A7A1a'}
                 >
                   Preguntarle a Anto
                 </button>
