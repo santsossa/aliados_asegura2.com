@@ -33,7 +33,7 @@ const HOVER_BG    = '#f3f4f6'
 const navItemStyle = (isActive, sideOpen = true) => ({
   display: 'flex', alignItems: 'center',
   justifyContent: sideOpen ? 'flex-start' : 'center',
-  gap: 10, height: 40,
+  gap: sideOpen ? 10 : 0, height: 40,
   padding: sideOpen ? '0 8px' : '0',
   borderRadius: 9,
   textDecoration: 'none', fontFamily: 'Poppins', fontWeight: 500, fontSize: 14, letterSpacing: '0.01em',
@@ -285,7 +285,7 @@ export default function DashboardLayout() {
                 <button
                   data-anto-trigger
                   onClick={() => { setSideOpen(false); document.querySelector('[data-anto-pill]')?.click() }}
-                  style={{ display:'flex', alignItems:'center', justifyContent: sideOpen ? 'flex-start' : 'center', gap:10, height:38, padding: sideOpen ? '0 8px' : '0', borderRadius:9, border:'none', background:'linear-gradient(135deg,#ede9fe,#ddd6fe)', color:'#4f46e5', fontWeight:700, fontSize:13.5, cursor:'pointer', width:'100%', overflow:'hidden', whiteSpace:'nowrap', transition:'background 0.15s, padding 0.25s', flexShrink:0, textAlign:'left', marginBottom:4 }}
+                  style={{ display:'flex', alignItems:'center', justifyContent: sideOpen ? 'flex-start' : 'center', gap: sideOpen ? 10 : 0, height:38, padding: sideOpen ? '0 8px' : '0', borderRadius:9, border:'none', background:'linear-gradient(135deg,#ede9fe,#ddd6fe)', color:'#4f46e5', fontWeight:700, fontSize:13.5, cursor:'pointer', width:'100%', overflow:'hidden', whiteSpace:'nowrap', transition:'background 0.15s, padding 0.25s', flexShrink:0, textAlign:'left', marginBottom:4 }}
                   onMouseEnter={e=>e.currentTarget.style.background='linear-gradient(135deg,#ddd6fe,#c4b5fd)'}
                   onMouseLeave={e=>e.currentTarget.style.background='linear-gradient(135deg,#ede9fe,#ddd6fe)'}
                 >

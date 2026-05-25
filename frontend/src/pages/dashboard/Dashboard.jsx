@@ -321,7 +321,7 @@ export default function Dashboard() {
             {/* 1. Hero banner */}
             <div style={{
               background: 'linear-gradient(135deg, #3730a3 0%, #4f46e5 60%, #6366f1 100%)',
-              borderRadius: 24, padding: '28px 32px',
+              borderRadius: 28, padding: '28px 32px',
               position: 'relative', overflow: 'hidden', minHeight: 148,
               display: 'flex', flexDirection: 'column', justifyContent: 'center',
             }}>
@@ -371,7 +371,7 @@ export default function Dashboard() {
                 return (
                   <div key={i} style={{
                     background: '#fff',
-                    borderRadius: 22,
+                    borderRadius: 24,
                     padding: '15px 16px',
                     display: 'flex', alignItems: 'center', gap: 12,
                   }}>
@@ -388,7 +388,7 @@ export default function Dashboard() {
             </div>
 
             {/* 3. Enviadas a emitir — full card, row list */}
-            <div style={{ background: '#fff', borderRadius: 22, overflow: 'hidden', boxShadow: 'none' }}>
+            <div style={{ background: '#fff', borderRadius: 24, overflow: 'hidden', boxShadow: 'none' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', borderBottom: 'none' }}>
                 <span style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: 14, color: '#111827' }}>Enviadas a emitir</span>
                 <button onClick={() => navigate('/dashboard/mis-polizas')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'Inter', fontSize: 12, color: '#7c3aed', fontWeight: 500 }}>
@@ -439,7 +439,7 @@ export default function Dashboard() {
             </div>
 
             {/* 4. Actividad reciente */}
-            <div style={{ background: '#fff', borderRadius: 22, overflow: 'hidden', display: 'flex', flexDirection: 'column', minHeight: 180 }}>
+            <div style={{ background: '#fff', borderRadius: 24, overflow: 'hidden', display: 'flex', flexDirection: 'column', minHeight: 180 }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 20px', flexShrink: 0 }}>
                 <span style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: 14, color: '#111827' }}>Actividad reciente</span>
                 <button onClick={() => navigate('/dashboard/cotizaciones')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'Inter', fontSize: 12, color: '#7c3aed', fontWeight: 500 }}>
@@ -494,7 +494,7 @@ export default function Dashboard() {
           <div className="db-right">
 
             {/* 5. Tu rendimiento */}
-            <div style={{ background: '#fff', borderRadius: 20, padding: '16px' }}>
+            <div style={{ background: '#fff', borderRadius: 22, padding: '16px' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
                 <span style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: 14, color: '#111827' }}>Tu rendimiento</span>
                 <span style={{ fontFamily: 'Inter', fontSize: 9.5, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', padding: '3px 8px', borderRadius: 99, background: '#f5f7fb', color: '#9ca3af' }}>
@@ -515,28 +515,32 @@ export default function Dashboard() {
             </div>
 
             {/* 6+7. White outer card — Comisiones + Anto */}
-            <div style={{ background: '#fff', borderRadius: 20, padding: 8, display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div style={{ background: '#fff', borderRadius: 22, padding: '14px 14px 12px', display: 'flex', flexDirection: 'column', gap: 10 }}>
 
-              {/* Comisiones mensuales — gray inner */}
-              <div style={{ background: '#f5f7fb', borderRadius: 14, padding: '14px 16px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-                  <span style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: 13, color: '#111827' }}>Comisiones</span>
-                  <span style={{ fontFamily: 'Inter', fontSize: 9.5, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', padding: '3px 8px', borderRadius: 99, background: '#fff', color: '#9ca3af' }}>
-                    {MESES_CORTO[m2idx]} – {mesCorto}
-                  </span>
-                </div>
+              {/* Comisiones — título fuera de la gray card */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 2px' }}>
+                <span style={{ fontFamily: 'Poppins', fontWeight: 700, fontSize: 14, color: '#111827' }}>Comisiones</span>
+                <span style={{ fontFamily: 'Inter', fontSize: 9.5, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', padding: '3px 8px', borderRadius: 99, background: '#f5f7fb', color: '#9ca3af' }}>
+                  {MESES_CORTO[m2idx]} – {mesCorto}
+                </span>
+              </div>
+
+              {/* Gray inner: chart */}
+              <div style={{ background: '#f5f7fb', borderRadius: 16, padding: '14px 16px' }}>
                 <MonthlyCommissionsChart meses={chartMeses} />
               </div>
 
-              {/* Pregúntale a Anto — gray inner */}
-              <div style={{ background: '#f5f7fb', borderRadius: 14, padding: '14px 16px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-                  <span style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: 13, color: '#111827' }}>Pregúntale a Anto</span>
-                  <button
-                    onClick={() => document.querySelector('[data-anto-pill]')?.click()}
-                    style={{ width: 24, height: 24, borderRadius: '50%', background: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, color: '#374151', lineHeight: 1, border: 'none' }}
-                  >+</button>
-                </div>
+              {/* Pregúntale a Anto — título fuera de la gray card */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '4px 2px 0' }}>
+                <span style={{ fontFamily: 'Poppins', fontWeight: 700, fontSize: 14, color: '#111827' }}>Pregúntale a Anto</span>
+                <button
+                  onClick={() => document.querySelector('[data-anto-pill]')?.click()}
+                  style={{ width: 24, height: 24, borderRadius: '50%', background: '#f5f7fb', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, color: '#374151', lineHeight: 1, border: 'none' }}
+                >+</button>
+              </div>
+
+              {/* Gray inner: Anto opciones */}
+              <div style={{ background: '#f5f7fb', borderRadius: 16, padding: '10px 14px 14px' }}>
                 <div>
                   {[
                     { bg: '#ede9fe', color: '#4f46e5', emoji: '🛡️', title: 'Coberturas'            },
@@ -565,7 +569,7 @@ export default function Dashboard() {
                 </div>
                 <button
                   onClick={() => document.querySelector('[data-anto-pill]')?.click()}
-                  style={{ width: '100%', fontFamily: 'Poppins', background: '#2D2A7A1a', color: '#2D2A7A', border: 'none', borderRadius: 999, padding: '10px', fontSize: 13, fontWeight: 600, cursor: 'pointer', transition: 'background 0.15s', marginTop: 12 }}
+                  style={{ width: '100%', fontFamily: 'Poppins', background: '#2D2A7A1a', color: '#2D2A7A', border: 'none', borderRadius: 999, padding: '10px', fontSize: 13, fontWeight: 600, cursor: 'pointer', transition: 'background 0.15s', marginTop: 10 }}
                   onMouseEnter={e => e.currentTarget.style.background = '#2D2A7A33'}
                   onMouseLeave={e => e.currentTarget.style.background = '#2D2A7A1a'}
                 >
