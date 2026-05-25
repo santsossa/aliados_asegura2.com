@@ -2,7 +2,7 @@ import { Outlet, NavLink, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import {
   Home, FileText, ShieldCheck, Wallet, Calculator,
-  AlignJustify, X, LogOut, Sparkles, Settings, Headphones, Search,
+  AlignJustify, X, LogOut, Sparkles, Settings, Headphones, Search, ChevronLeft,
 } from 'lucide-react'
 import { LogoIcon } from '../components/Logo'
 import { useIsMobile } from '../hooks/use-mobile'
@@ -29,7 +29,6 @@ const ACTIVE_BG   = '#edeef3'
 const ACTIVE_TEXT = '#2D2A7A'
 const HOVER_BG    = '#f3f4f6'
 
-// sideOpen=true por defecto para móvil (drawer siempre abierto)
 const navItemStyle = (isActive, sideOpen = true) => ({
   display: 'flex', alignItems: 'center',
   justifyContent: sideOpen ? 'flex-start' : 'center',
@@ -71,15 +70,15 @@ function NavLabel({ label, sideOpen }) {
 }
 
 export default function DashboardLayout() {
-  const navigate             = useNavigate()
-  const isMobile             = useIsMobile()
-  const { logout, user }     = useAuth()
-  const [sideOpen, setSideOpen]   = useState(true)
+  const navigate                    = useNavigate()
+  const isMobile                    = useIsMobile()
+  const { logout, user }            = useAuth()
+  const [sideOpen, setSideOpen]     = useState(true)
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const [logoHover, setLogoHover]   = useState(false)
 
   const sidebarW = sideOpen ? 200 : 60
 
-  // Datos de usuario (usados en topbar desktop y drawer móvil)
   const nombre   = user?.nombre   || ''
   const apellido = user?.apellido || ''
   const initials = ((nombre[0] || '') + (apellido[0] || nombre[1] || '')).toUpperCase()
@@ -92,7 +91,6 @@ export default function DashboardLayout() {
       <SSEProvider>
       <div style={{ display: 'flex', flexDirection: 'column', height: '100dvh', background: '#fff', fontFamily: 'Inter, system-ui, sans-serif' }}>
 
-        {/* Topbar */}
         <header style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 16px', height: 56, background: '#fff', borderBottom: '1px solid #eeeeef', flexShrink: 0, zIndex: 10 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <LogoIcon size={26} />
@@ -112,12 +110,10 @@ export default function DashboardLayout() {
           </div>
         </header>
 
-        {/* Contenido principal */}
         <main style={{ flex: 1, overflowY: 'auto', background: '#fff' }}>
           <Outlet />
         </main>
 
-        {/* Drawer lateral */}
         {drawerOpen && (
           <>
             <div onClick={() => setDrawerOpen(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 310 }} />
@@ -133,11 +129,10 @@ export default function DashboardLayout() {
                 </button>
               </div>
 
-              <nav style={{ flex: 1, padding: '10px 10px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 4 }}>
+              <nav style={{ flex: 1, padding: '10px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 4 }}>
                 {NAV_MAIN.map(({ to, icon: Icon, label }) => (
                   <NavLink
-                    key={to} to={to}
-                    end={to === '/dashboard'}
+                    key={to} to={to} end={to === '/dashboard'}
                     onClick={() => setDrawerOpen(false)}
                     style={({ isActive }) => ({ ...navItemStyle(isActive), marginBottom: 2 })}
                     onMouseEnter={hoverOn} onMouseLeave={hoverOff}
@@ -145,7 +140,7 @@ export default function DashboardLayout() {
                     {({ isActive }) => (
                       <>
                         <span style={{ display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, width:26 }}>
-                          <Icon size={17} color={isActive ? '#fff' : '#6b7280'} />
+                          <Icon size={17} color={isActive ? ACTIVE_TEXT : '#6b7280'} />
                         </span>
                         <span>{label}</span>
                       </>
@@ -157,52 +152,26 @@ export default function DashboardLayout() {
 
                 <button
                   onClick={() => { setDrawerOpen(false); document.querySelector('[data-anto-pill]')?.click() }}
-                  style={{
-                    display:'flex', alignItems:'center', gap:10, height:38, padding:'0 8px', borderRadius:9, border:'none',
-                    background:'linear-gradient(135deg,#ede9fe,#ddd6fe)', color:'#4f46e5',
-                    fontWeight:700, fontSize:13.5, cursor:'pointer', width:'100%', overflow:'hidden',
-                    whiteSpace:'nowrap', transition:'background 0.15s', flexShrink:0, textAlign:'left', marginBottom:4,
-                  }}
+                  style={{ display:'flex', alignItems:'center', gap:10, height:38, padding:'0 8px', borderRadius:9, border:'none', background:'linear-gradient(135deg,#ede9fe,#ddd6fe)', color:'#4f46e5', fontWeight:700, fontSize:13.5, cursor:'pointer', width:'100%', overflow:'hidden', whiteSpace:'nowrap', transition:'background 0.15s', flexShrink:0, textAlign:'left', marginBottom:4 }}
                   onMouseEnter={e=>e.currentTarget.style.background='linear-gradient(135deg,#ddd6fe,#c4b5fd)'}
                   onMouseLeave={e=>e.currentTarget.style.background='linear-gradient(135deg,#ede9fe,#ddd6fe)'}
                 >
-                  <span style={{ display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, width:26 }}>
-                    <Sparkles size={17} color="#4f46e5" />
-                  </span>
+                  <span style={{ display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, width:26 }}><Sparkles size={17} color="#4f46e5" /></span>
                   <span>Anto IA</span>
                 </button>
 
                 <Divider />
 
-                <button
-                  onClick={() => window.open('mailto:soporte@asegura2.com', '_blank')}
-                  style={{ ...navItemStyle(false), marginBottom: 4 }}
-                  onMouseEnter={hoverOn} onMouseLeave={hoverOff}
-                >
-                  <span style={{ display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, width:26 }}>
-                    <Headphones size={17} color="#6b7280" />
-                  </span>
+                <button onClick={() => window.open('mailto:soporte@asegura2.com', '_blank')} style={{ ...navItemStyle(false), marginBottom: 4 }} onMouseEnter={hoverOn} onMouseLeave={hoverOff}>
+                  <span style={{ display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, width:26 }}><Headphones size={17} color="#6b7280" /></span>
                   <span>Soporte</span>
                 </button>
 
-                <NavLink
-                  to={NAV_CONFIG.to}
-                  onClick={() => setDrawerOpen(false)}
-                  style={({ isActive }) => ({ ...navItemStyle(isActive), marginBottom: 2 })}
-                  onMouseEnter={hoverOn} onMouseLeave={hoverOff}
-                >
-                  {({ isActive }) => (
-                    <>
-                      <span style={{ display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, width:26 }}>
-                        <Settings size={17} color={isActive ? '#fff' : '#6b7280'} />
-                      </span>
-                      <span>Configuración</span>
-                    </>
-                  )}
+                <NavLink to={NAV_CONFIG.to} onClick={() => setDrawerOpen(false)} style={({ isActive }) => ({ ...navItemStyle(isActive), marginBottom: 2 })} onMouseEnter={hoverOn} onMouseLeave={hoverOff}>
+                  {({ isActive }) => (<><span style={{ display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, width:26 }}><Settings size={17} color={isActive ? ACTIVE_TEXT : '#6b7280'} /></span><span>Configuración</span></>)}
                 </NavLink>
               </nav>
 
-              {/* Perfil + logout */}
               <div style={{ padding: '10px', borderTop: '1px solid #f0f0f2' }}>
                 <div style={{ display:'flex', alignItems:'flex-start', gap:10, padding:'6px 8px 10px' }}>
                   <div style={{ width:32, height:32, borderRadius:'50%', background:'linear-gradient(135deg,#4f46e5,#2D2A7A)', flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center', marginTop:2 }}>
@@ -213,20 +182,8 @@ export default function DashboardLayout() {
                     <p style={{ margin:0, fontSize:11, color:'#9ca3af', wordBreak:'break-all', lineHeight:1.35 }}>{correo}</p>
                   </div>
                 </div>
-                <button
-                  onClick={() => { logout(); navigate('/login') }}
-                  style={{
-                    display:'flex', alignItems:'center', gap:10, height:38, padding:'0 8px', borderRadius:9,
-                    border:'none', background:'transparent', color:'#ef4444',
-                    fontWeight:600, fontSize:13.5, cursor:'pointer', width:'100%',
-                    overflow:'hidden', whiteSpace:'nowrap', transition:'background 0.13s', marginTop:10,
-                  }}
-                  onMouseEnter={e=>e.currentTarget.style.background='#fef2f2'}
-                  onMouseLeave={e=>e.currentTarget.style.background='transparent'}
-                >
-                  <span style={{ display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, width:26 }}>
-                    <LogOut size={17} color="#ef4444" />
-                  </span>
+                <button onClick={() => { logout(); navigate('/login') }} style={{ display:'flex', alignItems:'center', gap:10, height:38, padding:'0 8px', borderRadius:9, border:'none', background:'transparent', color:'#ef4444', fontWeight:600, fontSize:13.5, cursor:'pointer', width:'100%', overflow:'hidden', whiteSpace:'nowrap', transition:'background 0.13s', marginTop:10 }} onMouseEnter={e=>e.currentTarget.style.background='#fef2f2'} onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
+                  <span style={{ display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, width:26 }}><LogOut size={17} color="#ef4444" /></span>
                   <span>Cerrar sesión</span>
                 </button>
               </div>
@@ -256,20 +213,51 @@ export default function DashboardLayout() {
           {/* ── Sidebar ── */}
           <aside style={{ width: sidebarW, height: '100%', background: '#fff', borderRadius: 28, display: 'flex', flexDirection: 'column', overflow: 'hidden', transition: 'width 0.25s cubic-bezier(0.4,0,0.2,1)' }}>
 
-            {/* Logo */}
-            <div style={{
-              display: 'flex', alignItems: 'center',
-              justifyContent: sideOpen ? 'flex-start' : 'center',
-              gap: 8,
-              padding: sideOpen ? '14px 10px 12px 12px' : '14px 0 12px',
-              borderBottom: '1px solid #f0f0f2', flexShrink: 0, overflow: 'hidden',
-              transition: 'padding 0.25s ease, justify-content 0.25s ease',
-            }}>
-              <LogoIcon size={26} style={{ flexShrink: 0 }} />
-              <div style={{ opacity: sideOpen ? 1 : 0, maxWidth: sideOpen ? 130 : 0, overflow: 'hidden', transition: 'opacity 0.2s ease, max-width 0.25s ease', whiteSpace: 'nowrap' }}>
+            {/* Logo + toggle */}
+            <div
+              onMouseEnter={() => setLogoHover(true)}
+              onMouseLeave={() => setLogoHover(false)}
+              onClick={() => !sideOpen && setSideOpen(true)}
+              style={{
+                display: 'flex', alignItems: 'center',
+                height: 56,
+                padding: sideOpen ? '0 6px 0 12px' : '0',
+                justifyContent: sideOpen ? 'flex-start' : 'center',
+                borderBottom: '1px solid #f0f0f2', flexShrink: 0, overflow: 'hidden',
+                cursor: !sideOpen ? 'pointer' : 'default',
+                transition: 'padding 0.25s ease',
+              }}
+            >
+              {/* Logo icon — se convierte en hint de expansión al hover cuando está colapsado */}
+              <div style={{ width: 26, height: 26, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'opacity 0.2s', opacity: (!sideOpen && logoHover) ? 0.6 : 1 }}>
+                {(!sideOpen && logoHover)
+                  ? <AlignJustify size={20} color="#2D2A7A" />
+                  : <LogoIcon size={26} />
+                }
+              </div>
+
+              {/* Texto logo — se oculta al colapsar */}
+              <div style={{ opacity: sideOpen ? 1 : 0, maxWidth: sideOpen ? 120 : 0, overflow: 'hidden', transition: 'opacity 0.2s ease, max-width 0.25s ease', whiteSpace: 'nowrap', marginLeft: sideOpen ? 8 : 0, flex: 1, minWidth: 0 }}>
                 <p style={{ fontWeight: 700, fontSize: 13, color: '#16151b', margin: 0, lineHeight: '15px' }}>Asegura2.com</p>
                 <p style={{ fontWeight: 400, fontSize: 9.5, color: '#a2a8c0', margin: 0 }}>Portal de aliados</p>
               </div>
+
+              {/* Botón colapsar — solo visible cuando el sidebar está abierto */}
+              {sideOpen && (
+                <button
+                  onClick={(e) => { e.stopPropagation(); setSideOpen(false) }}
+                  style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    width: 28, height: 28, borderRadius: 8, flexShrink: 0,
+                    background: logoHover ? '#f3f4f6' : 'transparent',
+                    border: 'none', cursor: 'pointer',
+                    opacity: logoHover ? 1 : 0,
+                    transition: 'background 0.15s, opacity 0.2s',
+                  }}
+                >
+                  <ChevronLeft size={16} color="#6b7280" />
+                </button>
+              )}
             </div>
 
             {/* Nav principal */}
@@ -314,7 +302,7 @@ export default function DashboardLayout() {
               </button>
             </nav>
 
-            {/* ── Sección inferior — siempre fija abajo ── */}
+            {/* ── Sección inferior — siempre fija al fondo ── */}
             <div style={{ padding: '8px', flexShrink: 0 }}>
               <button
                 onClick={() => window.open('mailto:soporte@asegura2.com', '_blank')}
@@ -341,10 +329,7 @@ export default function DashboardLayout() {
 
               <button
                 onClick={() => { logout(); navigate('/login') }}
-                style={{
-                  ...navItemStyle(false, sideOpen),
-                  color: '#ef4444',
-                }}
+                style={{ ...navItemStyle(false, sideOpen), color: '#ef4444' }}
                 onMouseEnter={e => e.currentTarget.style.background = '#fef2f2'}
                 onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
               >
@@ -356,23 +341,17 @@ export default function DashboardLayout() {
             </div>
           </aside>
 
-          {/* ── Contenido principal ── */}
-          <main style={{ background: '#f5f7fb', borderRadius: 24, overflow: 'hidden', height: '100%', display: 'flex', flexDirection: 'column' }}>
-
-            {/* Topbar */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '0 20px', height: 64, background: '#f5f7fb', flexShrink: 0 }}>
-
-              {/* Toggle sidebar */}
-              <button
-                onClick={() => setSideOpen(v => !v)}
-                style={{ width: 36, height: 36, borderRadius: 10, background: '#fff', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, transition: 'background 0.15s' }}
-                onMouseEnter={e => e.currentTarget.style.background = '#e9eaf0'}
-                onMouseLeave={e => e.currentTarget.style.background = '#fff'}
-              >
-                <AlignJustify size={17} color="#6b7280" />
-              </button>
-
-              {/* Barra de búsqueda — ocupa todo el espacio disponible */}
+          {/* ── Contenido principal — click aquí cierra el sidebar ── */}
+          <main
+            onClick={() => sideOpen && setSideOpen(false)}
+            style={{ background: '#f5f7fb', borderRadius: 24, overflow: 'hidden', height: '100%', display: 'flex', flexDirection: 'column' }}
+          >
+            {/* Topbar — sin botón de toggle (está en el sidebar) */}
+            <div
+              onClick={e => e.stopPropagation()}
+              style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '0 20px', height: 64, background: '#f5f7fb', flexShrink: 0 }}
+            >
+              {/* Search bar — ocupa todo el espacio disponible */}
               <div style={{ flex: 1, position: 'relative' }}>
                 <Search size={14} color="#9ca3af" style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
                 <input
@@ -386,24 +365,20 @@ export default function DashboardLayout() {
               {/* Campana + usuario */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
                 <NotificationBell />
-                {/* Pill usuario */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#fff', borderRadius: 999, padding: '4px 12px 4px 4px', cursor: 'default' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#fff', borderRadius: 999, padding: '4px 12px 4px 4px' }}>
                   <div style={{ width: 30, height: 30, borderRadius: '50%', background: 'linear-gradient(135deg,#4f46e5,#2D2A7A)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    <span style={{ fontSize: 11, fontWeight: 800, color: '#fff', textTransform: 'uppercase', lineHeight: 1 }}>
-                      {initials || '?'}
-                    </span>
+                    <span style={{ fontSize: 11, fontWeight: 800, color: '#fff', textTransform: 'uppercase', lineHeight: 1 }}>{initials || '?'}</span>
                   </div>
-                  <span style={{ fontSize: 13, fontWeight: 500, color: '#111827', fontFamily: 'Poppins', whiteSpace: 'nowrap' }}>
-                    {display}
-                  </span>
+                  <span style={{ fontSize: 13, fontWeight: 500, color: '#111827', fontFamily: 'Poppins', whiteSpace: 'nowrap' }}>{display}</span>
                 </div>
               </div>
             </div>
 
-            <div style={{ flex: 1, overflow: 'auto' }}>
+            <div style={{ flex: 1, overflow: 'auto' }} onClick={e => e.stopPropagation()}>
               <Outlet />
             </div>
           </main>
+
         </div>
       </div>
     </div>

@@ -488,8 +488,8 @@ export default function Dashboard() {
                   <p style={{ margin: '0 0 8px', fontFamily: 'Poppins', fontSize: 16, fontWeight: 600, color: '#111827' }}>
                     {saludo}, {nombreAliado}! 🔥
                   </p>
-                  <p style={{ margin: 0, fontFamily: 'Inter', fontSize: 12, color: '#6b7280', lineHeight: 1.6 }}>
-                    Sigue enviando clientes a emitir<br />para generar más comisiones
+                  <p style={{ margin: 0, fontFamily: 'Inter', fontSize: 12, color: '#6b7280', whiteSpace: 'nowrap' }}>
+                    Envía a emitir y gana más comisiones
                   </p>
                 </div>
               </div>

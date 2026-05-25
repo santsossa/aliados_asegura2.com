@@ -22,15 +22,17 @@ body {
 }
 
 /* ── Dashboard scroll layout ────────────────────────────────────────────────── */
+/* Columna derecha siempre estática y completa; columna izquierda scrollea */
 .db-outer { height: 100%; overflow: hidden; display: flex; flex-direction: column; }
 .db-inner { flex: 1; min-height: 0; padding: 16px 24px; display: flex; flex-direction: column; }
-.db-grid  { flex: 1; min-height: 0; display: grid; gap: 20px; max-width: 72rem; margin: 0 auto; width: 100%; }
+.db-grid  { flex: 1; min-height: 0; display: grid; gap: 20px; grid-template-columns: 1fr 280px; max-width: 72rem; margin: 0 auto; width: 100%; }
 .db-left  { overflow-y: auto; display: flex; flex-direction: column; gap: 18px; min-height: 0; }
 .db-right { overflow: hidden; display: flex; flex-direction: column; }
 @media (min-width: 1280px) { .db-grid { grid-template-columns: 1fr 300px; } }
-@media (max-width: 1279px) {
+/* Solo en móvil se apilan las columnas */
+@media (max-width: 640px) {
   .db-outer { overflow-y: auto; }
-  .db-grid  { height: auto; overflow: visible; }
+  .db-grid  { grid-template-columns: 1fr; height: auto; overflow: visible; }
   .db-left  { overflow-y: visible; }
   .db-right { overflow-y: auto; height: auto; }
 }
