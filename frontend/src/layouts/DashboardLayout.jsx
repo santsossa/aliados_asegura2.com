@@ -333,7 +333,7 @@ export default function DashboardLayout() {
           <main style={{ background: '#f5f7fb', borderRadius: 24, height: '100%', overflow: 'auto' }}>
 
             {/* Topbar — parte del contenido, scrollea con la página */}
-            <div style={{ padding: '16px 24px 12px', background: '#f5f7fb' }}>
+            <div style={{ padding: '16px 24px 24px', background: '#f5f7fb' }}>
               <div style={{ maxWidth: '72rem', margin: '0 auto', height: '100%', display: 'flex', alignItems: 'center', gap: 12 }}>
                 {/* Search */}
                 <div style={{ flex: 1, position: 'relative' }}>
