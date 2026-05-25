@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { DollarSign, FileText, Shield, TrendingUp, Sparkles, ChevronRight, MoreHorizontal } from 'lucide-react'
+import { DollarSign, FileText, Shield, TrendingUp, ChevronRight } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { useSSE } from '../../context/SSEContext'
@@ -282,7 +282,7 @@ export default function Dashboard() {
     },
     {
       icon: TrendingUp, iconBg: '#fff7ed', iconColor: '#ea580c',
-      label: 'Total ganado histórico',
+      label: 'Total ganado',
       value: fmt(stats.total_ganado.monto),
       badge: null,
       sub: `${pct(stats.total_ganado.variacion)} vs. el mes anterior`,
@@ -302,7 +302,7 @@ export default function Dashboard() {
             {/* 1. Hero banner */}
             <div style={{
               background: 'linear-gradient(135deg, #3730a3 0%, #4f46e5 60%, #6366f1 100%)',
-              borderRadius: 18, padding: '28px 32px',
+              borderRadius: 24, padding: '28px 32px',
               position: 'relative', overflow: 'hidden', minHeight: 148,
               display: 'flex', flexDirection: 'column', justifyContent: 'center',
             }}>
@@ -352,7 +352,7 @@ export default function Dashboard() {
                 return (
                   <div key={i} style={{
                     background: '#fff',
-                    borderRadius: 16,
+                    borderRadius: 22,
                     padding: '15px 16px',
                     display: 'flex', alignItems: 'center', gap: 12,
                   }}>
@@ -360,19 +360,16 @@ export default function Dashboard() {
                       <Icon size={17} color={c.iconColor} />
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={{ margin: 0, fontFamily: 'Inter', fontSize: 11, color: '#9ca3af', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{c.label}</p>
-                      <p style={{ margin: '2px 0 0', fontFamily: 'Poppins', fontSize: 14.5, fontWeight: 600, color: '#111827', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', letterSpacing: '-0.2px' }}>{c.value}</p>
+                      <p style={{ margin: 0, fontFamily: 'Inter', fontSize: 11, color: '#9ca3af', lineHeight: 1.4 }}>{c.label}</p>
+                      <p style={{ margin: '2px 0 0', fontFamily: 'Poppins', fontSize: 14.5, fontWeight: 600, color: '#111827', letterSpacing: '-0.2px' }}>{c.value}</p>
                     </div>
-                    <button style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 2, color: '#e5e7eb', display: 'flex', flexShrink: 0 }}>
-                      <MoreHorizontal size={14} />
-                    </button>
                   </div>
                 )
               })}
             </div>
 
             {/* 3. Enviadas a emitir — full card, row list */}
-            <div style={{ background: '#fff', borderRadius: 16, overflow: 'hidden', boxShadow: 'none' }}>
+            <div style={{ background: '#fff', borderRadius: 22, overflow: 'hidden', boxShadow: 'none' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', borderBottom: 'none' }}>
                 <span style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: 14, color: '#111827' }}>Enviadas a emitir</span>
                 <button onClick={() => navigate('/dashboard/mis-polizas')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'Inter', fontSize: 12, color: '#7c3aed', fontWeight: 500 }}>
@@ -423,7 +420,7 @@ export default function Dashboard() {
             </div>
 
             {/* 4. Actividad reciente — flex:1, solo la lista scrollea */}
-            <div style={{ background: '#fff', borderRadius: 16, overflow: 'hidden', display: 'flex', flexDirection: 'column', flex: 1, minHeight: 180 }}>
+            <div style={{ background: '#fff', borderRadius: 22, overflow: 'hidden', display: 'flex', flexDirection: 'column', flex: 1, minHeight: 180 }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 20px', flexShrink: 0 }}>
                 <span style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: 14, color: '#111827' }}>Actividad reciente</span>
                 <button onClick={() => navigate('/dashboard/cotizaciones')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'Inter', fontSize: 12, color: '#7c3aed', fontWeight: 500 }}>
@@ -437,7 +434,7 @@ export default function Dashboard() {
                   <p style={{ margin: '0 0 16px', fontSize: 12, color: '#9ca3af', lineHeight: 1.5 }}>
                     Empieza creando tu primera cotización<br />en menos de 2 minutos.
                   </p>
-                  <button onClick={() => navigate('/dashboard/cotizar')} style={{ background: '#2D2A7A', color: '#fff', border: 'none', borderRadius: 10, padding: '8px 20px', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
+                  <button onClick={() => navigate('/dashboard/cotizar')} style={{ background: '#2D2A7A', color: '#fff', border: 'none', borderRadius: 999, padding: '8px 20px', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
                     Nueva cotización →
                   </button>
                 </div>
@@ -498,19 +495,23 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* 6. Enviadas a emitir — flex:1.8 */}
-            <div style={{ flex: 1.8, background: '#f5f7fb', borderRadius: 16, padding: '14px 16px', margin: '0 4px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+            {/* 6. Enviadas a emitir — flex:1.8, chart anclado abajo */}
+            <div style={{ flex: 1.8, background: '#f5f7fb', borderRadius: 20, padding: '14px 16px', margin: '0 4px', display: 'flex', flexDirection: 'column' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 0, flexShrink: 0 }}>
                 <span style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: 13, color: '#111827' }}>Enviadas a emitir</span>
                 <span style={{ fontFamily: 'Inter', fontSize: 9.5, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', padding: '3px 8px', borderRadius: 99, background: '#ffffff', color: '#9ca3af' }}>
                   {mesCorto}
                 </span>
               </div>
-              <PeriodBarChart polizas={polizas_proceso} />
+              <div style={{ flex: 1, display: 'flex', alignItems: 'flex-end' }}>
+                <div style={{ width: '100%' }}>
+                  <PeriodBarChart polizas={polizas_proceso} />
+                </div>
+              </div>
             </div>
 
             {/* 7. Pregúntale a Anto — flex:1 */}
-            <div style={{ flex: 1, background: '#f5f7fb', borderRadius: 16, padding: '14px 16px', margin: '4px 4px 4px', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ flex: 1, background: '#f5f7fb', borderRadius: 20, padding: '14px 16px', margin: '4px 4px 4px', display: 'flex', flexDirection: 'column' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
                 <span style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: 13, color: '#111827' }}>Pregúntale a Anto</span>
                 <button
@@ -539,7 +540,7 @@ export default function Dashboard() {
                       </div>
                       <button
                         onClick={() => document.querySelector('[data-anto-pill]')?.click()}
-                        style={{ flexShrink: 0, fontFamily: 'Inter', fontSize: 11, fontWeight: 600, color: item.color, background: `${item.color}15`, border: 'none', borderRadius: 10, padding: '4px 9px', cursor: 'pointer' }}
+                        style={{ flexShrink: 0, fontFamily: 'Inter', fontSize: 11, fontWeight: 600, color: item.color, background: `${item.color}15`, border: 'none', borderRadius: 999, padding: '4px 9px', cursor: 'pointer' }}
                       >
                         Preguntar
                       </button>
@@ -549,7 +550,7 @@ export default function Dashboard() {
 
                 <button
                   onClick={() => document.querySelector('[data-anto-pill]')?.click()}
-                  style={{ width: '100%', fontFamily: 'Poppins', background: '#2D2A7A1a', color: '#2D2A7A', border: 'none', borderRadius: 12, padding: '10px', fontSize: 13, fontWeight: 600, cursor: 'pointer', transition: 'background 0.15s', marginTop: 14 }}
+                  style={{ width: '100%', fontFamily: 'Poppins', background: '#2D2A7A1a', color: '#2D2A7A', border: 'none', borderRadius: 999, padding: '10px', fontSize: 13, fontWeight: 600, cursor: 'pointer', transition: 'background 0.15s', marginTop: 14 }}
                   onMouseEnter={e => e.currentTarget.style.background = '#2D2A7A33'}
                   onMouseLeave={e => e.currentTarget.style.background = '#2D2A7A1a'}
                 >
