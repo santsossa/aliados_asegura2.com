@@ -109,69 +109,53 @@ function BarChart({ data = [], color = '#2D2A7A' }) {
   )
 }
 
-// ─── Donut con avatar dentro ──────────────────────────────────────────────────
-function DonutRingAvatar({ pct: p = 0, size = 96, stroke = 6, color = '#4f46e5', initials = '?' }) {
-  const r = (size - stroke) / 2
-  const circ = 2 * Math.PI * r
-  const dash = (Math.min(p, 100) / 100) * circ
-  const av = size - stroke * 2 - 10
+// ─── Avatar círculo simple ────────────────────────────────────────────────────
+function PlainAvatar({ size = 80, initials = '?' }) {
   return (
-    <div style={{ position: 'relative', width: size, height: size, display: 'inline-block', flexShrink: 0 }}>
-      <svg width={size} height={size} style={{ display: 'block', transform: 'rotate(-90deg)' }}>
-        <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="#e5e7eb" strokeWidth={stroke} />
-        <circle cx={size/2} cy={size/2} r={r} fill="none" stroke={color} strokeWidth={stroke}
-          strokeDasharray={`${dash} ${circ}`} strokeLinecap="round" />
-      </svg>
-      <div style={{
-        position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)',
-        width: av, height: av, borderRadius: '50%',
-        background: 'linear-gradient(135deg,#4f46e5,#2D2A7A)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-      }}>
-        <span style={{ fontSize: Math.round(av * 0.36), fontWeight: 900, color: '#fff', textTransform: 'uppercase' }}>
-          {initials}
-        </span>
-      </div>
-      <div style={{ position: 'absolute', top: 2, right: -6, background: color, color: '#fff', fontSize: 8.5, fontWeight: 800, borderRadius: 99, padding: '2px 6px', lineHeight: 1.4 }}>
-        {p}%
-      </div>
+    <div style={{
+      width: size, height: size, borderRadius: '50%',
+      background: 'linear-gradient(135deg,#4f46e5,#2D2A7A)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+    }}>
+      <span style={{ fontSize: Math.round(size * 0.36), fontWeight: 900, color: '#fff', textTransform: 'uppercase' }}>
+        {initials}
+      </span>
     </div>
   )
 }
 
-// ─── Period bar chart (3 columnas: 1-10, 11-20, 21-31) ───────────────────────
-function PeriodBarChart({ data = [] }) {
-  const inc = data.map((d, i) => ({ dia: d.dia, monto: i === 0 ? d.monto : d.monto - data[i-1].monto }))
-  const sums = [
-    inc.filter(d => d.dia <= 10).reduce((s, d) => s + d.monto, 0),
-    inc.filter(d => d.dia > 10 && d.dia <= 20).reduce((s, d) => s + d.monto, 0),
-    inc.filter(d => d.dia > 20).reduce((s, d) => s + d.monto, 0),
-  ]
-  const max = Math.max(...sums, 1)
-  const labels = ['1-10', '11-20', '21-31']
-  const yTicks = [max, Math.round(max * 0.5), 0]
+// ─── Period bar chart — pólizas enviadas a emitir por período ─────────────────
+function PeriodBarChart({ polizas = [] }) {
+  const now = new Date()
+  const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate()
+  const currMonth = now.getMonth()
+  const currYear  = now.getFullYear()
+
+  const counts = [0, 0, 0]
+  polizas.forEach(p => {
+    if (!p.created_at) return
+    const d = new Date(p.created_at)
+    if (d.getMonth() !== currMonth || d.getFullYear() !== currYear) return
+    const day = d.getDate()
+    if (day <= 10) counts[0]++
+    else if (day <= 20) counts[1]++
+    else counts[2]++
+  })
+
+  const max = Math.max(...counts, 1)
+  const labels = ['1-10', '11-20', `21-${lastDay}`]
+
   return (
-    <div style={{ display: 'flex', gap: 4 }}>
-      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', paddingBottom: 18, height: 80 }}>
-        {yTicks.map((v, i) => (
-          <span key={i} style={{ fontSize: 9, color: '#9ca3af', lineHeight: 1 }}>
-            {v >= 1000000 ? `${(v/1000000).toFixed(1)}M` : v >= 1000 ? `${Math.round(v/1000)}K` : v}
-          </span>
-        ))}
-      </div>
-      <div style={{ flex: 1 }}>
-        <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end', height: 62 }}>
-          {sums.map((val, i) => (
-            <div key={i} style={{ flex: 1, display: 'flex', gap: 3, alignItems: 'flex-end', height: '100%' }}>
-              <div style={{ flex: 1, background: '#c4b5fd', borderRadius: '3px 3px 0 0', height: `${Math.max((val/max)*65, val>0?8:2)}%` }} />
-              <div style={{ flex: 1, background: '#4f46e5', borderRadius: '3px 3px 0 0', height: `${Math.max((val/max)*100, val>0?12:3)}%` }} />
-            </div>
-          ))}
+    <div style={{ display: 'flex', gap: 10, alignItems: 'flex-end' }}>
+      {counts.map((val, i) => (
+        <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+          <div style={{ width: '100%', display: 'flex', gap: 3, alignItems: 'flex-end', height: 72 }}>
+            <div style={{ flex: 1, background: '#c4b5fd', borderRadius: 8, height: `${Math.max((val/max)*60, val>0?18:6)}%`, transition: 'height 0.3s' }} />
+            <div style={{ flex: 1, background: '#4f46e5', borderRadius: 8, height: `${Math.max((val/max)*100, val>0?25:6)}%`, transition: 'height 0.3s' }} />
+          </div>
+          <span style={{ fontSize: 9, color: '#9ca3af', fontWeight: 500 }}>{labels[i]}</span>
         </div>
-        <div style={{ display: 'flex', gap: 8, marginTop: 5 }}>
-          {labels.map((l, i) => <span key={i} style={{ flex: 1, fontSize: 9, color: '#9ca3af', textAlign: 'center' }}>{l}</span>)}
-        </div>
-      </div>
+      ))}
     </div>
   )
 }
@@ -285,7 +269,7 @@ export default function Dashboard() {
   return (
     <div className="p-4 lg:p-6" style={{ height: '100%', overflowY: 'auto' }}>
       <div style={{ maxWidth: '72rem', margin: '0 auto' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: 20, alignItems: 'start' }}>
+        <div className="grid gap-5 grid-cols-1 xl:grid-cols-[1fr_300px] items-start">
 
           {/* ═══ LEFT COLUMN ═══ */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
@@ -336,37 +320,33 @@ export default function Dashboard() {
               </button>
             </div>
 
-            {/* 2. Stats pills — compact horizontal like reference */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 10 }}>
+            {/* 2. Stats cards — cuadradas, título arriba, valor abajo */}
+            <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
               {cards.map((c, i) => {
                 const Icon = c.icon
                 return (
                   <div key={i} style={{
                     background: '#fff',
-                    borderRadius: 999,
+                    borderRadius: 16,
                     border: '1px solid #eeeeef',
                     boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
-                    padding: '10px 12px 10px 10px',
-                    display: 'flex', alignItems: 'center', gap: 10,
+                    padding: '16px',
+                    display: 'flex', flexDirection: 'column', gap: 2,
+                    overflow: 'hidden',
                   }}>
-                    <div style={{
-                      width: 40, height: 40, borderRadius: '50%',
-                      background: c.iconBg,
-                      display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-                    }}>
-                      <Icon size={17} color={c.iconColor} />
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                      <div style={{ width: 32, height: 32, borderRadius: 10, background: c.iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <Icon size={15} color={c.iconColor} />
+                      </div>
+                      <button style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 2, color: '#d1d5db', display: 'flex' }}>
+                        <MoreHorizontal size={14} />
+                      </button>
                     </div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={{ margin: '0 0 1px', fontSize: 10, color: '#9ca3af', fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                        {c.value}{c.badge ? ` · ${c.badge}` : ''}
-                      </p>
-                      <p style={{ margin: 0, fontSize: 11.5, fontWeight: 700, color: '#111827', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                        {c.label}
-                      </p>
-                    </div>
-                    <button style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 2, flexShrink: 0, color: '#d1d5db', display: 'flex' }}>
-                      <MoreHorizontal size={14} />
-                    </button>
+                    <p style={{ margin: 0, fontSize: 10.5, color: '#9ca3af', fontWeight: 500 }}>{c.label}</p>
+                    <p style={{ margin: '2px 0 0', fontSize: 20, fontWeight: 800, color: '#111827', letterSpacing: '-0.5px', lineHeight: 1.1 }}>{c.value}</p>
+                    <p style={{ margin: '4px 0 0', fontSize: 11, color: c.positive === false ? '#dc2626' : '#6b7280', fontWeight: 500 }}>
+                      {c.badge ? `${c.badge}` : c.sub}
+                    </p>
                   </div>
                 )
               })}
@@ -487,35 +467,37 @@ export default function Dashboard() {
                 </span>
               </div>
 
-              {/* Avatar + donut centrado */}
+              {/* Avatar + saludo */}
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 12 }}>
-                <DonutRingAvatar pct={metaPct} size={96} stroke={6} color="#4f46e5" initials={initials} />
+                <PlainAvatar size={80} initials={initials} />
                 <p style={{ margin: '10px 0 2px', fontSize: 15, fontWeight: 700, color: '#111827', textAlign: 'center' }}>
                   {saludo}, {nombreAliado}! 🔥
                 </p>
                 <p style={{ margin: 0, fontSize: 11, color: '#6b7280', textAlign: 'center', lineHeight: 1.5 }}>
-                  {metaPct >= 100 ? '¡Meta del mes superada!' : 'Sigue así para alcanzar tu meta'}
+                  Sigue enviando clientes a emitir para generar más comisiones
                 </p>
               </div>
 
-              {/* Comisiones */}
-              <div style={{ background: '#ffffff', borderRadius: 10, padding: '10px 14px', marginBottom: 14, border: '1px solid #e9eaed' }}>
-                <p style={{ margin: '0 0 2px', fontSize: 10, color: '#9ca3af', fontWeight: 500 }}>Comisiones generadas · {mesCorto}</p>
-                <span style={{ fontSize: 20, fontWeight: 800, color: '#111827', letterSpacing: '-0.5px' }}>{fmt(rendimiento.comisiones_mes)}</span>
-              </div>
-
-              {/* Period bar chart */}
-              <PeriodBarChart data={rendimiento.grafica} />
-
               <button
                 onClick={() => navigate('/dashboard/pagos')}
-                style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 11, color: '#4f46e5', fontWeight: 600, padding: '10px 0 0', display: 'block' }}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 11, color: '#4f46e5', fontWeight: 600, padding: '4px 0 0', display: 'block' }}
               >
                 Ver reporte completo →
               </button>
             </div>
 
-            {/* 6. Tu copiloto — card gris, lista estilo mentor */}
+            {/* 6. Enviadas a emitir — card gris con gráfica de períodos */}
+            <div style={{ background: '#f5f7fb', borderRadius: 16, padding: '18px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+                <span style={{ fontWeight: 700, fontSize: 14, color: '#111827' }}>Enviadas a emitir</span>
+                <span style={{ fontSize: 10, fontWeight: 600, padding: '3px 9px', borderRadius: 99, background: '#ffffff', color: '#6b7280', border: '1px solid #e5e7eb' }}>
+                  {mesCorto} {anioLabel}
+                </span>
+              </div>
+              <PeriodBarChart polizas={polizas_proceso} />
+            </div>
+
+            {/* 7. Tu copiloto — card gris, lista estilo mentor */}
             <div style={{ background: '#f5f7fb', borderRadius: 16, padding: '18px' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
                 <span style={{ fontWeight: 700, fontSize: 14, color: '#111827' }}>Tu copiloto</span>

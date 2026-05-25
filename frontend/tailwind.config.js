@@ -31,7 +31,7 @@ export default {
   		},
   		fontFamily: {
   			sans: [
-  				'Inter',
+  				'Mona Sans',
   				'system-ui',
   				'sans-serif'
   			]
