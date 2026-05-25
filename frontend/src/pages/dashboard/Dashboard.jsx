@@ -142,16 +142,20 @@ function PeriodBarChart({ polizas = [] }) {
     else counts[2]++
   })
 
-  const max = Math.max(...counts, 1)
-  const mid  = Math.ceil(max / 2)
+  const max = Math.max(...counts, 0)
   const labels = ['1-10', '11-20', `21-${lastDay}`]
+  // Y-axis ticks: deduped, meaningful scale
+  const yTicks = max === 0 ? [0]
+    : max === 1 ? [1, 0]
+    : max === 2 ? [2, 1, 0]
+    : [max, Math.round(max / 2), 0]
 
   return (
     <div style={{ display: 'flex', gap: 6 }}>
       {/* Y-axis */}
-      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: 80, paddingBottom: 18, width: 14, flexShrink: 0 }}>
-        {[max, mid, 0].map((v, i) => (
-          <span key={i} style={{ fontSize: 8.5, color: '#9ca3af', lineHeight: 1, textAlign: 'right', display: 'block' }}>{v}</span>
+      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: 80, paddingBottom: 18, width: 16, flexShrink: 0 }}>
+        {yTicks.map((v, i) => (
+          <span key={i} style={{ fontSize: 8.5, fontFamily: 'Inter', color: '#9ca3af', lineHeight: 1, textAlign: 'right', display: 'block' }}>{v}</span>
         ))}
       </div>
       {/* Bars */}
@@ -164,10 +168,10 @@ function PeriodBarChart({ polizas = [] }) {
               )}
               <div style={{
                 width: '60%', background: '#4f46e5', borderRadius: '8px 8px 4px 4px',
-                height: `${Math.max((val / max) * 100, val > 0 ? 20 : 4)}%`,
+                height: `${max > 0 ? Math.max((val / max) * 100, val > 0 ? 20 : 4) : 4}%`,
                 minHeight: val > 0 ? 14 : 3,
                 transition: 'height 0.4s ease',
-                opacity: val > 0 ? 1 : 0.18,
+                opacity: val > 0 ? 1 : 0.15,
               }} />
             </div>
           ))}
@@ -350,7 +354,6 @@ export default function Dashboard() {
                   <div key={i} style={{
                     background: '#fff',
                     borderRadius: 16,
-                    boxShadow: '0 1px 6px rgba(0,0,0,0.06)',
                     padding: '14px 16px',
                     display: 'flex', flexDirection: 'column', gap: 0,
                   }}>
@@ -362,9 +365,9 @@ export default function Dashboard() {
                         <MoreHorizontal size={13} />
                       </button>
                     </div>
-                    <p className="t-caption" style={{ margin: '0 0 4px', fontFamily: 'Inter', color: '#9ca3af' }}>{c.label}</p>
-                    <p style={{ margin: 0, fontFamily: 'Poppins', fontSize: 19, fontWeight: 700, color: '#111827', letterSpacing: '-0.4px', lineHeight: 1.1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.value}</p>
-                    <p className="t-caption" style={{ margin: '5px 0 0', fontFamily: 'Inter', color: c.positive === false ? '#dc2626' : '#6b7280' }}>
+                    <p style={{ margin: '0 0 3px', fontFamily: 'Inter', fontSize: 11, color: '#9ca3af', lineHeight: 1.3 }}>{c.label}</p>
+                    <p style={{ margin: 0, fontFamily: 'Poppins', fontSize: 17, fontWeight: 600, color: '#111827', letterSpacing: '-0.3px', lineHeight: 1.2, wordBreak: 'break-word', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{c.value}</p>
+                    <p style={{ margin: '4px 0 0', fontFamily: 'Inter', fontSize: 11, color: c.positive === false ? '#dc2626' : '#6b7280', lineHeight: 1.3 }}>
                       {c.badge || c.sub}
                     </p>
                   </div>
@@ -373,7 +376,7 @@ export default function Dashboard() {
             </div>
 
             {/* 3. Enviadas a emitir — full card, row list */}
-            <div style={{ background: '#fff', borderRadius: 16, overflow: 'hidden', boxShadow: '0 1px 6px rgba(0,0,0,0.06)' }}>
+            <div style={{ background: '#fff', borderRadius: 16, overflow: 'hidden', boxShadow: 'none' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', borderBottom: '1px solid #f3f4f6' }}>
                 <span style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: 14, color: '#111827' }}>Enviadas a emitir</span>
                 <button onClick={() => navigate('/dashboard/mis-polizas')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'Inter', fontSize: 12, color: '#7c3aed', fontWeight: 500 }}>
@@ -424,7 +427,7 @@ export default function Dashboard() {
             </div>
 
             {/* 4. Actividad reciente — full card, row list */}
-            <div style={{ background: '#fff', borderRadius: 16, overflow: 'hidden', boxShadow: '0 1px 6px rgba(0,0,0,0.06)' }}>
+            <div style={{ background: '#fff', borderRadius: 16, overflow: 'hidden', boxShadow: 'none' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', borderBottom: '1px solid #f3f4f6' }}>
                 <span style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: 14, color: '#111827' }}>Actividad reciente</span>
                 <button onClick={() => navigate('/dashboard/cotizaciones')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'Inter', fontSize: 12, color: '#7c3aed', fontWeight: 500 }}>
@@ -475,80 +478,85 @@ export default function Dashboard() {
 
           </div>
 
-          {/* ═══ RIGHT COLUMN — sticky, 100vh ═══ */}
-          <div style={{ background: '#ffffff', borderRadius: 20, padding: 12, display: 'flex', flexDirection: 'column', gap: 12, position: 'sticky', top: 0, height: 'calc(100vh - 64px)', overflowY: 'auto' }}>
+          {/* ═══ RIGHT COLUMN — sticky, responsive height ═══ */}
+          <div style={{ background: '#ffffff', borderRadius: 20, padding: 12, display: 'flex', flexDirection: 'column', gap: 0, position: 'sticky', top: 0, maxHeight: 'calc(100vh - 64px)', overflowY: 'auto' }}>
 
-            {/* 5. Tu rendimiento — fondo blanco, sin card gris */}
-            <div style={{ background: '#ffffff', borderRadius: 16, padding: '18px 18px 12px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+            {/* 5. Tu rendimiento — blanco, sin borde */}
+            <div style={{ padding: '16px 16px 14px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
                 <span style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: 14, color: '#111827' }}>Tu rendimiento</span>
-                <span className="t-label" style={{ padding: '3px 9px', borderRadius: 99, background: '#f5f7fb', color: '#9ca3af', fontFamily: 'Inter' }}>
+                <span style={{ fontFamily: 'Inter', fontSize: 9.5, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', padding: '3px 8px', borderRadius: 99, background: '#f5f7fb', color: '#9ca3af' }}>
                   {mesCorto} {anioLabel}
                 </span>
               </div>
-
-              {/* Avatar + saludo */}
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                <PlainAvatar size={80} initials={initials} />
-                <p style={{ margin: '10px 0 2px', fontSize: 15, fontWeight: 700, color: '#111827', textAlign: 'center' }}>
-                  {saludo}, {nombreAliado}! 🔥
-                </p>
-                <p style={{ margin: 0, fontSize: 11, color: '#6b7280', textAlign: 'center', lineHeight: 1.5 }}>
-                  Sigue enviando clientes a emitir para generar más comisiones
-                </p>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+                <PlainAvatar size={72} initials={initials} />
+                <div style={{ textAlign: 'center' }}>
+                  <p style={{ margin: '0 0 3px', fontFamily: 'Poppins', fontSize: 14, fontWeight: 600, color: '#111827' }}>
+                    {saludo}, {nombreAliado}! 🔥
+                  </p>
+                  <p style={{ margin: 0, fontFamily: 'Inter', fontSize: 11, color: '#6b7280', lineHeight: 1.45 }}>
+                    Sigue enviando clientes a emitir<br />para generar más comisiones
+                  </p>
+                </div>
               </div>
             </div>
 
-            {/* 6. Enviadas a emitir — card gris con gráfica de períodos */}
-            <div style={{ background: '#f5f7fb', borderRadius: 20, padding: '18px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-                <span style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: 14, color: '#111827' }}>Enviadas a emitir</span>
-                <span className="t-label" style={{ padding: '3px 9px', borderRadius: 99, background: '#ffffff', color: '#9ca3af', fontFamily: 'Inter' }}>
-                  {mesCorto} {anioLabel}
+            {/* divider */}
+            <div style={{ height: 1, background: '#f5f7fb', marginInline: 4 }} />
+
+            {/* 6. Enviadas a emitir — card gris */}
+            <div style={{ background: '#f5f7fb', borderRadius: 16, padding: '16px', margin: '8px 4px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+                <span style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: 13, color: '#111827' }}>Enviadas a emitir</span>
+                <span style={{ fontFamily: 'Inter', fontSize: 9.5, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', padding: '3px 8px', borderRadius: 99, background: '#ffffff', color: '#9ca3af' }}>
+                  {mesCorto}
                 </span>
               </div>
               <PeriodBarChart polizas={polizas_proceso} />
             </div>
 
-            {/* 7. Pregúntale a Anto — card gris, 3 opciones */}
-            <div style={{ background: '#f5f7fb', borderRadius: 20, padding: '18px' }}>
+            {/* 7. Pregúntale a Anto — card gris, flex-1 para llenar espacio */}
+            <div style={{ background: '#f5f7fb', borderRadius: 16, padding: '16px', margin: '0 4px 4px', flex: 1, display: 'flex', flexDirection: 'column' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-                <span style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: 14, color: '#111827' }}>Pregúntale a Anto</span>
+                <span style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: 13, color: '#111827' }}>Pregúntale a Anto</span>
                 <button
                   onClick={() => document.querySelector('[data-anto-pill]')?.click()}
-                  style={{ width: 26, height: 26, borderRadius: '50%', background: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, color: '#374151', lineHeight: 1, border: 'none', boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}
+                  style={{ width: 24, height: 24, borderRadius: '50%', background: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, color: '#374151', lineHeight: 1, border: 'none' }}
                 >+</button>
               </div>
 
-              {[
-                { bg: '#ede9fe', color: '#4f46e5', emoji: '🛡️', title: 'Coberturas',           sub: 'Qué cubre la póliza'     },
-                { bg: '#e0f2fe', color: '#0284c7', emoji: '⚖️', title: 'Comparar aseguradoras', sub: 'Diferencias y precios'   },
-                { bg: '#dcfce7', color: '#16a34a', emoji: '💬', title: 'Responder al cliente',  sub: 'Dudas frecuentes'        },
-              ].map((item, i, arr) => (
-                <div
-                  key={i}
-                  style={{ display: 'flex', alignItems: 'center', gap: 10, paddingBottom: i < arr.length - 1 ? 12 : 0, marginBottom: i < arr.length - 1 ? 12 : 0, borderBottom: i < arr.length - 1 ? '1px solid #eceef3' : 'none' }}
-                >
-                  <div style={{ width: 36, height: 36, borderRadius: '50%', background: item.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 16 }}>
-                    {item.emoji}
-                  </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <p style={{ margin: '0 0 1px', fontFamily: 'Poppins', fontSize: 12, fontWeight: 500, color: '#111827', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.title}</p>
-                    <p className="t-caption" style={{ margin: 0, fontFamily: 'Inter' }}>Anto IA</p>
-                  </div>
-                  <button
-                    onClick={() => document.querySelector('[data-anto-pill]')?.click()}
-                    style={{ flexShrink: 0, fontFamily: 'Inter', fontSize: 11, fontWeight: 600, color: item.color, background: `${item.color}15`, border: 'none', borderRadius: 12, padding: '4px 10px', cursor: 'pointer' }}
-                  >
-                    Preguntar
-                  </button>
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                <div>
+                  {[
+                    { bg: '#ede9fe', color: '#4f46e5', emoji: '🛡️', title: 'Coberturas',           },
+                    { bg: '#e0f2fe', color: '#0284c7', emoji: '⚖️', title: 'Comparar aseguradoras', },
+                    { bg: '#dcfce7', color: '#16a34a', emoji: '💬', title: 'Responder al cliente',  },
+                  ].map((item, i, arr) => (
+                    <div
+                      key={i}
+                      style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 0', borderBottom: i < arr.length - 1 ? '1px solid #eaedf2' : 'none' }}
+                    >
+                      <div style={{ width: 34, height: 34, borderRadius: '50%', background: item.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 15 }}>
+                        {item.emoji}
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <p style={{ margin: 0, fontFamily: 'Poppins', fontSize: 12, fontWeight: 500, color: '#111827', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.title}</p>
+                        <p style={{ margin: 0, fontFamily: 'Inter', fontSize: 10, color: '#9ca3af' }}>Anto IA</p>
+                      </div>
+                      <button
+                        onClick={() => document.querySelector('[data-anto-pill]')?.click()}
+                        style={{ flexShrink: 0, fontFamily: 'Inter', fontSize: 11, fontWeight: 600, color: item.color, background: `${item.color}15`, border: 'none', borderRadius: 10, padding: '4px 9px', cursor: 'pointer' }}
+                      >
+                        Preguntar
+                      </button>
+                    </div>
+                  ))}
                 </div>
-              ))}
 
-              <div style={{ borderTop: '1px solid #eceef3', paddingTop: 12, marginTop: 12 }}>
                 <button
                   onClick={() => document.querySelector('[data-anto-pill]')?.click()}
-                  style={{ width: '100%', fontFamily: 'Poppins', background: '#2D2A7A1a', color: '#2D2A7A', border: 'none', borderRadius: 14, padding: '10px', fontSize: 13, fontWeight: 600, cursor: 'pointer', transition: 'background 0.15s' }}
+                  style={{ width: '100%', fontFamily: 'Poppins', background: '#2D2A7A1a', color: '#2D2A7A', border: 'none', borderRadius: 12, padding: '10px', fontSize: 13, fontWeight: 600, cursor: 'pointer', transition: 'background 0.15s', marginTop: 14 }}
                   onMouseEnter={e => e.currentTarget.style.background = '#2D2A7A33'}
                   onMouseLeave={e => e.currentTarget.style.background = '#2D2A7A1a'}
                 >
