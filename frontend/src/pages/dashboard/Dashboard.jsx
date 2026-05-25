@@ -388,10 +388,10 @@ export default function Dashboard() {
             </div>
 
             {/* 3. Enviadas a emitir */}
-            <div>
+            <div style={{ marginTop: 8 }}>
               {/* Título fuera del card */}
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 4px', marginBottom: 10 }}>
-                <span style={{ fontFamily: 'Poppins', fontWeight: 700, fontSize: 15, color: '#111827', letterSpacing: '-0.2px' }}>Enviadas a emitir</span>
+                <span style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: 14, color: '#111827' }}>Enviadas a emitir</span>
                 <button onClick={() => navigate('/dashboard/mis-polizas')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'Inter', fontSize: 12, color: '#7c3aed', fontWeight: 600 }}>
                   Ver todas →
                 </button>
@@ -442,10 +442,10 @@ export default function Dashboard() {
             </div>
 
             {/* 4. Actividad reciente */}
-            <div>
+            <div style={{ marginTop: 8 }}>
               {/* Título fuera del card */}
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 4px', marginBottom: 10 }}>
-                <span style={{ fontFamily: 'Poppins', fontWeight: 700, fontSize: 15, color: '#111827', letterSpacing: '-0.2px' }}>Actividad reciente</span>
+                <span style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: 14, color: '#111827' }}>Actividad reciente</span>
                 <button onClick={() => navigate('/dashboard/cotizaciones')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'Inter', fontSize: 12, color: '#7c3aed', fontWeight: 600 }}>
                   Ver todas →
                 </button>
@@ -525,7 +525,7 @@ export default function Dashboard() {
 
               {/* Comisiones — título fuera de la gray card */}
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 2px' }}>
-                <span style={{ fontFamily: 'Poppins', fontWeight: 700, fontSize: 15, color: '#111827', letterSpacing: '-0.2px' }}>Comisiones</span>
+                <span style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: 14, color: '#111827' }}>Comisiones</span>
                 <span style={{ fontFamily: 'Inter', fontSize: 9.5, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', padding: '3px 8px', borderRadius: 99, background: '#f5f7fb', color: '#9ca3af' }}>
                   {MESES_CORTO[m2idx]} – {mesCorto}
                 </span>
@@ -538,7 +538,7 @@ export default function Dashboard() {
 
               {/* Pregúntale a Anto — título fuera de la gray card */}
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 2px 0' }}>
-                <span style={{ fontFamily: 'Poppins', fontWeight: 700, fontSize: 15, color: '#111827', letterSpacing: '-0.2px' }}>Pregúntale a Anto</span>
+                <span style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: 14, color: '#111827' }}>Pregúntale a Anto</span>
                 <button
                   onClick={() => document.querySelector('[data-anto-pill]')?.click()}
                   style={{ width: 24, height: 24, borderRadius: '50%', background: '#f5f7fb', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, color: '#374151', lineHeight: 1, border: 'none' }}
