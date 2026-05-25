@@ -25,15 +25,17 @@ const NAV_CONFIG = {
   label: 'Configuración',
 }
 
-// ── Estilos reutilizables ───────────────────────────────────────────────────
-// Activo: gris suave con texto/icono en morado de marca (visible, no negro)
 const ACTIVE_BG   = '#edeef3'
 const ACTIVE_TEXT = '#2D2A7A'
 const HOVER_BG    = '#f3f4f6'
 
-const navItemStyle = (isActive) => ({
-  display: 'flex', alignItems: 'center', gap: 10,
-  height: 40, padding: '0 8px', borderRadius: 9,
+// sideOpen=true por defecto para móvil (drawer siempre abierto)
+const navItemStyle = (isActive, sideOpen = true) => ({
+  display: 'flex', alignItems: 'center',
+  justifyContent: sideOpen ? 'flex-start' : 'center',
+  gap: 10, height: 40,
+  padding: sideOpen ? '0 8px' : '0',
+  borderRadius: 9,
   textDecoration: 'none', fontFamily: 'Poppins', fontWeight: 500, fontSize: 14, letterSpacing: '0.01em',
   color: isActive ? ACTIVE_TEXT : '#374151',
   background: isActive ? ACTIVE_BG : 'transparent',
@@ -42,11 +44,9 @@ const navItemStyle = (isActive) => ({
   border: 'none', cursor: 'pointer', width: '100%', textAlign: 'left',
 })
 
-// No aplica hover si el ítem ya está activo (edeef3 en background)
 const hoverOn  = e => { if (!e.currentTarget.style.background.includes('edeef3')) e.currentTarget.style.background = HOVER_BG }
 const hoverOff = e => { if (!e.currentTarget.style.background.includes('edeef3')) e.currentTarget.style.background = 'transparent' }
 
-// Línea divisoria centrada en el eje X del sidebar
 function Divider() {
   return (
     <div style={{ display:'flex', justifyContent:'center', margin:'7px 0' }}>
@@ -55,7 +55,6 @@ function Divider() {
   )
 }
 
-// Nav item ícono + texto (para la sección colapsable del sidebar desktop)
 function NavIcon({ icon: Icon, isActive }) {
   return (
     <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, width: 26 }}>
@@ -71,28 +70,6 @@ function NavLabel({ label, sideOpen }) {
   )
 }
 
-// Perfil del usuario
-function UserProfile({ user, sideOpen }) {
-  const nombre   = user?.nombre   || ''
-  const apellido = user?.apellido || ''
-  const initials = (nombre[0] || '') + (apellido[0] || nombre[1] || '')
-  const display  = nombre || user?.email?.split('@')[0] || 'Aliado'
-  const correo   = user?.correo || user?.email || ''
-  return (
-    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '6px 8px', overflow: 'hidden' }}>
-      <div style={{ width: 30, height: 30, borderRadius: '50%', background: 'linear-gradient(135deg,#4f46e5,#2D2A7A)', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 2 }}>
-        <span style={{ fontSize: 11, fontWeight: 800, color: '#fff', textTransform: 'uppercase', lineHeight: 1 }}>
-          {initials || '?'}
-        </span>
-      </div>
-      <div style={{ opacity: sideOpen ? 1 : 0, maxWidth: sideOpen ? 145 : 0, overflow: 'hidden', transition: 'opacity 0.2s ease, max-width 0.25s ease', minWidth: 0 }}>
-        <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: '#111827', lineHeight: 1.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{display}</p>
-        <p style={{ margin: 0, fontSize: 10.5, color: '#9ca3af', lineHeight: 1.35, marginTop: 2, wordBreak: 'break-all' }}>{correo}</p>
-      </div>
-    </div>
-  )
-}
-
 export default function DashboardLayout() {
   const navigate             = useNavigate()
   const isMobile             = useIsMobile()
@@ -102,14 +79,15 @@ export default function DashboardLayout() {
 
   const sidebarW = sideOpen ? 200 : 60
 
+  // Datos de usuario (usados en topbar desktop y drawer móvil)
+  const nombre   = user?.nombre   || ''
+  const apellido = user?.apellido || ''
+  const initials = ((nombre[0] || '') + (apellido[0] || nombre[1] || '')).toUpperCase()
+  const display  = nombre || user?.email?.split('@')[0] || 'Aliado'
+  const correo   = user?.correo || user?.email || ''
+
   // ── MÓVIL ─────────────────────────────────────────────────────────────────
   if (isMobile) {
-    const nombre   = user?.nombre   || ''
-    const apellido = user?.apellido || ''
-    const initials = (nombre[0] || '') + (apellido[0] || nombre[1] || '')
-    const display  = nombre || user?.email?.split('@')[0] || 'Aliado'
-    const correo   = user?.correo || user?.email || ''
-
     return (
       <SSEProvider>
       <div style={{ display: 'flex', flexDirection: 'column', height: '100dvh', background: '#fff', fontFamily: 'Inter, system-ui, sans-serif' }}>
@@ -145,7 +123,6 @@ export default function DashboardLayout() {
             <div onClick={() => setDrawerOpen(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 310 }} />
             <div style={{ position: 'fixed', top: 0, right: 0, bottom: 0, width: 272, background: '#fff', zIndex: 320, display: 'flex', flexDirection: 'column', boxShadow: '-4px 0 24px rgba(0,0,0,0.12)' }}>
 
-              {/* Drawer header */}
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px', borderBottom: '1px solid #f0f0f2' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   <LogoIcon size={22} />
@@ -156,9 +133,7 @@ export default function DashboardLayout() {
                 </button>
               </div>
 
-              {/* Nav items */}
               <nav style={{ flex: 1, padding: '10px 10px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 4 }}>
-                {/* Nav principal */}
                 {NAV_MAIN.map(({ to, icon: Icon, label }) => (
                   <NavLink
                     key={to} to={to}
@@ -180,7 +155,6 @@ export default function DashboardLayout() {
 
                 <Divider />
 
-                {/* Anto IA — morado igual que desktop */}
                 <button
                   onClick={() => { setDrawerOpen(false); document.querySelector('[data-anto-pill]')?.click() }}
                   style={{
@@ -200,7 +174,6 @@ export default function DashboardLayout() {
 
                 <Divider />
 
-                {/* Soporte */}
                 <button
                   onClick={() => window.open('mailto:soporte@asegura2.com', '_blank')}
                   style={{ ...navItemStyle(false), marginBottom: 4 }}
@@ -212,7 +185,6 @@ export default function DashboardLayout() {
                   <span>Soporte</span>
                 </button>
 
-                {/* Configuración */}
                 <NavLink
                   to={NAV_CONFIG.to}
                   onClick={() => setDrawerOpen(false)}
@@ -241,7 +213,6 @@ export default function DashboardLayout() {
                     <p style={{ margin:0, fontSize:11, color:'#9ca3af', wordBreak:'break-all', lineHeight:1.35 }}>{correo}</p>
                   </div>
                 </div>
-                {/* Cerrar sesión — solo hover rojo */}
                 <button
                   onClick={() => { logout(); navigate('/login') }}
                   style={{
@@ -282,11 +253,18 @@ export default function DashboardLayout() {
           background: '#fff',
         }}>
 
-          {/* Sidebar */}
+          {/* ── Sidebar ── */}
           <aside style={{ width: sidebarW, height: '100%', background: '#fff', borderRadius: 28, display: 'flex', flexDirection: 'column', overflow: 'hidden', transition: 'width 0.25s cubic-bezier(0.4,0,0.2,1)' }}>
 
-            {/* Logo en sidebar */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '14px 10px 12px 12px', borderBottom: '1px solid #f0f0f2', flexShrink: 0, overflow: 'hidden' }}>
+            {/* Logo */}
+            <div style={{
+              display: 'flex', alignItems: 'center',
+              justifyContent: sideOpen ? 'flex-start' : 'center',
+              gap: 8,
+              padding: sideOpen ? '14px 10px 12px 12px' : '14px 0 12px',
+              borderBottom: '1px solid #f0f0f2', flexShrink: 0, overflow: 'hidden',
+              transition: 'padding 0.25s ease, justify-content 0.25s ease',
+            }}>
               <LogoIcon size={26} style={{ flexShrink: 0 }} />
               <div style={{ opacity: sideOpen ? 1 : 0, maxWidth: sideOpen ? 130 : 0, overflow: 'hidden', transition: 'opacity 0.2s ease, max-width 0.25s ease', whiteSpace: 'nowrap' }}>
                 <p style={{ fontWeight: 700, fontSize: 13, color: '#16151b', margin: 0, lineHeight: '15px' }}>Asegura2.com</p>
@@ -294,12 +272,11 @@ export default function DashboardLayout() {
               </div>
             </div>
 
+            {/* Nav principal */}
             <nav style={{ padding: '12px 8px', display: 'flex', flexDirection: 'column', gap: 4, flex: 1 }}>
-
-              {/* Nav principal */}
               {NAV_MAIN.map(({ to, icon: Icon, label }) => (
                 <NavLink key={to} to={to} end={to === '/dashboard'}
-                  style={({ isActive }) => ({ ...navItemStyle(isActive), marginBottom: 2 })}
+                  style={({ isActive }) => ({ ...navItemStyle(isActive, sideOpen), marginBottom: 2 })}
                   onMouseEnter={hoverOn} onMouseLeave={hoverOff}
                 >
                   {({ isActive }) => (
@@ -313,15 +290,19 @@ export default function DashboardLayout() {
 
               <Divider />
 
-              {/* Anto IA — destaque morado */}
+              {/* Anto IA */}
               <button
                 data-anto-trigger
                 onClick={() => document.querySelector('[data-anto-pill]')?.click()}
                 style={{
-                  display:'flex', alignItems:'center', gap:10, height:38, padding:'0 8px', borderRadius:9, border:'none',
+                  display:'flex', alignItems:'center',
+                  justifyContent: sideOpen ? 'flex-start' : 'center',
+                  gap:10, height:38,
+                  padding: sideOpen ? '0 8px' : '0',
+                  borderRadius:9, border:'none',
                   background:'linear-gradient(135deg,#ede9fe,#ddd6fe)', color:'#4f46e5',
                   fontWeight:700, fontSize:13.5, cursor:'pointer', width:'100%', overflow:'hidden',
-                  whiteSpace:'nowrap', transition:'background 0.15s', flexShrink:0, textAlign:'left', marginBottom:4,
+                  whiteSpace:'nowrap', transition:'background 0.15s, padding 0.25s', flexShrink:0, textAlign:'left', marginBottom:4,
                 }}
                 onMouseEnter={e=>e.currentTarget.style.background='linear-gradient(135deg,#ddd6fe,#c4b5fd)'}
                 onMouseLeave={e=>e.currentTarget.style.background='linear-gradient(135deg,#ede9fe,#ddd6fe)'}
@@ -333,22 +314,19 @@ export default function DashboardLayout() {
               </button>
             </nav>
 
-            {/* Sección inferior */}
-            <div style={{ padding: '8px' }}>
-
-              {/* Soporte */}
+            {/* ── Sección inferior — siempre fija abajo ── */}
+            <div style={{ padding: '8px', flexShrink: 0 }}>
               <button
                 onClick={() => window.open('mailto:soporte@asegura2.com', '_blank')}
-                style={{ ...navItemStyle(false), marginBottom: 4 }}
+                style={{ ...navItemStyle(false, sideOpen), marginBottom: 4 }}
                 onMouseEnter={hoverOn} onMouseLeave={hoverOff}
               >
                 <NavIcon icon={Headphones} isActive={false} />
                 <NavLabel label="Soporte" sideOpen={sideOpen} />
               </button>
 
-              {/* Configuración */}
               <NavLink to={NAV_CONFIG.to}
-                style={({ isActive }) => ({ ...navItemStyle(isActive), marginBottom: 2 })}
+                style={({ isActive }) => ({ ...navItemStyle(isActive, sideOpen), marginBottom: 2 })}
                 onMouseEnter={hoverOn} onMouseLeave={hoverOff}
               >
                 {({ isActive }) => (
@@ -359,21 +337,13 @@ export default function DashboardLayout() {
                 )}
               </NavLink>
 
-              {/* Separador antes del perfil */}
               <Divider />
 
-              {/* Perfil */}
-              <UserProfile user={user} sideOpen={sideOpen} />
-
-              {/* Cerrar sesión — solo hover rojo, sin estados oscuros */}
               <button
                 onClick={() => { logout(); navigate('/login') }}
                 style={{
-                  display:'flex', alignItems:'center', gap:10, height:38, padding:'0 8px', borderRadius:9,
-                  border:'none', background:'transparent', color:'#ef4444',
-                  fontWeight:600, fontSize:13.5, cursor:'pointer', width:'100%',
-                  overflow:'hidden', whiteSpace:'nowrap', transition:'background 0.13s',
-                  flexShrink:0, textAlign:'left', marginTop:10,
+                  ...navItemStyle(false, sideOpen),
+                  color: '#ef4444',
                 }}
                 onMouseEnter={e => e.currentTarget.style.background = '#fef2f2'}
                 onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
@@ -386,34 +356,50 @@ export default function DashboardLayout() {
             </div>
           </aside>
 
-          {/* Contenido principal */}
+          {/* ── Contenido principal ── */}
           <main style={{ background: '#f5f7fb', borderRadius: 24, overflow: 'hidden', height: '100%', display: 'flex', flexDirection: 'column' }}>
-            {/* Topbar: toggle + búsqueda + campana */}
+
+            {/* Topbar */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '0 20px', height: 64, background: '#f5f7fb', flexShrink: 0 }}>
-              {/* Sidebar toggle — mismo tamaño que la campana */}
+
+              {/* Toggle sidebar */}
               <button
                 onClick={() => setSideOpen(v => !v)}
-                style={{ width: 36, height: 36, borderRadius: 10, background: '#fff', border: '1px solid #e5e7eb', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, transition: 'background 0.15s' }}
-                onMouseEnter={e => e.currentTarget.style.background = '#f3f4f6'}
+                style={{ width: 36, height: 36, borderRadius: 10, background: '#fff', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, transition: 'background 0.15s' }}
+                onMouseEnter={e => e.currentTarget.style.background = '#e9eaf0'}
                 onMouseLeave={e => e.currentTarget.style.background = '#fff'}
               >
                 <AlignJustify size={17} color="#6b7280" />
               </button>
-              {/* Barra de búsqueda */}
-              <div style={{ flex: 1, maxWidth: 400, position: 'relative' }}>
-                <Search size={14} color="#9ca3af" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
+
+              {/* Barra de búsqueda — ocupa todo el espacio disponible */}
+              <div style={{ flex: 1, position: 'relative' }}>
+                <Search size={14} color="#9ca3af" style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
                 <input
                   placeholder="Buscar cliente, placa, póliza..."
-                  style={{ width: '100%', height: 36, padding: '0 14px 0 34px', borderRadius: 999, border: '1px solid #e5e7eb', background: '#fff', fontSize: 13, color: '#111827', outline: 'none', boxSizing: 'border-box' }}
-                  onFocus={e => e.target.style.borderColor = '#a5b4fc'}
-                  onBlur={e => e.target.style.borderColor = '#e5e7eb'}
+                  style={{ width: '100%', height: 38, padding: '0 16px 0 38px', borderRadius: 999, border: 'none', background: '#fff', fontSize: 13, color: '#111827', outline: 'none', boxSizing: 'border-box', fontFamily: 'Inter, system-ui, sans-serif' }}
+                  onFocus={e => e.target.style.boxShadow = '0 0 0 2px #a5b4fc'}
+                  onBlur={e => e.target.style.boxShadow = 'none'}
                 />
               </div>
-              {/* Campana */}
-              <div style={{ marginLeft: 'auto' }}>
+
+              {/* Campana + usuario */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
                 <NotificationBell />
+                {/* Pill usuario */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#fff', borderRadius: 999, padding: '4px 12px 4px 4px', cursor: 'default' }}>
+                  <div style={{ width: 30, height: 30, borderRadius: '50%', background: 'linear-gradient(135deg,#4f46e5,#2D2A7A)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <span style={{ fontSize: 11, fontWeight: 800, color: '#fff', textTransform: 'uppercase', lineHeight: 1 }}>
+                      {initials || '?'}
+                    </span>
+                  </div>
+                  <span style={{ fontSize: 13, fontWeight: 500, color: '#111827', fontFamily: 'Poppins', whiteSpace: 'nowrap' }}>
+                    {display}
+                  </span>
+                </div>
               </div>
             </div>
+
             <div style={{ flex: 1, overflow: 'auto' }}>
               <Outlet />
             </div>
