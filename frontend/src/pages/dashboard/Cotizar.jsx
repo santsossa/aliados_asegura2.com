@@ -30,15 +30,15 @@ const MONTH_OPTIONS = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio',
 const YEAR_OPTIONS  = Array.from({ length:2008-1940+1 }, (_,i) => ({ v:String(2008-i), label:String(2008-i) }))
 
 const COMPANY_MAP = [
-  { keys:['allianz'],           name:'Allianz',           logo:'/logos/allianz.png'   },
-  { keys:['axa','colpatria'],   name:'AXA Colpatria',     logo:'/logos/axa.png'       },
-  { keys:['bolívar','bolivar'], name:'Seguros Bolívar',   logo:'/logos/bolivar.png'   },
-  { keys:['equidad'],           name:'La Equidad',        logo:'/logos/equidad.png'   },
-  { keys:['hdi'],               name:'HDI Seguros',       logo:'/logos/hdi.png'       },
-  { keys:['mapfre'],            name:'Mapfre',            logo:'/logos/mapfre.png'    },
-  { keys:['sbs'],               name:'SBS Seguros',       logo:'/logos/sbs.png'       },
-  { keys:['solidaria'],         name:'Seguros Solidaria', logo:'/logos/solidaria.png' },
-  { keys:['qualitas'],          name:'Qualitas',           logo:'/logos/qualitas.png'  },
+  { keys:['allianz'],           name:'Allianz',           logo:'/logos/allianz.webp'   },
+  { keys:['axa','colpatria'],   name:'AXA Colpatria',     logo:'/logos/axa.webp'       },
+  { keys:['bolívar','bolivar'], name:'Seguros Bolívar',   logo:'/logos/bolivar.webp'   },
+  { keys:['equidad'],           name:'La Equidad',        logo:'/logos/equidad.webp'   },
+  { keys:['hdi'],               name:'HDI Seguros',       logo:'/logos/hdi.webp'       },
+  { keys:['mapfre'],            name:'Mapfre',            logo:'/logos/mapfre.webp'    },
+  { keys:['sbs'],               name:'SBS Seguros',       logo:'/logos/sbs.webp'       },
+  { keys:['solidaria'],         name:'Seguros Solidaria', logo:'/logos/solidaria.webp' },
+  { keys:['qualitas'],          name:'Qualitas',           logo:'/logos/qualitas.webp'  },
 ]
 function resolveCompany(apiName = '') {
   const lower = apiName.toLowerCase()
