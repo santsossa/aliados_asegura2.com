@@ -141,7 +141,7 @@ function AvatarCircle({ avatarId, size = 80, initials = '?' }) {
     }}>
       {src
         ? <img src={src} alt="avatar" width={size} height={size}
-            style={{ width: '95%', height: '95%', objectFit: 'cover', objectPosition: 'center top', borderRadius: '50%' }}
+            style={{ width: '90%', height: '90%', objectFit: 'contain', objectPosition: 'center center' }}
             decoding="async" fetchpriority="high" />
         : <span style={{ fontSize: Math.round(size * 0.36), fontWeight: 900, color: '#6366f1', textTransform: 'uppercase' }}>{initials}</span>
       }

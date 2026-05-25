@@ -28,7 +28,7 @@ function AvatarCircle({ avatarId, size = 80 }) {
     }}>
       {src
         ? <img src={src} alt="avatar" width={size} height={size}
-            style={{ width: '95%', height: '95%', objectFit: 'cover', objectPosition: 'center top', borderRadius: '50%' }}
+            style={{ width: '90%', height: '90%', objectFit: 'contain', objectPosition: 'center center' }}
             decoding="async" fetchpriority="high" />
         : <User size={size * 0.4} color="#6366f1" />
       }
