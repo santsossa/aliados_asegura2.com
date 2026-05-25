@@ -423,6 +423,7 @@ export default function Dashboard() {
                 </div>
               </div>
 
+              <div style={{ background: '#fff', borderRadius: 24, padding: 12 }}>
               <div
                 ref={enviRef}
                 className="no-scrollbar"
@@ -441,7 +442,7 @@ export default function Dashboard() {
                       onClick={() => navigate('/dashboard/mis-polizas')}
                       style={{
                         minWidth: 170, maxWidth: 170, flexShrink: 0,
-                        background: '#fff', borderRadius: 20, overflow: 'hidden',
+                        background: '#f5f7fb', borderRadius: 20, overflow: 'hidden',
                         cursor: 'pointer', display: 'flex', flexDirection: 'column',
                         transition: 'transform 0.15s, box-shadow 0.15s',
                       }}
@@ -449,7 +450,7 @@ export default function Dashboard() {
                       onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none' }}
                     >
                       {/* Área logo — como el thumbnail de la imagen ref */}
-                      <div style={{ height: 96, background: '#f5f7fb', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <div style={{ height: 96, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                         {logo
                           ? <img src={logo} alt={p.aseguradora} style={{ maxHeight: 50, maxWidth: 128, objectFit: 'contain' }} />
                           : <div style={{ width: 48, height: 48, borderRadius: 14, background: cfg.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>🚗</div>
@@ -477,6 +478,7 @@ export default function Dashboard() {
                     </div>
                   )
                 })}
+              </div>
               </div>
             </div>
 
