@@ -25,7 +25,6 @@ function getLogoUrl(nombre) {
 }
 
 const ESTADOS = {
-  // Sub-estados de "En trámite"
   lead:           { bg:'#f0f9ff', color:'#0ea5e9', label:'Recibido',
                     desc:'Recibimos tu solicitud. Ya tenemos al cliente en nuestro sistema.' },
   en_contacto:    { bg:'#e0f2fe', color:'#0284c7', label:'En contacto',
@@ -34,14 +33,12 @@ const ESTADOS = {
                     desc:'El cliente muestra interés en tomar la póliza y estamos haciendo los trámites para que la pueda tomar.' },
   poliza_emitida: { bg:'#ede9fe', color:'#7c3aed', label:'Póliza emitida',
                     desc:'Se emitió la póliza con la aseguradora y estamos a la espera de recibir el primer pago del cliente.' },
-  // Estados finales
   aprobada:       { bg:'#dcfce7', color:'#16a34a', label:'Aprobado ✓',
                     desc:'¡El cliente pagó! Tu comisión queda lista para el pago del 1 del mes.' },
   no_convertida:  { bg:'#fee2e2', color:'#dc2626', label:'No aprobado',
                     desc:'Esta póliza no se pudo emitir. Nuestro equipo dejó el motivo abajo.' },
 }
 
-// Estados que se muestran en la pestaña "En trámite"
 const EN_TRAMITE = new Set(['lead', 'en_contacto', 'en_proceso', 'poliza_emitida'])
 
 function Badge({ estado }) {
@@ -88,7 +85,6 @@ function DetalleModal({ item, onClose, token }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // cotizacion_id viene directo del item (ya incluido en el query de /me/polizas)
     const cotId = item.cotizacion_id
     if (!cotId) { setLoading(false); return }
     fetch(`${API}/api/aliados/me/cotizaciones/${cotId}/detalle`, {
@@ -101,11 +97,9 @@ function DetalleModal({ item, onClose, token }) {
       .finally(() => setLoading(false))
   }, [item])
 
-  // Estado: si hay detalle del servidor úsalo, si no el del item
   const estadoActual = det?.poliza_estado || item.estado || 'en_proceso'
   const E = ESTADOS[estadoActual] || ESTADOS.en_proceso
 
-  // Campos con fallback a item (ya enriquecido por el JOIN en /me/polizas)
   const clienteNombre   = det?.cliente_nombre   || item.cliente_nombre   || '—'
   const clienteTelefono = det?.cliente_telefono || det?.lead_telefono    || item.cliente_telefono || '—'
   const clienteCorreo   = det?.cliente_correo   || item.cliente_correo   || '—'
@@ -128,9 +122,9 @@ function DetalleModal({ item, onClose, token }) {
                     boxShadow:'0 24px 64px rgba(0,0,0,0.18)' }}
            onClick={e => e.stopPropagation()}>
 
-        {/* Cabecera */}
         <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between',
-                      padding:'20px 24px 16px', borderBottom:'1px solid #f3f4f6', position:'sticky', top:0, background:'#fff', zIndex:1 }}>
+                      padding:'20px 24px 16px', borderBottom:'1px solid #f3f4f6',
+                      position:'sticky', top:0, background:'#fff', zIndex:1 }}>
           <div>
             <h2 style={{ fontSize:17, fontWeight:800, color:'#111827', margin:0 }}>
               Seguimiento de póliza
@@ -150,29 +144,21 @@ function DetalleModal({ item, onClose, token }) {
           {loading ? (
             <div style={{ textAlign:'center', padding:'32px 0', color:'#9ca3af', fontSize:14 }}>Cargando detalles...</div>
           ) : estadoActual === 'no_convertida' ? (
-            /* ── MODAL NO APROBADA: vehículo → cliente → motivo ── */
             <>
-              {/* Cabecera de estado */}
               <div style={{ background:E.bg, borderRadius:12, padding:'12px 16px', marginBottom:18,
                             display:'flex', alignItems:'center', gap:10 }}>
                 <span style={{ fontSize:18 }}>❌</span>
                 <div>
                   <p style={{ margin:0, fontSize:13, fontWeight:700, color:E.color }}>Póliza no aprobada</p>
-                  <p style={{ margin:'2px 0 0', fontSize:12, color:'#6b7280' }}>
-                    Esta póliza no pudo ser emitida.
-                  </p>
+                  <p style={{ margin:'2px 0 0', fontSize:12, color:'#6b7280' }}>Esta póliza no pudo ser emitida.</p>
                 </div>
               </div>
-
-              {/* Vehículo */}
               <Sec title="Vehículo">
                 <Row label="Placa"           value={placa} />
                 <Row label="Aseguradora"     value={aseguradora} />
                 <Row label="Valor asegurado" value={comercialValue ? fmt(comercialValue) : null} />
                 <Row label="Prima cotizada"  value={fmt(valorPrima)} />
               </Sec>
-
-              {/* Cliente */}
               <Sec title="Datos del cliente">
                 <Row label="Nombre"   value={clienteNombre} />
                 {clienteTipoDoc && clienteCedula && (
@@ -181,8 +167,6 @@ function DetalleModal({ item, onClose, token }) {
                 <Row label="Teléfono" value={clienteTelefono} />
                 <Row label="Correo"   value={clienteCorreo} />
               </Sec>
-
-              {/* Motivo */}
               <div style={{ marginBottom:4 }}>
                 <div style={{ fontSize:11, fontWeight:700, color:'#9ca3af', textTransform:'uppercase',
                               letterSpacing:'0.08em', marginBottom:8 }}>
@@ -190,8 +174,7 @@ function DetalleModal({ item, onClose, token }) {
                 </div>
                 {observaciones ? (
                   <div style={{ background:'#fef2f2', border:'1.5px solid #fecaca', borderRadius:12,
-                                padding:'16px', fontSize:14, color:'#991b1b', lineHeight:1.75,
-                                fontWeight:500 }}>
+                                padding:'16px', fontSize:14, color:'#991b1b', lineHeight:1.75, fontWeight:500 }}>
                     {observaciones}
                   </div>
                 ) : (
@@ -203,9 +186,7 @@ function DetalleModal({ item, onClose, token }) {
               </div>
             </>
           ) : (
-            /* ── MODAL NORMAL (en proceso / aprobada) ── */
             <>
-              {/* Estado actual */}
               <div style={{ background:E.bg, borderRadius:12, padding:'14px 16px', marginBottom:20 }}>
                 <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:6 }}>
                   <span style={{ fontSize:11, fontWeight:700, color:E.color, textTransform:'uppercase', letterSpacing:'0.06em' }}>
@@ -215,8 +196,6 @@ function DetalleModal({ item, onClose, token }) {
                 </div>
                 <p style={{ fontSize:12, color:'#6b7280', margin:0, lineHeight:1.5 }}>{E.desc}</p>
               </div>
-
-              {/* Cliente */}
               <Sec title="Datos del cliente">
                 <Row label="Nombre"   value={clienteNombre} />
                 {clienteTipoDoc && clienteCedula && (
@@ -225,21 +204,15 @@ function DetalleModal({ item, onClose, token }) {
                 <Row label="Teléfono" value={clienteTelefono} />
                 <Row label="Correo"   value={clienteCorreo} />
               </Sec>
-
-              {/* Vehículo */}
               <Sec title="Vehículo">
                 <Row label="Placa"           value={placa} />
                 <Row label="Valor asegurado" value={comercialValue ? fmt(comercialValue) : null} />
               </Sec>
-
-              {/* Póliza y comisión */}
               <Sec title="Póliza y tu comisión">
                 <Row label="Aseguradora"      value={aseguradora} />
                 <Row label="Prima anual"      value={fmt(valorPrima)} />
                 <Row label="Tu comisión (6%)" value={fmt(valorComision)} highlight />
               </Sec>
-
-              {/* Fechas */}
               <Sec title="Seguimiento">
                 <Row label="Lead enviado" value={fechaStr(createdAt)} />
                 {estadoActual === 'aprobada' && (det?.mes || item.mes) &&
@@ -247,7 +220,6 @@ function DetalleModal({ item, onClose, token }) {
                        value={`1 de ${MESES[((det?.mes || item.mes) - 1)]} ${det?.anio || item.anio}`}
                        highlight />}
               </Sec>
-
               {estadoActual === 'aprobada' ? (
                 <div style={{ background:'#f0fdf4', border:'1.5px solid #bbf7d0', borderRadius:12,
                               padding:'14px 16px', fontSize:13, color:'#166534',
@@ -290,7 +262,6 @@ function DetalleModal({ item, onClose, token }) {
                   </span>
                 </div>
               ) : (
-                /* Estado inicial — lead recién enviado */
                 <div style={{ background:'#f0f9ff', border:'1.5px solid #bae6fd', borderRadius:12,
                               padding:'14px 16px', fontSize:13, color:'#0369a1',
                               display:'flex', gap:10, alignItems:'flex-start', lineHeight:1.6 }}>
@@ -318,7 +289,6 @@ export default function MisPolizas() {
   const [data,    setData] = useState({ leads: [], polizas: [] })
   const [loading, setLoading] = useState(true)
   const [modal,   setModal]   = useState(null)
-  // Lee el tab desde la URL (?tab=no_convertida etc.), default 'en_proceso'
   const [tab, setTab] = useState(() => searchParams.get('tab') || 'en_tramite')
 
   const fetchData = useCallback((silent = false) => {
@@ -335,22 +305,16 @@ export default function MisPolizas() {
 
   useEffect(() => { fetchData() }, [fetchData])
 
-  // Refetch silencioso al volver al tab (fallback ante caída de SSE)
   useEffect(() => {
     return subscribe('__refresh', () => fetchData(true))
   }, [subscribe, fetchData])
 
-  // ── Actualizaciones en vivo ───────────────────────────────────────────────
   useEffect(() => {
     return subscribe('poliza_update', (ev) => {
       setData(prev => {
-        // Si se creó una póliza para este lead → sacarlo de "En trámite"
-        // (ya no debe aparecer en leads; ahora vive como poliza)
         const leads = ev.lead_id
           ? prev.leads.filter(l => l.id !== ev.lead_id)
           : prev.leads
-
-        // Actualizar póliza existente o añadir la nueva
         let polizas = prev.polizas.map(p =>
           p.id === ev.poliza_id
             ? { ...p, estado: ev.estado, valor_comision: ev.valor_comision ?? p.valor_comision }
@@ -371,7 +335,6 @@ export default function MisPolizas() {
         }
         return { leads, polizas }
       })
-      // Si el modal abierto es el item que cambió, actualizar su estado también
       setModal(prev => {
         if (!prev) return prev
         if (prev.id === ev.lead_id || prev.id === ev.poliza_id)
@@ -383,7 +346,6 @@ export default function MisPolizas() {
 
   const allItems = [
     ...data.polizas.map(p => ({ ...p, _tipo:'poliza' })),
-    // Leads sin póliza → sub-estado 'lead' dentro de "En trámite"
     ...data.leads.map(l  => ({ ...l, _tipo:'lead', estado:'lead' })),
   ].sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
 
@@ -393,66 +355,66 @@ export default function MisPolizas() {
     { key:'no_convertida', label:'No aprobado', E: ESTADOS.no_convertida },
   ]
 
-  // "En trámite" agrupa: leads, en_proceso y poliza_emitida
   const filtered = tab === 'en_tramite'
     ? allItems.filter(it => EN_TRAMITE.has(it.estado))
     : allItems.filter(it => it.estado === tab)
 
+  /* ── Card estilo "enviadas a emitir" ─────────────────────────────────── */
   function ItemCard({ item }) {
     const aseguradoraLogo = getLogoUrl(item.aseguradora)
+    const estadoCfg = (tab === 'en_tramite' ? ESTADOS[item.estado] : ESTADOS[tab]) || ESTADOS.en_proceso
 
     return (
       <button
         onClick={() => setModal(item)}
         style={{ width:'100%', textAlign:'left', background:'none', border:'none', padding:0, cursor:'pointer' }}
       >
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm px-5 py-4 hover:border-brand/40 hover:shadow-md transition-all">
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
-              {/* Logo aseguradora + separador vertical */}
-              {aseguradoraLogo ? (
-                <div style={{ display:'flex', alignItems:'center', gap:14, flexShrink:0 }}>
-                  <img src={aseguradoraLogo} alt={item.aseguradora}
-                       width={64} height={28}
-                       style={{ height:28, maxWidth:64, objectFit:'contain', display:'block' }}
-                       loading="lazy" decoding="async" />
-                  <div style={{ width:1, height:32, background:'#e5e7eb', flexShrink:0 }} />
-                </div>
-              ) : (
-                <div style={{ display:'flex', alignItems:'center', gap:14, flexShrink:0 }}>
-                  <Shield size={18} style={{ color: ESTADOS[tab]?.color || '#9ca3af' }} />
-                  <div style={{ width:1, height:32, background:'#e5e7eb', flexShrink:0 }} />
-                </div>
-              )}
-              <div>
-                <p className="font-semibold text-gray-900 text-sm">{item.cliente_nombre || 'Cliente'}</p>
-                <p className="text-xs text-gray-400 mt-0.5">
-                  {item.aseguradora || '—'}
-                  {item.placa ? ` · ${item.placa}` : ''}
-                  {' · '}{fechaStr(item.created_at)}
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 flex-shrink-0">
-              {/* Badge sub-estado individual — visible en "En trámite" */}
-              {tab === 'en_tramite' && (
-                <span style={{
-                  background: ESTADOS[item.estado]?.bg || '#f3f4f6',
-                  color:      ESTADOS[item.estado]?.color || '#6b7280',
-                  fontSize: 10, fontWeight: 700,
-                  padding: '3px 8px', borderRadius: 99, whiteSpace: 'nowrap',
-                }}>
-                  {ESTADOS[item.estado]?.label || 'En trámite'}
-                </span>
-              )}
-              <div className="text-right hidden sm:block">
-                <p className="text-sm font-bold text-gray-900">{fmt(item.valor_prima)}</p>
-                {item.estado === 'aprobada' && item.valor_comision
-                  ? <p className="text-xs text-green-600 font-medium">Comisión: {fmt(item.valor_comision)}</p>
-                  : null
-                }
-              </div>
-              <span style={{ color:'#d1d5db', fontSize:18, lineHeight:1 }}>›</span>
+        <div
+          style={{
+            background: '#f5f7fb', borderRadius: 20, overflow: 'hidden',
+            display: 'flex', flexDirection: 'column', height: '100%',
+            transition: 'background 0.15s',
+          }}
+          onMouseEnter={e => e.currentTarget.style.background = '#eceef4'}
+          onMouseLeave={e => e.currentTarget.style.background = '#f5f7fb'}
+        >
+          {/* Área de logo */}
+          <div style={{ height: 90, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            {aseguradoraLogo
+              ? <img src={aseguradoraLogo} alt={item.aseguradora} width={120} height={46}
+                  style={{ maxHeight: 46, maxWidth: 120, objectFit: 'contain' }}
+                  loading="lazy" decoding="async" />
+              : <div style={{ width: 44, height: 44, borderRadius: 12, background: estadoCfg.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>🚗</div>
+            }
+          </div>
+
+          {/* Info */}
+          <div style={{ padding: '11px 13px 13px', display: 'flex', flexDirection: 'column', gap: 5, flex: 1 }}>
+            {tab === 'en_tramite' && (
+              <span style={{
+                fontSize: 10, fontWeight: 700, padding: '3px 8px', borderRadius: 99,
+                background: estadoCfg.bg, color: estadoCfg.color,
+                whiteSpace: 'nowrap', alignSelf: 'flex-start',
+              }}>
+                {estadoCfg.label}
+              </span>
+            )}
+            <p style={{ margin: 0, fontFamily: 'Poppins', fontSize: 13, fontWeight: 600, color: '#111827',
+              overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {item.cliente_nombre || 'Cliente'}
+            </p>
+            <p style={{ margin: 0, fontFamily: 'Inter', fontSize: 11, color: '#9ca3af',
+              overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {[item.placa, item.aseguradora].filter(Boolean).join(' · ') || '—'}
+            </p>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto', paddingTop: 6 }}>
+              {item.estado === 'aprobada' && item.valor_comision > 0
+                ? <span style={{ fontFamily: 'Inter', fontSize: 12, fontWeight: 700, color: '#16a34a' }}>+{fmt(item.valor_comision)}</span>
+                : item.valor_prima > 0
+                ? <span style={{ fontFamily: 'Inter', fontSize: 11, color: '#9ca3af' }}>{fmt(item.valor_prima)}</span>
+                : <span />
+              }
+              <span style={{ fontFamily: 'Inter', fontSize: 10, color: '#b0b4c1' }}>{fechaStr(item.created_at)}</span>
             </div>
           </div>
         </div>
@@ -460,17 +422,27 @@ export default function MisPolizas() {
     )
   }
 
+  /* ── Leyenda de estados ───────────────────────────────────────────────── */
+  const EN_TRAMITE_LEGEND = [
+    { estado:'lead',           emoji:'📥', text:'Enviaste la solicitud. Ya la tenemos y pronto nuestro equipo la gestiona.' },
+    { estado:'en_contacto',    emoji:'📞', text:'Nuestro asesor está intentando comunicarse con el cliente para avanzar.' },
+    { estado:'en_proceso',     emoji:'📋', text:'El cliente quiere la póliza. Estamos haciendo los trámites para emitirla.' },
+    { estado:'poliza_emitida', emoji:'✍️', text:'Ya se emitió la póliza. Esperamos que el cliente realice su primer pago.' },
+  ]
+
   return (
-    <div className="p-6 lg:p-8 max-w-5xl mx-auto">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Mis pólizas</h1>
-        <p className="text-gray-500 text-sm mt-1">
-          Acá puedes ver el estado de cada póliza que enviaste a emitir. Toca cualquiera para saber qué está pasando con ese cliente y cuánto ganarás si se aprueba.
+    <div style={{ padding:'0 24px 32px', maxWidth:'72rem', margin:'0 auto' }}>
+
+      {/* Header */}
+      <div style={{ marginBottom: 20, paddingTop: 8 }}>
+        <h1 style={{ fontFamily:'Poppins', fontSize:22, fontWeight:700, color:'#111827', margin:0 }}>Mis pólizas</h1>
+        <p style={{ fontFamily:'Inter', fontSize:13, color:'#9ca3af', margin:'4px 0 0' }}>
+          Acá puedes ver el estado de cada póliza que enviaste a emitir. Toca cualquiera para saber qué está pasando.
         </p>
       </div>
 
-      {/* Pestañas */}
-      <div style={{ display:'flex', gap:8, marginBottom:20, flexWrap:'wrap' }}>
+      {/* Tabs */}
+      <div style={{ display:'flex', gap:8, marginBottom:16, flexWrap:'wrap' }}>
         {tabs.map(t => {
           const count = t.key === 'en_tramite'
             ? allItems.filter(it => EN_TRAMITE.has(it.estado)).length
@@ -481,7 +453,7 @@ export default function MisPolizas() {
               style={{
                 display:'flex', alignItems:'center', gap:8,
                 padding:'10px 18px', borderRadius:12, border:'none', cursor:'pointer',
-                fontWeight: active ? 700 : 500, fontSize:14,
+                fontWeight: active ? 700 : 500, fontSize:14, fontFamily:'Poppins',
                 background: active ? t.E.bg : '#f3f4f6',
                 color:      active ? t.E.color : '#6b7280',
                 transition:'all 0.15s',
@@ -500,62 +472,79 @@ export default function MisPolizas() {
         })}
       </div>
 
-      {/* Descripción del estado activo */}
-      {tab !== 'en_tramite' && (
-        <div style={{ background: ESTADOS[tab]?.bg, borderRadius:12, padding:'10px 16px',
-                      marginBottom:16, fontSize:13, color: ESTADOS[tab]?.color, lineHeight:1.5 }}>
-          {ESTADOS[tab]?.desc}
-        </div>
-      )}
-
-      {/* Guía de sub-estados — solo visible en "En trámite" */}
-      {tab === 'en_tramite' && (
-        <div style={{ background:'#fff', border:'1.5px solid #e8e8f0', borderRadius:14,
-                      padding:'16px 18px', marginBottom:18 }}>
-          <p style={{ fontSize:11, fontWeight:700, color:'#9ca3af', textTransform:'uppercase',
-                      letterSpacing:'0.08em', marginBottom:12 }}>
-            ¿Qué significa cada estado?
-          </p>
-          <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
-            {[
-              { color:'#0284c7', bg:'#dbeafe', emoji:'📥', title:'Recibido',        text:'Enviaste la solicitud. Ya la tenemos y pronto nuestro equipo la gestiona.' },
-              { color:'#0369a1', bg:'#bae6fd', emoji:'📞', title:'En contacto',     text:'Nuestro asesor está intentando comunicarse con el cliente para avanzar.' },
-              { color:'#b45309', bg:'#fde68a', emoji:'📋', title:'En gestión',      text:'El cliente quiere la póliza. Estamos haciendo los trámites para emitirla.' },
-              { color:'#6d28d9', bg:'#ddd6fe', emoji:'✍️',  title:'Póliza emitida', text:'Ya se emitió la póliza. Esperamos que el cliente realice su primer pago.' },
-            ].map(s => (
-              <div key={s.title} style={{ display:'flex', alignItems:'center', gap:12 }}>
-                <span style={{
-                  background: s.bg, color: s.color,
-                  fontSize: 11, fontWeight: 700,
-                  padding: '4px 11px', borderRadius: 99,
-                  whiteSpace: 'nowrap', flexShrink: 0,
-                  minWidth: 106, textAlign: 'center',
-                  border: `1px solid ${s.color}33`,
-                }}>
-                  {s.emoji} {s.title}
-                </span>
-                <span style={{ fontSize:12, color:'#4b5563', lineHeight:1.5 }}>
-                  {s.text}
-                </span>
-              </div>
-            ))}
+      {/* Leyenda de estados — siempre visible, actualiza según tab */}
+      <div style={{ background:'#fff', border:'1.5px solid #e8e8f0', borderRadius:16,
+                    padding:'14px 18px', marginBottom:20 }}>
+        {tab === 'en_tramite' ? (
+          <>
+            <p style={{ fontFamily:'Inter', fontSize:11, fontWeight:700, color:'#9ca3af',
+                        textTransform:'uppercase', letterSpacing:'0.08em', margin:'0 0 12px' }}>
+              ¿Qué significa cada estado?
+            </p>
+            <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(220px, 1fr))', gap:10 }}>
+              {EN_TRAMITE_LEGEND.map(s => {
+                const E = ESTADOS[s.estado]
+                return (
+                  <div key={s.estado} style={{ display:'flex', alignItems:'flex-start', gap:10 }}>
+                    <span style={{
+                      background: E.bg, color: E.color,
+                      fontSize: 11, fontWeight: 700,
+                      padding: '4px 10px', borderRadius: 99,
+                      whiteSpace: 'nowrap', flexShrink: 0,
+                      border: `1px solid ${E.color}22`,
+                    }}>
+                      {s.emoji} {E.label}
+                    </span>
+                    <span style={{ fontFamily:'Inter', fontSize:12, color:'#4b5563', lineHeight:1.5 }}>
+                      {s.text}
+                    </span>
+                  </div>
+                )
+              })}
+            </div>
+          </>
+        ) : (
+          <div style={{ display:'flex', alignItems:'center', gap:12 }}>
+            <span style={{
+              background: ESTADOS[tab]?.bg, color: ESTADOS[tab]?.color,
+              fontSize: 12, fontWeight: 700,
+              padding: '5px 14px', borderRadius: 99,
+              whiteSpace: 'nowrap', flexShrink: 0,
+              border: `1px solid ${ESTADOS[tab]?.color}22`,
+            }}>
+              {ESTADOS[tab]?.label}
+            </span>
+            <span style={{ fontFamily:'Inter', fontSize:13, color:'#4b5563', lineHeight:1.5 }}>
+              {ESTADOS[tab]?.desc}
+            </span>
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
+      {/* Grid de pólizas */}
       {loading ? (
-        <div className="space-y-3">
-          {[1,2,3].map(i => <div key={i} className="bg-white rounded-2xl border border-gray-100 h-20 animate-pulse" />)}
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(180px, 1fr))', gap:12 }}>
+          {[1,2,3,4,5,6].map(i => (
+            <div key={i} style={{ height:185, background:'#f3f4f6', borderRadius:20, animation:'pulse 1.4s infinite' }} />
+          ))}
+          <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}`}</style>
         </div>
       ) : filtered.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm flex flex-col items-center justify-center py-16 text-center">
-          <div className="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center mb-4">
-            <Shield size={24} className="text-gray-300" />
+        <div style={{ background:'#fff', borderRadius:22, border:'1px solid #f0f0f2', padding:'48px 24px',
+                      display:'flex', flexDirection:'column', alignItems:'center', textAlign:'center' }}>
+          <div style={{ width:56, height:56, borderRadius:20, background:'#f5f7fb',
+                        display:'flex', alignItems:'center', justifyContent:'center', marginBottom:16 }}>
+            <Shield size={24} color="#d1d5db" />
           </div>
-          <p className="text-gray-400 font-medium text-sm">Sin pólizas en esta categoría</p>
+          <p style={{ margin:'0 0 6px', fontFamily:'Poppins', fontSize:15, fontWeight:600, color:'#374151' }}>
+            Sin pólizas en esta categoría
+          </p>
+          <p style={{ margin:0, fontFamily:'Inter', fontSize:13, color:'#9ca3af', maxWidth:260, lineHeight:1.6 }}>
+            Cuando envíes una cotización a emitir aparecerá aquí.
+          </p>
         </div>
       ) : (
-        <div className="space-y-3">
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(180px, 1fr))', gap:12 }}>
           {filtered.map(item => <ItemCard key={`${item._tipo}-${item.id}`} item={item} />)}
         </div>
       )}
