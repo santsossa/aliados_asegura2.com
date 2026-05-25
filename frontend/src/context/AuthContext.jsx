@@ -7,9 +7,15 @@ const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 export function AuthProvider({ children }) {
   // ⚠️ accessToken en memoria (NO localStorage) — previene XSS
   const tokenRef = useRef(null)
-  const [user,      setUser]      = useState(null)
-  const [loading,   setLoading]   = useState(true)
-  const [avatarId,  setAvatarId]  = useState(null)
+  const [user,     setUser]    = useState(null)
+  const [loading,  setLoading] = useState(true)
+  const [avatarId, setAvatarIdState] = useState(() => localStorage.getItem('aliados_avatar') || null)
+
+  function setAvatarId(id) {
+    if (id) localStorage.setItem('aliados_avatar', id)
+    else    localStorage.removeItem('aliados_avatar')
+    setAvatarIdState(id)
+  }
 
   useEffect(() => {
     // Al montar, intentar refresh con la cookie httpOnly
@@ -56,7 +62,8 @@ export function AuthProvider({ children }) {
   function clearAuth() {
     tokenRef.current = null
     setUser(null)
-    setAvatarId(null)
+    localStorage.removeItem('aliados_avatar')
+    setAvatarIdState(null)
   }
 
   function getToken() {
