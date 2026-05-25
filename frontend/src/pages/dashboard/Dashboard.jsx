@@ -550,7 +550,7 @@ export default function Dashboard() {
             {/* 5. Tu rendimiento */}
             <div style={{ background: '#fff', borderRadius: 22, padding: '22px 16px 18px' }}>
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
-                <AvatarCircle avatarId={avatarId} size={72} initials={initials} />
+                <AvatarCircle avatarId={avatarId} size={92} initials={initials} />
                 <div style={{ textAlign: 'center' }}>
                   <p style={{ margin: '0 0 6px', fontFamily: 'Poppins', fontSize: 15, fontWeight: 600, color: '#111827' }}>
                     {saludo}, {nombreAliado}! 👋

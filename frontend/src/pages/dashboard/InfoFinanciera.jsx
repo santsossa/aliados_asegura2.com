@@ -220,10 +220,12 @@ export default function InfoFinanciera() {
                     outlineOffset: 2,
                     transition: 'outline 0.12s',
                     background: 'linear-gradient(135deg, #e8e6ff, #c7d2fe)',
+                    aspectRatio: '1',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
                   }}
                 >
                   <img src={a.src} alt={a.id} width={80} height={80}
-                    style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', objectPosition: 'center', display: 'block' }}
+                    style={{ width: '85%', height: '85%', objectFit: 'contain', objectPosition: 'center', display: 'block' }}
                     loading="lazy" decoding="async" />
                 </button>
               ))}

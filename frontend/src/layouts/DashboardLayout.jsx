@@ -58,7 +58,7 @@ function UserAvatar({ avatarId, initials, size = 30 }) {
     }}>
       {src
         ? <img src={src} alt="avatar" width={size} height={size}
-            style={{ width: '90%', height: '90%', objectFit: 'contain', objectPosition: 'center center' }}
+            style={{ width: '80%', height: '80%', objectFit: 'contain', objectPosition: 'center center' }}
             decoding="async" fetchpriority="high" />
         : <span style={{ fontSize: Math.round(size * 0.38), fontWeight: 800, color: '#6366f1', textTransform: 'uppercase', lineHeight: 1 }}>{initials || '?'}</span>
       }
