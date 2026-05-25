@@ -37,7 +37,7 @@ function AvatarCircle({ avatarId, size = 80 }) {
 }
 
 export default function InfoFinanciera() {
-  const { getToken, setAvatarId: setGlobalAvatar } = useAuth()
+  const { getToken, avatarId: globalAvatarId, setAvatarId: setGlobalAvatar } = useAuth()
 
   const [perfil,  setPerfil]  = useState(null)
   const [banco,   setBanco]   = useState(null)
@@ -76,6 +76,7 @@ export default function InfoFinanciera() {
         setBanco({ banco: b, tipo_cuenta, numero_cuenta, titular })
         setFormPerfil({ nombre: rest.nombre || '', apellido: rest.apellido || '', cedula: rest.cedula || '', telefono: rest.telefono || '', ciudad: rest.ciudad || '' })
         setFormBanco({ banco: b || '', tipo_cuenta: tipo_cuenta || '', numero_cuenta: numero_cuenta || '', titular: titular || '' })
+        if (!globalAvatarId && rest.avatar) setGlobalAvatar(rest.avatar)
         setNewAvatar(rest.avatar || null)
       })
       .catch(() => setError('Error de conexión.'))
@@ -171,7 +172,7 @@ export default function InfoFinanciera() {
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-4">
         <div className="flex flex-col items-center">
           <div className="relative mb-3">
-            <AvatarCircle avatarId={perfil?.avatar} size={80} />
+            <AvatarCircle avatarId={globalAvatarId || perfil?.avatar} size={80} />
             <button
               onClick={() => { setNewAvatar(perfil?.avatar || null); setErrAvatar(''); setEditAvatar(true) }}
               className="absolute bottom-0 right-0 w-7 h-7 rounded-full bg-brand border-2 border-white flex items-center justify-center hover:bg-brand-dark transition-colors"

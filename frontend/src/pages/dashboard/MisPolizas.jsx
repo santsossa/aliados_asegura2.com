@@ -8,6 +8,22 @@ const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 const MESES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic']
 const fmt = n => n ? ('$' + Math.round(n).toLocaleString('es-CO')) : '—'
 
+const LOGO_MAP = {
+  allianz: '/logos/allianz.webp', axa: '/logos/axa.webp',
+  colpatria: '/logos/axa.webp',   bolivar: '/logos/bolivar.webp',
+  equidad: '/logos/equidad.webp', hdi: '/logos/hdi.webp',
+  mapfre: '/logos/mapfre.webp',   sbs: '/logos/sbs.webp',
+  solidaria: '/logos/solidaria.webp', sura: '/logos/sura.webp',
+  estado: '/logos/estado.webp',   coomeva: '/logos/coomeva.webp',
+  qualitas: '/logos/qualitas.webp',
+}
+function getLogoUrl(nombre) {
+  if (!nombre) return null
+  const key = nombre.toLowerCase()
+  const match = Object.keys(LOGO_MAP).find(k => key.includes(k))
+  return match ? LOGO_MAP[match] : null
+}
+
 const ESTADOS = {
   // Sub-estados de "En trámite"
   lead:           { bg:'#f0f9ff', color:'#0ea5e9', label:'Recibido',
@@ -383,18 +399,7 @@ export default function MisPolizas() {
     : allItems.filter(it => it.estado === tab)
 
   function ItemCard({ item }) {
-    // Extraer logo de la aseguradora desde datos_cotizacion
-    const aseguradoraLogo = (() => {
-      try {
-        const raw = item.datos_cotizacion
-        const datos = typeof raw === 'object' ? raw : JSON.parse(raw || '{}')
-        const quotes = datos?.quotes || []
-        const match = quotes.find(q =>
-          q.company?.toLowerCase().trim() === item.aseguradora?.toLowerCase().trim()
-        )
-        return match?.logo || null
-      } catch { return null }
-    })()
+    const aseguradoraLogo = getLogoUrl(item.aseguradora)
 
     return (
       <button
@@ -408,8 +413,9 @@ export default function MisPolizas() {
               {aseguradoraLogo ? (
                 <div style={{ display:'flex', alignItems:'center', gap:14, flexShrink:0 }}>
                   <img src={aseguradoraLogo} alt={item.aseguradora}
+                       width={64} height={28}
                        style={{ height:28, maxWidth:64, objectFit:'contain', display:'block' }}
-                       onError={e => e.currentTarget.style.display='none'} />
+                       loading="lazy" decoding="async" />
                   <div style={{ width:1, height:32, background:'#e5e7eb', flexShrink:0 }} />
                 </div>
               ) : (
