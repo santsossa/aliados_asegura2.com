@@ -353,15 +353,15 @@ export default function Dashboard() {
                   <div key={i} style={{
                     background: '#fff',
                     borderRadius: 16,
-                    padding: '13px 14px',
-                    display: 'flex', alignItems: 'center', gap: 11,
+                    padding: '15px 16px',
+                    display: 'flex', alignItems: 'center', gap: 12,
                   }}>
-                    <div style={{ width: 38, height: 38, borderRadius: '50%', background: c.iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                      <Icon size={16} color={c.iconColor} />
+                    <div style={{ width: 40, height: 40, borderRadius: '50%', background: c.iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <Icon size={17} color={c.iconColor} />
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={{ margin: 0, fontFamily: 'Inter', fontSize: 10.5, color: '#9ca3af', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{c.label}</p>
-                      <p style={{ margin: '2px 0 0', fontFamily: 'Poppins', fontSize: 14, fontWeight: 600, color: '#111827', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', letterSpacing: '-0.2px' }}>{c.value}</p>
+                      <p style={{ margin: 0, fontFamily: 'Inter', fontSize: 11, color: '#9ca3af', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{c.label}</p>
+                      <p style={{ margin: '2px 0 0', fontFamily: 'Poppins', fontSize: 14.5, fontWeight: 600, color: '#111827', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', letterSpacing: '-0.2px' }}>{c.value}</p>
                     </div>
                     <button style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 2, color: '#e5e7eb', display: 'flex', flexShrink: 0 }}>
                       <MoreHorizontal size={14} />
@@ -477,29 +477,29 @@ export default function Dashboard() {
           {/* ═══ RIGHT COLUMN — fija, no scrollea ═══ */}
           <div className="db-right" style={{ background: '#ffffff', borderRadius: 20, padding: 12 }}>
 
-            {/* 5. Tu rendimiento — flex:3, espacio generoso */}
-            <div style={{ flex: 3, padding: '22px 16px 18px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            {/* 5. Tu rendimiento — flex:3, desde arriba */}
+            <div style={{ flex: 3, padding: '22px 16px 18px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
                 <span style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: 14, color: '#111827' }}>Tu rendimiento</span>
                 <span style={{ fontFamily: 'Inter', fontSize: 9.5, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', padding: '3px 8px', borderRadius: 99, background: '#f5f7fb', color: '#9ca3af' }}>
                   {mesCorto} {anioLabel}
                 </span>
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
-                <PlainAvatar size={80} initials={initials} />
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14, flex: 1, justifyContent: 'center' }}>
+                <PlainAvatar size={84} initials={initials} />
                 <div style={{ textAlign: 'center' }}>
-                  <p style={{ margin: '0 0 6px', fontFamily: 'Poppins', fontSize: 15, fontWeight: 600, color: '#111827' }}>
+                  <p style={{ margin: '0 0 8px', fontFamily: 'Poppins', fontSize: 16, fontWeight: 600, color: '#111827' }}>
                     {saludo}, {nombreAliado}! 🔥
                   </p>
-                  <p style={{ margin: 0, fontFamily: 'Inter', fontSize: 12, color: '#6b7280', lineHeight: 1.5 }}>
+                  <p style={{ margin: 0, fontFamily: 'Inter', fontSize: 12, color: '#6b7280', lineHeight: 1.6 }}>
                     Sigue enviando clientes a emitir<br />para generar más comisiones
                   </p>
                 </div>
               </div>
             </div>
 
-            {/* 6. Enviadas a emitir — flex:1, compacto */}
-            <div style={{ flex: 1, background: '#f5f7fb', borderRadius: 16, padding: '12px 16px', margin: '0 4px' }}>
+            {/* 6. Enviadas a emitir — flex:1.8 */}
+            <div style={{ flex: 1.8, background: '#f5f7fb', borderRadius: 16, padding: '14px 16px', margin: '0 4px' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
                 <span style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: 13, color: '#111827' }}>Enviadas a emitir</span>
                 <span style={{ fontFamily: 'Inter', fontSize: 9.5, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', padding: '3px 8px', borderRadius: 99, background: '#ffffff', color: '#9ca3af' }}>
