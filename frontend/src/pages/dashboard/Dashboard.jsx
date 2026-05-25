@@ -258,7 +258,7 @@ export default function Dashboard() {
         ? `Próximo pago · 1 ${MESES_CORTO[stats.proximo_pago.mes - 1]}`
         : 'Próximo pago',
       value: fmt(stats.proximo_pago.monto ?? 0),
-      badge: stats.proximo_pago.dias_restantes !== null ? `En ${stats.proximo_pago.dias_restantes} días` : null,
+      badge: null,
       sub: stats.proximo_pago.mes ? `1 ${MESES_CORTO[stats.proximo_pago.mes - 1]} ${stats.proximo_pago.anio}` : 'Sin pagos pendientes',
       showArrow: false, spark: sparklines.ganancias, sparkColor: '#16a34a',
     },
@@ -352,19 +352,19 @@ export default function Dashboard() {
                 return (
                   <div key={i} style={{
                     background: '#fff',
-                    borderRadius: 14,
-                    padding: '10px 12px',
-                    display: 'flex', alignItems: 'center', gap: 9,
+                    borderRadius: 16,
+                    padding: '13px 14px',
+                    display: 'flex', alignItems: 'center', gap: 11,
                   }}>
-                    <div style={{ width: 34, height: 34, borderRadius: '50%', background: c.iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                      <Icon size={14} color={c.iconColor} />
+                    <div style={{ width: 38, height: 38, borderRadius: '50%', background: c.iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <Icon size={16} color={c.iconColor} />
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={{ margin: 0, fontFamily: 'Inter', fontSize: 10, color: '#9ca3af', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{c.label}</p>
-                      <p style={{ margin: '1px 0 0', fontFamily: 'Poppins', fontSize: 13, fontWeight: 600, color: '#111827', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', letterSpacing: '-0.2px' }}>{c.value}{c.badge ? <span style={{ fontWeight: 400, fontSize: 10, color: '#6b7280' }}> · {c.badge}</span> : null}</p>
+                      <p style={{ margin: 0, fontFamily: 'Inter', fontSize: 10.5, color: '#9ca3af', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{c.label}</p>
+                      <p style={{ margin: '2px 0 0', fontFamily: 'Poppins', fontSize: 14, fontWeight: 600, color: '#111827', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', letterSpacing: '-0.2px' }}>{c.value}</p>
                     </div>
                     <button style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 2, color: '#e5e7eb', display: 'flex', flexShrink: 0 }}>
-                      <MoreHorizontal size={13} />
+                      <MoreHorizontal size={14} />
                     </button>
                   </div>
                 )
@@ -477,8 +477,8 @@ export default function Dashboard() {
           {/* ═══ RIGHT COLUMN — fija, no scrollea ═══ */}
           <div className="db-right" style={{ background: '#ffffff', borderRadius: 20, padding: 12 }}>
 
-            {/* 5. Tu rendimiento — flex:2, más espacio */}
-            <div style={{ flex: 2, padding: '20px 16px 16px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            {/* 5. Tu rendimiento — flex:3, espacio generoso */}
+            <div style={{ flex: 3, padding: '22px 16px 18px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
                 <span style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: 14, color: '#111827' }}>Tu rendimiento</span>
                 <span style={{ fontFamily: 'Inter', fontSize: 9.5, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', padding: '3px 8px', borderRadius: 99, background: '#f5f7fb', color: '#9ca3af' }}>
@@ -498,9 +498,9 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* 6. Enviadas a emitir — flex:1.5, más espacio que Anto */}
-            <div style={{ flex: 1.5, background: '#f5f7fb', borderRadius: 16, padding: '16px', margin: '0 4px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+            {/* 6. Enviadas a emitir — flex:1, compacto */}
+            <div style={{ flex: 1, background: '#f5f7fb', borderRadius: 16, padding: '12px 16px', margin: '0 4px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
                 <span style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: 13, color: '#111827' }}>Enviadas a emitir</span>
                 <span style={{ fontFamily: 'Inter', fontSize: 9.5, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', padding: '3px 8px', borderRadius: 99, background: '#ffffff', color: '#9ca3af' }}>
                   {mesCorto}
