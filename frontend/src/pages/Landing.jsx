@@ -641,116 +641,183 @@ export default function Landing() {
       </section>
 
       {/* ── Anto IA ─────────────────────────────────────────────── */}
-      <section id="anto" style={{ background:'linear-gradient(160deg,#1e1b4b 0%,#2D2A7A 50%,#3730a3 100%)', padding:'80px 0 90px', overflow:'hidden', position:'relative' }}>
-
-        {/* Decoración de fondo */}
-        <div style={{ position:'absolute', top:-80, right:-80, width:400, height:400, borderRadius:'50%', background:'rgba(99,91,220,0.15)', pointerEvents:'none' }} />
-        <div style={{ position:'absolute', bottom:-60, left:-60, width:280, height:280, borderRadius:'50%', background:'rgba(167,139,250,0.08)', pointerEvents:'none' }} />
-
+      <section id="anto" style={{ background:'#f2effe', padding:'80px 0 90px', overflow:'hidden' }}>
         <div className="max-w-6xl mx-auto px-6">
 
-          {/* Header */}
-          <div className="text-center mb-14">
-            <div className="inline-flex items-center gap-2 mb-5" style={{ background:'rgba(255,255,255,0.1)', borderRadius:999, padding:'6px 16px 6px 8px', border:'1px solid rgba(255,255,255,0.15)' }}>
-              <span style={{ width:24, height:24, borderRadius:'50%', background:'linear-gradient(135deg,#818cf8,#a78bfa)', display:'inline-flex', alignItems:'center', justifyContent:'center', fontSize:12 }}>✨</span>
-              <span style={{ fontFamily:'Inter', fontSize:11, fontWeight:700, color:'rgba(255,255,255,0.8)', letterSpacing:'0.08em', textTransform:'uppercase' }}>Anto IA · Tu asesor inteligente</span>
+          {/* ── Header centrado ── */}
+          <div style={{ textAlign:'center', marginBottom:52 }}>
+            {/* Badge */}
+            <div style={{ display:'inline-flex', alignItems:'center', gap:8, background:'#ede9fe', borderRadius:999, padding:'6px 18px 6px 12px', marginBottom:20 }}>
+              <span style={{ fontSize:13, color:'#7c3aed' }}>✦</span>
+              <span style={{ fontFamily:'Inter', fontSize:11, fontWeight:700, color:'#6d28d9', letterSpacing:'0.09em', textTransform:'uppercase' }}>Anto IA · Tu asesor inteligente</span>
             </div>
-            <h2 className="text-3xl sm:text-4xl font-bold mb-4" style={{ color:'#fff', letterSpacing:'-0.5px' }}>
+            {/* Título */}
+            <h2 style={{ fontFamily:'Poppins', fontSize:42, fontWeight:800, color:'#111827', margin:'0 0 16px', letterSpacing:'-0.5px', lineHeight:1.15 }}>
               Vende seguros sin saber nada<br />
-              <span style={{ color:'#a78bfa' }}>de seguros</span>
+              <span style={{ color:'#7c3aed' }}>de seguros</span>
             </h2>
-            <p style={{ color:'rgba(255,255,255,0.55)', fontSize:15, maxWidth:520, margin:'0 auto', lineHeight:1.7 }}>
-              Anto es tu IA integrada al portal. Responde las preguntas difíciles de tus clientes, te explica coberturas y te ayuda a cerrar cada venta — en segundos.
+            {/* Subtítulo */}
+            <p style={{ fontFamily:'Inter', fontSize:16, color:'#6b7280', maxWidth:520, margin:'0 auto 28px', lineHeight:1.7 }}>
+              <strong style={{ color:'#111827' }}>Anto</strong> es tu IA integrada al portal. Responde las preguntas difíciles de tus clientes, te explica coberturas y te ayuda a cerrar cada venta — en segundos.
             </p>
-          </div>
-
-          {/* Grid principal */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
-
-            {/* Izquierda — Chat mockup */}
-            <div style={{ background:'rgba(255,255,255,0.05)', borderRadius:24, border:'1px solid rgba(255,255,255,0.1)', padding:20, backdropFilter:'blur(8px)' }}>
-              {/* Header del chat */}
-              <div style={{ display:'flex', alignItems:'center', gap:10, padding:'8px 4px 16px', borderBottom:'1px solid rgba(255,255,255,0.08)', marginBottom:16 }}>
-                <div style={{ width:34, height:34, borderRadius:'50%', background:'linear-gradient(135deg,#4f46e5,#7c3aed)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:16, flexShrink:0 }}>✨</div>
-                <div>
-                  <p style={{ margin:0, fontFamily:'Poppins', fontWeight:700, fontSize:13, color:'#fff' }}>Anto</p>
-                  <p style={{ margin:0, fontFamily:'Inter', fontSize:10, color:'rgba(255,255,255,0.4)' }}>IA · Siempre disponible</p>
-                </div>
-                <div style={{ marginLeft:'auto', width:8, height:8, borderRadius:'50%', background:'#4ade80' }} />
-              </div>
-              {/* Mensajes */}
-              <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
-                {[
-                  { who:'user', text:'Mi cliente pregunta qué cubre el todo riesgo de Allianz vs. Qualitas' },
-                  { who:'anto', text:'¡Claro! El todo riesgo de Allianz incluye daños propios, hurto total, responsabilidad civil hasta $150M y asistencia 24h. Qualitas es similar pero con RC hasta $120M y talleres aliados en más de 40 ciudades. Para un carro de uso diario urbano, Qualitas suele ser mejor opción por su red de talleres. ¿Quieres que te ayude a armar la respuesta para enviarle a tu cliente?' },
-                  { who:'user', text:'Sí, redáctame el mensaje' },
-                  { who:'anto', text:'Hola [nombre del cliente] 👋 Te cuento que comparé las dos opciones para tu carro:\n\n✅ Qualitas: RC $120M + red de 40+ talleres\n✅ Allianz: RC $150M + asistencia carretera premium\n\nPara uso en ciudad, te recomendaría Qualitas. ¿Te genero la cotización ahora?' },
-                ].map((m, i) => (
-                  <div key={i} style={{ display:'flex', justifyContent: m.who === 'user' ? 'flex-end' : 'flex-start' }}>
-                    <div style={{
-                      maxWidth:'82%', borderRadius: m.who === 'user' ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
-                      padding:'10px 14px', fontSize:11.5, lineHeight:1.55, whiteSpace:'pre-line',
-                      background: m.who === 'user' ? 'rgba(255,255,255,0.12)' : 'rgba(99,91,220,0.35)',
-                      color: m.who === 'user' ? 'rgba(255,255,255,0.85)' : '#e0e7ff',
-                      fontFamily:'Inter',
-                    }}>
-                      {m.text}
-                    </div>
-                  </div>
-                ))}
-                {/* Typing indicator */}
-                <div style={{ display:'flex', gap:4, padding:'4px 0 0 4px' }}>
-                  {[0,1,2].map(i => (
-                    <div key={i} style={{ width:6, height:6, borderRadius:'50%', background:'rgba(167,139,250,0.6)', animation:`bounce 1.2s ${i*0.2}s infinite` }} />
-                  ))}
-                </div>
-              </div>
-              <style>{`@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}`}</style>
-            </div>
-
-            {/* Derecha — 4 casos de uso */}
-            <div style={{ display:'flex', flexDirection:'column', gap:14 }}>
+            {/* Pills de características */}
+            <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:10, flexWrap:'wrap' }}>
               {[
-                {
-                  icon:'🧠', color:'#818cf8', bg:'rgba(129,140,248,0.15)',
-                  title:'Explica coberturas al instante',
-                  desc:'Tu cliente pregunta qué cubre la póliza. Anto le explica en lenguaje simple, con comparativas entre aseguradoras. Tú no necesitas saber nada de antemano.',
-                },
-                {
-                  icon:'⚖️', color:'#34d399', bg:'rgba(52,211,153,0.12)',
-                  title:'Compara aseguradoras sin esfuerzo',
-                  desc:'¿Cuál es mejor para este carro y este cliente? Anto analiza el perfil y recomienda la mejor opción — argumentada, clara y lista para enviar.',
-                },
-                {
-                  icon:'💬', color:'#fb923c', bg:'rgba(251,146,60,0.12)',
-                  title:'Redacta respuestas para tu cliente',
-                  desc:'Dile a Anto qué necesitas comunicar y él redacta el mensaje listo para copiar y enviar por WhatsApp. Profesional, claro y en segundos.',
-                },
-                {
-                  icon:'🎓', color:'#a78bfa', bg:'rgba(167,139,250,0.12)',
-                  title:'Aprende vendiendo, sin estudiar',
-                  desc:'Con cada consulta a Anto entiendes más del negocio. Sin cursos, sin manuales — el conocimiento llega solo mientras cierras ventas.',
-                },
-              ].map((item, i) => (
-                <div key={i} style={{ display:'flex', gap:14, padding:'16px', borderRadius:18, background: item.bg, border:`1px solid ${item.color}22`, alignItems:'flex-start' }}>
-                  <div style={{ width:40, height:40, borderRadius:13, background:`${item.color}22`, display:'flex', alignItems:'center', justifyContent:'center', fontSize:18, flexShrink:0 }}>
-                    {item.icon}
-                  </div>
-                  <div>
-                    <p style={{ margin:'0 0 4px', fontFamily:'Poppins', fontWeight:700, fontSize:13, color:'#fff' }}>{item.title}</p>
-                    <p style={{ margin:0, fontFamily:'Inter', fontSize:12, color:'rgba(255,255,255,0.5)', lineHeight:1.6 }}>{item.desc}</p>
-                  </div>
+                { icon:'⚡', text:'Respuestas al instante' },
+                { icon:'✦', text:'Entrenada con tu negocio' },
+                { icon:'🔒', text:'100% segura y privada' },
+              ].map(p => (
+                <div key={p.text} style={{ display:'inline-flex', alignItems:'center', gap:7, background:'#fff', border:'1px solid #e5e7eb', borderRadius:999, padding:'7px 16px', fontSize:13, fontWeight:600, color:'#374151', fontFamily:'Inter' }}>
+                  <span style={{ fontSize:14 }}>{p.icon}</span>
+                  {p.text}
                 </div>
               ))}
+            </div>
+          </div>
 
-              {/* CTA */}
-              <a href="/registro" style={{ display:'inline-flex', alignItems:'center', gap:8, marginTop:4, background:'linear-gradient(135deg,#4f46e5,#7c3aed)', borderRadius:14, padding:'13px 22px', textDecoration:'none', width:'fit-content', border:'none', cursor:'pointer' }}>
-                <span style={{ fontFamily:'Poppins', fontWeight:700, fontSize:13, color:'#fff' }}>Prueba Anto gratis</span>
-                <ArrowRight size={14} color="#fff" />
-              </a>
+          {/* ── 3 columnas: cards izq | mockup | cards der ── */}
+          <div style={{ display:'grid', gridTemplateColumns:'200px 1fr 200px', gap:24, alignItems:'center', marginBottom:64 }}>
+
+            {/* Cards izquierda */}
+            <div style={{ display:'flex', flexDirection:'column', gap:14 }}>
+              {[
+                { icon:'⚡', color:'#f59e0b', title:'Respuestas al instante', desc:'Anto responde en segundos lo que antes te tomaba minutos.' },
+                { icon:'🛡️', color:'#6d28d9', title:'Información confiable',  desc:'Basada en las condiciones de tus pólizas y tu negocio.' },
+              ].map(c => (
+                <div key={c.title} style={{ background:'#fff', borderRadius:16, padding:'16px', boxShadow:'0 2px 16px rgba(0,0,0,0.07)' }}>
+                  <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:7 }}>
+                    <div style={{ width:30, height:30, borderRadius:9, background:'#f5f7fb', display:'flex', alignItems:'center', justifyContent:'center', fontSize:16, flexShrink:0 }}>{c.icon}</div>
+                    <p style={{ margin:0, fontFamily:'Poppins', fontWeight:700, fontSize:13, color:'#111827' }}>{c.title}</p>
+                  </div>
+                  <p style={{ margin:0, fontFamily:'Inter', fontSize:12, color:'#6b7280', lineHeight:1.55 }}>{c.desc}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* Mockup central */}
+            <div style={{ borderRadius:20, overflow:'hidden', boxShadow:'0 20px 64px rgba(109,40,217,0.14)', background:'#fff', border:'1px solid #e5e7eb' }}>
+              {/* Barra de navegador */}
+              <div style={{ background:'#1e1b4b', padding:'10px 16px', display:'flex', alignItems:'center', gap:10 }}>
+                <div style={{ display:'flex', gap:5 }}>
+                  {['#ff5f57','#febc2e','#28c840'].map(c => <div key={c} style={{ width:9, height:9, borderRadius:'50%', background:c }} />)}
+                </div>
+                <div style={{ flex:1, background:'rgba(255,255,255,0.09)', borderRadius:6, padding:'3px 12px', fontSize:10, color:'rgba(255,255,255,0.4)', fontFamily:'Inter' }}>
+                  app.asegura2.com/dashboard/anto
+                </div>
+              </div>
+              {/* Contenido: chat + panel acciones */}
+              <div style={{ display:'grid', gridTemplateColumns:'1fr 190px', height:390 }}>
+
+                {/* Chat */}
+                <div style={{ display:'flex', flexDirection:'column', borderRight:'1px solid #f0f0f2' }}>
+                  <div style={{ padding:'12px 16px', borderBottom:'1px solid #f0f0f2', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+                    <span style={{ fontFamily:'Poppins', fontWeight:700, fontSize:14, color:'#111827' }}>Chat con Anto</span>
+                    <div style={{ display:'flex', alignItems:'center', gap:6 }}>
+                      <div style={{ width:7, height:7, borderRadius:'50%', background:'#22c55e' }} />
+                      <span style={{ fontFamily:'Inter', fontSize:11, color:'#6b7280' }}>En línea</span>
+                    </div>
+                  </div>
+                  <div style={{ flex:1, overflowY:'auto', padding:'14px 14px 8px', display:'flex', flexDirection:'column', gap:10 }}>
+                    {/* User */}
+                    <div style={{ display:'flex', justifyContent:'flex-end' }}>
+                      <div style={{ background:'#4f46e5', color:'#fff', borderRadius:'14px 14px 4px 14px', padding:'9px 13px', fontSize:12, maxWidth:'76%', lineHeight:1.5, fontFamily:'Inter' }}>
+                        Mi cliente pregunta qué cubre el robo de auto
+                      </div>
+                    </div>
+                    {/* Anto */}
+                    <div style={{ display:'flex', justifyContent:'flex-start' }}>
+                      <div style={{ background:'#f9fafb', border:'1px solid #f0f0f2', borderRadius:'4px 14px 14px 14px', padding:'10px 13px', fontSize:12, maxWidth:'88%', lineHeight:1.6, color:'#111827', fontFamily:'Inter' }}>
+                        <p style={{ margin:'0 0 6px' }}>El robo total cubre la pérdida completa del vehículo por robo con violencia o sin violencia, según la póliza.</p>
+                        <p style={{ margin:'0 0 6px', fontWeight:600 }}>Generalmente incluye:</p>
+                        {['Robo total del vehículo','Daños al intentar recuperar el auto','Gastos por cerraduras y llaves','Auto sustituto (según tu plan)'].map(item => (
+                          <div key={item} style={{ display:'flex', alignItems:'center', gap:6, margin:'3px 0' }}>
+                            <div style={{ width:14, height:14, borderRadius:'50%', background:'#4f46e5', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                              <span style={{ color:'#fff', fontSize:8, fontWeight:900, lineHeight:1 }}>✓</span>
+                            </div>
+                            <span style={{ fontSize:11, color:'#374151' }}>{item}</span>
+                          </div>
+                        ))}
+                        <p style={{ margin:'8px 0 0', fontSize:10, color:'#9ca3af' }}>Fuentes: Condiciones Generales · Plan Amplio 2024</p>
+                      </div>
+                    </div>
+                    {/* Reactions */}
+                    <div style={{ display:'flex', gap:6, paddingLeft:2 }}>
+                      {['👍','🔄','💾'].map(e => (
+                        <div key={e} style={{ width:26, height:26, background:'#f3f4f6', borderRadius:8, display:'flex', alignItems:'center', justifyContent:'center', fontSize:12, cursor:'pointer' }}>{e}</div>
+                      ))}
+                    </div>
+                  </div>
+                  {/* Input */}
+                  <div style={{ padding:'9px 12px', borderTop:'1px solid #f0f0f2', display:'flex', alignItems:'center', gap:8 }}>
+                    <span style={{ flex:1, fontFamily:'Inter', fontSize:12, color:'#9ca3af' }}>Escribe tu pregunta...</span>
+                    <div style={{ width:28, height:28, borderRadius:8, background:'#4f46e5', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                      <span style={{ color:'#fff', fontSize:16, lineHeight:1, marginTop:-1 }}>›</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Panel acciones rápidas */}
+                <div style={{ padding:'14px 12px', background:'#fafafa', overflowY:'auto', display:'flex', flexDirection:'column' }}>
+                  <p style={{ margin:'0 0 10px', fontFamily:'Poppins', fontSize:12, fontWeight:700, color:'#111827' }}>Acciones rápidas</p>
+                  {['Explicar coberturas','Comparar seguros','Objeciones comunes','Redactar respuesta','Siguiente paso'].map(action => (
+                    <div key={action} style={{ display:'flex', alignItems:'center', gap:7, padding:'7px 8px', borderRadius:8, marginBottom:4, background:'#fff', border:'1px solid #f0f0f2', cursor:'pointer' }}>
+                      <div style={{ width:16, height:16, borderRadius:4, background:'#ede9fe', flexShrink:0 }} />
+                      <span style={{ fontFamily:'Inter', fontSize:11, color:'#374151', fontWeight:500 }}>{action}</span>
+                    </div>
+                  ))}
+                  <div style={{ marginTop:10, background:'#fff', borderRadius:10, border:'1px solid #e5e7eb', padding:'10px' }}>
+                    <p style={{ margin:'0 0 4px', fontFamily:'Poppins', fontSize:11, fontWeight:700, color:'#111827' }}>Sugerencia para ti</p>
+                    <p style={{ margin:'0 0 8px', fontFamily:'Inter', fontSize:10, color:'#6b7280', lineHeight:1.4 }}>Este cliente mostró interés en seguro de auto.</p>
+                    <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', background:'#f5f7fb', borderRadius:7, padding:'6px 8px' }}>
+                      <span style={{ fontFamily:'Inter', fontSize:11, fontWeight:600, color:'#4f46e5' }}>Enviar propuesta</span>
+                      <span style={{ color:'#4f46e5', fontSize:14, fontWeight:700 }}>›</span>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            {/* Cards derecha */}
+            <div style={{ display:'flex', flexDirection:'column', gap:14 }}>
+              {[
+                { icon:'👥', title:'Aumenta tus ventas',  desc:'Responde mejor, genera confianza y cierra más negocios.' },
+                { icon:'⏰', title:'Ahorra tiempo',        desc:'Automatiza respuestas y enfócate en lo que importa: tus clientes.' },
+              ].map(c => (
+                <div key={c.title} style={{ background:'#fff', borderRadius:16, padding:'16px', boxShadow:'0 2px 16px rgba(0,0,0,0.07)' }}>
+                  <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:7 }}>
+                    <div style={{ width:30, height:30, borderRadius:9, background:'#f5f7fb', display:'flex', alignItems:'center', justifyContent:'center', fontSize:16, flexShrink:0 }}>{c.icon}</div>
+                    <p style={{ margin:0, fontFamily:'Poppins', fontWeight:700, fontSize:13, color:'#111827' }}>{c.title}</p>
+                  </div>
+                  <p style={{ margin:0, fontFamily:'Inter', fontSize:12, color:'#6b7280', lineHeight:1.55 }}>{c.desc}</p>
+                </div>
+              ))}
             </div>
 
           </div>
+
+          {/* ── ¿Cómo te ayuda Anto? ── */}
+          <div style={{ textAlign:'center', marginBottom:36 }}>
+            <h3 style={{ fontFamily:'Poppins', fontSize:26, fontWeight:700, color:'#111827', margin:'0 0 32px' }}>¿Cómo te ayuda Anto?</h3>
+          </div>
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(5, 1fr)', gap:14 }}>
+            {[
+              { icon:'📋', title:'Explica coberturas',     desc:'De forma clara y sencilla, como si fueras un experto.' },
+              { icon:'💬', title:'Resuelve objeciones',    desc:'Te da argumentos listos para cada situación.' },
+              { icon:'⚖️', title:'Compara opciones',       desc:'Muestra diferencias entre planes al instante.' },
+              { icon:'✉️', title:'Redacta mensajes',       desc:'Crea respuestas listas para enviar por WhatsApp.' },
+              { icon:'📊', title:'Aprende de tu negocio',  desc:'Entre más la usas, mejor te ayuda a vender.' },
+            ].map(item => (
+              <div key={item.title} style={{ background:'#fff', borderRadius:18, padding:'20px 16px', border:'1px solid #ede9fe', textAlign:'center', boxShadow:'0 1px 8px rgba(109,40,217,0.05)' }}>
+                <div style={{ width:44, height:44, borderRadius:13, background:'#ede9fe', display:'flex', alignItems:'center', justifyContent:'center', fontSize:20, margin:'0 auto 12px' }}>
+                  {item.icon}
+                </div>
+                <p style={{ margin:'0 0 6px', fontFamily:'Poppins', fontWeight:700, fontSize:13, color:'#111827' }}>{item.title}</p>
+                <p style={{ margin:0, fontFamily:'Inter', fontSize:12, color:'#6b7280', lineHeight:1.55 }}>{item.desc}</p>
+              </div>
+            ))}
+          </div>
+
         </div>
       </section>
 
