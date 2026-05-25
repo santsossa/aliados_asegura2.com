@@ -34,6 +34,7 @@ const ASEGURADORAS = [
 
 const NAV_LINKS = [
   { label: 'Cómo funciona', href: '#como-funciona' },
+  { label: 'Anto IA',       href: '#anto'           },
   { label: 'Beneficios',    href: '#beneficios'     },
   { label: 'Para quién',    href: '#para-quien'     },
   { label: 'Preguntas',     href: '#preguntas'      },
@@ -512,10 +513,20 @@ export default function Landing() {
             </div>
 
             {/* Texto descriptivo — centrado en móvil */}
-            <p className="text-gray-500 text-sm sm:text-base leading-relaxed mb-6 sm:mb-8 max-w-md text-center lg:text-left mx-auto lg:mx-0">
+            <p className="text-gray-500 text-sm sm:text-base leading-relaxed mb-5 max-w-md text-center lg:text-left mx-auto lg:mx-0">
               Si conoces personas con carros o que están por comprar uno, ya tienes todo lo que necesitas.
               Cotiza, envíanos el cliente y gana el 6% de comisión por cada póliza emitida — sin experiencia previa, sin costos, sin límites.
             </p>
+
+            {/* Pill Anto */}
+            <a href="#anto" className="inline-flex items-center gap-2.5 mb-6 sm:mb-8 group"
+              style={{ background:'linear-gradient(135deg,#ede9fe,#ddd6fe)', borderRadius:999, padding:'8px 16px 8px 8px', textDecoration:'none', border:'1px solid #c4b5fd', display:'inline-flex' }}>
+              <span style={{ width:28, height:28, borderRadius:'50%', background:'linear-gradient(135deg,#4f46e5,#7c3aed)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:14, flexShrink:0 }}>✨</span>
+              <span style={{ fontFamily:'Poppins', fontSize:12.5, fontWeight:600, color:'#4f46e5' }}>
+                Anto IA resuelve las dudas de tu cliente — tú solo cierras la venta
+              </span>
+              <ArrowRight size={13} style={{ color:'#7c3aed', flexShrink:0 }} className="group-hover:translate-x-0.5 transition-transform" />
+            </a>
 
             {/* Social proof — izq: aliados activos · der: calificaciones */}
             <div className="flex items-center justify-between lg:justify-start lg:gap-0 mb-6 lg:mb-8">
@@ -627,6 +638,120 @@ export default function Landing() {
         {/* Carousel 3D */}
         <CarouselPasos />
 
+      </section>
+
+      {/* ── Anto IA ─────────────────────────────────────────────── */}
+      <section id="anto" style={{ background:'linear-gradient(160deg,#1e1b4b 0%,#2D2A7A 50%,#3730a3 100%)', padding:'80px 0 90px', overflow:'hidden', position:'relative' }}>
+
+        {/* Decoración de fondo */}
+        <div style={{ position:'absolute', top:-80, right:-80, width:400, height:400, borderRadius:'50%', background:'rgba(99,91,220,0.15)', pointerEvents:'none' }} />
+        <div style={{ position:'absolute', bottom:-60, left:-60, width:280, height:280, borderRadius:'50%', background:'rgba(167,139,250,0.08)', pointerEvents:'none' }} />
+
+        <div className="max-w-6xl mx-auto px-6">
+
+          {/* Header */}
+          <div className="text-center mb-14">
+            <div className="inline-flex items-center gap-2 mb-5" style={{ background:'rgba(255,255,255,0.1)', borderRadius:999, padding:'6px 16px 6px 8px', border:'1px solid rgba(255,255,255,0.15)' }}>
+              <span style={{ width:24, height:24, borderRadius:'50%', background:'linear-gradient(135deg,#818cf8,#a78bfa)', display:'inline-flex', alignItems:'center', justifyContent:'center', fontSize:12 }}>✨</span>
+              <span style={{ fontFamily:'Inter', fontSize:11, fontWeight:700, color:'rgba(255,255,255,0.8)', letterSpacing:'0.08em', textTransform:'uppercase' }}>Anto IA · Tu asesor inteligente</span>
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-bold mb-4" style={{ color:'#fff', letterSpacing:'-0.5px' }}>
+              Vende seguros sin saber nada<br />
+              <span style={{ color:'#a78bfa' }}>de seguros</span>
+            </h2>
+            <p style={{ color:'rgba(255,255,255,0.55)', fontSize:15, maxWidth:520, margin:'0 auto', lineHeight:1.7 }}>
+              Anto es tu IA integrada al portal. Responde las preguntas difíciles de tus clientes, te explica coberturas y te ayuda a cerrar cada venta — en segundos.
+            </p>
+          </div>
+
+          {/* Grid principal */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+
+            {/* Izquierda — Chat mockup */}
+            <div style={{ background:'rgba(255,255,255,0.05)', borderRadius:24, border:'1px solid rgba(255,255,255,0.1)', padding:20, backdropFilter:'blur(8px)' }}>
+              {/* Header del chat */}
+              <div style={{ display:'flex', alignItems:'center', gap:10, padding:'8px 4px 16px', borderBottom:'1px solid rgba(255,255,255,0.08)', marginBottom:16 }}>
+                <div style={{ width:34, height:34, borderRadius:'50%', background:'linear-gradient(135deg,#4f46e5,#7c3aed)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:16, flexShrink:0 }}>✨</div>
+                <div>
+                  <p style={{ margin:0, fontFamily:'Poppins', fontWeight:700, fontSize:13, color:'#fff' }}>Anto</p>
+                  <p style={{ margin:0, fontFamily:'Inter', fontSize:10, color:'rgba(255,255,255,0.4)' }}>IA · Siempre disponible</p>
+                </div>
+                <div style={{ marginLeft:'auto', width:8, height:8, borderRadius:'50%', background:'#4ade80' }} />
+              </div>
+              {/* Mensajes */}
+              <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
+                {[
+                  { who:'user', text:'Mi cliente pregunta qué cubre el todo riesgo de Allianz vs. Qualitas' },
+                  { who:'anto', text:'¡Claro! El todo riesgo de Allianz incluye daños propios, hurto total, responsabilidad civil hasta $150M y asistencia 24h. Qualitas es similar pero con RC hasta $120M y talleres aliados en más de 40 ciudades. Para un carro de uso diario urbano, Qualitas suele ser mejor opción por su red de talleres. ¿Quieres que te ayude a armar la respuesta para enviarle a tu cliente?' },
+                  { who:'user', text:'Sí, redáctame el mensaje' },
+                  { who:'anto', text:'Hola [nombre del cliente] 👋 Te cuento que comparé las dos opciones para tu carro:\n\n✅ Qualitas: RC $120M + red de 40+ talleres\n✅ Allianz: RC $150M + asistencia carretera premium\n\nPara uso en ciudad, te recomendaría Qualitas. ¿Te genero la cotización ahora?' },
+                ].map((m, i) => (
+                  <div key={i} style={{ display:'flex', justifyContent: m.who === 'user' ? 'flex-end' : 'flex-start' }}>
+                    <div style={{
+                      maxWidth:'82%', borderRadius: m.who === 'user' ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
+                      padding:'10px 14px', fontSize:11.5, lineHeight:1.55, whiteSpace:'pre-line',
+                      background: m.who === 'user' ? 'rgba(255,255,255,0.12)' : 'rgba(99,91,220,0.35)',
+                      color: m.who === 'user' ? 'rgba(255,255,255,0.85)' : '#e0e7ff',
+                      fontFamily:'Inter',
+                    }}>
+                      {m.text}
+                    </div>
+                  </div>
+                ))}
+                {/* Typing indicator */}
+                <div style={{ display:'flex', gap:4, padding:'4px 0 0 4px' }}>
+                  {[0,1,2].map(i => (
+                    <div key={i} style={{ width:6, height:6, borderRadius:'50%', background:'rgba(167,139,250,0.6)', animation:`bounce 1.2s ${i*0.2}s infinite` }} />
+                  ))}
+                </div>
+              </div>
+              <style>{`@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}`}</style>
+            </div>
+
+            {/* Derecha — 4 casos de uso */}
+            <div style={{ display:'flex', flexDirection:'column', gap:14 }}>
+              {[
+                {
+                  icon:'🧠', color:'#818cf8', bg:'rgba(129,140,248,0.15)',
+                  title:'Explica coberturas al instante',
+                  desc:'Tu cliente pregunta qué cubre la póliza. Anto le explica en lenguaje simple, con comparativas entre aseguradoras. Tú no necesitas saber nada de antemano.',
+                },
+                {
+                  icon:'⚖️', color:'#34d399', bg:'rgba(52,211,153,0.12)',
+                  title:'Compara aseguradoras sin esfuerzo',
+                  desc:'¿Cuál es mejor para este carro y este cliente? Anto analiza el perfil y recomienda la mejor opción — argumentada, clara y lista para enviar.',
+                },
+                {
+                  icon:'💬', color:'#fb923c', bg:'rgba(251,146,60,0.12)',
+                  title:'Redacta respuestas para tu cliente',
+                  desc:'Dile a Anto qué necesitas comunicar y él redacta el mensaje listo para copiar y enviar por WhatsApp. Profesional, claro y en segundos.',
+                },
+                {
+                  icon:'🎓', color:'#a78bfa', bg:'rgba(167,139,250,0.12)',
+                  title:'Aprende vendiendo, sin estudiar',
+                  desc:'Con cada consulta a Anto entiendes más del negocio. Sin cursos, sin manuales — el conocimiento llega solo mientras cierras ventas.',
+                },
+              ].map((item, i) => (
+                <div key={i} style={{ display:'flex', gap:14, padding:'16px', borderRadius:18, background: item.bg, border:`1px solid ${item.color}22`, alignItems:'flex-start' }}>
+                  <div style={{ width:40, height:40, borderRadius:13, background:`${item.color}22`, display:'flex', alignItems:'center', justifyContent:'center', fontSize:18, flexShrink:0 }}>
+                    {item.icon}
+                  </div>
+                  <div>
+                    <p style={{ margin:'0 0 4px', fontFamily:'Poppins', fontWeight:700, fontSize:13, color:'#fff' }}>{item.title}</p>
+                    <p style={{ margin:0, fontFamily:'Inter', fontSize:12, color:'rgba(255,255,255,0.5)', lineHeight:1.6 }}>{item.desc}</p>
+                  </div>
+                </div>
+              ))}
+
+              {/* CTA */}
+              <a href="/registro" style={{ display:'inline-flex', alignItems:'center', gap:8, marginTop:4, background:'linear-gradient(135deg,#4f46e5,#7c3aed)', borderRadius:14, padding:'13px 22px', textDecoration:'none', width:'fit-content', border:'none', cursor:'pointer' }}>
+                <span style={{ fontFamily:'Poppins', fontWeight:700, fontSize:13, color:'#fff' }}>Prueba Anto gratis</span>
+                <ArrowRight size={14} color="#fff" />
+              </a>
+            </div>
+
+          </div>
+        </div>
       </section>
 
       {/* ── Beneficios ──────────────────────────────────────────── */}
