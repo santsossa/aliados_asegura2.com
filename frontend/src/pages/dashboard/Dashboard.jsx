@@ -6,6 +6,21 @@ import { useSSE } from '../../context/SSEContext'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
+const LOGO_MAP = {
+  allianz: '/logos/allianz.png', axa: '/logos/axa.png',
+  bolivar: '/logos/bolivar.png', equidad: '/logos/equidad.png',
+  hdi: '/logos/hdi.png', mapfre: '/logos/mapfre.png',
+  sbs: '/logos/sbs.png', solidaria: '/logos/solidaria.png',
+  sura: '/logos/sura.png', estado: '/logos/estado.png',
+  coomeva: '/logos/coomeva.png', qualitas: '/logos/qualitas.png',
+}
+function getLogoUrl(nombre) {
+  if (!nombre) return null
+  const key = nombre.toLowerCase()
+  const match = Object.keys(LOGO_MAP).find(k => key.includes(k))
+  return match ? LOGO_MAP[match] : null
+}
+
 function fmt(n) {
   return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(n)
 }
@@ -408,51 +423,50 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              {polizas_proceso.length === 0 ? (
-                <div style={{ background: '#fff', borderRadius: 24, padding: '28px 20px', textAlign: 'center' }}>
-                  <p style={{ margin: 0, fontSize: 13, color: '#9ca3af' }}>Aún no has enviado ninguna cotización a emitir.</p>
-                </div>
-              ) : (
-                <div
-                  ref={enviRef}
-                  className="no-scrollbar"
-                  style={{ display: 'flex', gap: 12, overflowX: 'auto', paddingBottom: 4 }}
-                >
-                  {polizas_proceso.map((p) => {
-                    const cfg = getPcfg(p.estado)
-                    return (
-                      <div
-                        key={p.id}
-                        onClick={() => navigate('/dashboard/mis-polizas')}
-                        style={{
-                          minWidth: 175, maxWidth: 175, flexShrink: 0,
-                          background: '#fff', borderRadius: 20, padding: '14px',
-                          cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: 10,
-                          transition: 'transform 0.15s, box-shadow 0.15s',
-                        }}
-                        onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 6px 18px rgba(0,0,0,0.08)' }}
-                        onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none' }}
-                      >
-                        {/* Ícono + badge de estado */}
-                        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
-                          <div style={{ width: 42, height: 42, borderRadius: 13, background: cfg.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>
-                            🚗
-                          </div>
-                          <span style={{ fontSize: 10, fontWeight: 600, padding: '3px 8px', borderRadius: 99, background: cfg.bg, color: cfg.color, whiteSpace: 'nowrap' }}>
-                            {cfg.label}
-                          </span>
-                        </div>
-                        {/* Nombre + placa */}
-                        <div>
-                          <p style={{ margin: '0 0 3px', fontSize: 13, fontWeight: 600, color: '#111827', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                            {p.cliente_nombre || 'Sin nombre'}
-                          </p>
-                          <p style={{ margin: 0, fontSize: 11, color: '#9ca3af', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                            {p.placa || '—'} · {p.aseguradora || '—'}
-                          </p>
-                        </div>
-                        {/* Comisión + hace */}
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto' }}>
+              <div
+                ref={enviRef}
+                className="no-scrollbar"
+                style={{ display: 'flex', gap: 12, overflowX: 'auto', paddingBottom: 4, minHeight: 192 }}
+              >
+                {polizas_proceso.length === 0 ? (
+                  <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff', borderRadius: 20, minWidth: 0 }}>
+                    <p style={{ margin: 0, fontSize: 13, color: '#9ca3af' }}>Aún no has enviado ninguna cotización a emitir.</p>
+                  </div>
+                ) : polizas_proceso.map((p) => {
+                  const cfg  = getPcfg(p.estado)
+                  const logo = getLogoUrl(p.aseguradora)
+                  return (
+                    <div
+                      key={p.id}
+                      onClick={() => navigate('/dashboard/mis-polizas')}
+                      style={{
+                        minWidth: 170, maxWidth: 170, flexShrink: 0,
+                        background: '#fff', borderRadius: 20, overflow: 'hidden',
+                        cursor: 'pointer', display: 'flex', flexDirection: 'column',
+                        transition: 'transform 0.15s, box-shadow 0.15s',
+                      }}
+                      onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 6px 18px rgba(0,0,0,0.08)' }}
+                      onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none' }}
+                    >
+                      {/* Área logo — como el thumbnail de la imagen ref */}
+                      <div style={{ height: 96, background: '#f5f7fb', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                        {logo
+                          ? <img src={logo} alt={p.aseguradora} style={{ maxHeight: 50, maxWidth: 128, objectFit: 'contain' }} />
+                          : <div style={{ width: 48, height: 48, borderRadius: 14, background: cfg.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>🚗</div>
+                        }
+                      </div>
+                      {/* Info */}
+                      <div style={{ padding: '11px 13px 13px', display: 'flex', flexDirection: 'column', gap: 5, flex: 1 }}>
+                        <span style={{ fontSize: 10, fontWeight: 600, padding: '3px 8px', borderRadius: 99, background: cfg.bg, color: cfg.color, whiteSpace: 'nowrap', alignSelf: 'flex-start' }}>
+                          {cfg.label}
+                        </span>
+                        <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: '#111827', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {p.cliente_nombre || 'Sin nombre'}
+                        </p>
+                        <p style={{ margin: 0, fontSize: 11, color: '#9ca3af', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {p.placa || '—'}
+                        </p>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto', paddingTop: 4 }}>
                           {p.valor_comision > 0
                             ? <span style={{ fontSize: 12, fontWeight: 700, color: '#16a34a' }}>+{fmt(p.valor_comision)}</span>
                             : <span />
@@ -460,10 +474,10 @@ export default function Dashboard() {
                           <span style={{ fontSize: 10, color: '#b0b4c1' }}>{p.hace}</span>
                         </div>
                       </div>
-                    )
-                  })}
-                </div>
-              )}
+                    </div>
+                  )
+                })}
+              </div>
             </div>
 
             {/* 4. Actividad reciente */}
@@ -525,20 +539,14 @@ export default function Dashboard() {
           <div className="db-right">
 
             {/* 5. Tu rendimiento */}
-            <div style={{ background: '#fff', borderRadius: 22, padding: '16px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-                <span style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: 14, color: '#111827' }}>Tu rendimiento</span>
-                <span style={{ fontFamily: 'Inter', fontSize: 9.5, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', padding: '3px 8px', borderRadius: 99, background: '#f5f7fb', color: '#9ca3af' }}>
-                  {mesCorto} {anioLabel}
-                </span>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, padding: '6px 0 8px' }}>
+            <div style={{ background: '#fff', borderRadius: 22, padding: '22px 16px 18px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
                 <PlainAvatar size={72} initials={initials} />
                 <div style={{ textAlign: 'center' }}>
                   <p style={{ margin: '0 0 6px', fontFamily: 'Poppins', fontSize: 15, fontWeight: 600, color: '#111827' }}>
                     {saludo}, {nombreAliado}! 👋
                   </p>
-                  <p style={{ margin: 0, fontFamily: 'Inter', fontSize: 12, color: '#6b7280', whiteSpace: 'nowrap' }}>
+                  <p style={{ margin: 0, fontFamily: 'Inter', fontSize: 12, color: '#6b7280' }}>
                     Envía a emitir y gana más comisiones
                   </p>
                 </div>
