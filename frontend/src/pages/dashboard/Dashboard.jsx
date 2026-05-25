@@ -324,7 +324,7 @@ export default function Dashboard() {
               </svg>
 
               <p style={{ margin: '0 0 8px', fontFamily: 'Inter', fontWeight: 700, fontSize: 9.5, color: '#c7d2fe', letterSpacing: '0.12em', textTransform: 'uppercase' }}>Portal de aliados</p>
-              <h2 style={{ margin: '0 0 20px', fontFamily: 'Poppins', fontWeight: 500, fontSize: 22, color: '#fff', lineHeight: 1.35, maxWidth: '52%' }}>
+              <h2 style={{ margin: '0 0 20px', fontFamily: 'Poppins', fontWeight: 500, fontSize: 22, color: '#fff', lineHeight: 1.35, maxWidth: '72%' }}>
                 Cotiza un seguro en segundos y gana tu comisión
               </h2>
               <button
@@ -472,10 +472,10 @@ export default function Dashboard() {
           </div>
 
           {/* ═══ RIGHT COLUMN — fija, no scrollea ═══ */}
-          <div className="db-right" style={{ background: '#ffffff', borderRadius: 20, padding: 12 }}>
+          <div className="db-right" style={{ background: '#ffffff', borderRadius: 20, padding: 8 }}>
 
-            {/* 5. Tu rendimiento — flex:3, desde arriba */}
-            <div style={{ flex: 3, padding: '22px 16px 18px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start' }}>
+            {/* 5. Tu rendimiento — flex:2.5, desde arriba sin margen excesivo */}
+            <div style={{ flex: 2.5, padding: '12px 16px 10px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
                 <span style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: 14, color: '#111827' }}>Tu rendimiento</span>
                 <span style={{ fontFamily: 'Inter', fontSize: 9.5, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', padding: '3px 8px', borderRadius: 99, background: '#f5f7fb', color: '#9ca3af' }}>
@@ -510,17 +510,17 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* 7. Pregúntale a Anto — flex:1 */}
-            <div style={{ flex: 1, background: '#f5f7fb', borderRadius: 20, padding: '16px', margin: '4px 4px 4px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-              <div>
-                <p style={{ margin: '0 0 6px', fontFamily: 'Poppins', fontWeight: 600, fontSize: 13, color: '#111827' }}>Pregúntale a Anto ✨</p>
+            {/* 7. Pregúntale a Anto — flex:1.3 */}
+            <div style={{ flex: 1.3, background: '#f5f7fb', borderRadius: 20, padding: '16px', margin: '4px 4px 4px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: 12 }}>
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 6 }}>
+                <p style={{ margin: 0, fontFamily: 'Poppins', fontWeight: 600, fontSize: 13, color: '#111827' }}>Pregúntale a Anto ✨</p>
                 <p style={{ margin: 0, fontFamily: 'Inter', fontSize: 11.5, color: '#6b7280', lineHeight: 1.55 }}>
                   Tu copiloto de IA para coberturas, comparar aseguradoras y responder a tus clientes.
                 </p>
               </div>
               <button
                 onClick={() => document.querySelector('[data-anto-pill]')?.click()}
-                style={{ width: '100%', fontFamily: 'Poppins', background: '#2D2A7A', color: '#fff', border: 'none', borderRadius: 999, padding: '10px', fontSize: 13, fontWeight: 600, cursor: 'pointer', transition: 'opacity 0.15s' }}
+                style={{ width: '100%', fontFamily: 'Poppins', background: '#2D2A7A', color: '#fff', border: 'none', borderRadius: 999, padding: '10px', fontSize: 13, fontWeight: 600, cursor: 'pointer', transition: 'opacity 0.15s', flexShrink: 0 }}
                 onMouseEnter={e => e.currentTarget.style.opacity = '0.85'}
                 onMouseLeave={e => e.currentTarget.style.opacity = '1'}
               >
