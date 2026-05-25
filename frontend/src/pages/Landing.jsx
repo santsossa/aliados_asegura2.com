@@ -705,8 +705,44 @@ export default function Landing() {
                   app.asegura2.com/dashboard/anto
                 </div>
               </div>
-              {/* Contenido: chat + panel acciones */}
-              <div style={{ display:'grid', gridTemplateColumns:'1fr 190px', height:390 }}>
+              {/* Contenido: sidebar + chat + panel acciones */}
+              <div style={{ display:'grid', gridTemplateColumns:'130px 1fr 178px', height:420 }}>
+
+                {/* Sidebar oscuro */}
+                <div style={{ background:'#1e1b4b', padding:'14px 10px', display:'flex', flexDirection:'column', gap:2, borderRight:'1px solid rgba(255,255,255,0.06)' }}>
+                  {/* Logo */}
+                  <div style={{ display:'flex', alignItems:'center', gap:7, marginBottom:14, paddingBottom:12, borderBottom:'1px solid rgba(255,255,255,0.1)' }}>
+                    <div style={{ width:26, height:26, borderRadius:8, background:'#4f46e5', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                      <span style={{ color:'#fff', fontSize:12, lineHeight:1 }}>✦</span>
+                    </div>
+                    <span style={{ fontFamily:'Poppins', fontWeight:700, fontSize:11.5, color:'#fff', lineHeight:1 }}>Anto IA</span>
+                  </div>
+                  {/* Nav */}
+                  {[
+                    { label:'Chat',          active:true  },
+                    { label:'Clientes',      active:false },
+                    { label:'Productos',     active:false },
+                    { label:'Cotizaciones',  active:false },
+                    { label:'Reportes',      active:false },
+                    { label:'Configuración', active:false },
+                  ].map(item => (
+                    <div key={item.label} style={{ display:'flex', alignItems:'center', gap:7, padding:'6px 8px', borderRadius:7, background: item.active ? 'rgba(255,255,255,0.13)' : 'transparent' }}>
+                      <div style={{ width:14, height:14, borderRadius:3, background: item.active ? 'rgba(99,102,241,0.5)' : 'rgba(255,255,255,0.12)', flexShrink:0 }} />
+                      <span style={{ fontFamily:'Inter', fontSize:10.5, color: item.active ? '#fff' : 'rgba(255,255,255,0.55)', fontWeight: item.active ? 600 : 400 }}>{item.label}</span>
+                    </div>
+                  ))}
+                  {/* Desempeño */}
+                  <div style={{ marginTop:'auto', paddingTop:10, borderTop:'1px solid rgba(255,255,255,0.1)' }}>
+                    <p style={{ fontFamily:'Inter', fontSize:8.5, color:'rgba(255,255,255,0.45)', margin:'0 0 3px' }}>Tu desempeño</p>
+                    <p style={{ fontFamily:'Inter', fontSize:9, color:'rgba(255,255,255,0.65)', margin:'0 0 1px' }}>Ventas con Anto</p>
+                    <p style={{ fontFamily:'Poppins', fontSize:17, fontWeight:800, color:'#4ade80', margin:'2px 0 1px', lineHeight:1 }}>+32%</p>
+                    <p style={{ fontFamily:'Inter', fontSize:8.5, color:'rgba(255,255,255,0.4)', margin:'0 0 7px' }}>vs. mes anterior</p>
+                    <svg width="100%" height="26" viewBox="0 0 110 26" fill="none">
+                      <polyline points="0,22 22,16 44,18 66,8 88,11 110,3" stroke="#818cf8" strokeWidth="1.8" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+                      <polygon points="0,22 22,16 44,18 66,8 88,11 110,3 110,26 0,26" fill="rgba(99,102,241,0.15)"/>
+                    </svg>
+                  </div>
+                </div>
 
                 {/* Chat */}
                 <div style={{ display:'flex', flexDirection:'column', borderRight:'1px solid #f0f0f2' }}>
