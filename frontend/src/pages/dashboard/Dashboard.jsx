@@ -143,19 +143,33 @@ function PeriodBarChart({ polizas = [] }) {
   })
 
   const max = Math.max(...counts, 1)
+  const mid  = Math.ceil(max / 2)
   const labels = ['1-10', '11-20', `21-${lastDay}`]
 
   return (
-    <div style={{ display: 'flex', gap: 10, alignItems: 'flex-end' }}>
-      {counts.map((val, i) => (
-        <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
-          <div style={{ width: '100%', display: 'flex', gap: 3, alignItems: 'flex-end', height: 72 }}>
-            <div style={{ flex: 1, background: '#c4b5fd', borderRadius: 8, height: `${Math.max((val/max)*60, val>0?18:6)}%`, transition: 'height 0.3s' }} />
-            <div style={{ flex: 1, background: '#4f46e5', borderRadius: 8, height: `${Math.max((val/max)*100, val>0?25:6)}%`, transition: 'height 0.3s' }} />
-          </div>
-          <span style={{ fontSize: 9, color: '#9ca3af', fontWeight: 500 }}>{labels[i]}</span>
+    <div style={{ display: 'flex', gap: 6 }}>
+      {/* Y-axis */}
+      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: 80, paddingBottom: 18, width: 14, flexShrink: 0 }}>
+        {[max, mid, 0].map((v, i) => (
+          <span key={i} style={{ fontSize: 8.5, color: '#9ca3af', lineHeight: 1, textAlign: 'right', display: 'block' }}>{v}</span>
+        ))}
+      </div>
+      {/* Bars */}
+      <div style={{ flex: 1 }}>
+        <div style={{ display: 'flex', gap: 10, alignItems: 'flex-end', height: 62 }}>
+          {counts.map((val, i) => (
+            <div key={i} style={{ flex: 1, display: 'flex', gap: 3, alignItems: 'flex-end', height: '100%' }}>
+              <div style={{ flex: 1, background: '#c4b5fd', borderRadius: 8, height: `${Math.max((val/max)*60, val>0?18:6)}%`, transition: 'height 0.3s' }} />
+              <div style={{ flex: 1, background: '#4f46e5', borderRadius: 8, height: `${Math.max((val/max)*100, val>0?25:6)}%`, transition: 'height 0.3s' }} />
+            </div>
+          ))}
         </div>
-      ))}
+        <div style={{ display: 'flex', gap: 10, marginTop: 6 }}>
+          {labels.map((l, i) => (
+            <span key={i} style={{ flex: 1, fontSize: 9, color: '#9ca3af', textAlign: 'center', fontWeight: 500 }}>{l}</span>
+          ))}
+        </div>
+      </div>
     </div>
   )
 }
@@ -320,7 +334,7 @@ export default function Dashboard() {
               </button>
             </div>
 
-            {/* 2. Stats cards — cuadradas, título arriba, valor abajo */}
+            {/* 2. Stats cards — horizontal pill estilo referencia */}
             <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
               {cards.map((c, i) => {
                 const Icon = c.icon
@@ -329,24 +343,24 @@ export default function Dashboard() {
                     background: '#fff',
                     borderRadius: 16,
                     border: '1px solid #eeeeef',
-                    boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
-                    padding: '16px',
-                    display: 'flex', flexDirection: 'column', gap: 2,
-                    overflow: 'hidden',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+                    padding: '12px 14px 12px 12px',
+                    display: 'flex', alignItems: 'center', gap: 10,
                   }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-                      <div style={{ width: 32, height: 32, borderRadius: 10, background: c.iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <Icon size={15} color={c.iconColor} />
-                      </div>
-                      <button style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 2, color: '#d1d5db', display: 'flex' }}>
-                        <MoreHorizontal size={14} />
-                      </button>
+                    <div style={{ width: 38, height: 38, borderRadius: '50%', background: c.iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <Icon size={16} color={c.iconColor} />
                     </div>
-                    <p style={{ margin: 0, fontSize: 10.5, color: '#9ca3af', fontWeight: 500 }}>{c.label}</p>
-                    <p style={{ margin: '2px 0 0', fontSize: 20, fontWeight: 800, color: '#111827', letterSpacing: '-0.5px', lineHeight: 1.1 }}>{c.value}</p>
-                    <p style={{ margin: '4px 0 0', fontSize: 11, color: c.positive === false ? '#dc2626' : '#6b7280', fontWeight: 500 }}>
-                      {c.badge ? `${c.badge}` : c.sub}
-                    </p>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <p style={{ margin: '0 0 1px', fontSize: 10.5, color: '#9ca3af', fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {c.value}{c.badge ? ` · ${c.badge}` : ''}
+                      </p>
+                      <p style={{ margin: 0, fontSize: 12, fontWeight: 700, color: '#111827', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {c.label}
+                      </p>
+                    </div>
+                    <button style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 2, flexShrink: 0, color: '#d1d5db', display: 'flex' }}>
+                      <MoreHorizontal size={14} />
+                    </button>
                   </div>
                 )
               })}
@@ -458,17 +472,17 @@ export default function Dashboard() {
           {/* ═══ RIGHT COLUMN — container blanco ═══ */}
           <div style={{ background: '#ffffff', borderRadius: 20, border: '1px solid #e5e7eb', padding: 12, display: 'flex', flexDirection: 'column', gap: 12 }}>
 
-            {/* 5. Tu rendimiento — card gris */}
-            <div style={{ background: '#f5f7fb', borderRadius: 16, padding: '18px' }}>
+            {/* 5. Tu rendimiento — fondo blanco, sin card gris */}
+            <div style={{ background: '#ffffff', borderRadius: 16, padding: '18px 18px 12px' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
                 <span style={{ fontWeight: 700, fontSize: 14, color: '#111827' }}>Tu rendimiento</span>
-                <span style={{ fontSize: 10, fontWeight: 600, padding: '3px 9px', borderRadius: 99, background: '#ffffff', color: '#6b7280', border: '1px solid #e5e7eb' }}>
+                <span style={{ fontSize: 10, fontWeight: 600, padding: '3px 9px', borderRadius: 99, background: '#f5f7fb', color: '#6b7280', border: '1px solid #e5e7eb' }}>
                   {mesCorto} {anioLabel}
                 </span>
               </div>
 
               {/* Avatar + saludo */}
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 12 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <PlainAvatar size={80} initials={initials} />
                 <p style={{ margin: '10px 0 2px', fontSize: 15, fontWeight: 700, color: '#111827', textAlign: 'center' }}>
                   {saludo}, {nombreAliado}! 🔥
@@ -477,17 +491,10 @@ export default function Dashboard() {
                   Sigue enviando clientes a emitir para generar más comisiones
                 </p>
               </div>
-
-              <button
-                onClick={() => navigate('/dashboard/pagos')}
-                style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 11, color: '#4f46e5', fontWeight: 600, padding: '4px 0 0', display: 'block' }}
-              >
-                Ver reporte completo →
-              </button>
             </div>
 
             {/* 6. Enviadas a emitir — card gris con gráfica de períodos */}
-            <div style={{ background: '#f5f7fb', borderRadius: 16, padding: '18px' }}>
+            <div style={{ background: '#f5f7fb', borderRadius: 20, padding: '18px' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
                 <span style={{ fontWeight: 700, fontSize: 14, color: '#111827' }}>Enviadas a emitir</span>
                 <span style={{ fontSize: 10, fontWeight: 600, padding: '3px 9px', borderRadius: 99, background: '#ffffff', color: '#6b7280', border: '1px solid #e5e7eb' }}>
@@ -497,22 +504,20 @@ export default function Dashboard() {
               <PeriodBarChart polizas={polizas_proceso} />
             </div>
 
-            {/* 7. Tu copiloto — card gris, lista estilo mentor */}
-            <div style={{ background: '#f5f7fb', borderRadius: 16, padding: '18px' }}>
+            {/* 7. Pregúntale a Anto — card gris, 3 opciones */}
+            <div style={{ background: '#f5f7fb', borderRadius: 20, padding: '18px' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-                <span style={{ fontWeight: 700, fontSize: 14, color: '#111827' }}>Tu copiloto</span>
+                <span style={{ fontWeight: 700, fontSize: 14, color: '#111827' }}>Pregúntale a Anto</span>
                 <button
                   onClick={() => document.querySelector('[data-anto-pill]')?.click()}
                   style={{ width: 26, height: 26, borderRadius: '50%', border: '1px solid #e5e7eb', background: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, color: '#374151', lineHeight: 1 }}
                 >+</button>
               </div>
 
-              {/* Lista de acciones — estilo "Your mentor" */}
               {[
-                { bg: '#ede9fe', color: '#4f46e5', emoji: '🛡️', title: 'Coberturas',           sub: 'Qué cubre la póliza'      },
-                { bg: '#e0f2fe', color: '#0284c7', emoji: '⚖️', title: 'Comparar aseguradoras', sub: 'Diferencias y precios'    },
-                { bg: '#dcfce7', color: '#16a34a', emoji: '💬', title: 'Responder al cliente',  sub: 'Dudas frecuentes'         },
-                { bg: '#fff7ed', color: '#ea580c', emoji: '📋', title: 'Exclusiones',            sub: 'Qué NO cubre la póliza'  },
+                { bg: '#ede9fe', color: '#4f46e5', emoji: '🛡️', title: 'Coberturas',           sub: 'Qué cubre la póliza'     },
+                { bg: '#e0f2fe', color: '#0284c7', emoji: '⚖️', title: 'Comparar aseguradoras', sub: 'Diferencias y precios'   },
+                { bg: '#dcfce7', color: '#16a34a', emoji: '💬', title: 'Responder al cliente',  sub: 'Dudas frecuentes'        },
               ].map((item, i, arr) => (
                 <div
                   key={i}
@@ -527,7 +532,7 @@ export default function Dashboard() {
                   </div>
                   <button
                     onClick={() => document.querySelector('[data-anto-pill]')?.click()}
-                    style={{ flexShrink: 0, fontSize: 11, fontWeight: 600, color: item.color, background: item.bg, border: `1px solid ${item.color}22`, borderRadius: 8, padding: '4px 10px', cursor: 'pointer' }}
+                    style={{ flexShrink: 0, fontSize: 11, fontWeight: 600, color: item.color, background: `${item.color}18`, border: `1px solid ${item.color}33`, borderRadius: 12, padding: '4px 10px', cursor: 'pointer' }}
                   >
                     Preguntar
                   </button>
@@ -537,9 +542,9 @@ export default function Dashboard() {
               <div style={{ borderTop: '1px solid #e5e7eb', paddingTop: 12, marginTop: 12 }}>
                 <button
                   onClick={() => document.querySelector('[data-anto-pill]')?.click()}
-                  style={{ width: '100%', background: '#2D2A7A', color: '#fff', border: 'none', borderRadius: 10, padding: '10px', fontSize: 13, fontWeight: 700, cursor: 'pointer', transition: 'opacity 0.15s' }}
-                  onMouseEnter={e => e.currentTarget.style.opacity = '0.85'}
-                  onMouseLeave={e => e.currentTarget.style.opacity = '1'}
+                  style={{ width: '100%', background: '#2D2A7A26', color: '#2D2A7A', border: '1px solid #2D2A7A33', borderRadius: 14, padding: '10px', fontSize: 13, fontWeight: 700, cursor: 'pointer', transition: 'background 0.15s' }}
+                  onMouseEnter={e => e.currentTarget.style.background = '#2D2A7A40'}
+                  onMouseLeave={e => e.currentTarget.style.background = '#2D2A7A26'}
                 >
                   Preguntarle a Anto
                 </button>
