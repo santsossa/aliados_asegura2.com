@@ -444,10 +444,10 @@ export default function Dashboard() {
                         minWidth: 170, maxWidth: 170, flexShrink: 0,
                         background: '#f5f7fb', borderRadius: 20, overflow: 'hidden',
                         cursor: 'pointer', display: 'flex', flexDirection: 'column',
-                        transition: 'transform 0.15s, box-shadow 0.15s',
+                        transition: 'background 0.15s',
                       }}
-                      onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 6px 18px rgba(0,0,0,0.08)' }}
-                      onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none' }}
+                      onMouseEnter={e => e.currentTarget.style.background = '#eceef4'}
+                      onMouseLeave={e => e.currentTarget.style.background = '#f5f7fb'}
                     >
                       {/* Área logo — como el thumbnail de la imagen ref */}
                       <div style={{ height: 96, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
