@@ -153,14 +153,14 @@ function PeriodBarChart({ polizas = [] }) {
   return (
     <div style={{ display: 'flex', gap: 6 }}>
       {/* Y-axis */}
-      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: 80, paddingBottom: 18, width: 16, flexShrink: 0 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: 110, paddingBottom: 22, width: 16, flexShrink: 0 }}>
         {yTicks.map((v, i) => (
           <span key={i} style={{ fontSize: 8.5, fontFamily: 'Inter', color: '#9ca3af', lineHeight: 1, textAlign: 'right', display: 'block' }}>{v}</span>
         ))}
       </div>
       {/* Bars */}
       <div style={{ flex: 1 }}>
-        <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end', height: 62 }}>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end', height: 88 }}>
           {counts.map((val, i) => (
             <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100%', justifyContent: 'flex-end', gap: 0 }}>
               {val > 0 && (
@@ -486,7 +486,7 @@ export default function Dashboard() {
                 <PlainAvatar size={72} initials={initials} />
                 <div style={{ textAlign: 'center' }}>
                   <p style={{ margin: '0 0 6px', fontFamily: 'Poppins', fontSize: 15, fontWeight: 600, color: '#111827' }}>
-                    {saludo}, {nombreAliado}! 🔥
+                    {saludo}, {nombreAliado}! 👋
                   </p>
                   <p style={{ margin: 0, fontFamily: 'Inter', fontSize: 12, color: '#6b7280', whiteSpace: 'nowrap' }}>
                     Envía a emitir y gana más comisiones
@@ -496,7 +496,7 @@ export default function Dashboard() {
             </div>
 
             {/* 6. Enviadas a emitir */}
-            <div style={{ background: '#f5f7fb', borderRadius: 20, padding: '14px 16px' }}>
+            <div style={{ background: '#fff', borderRadius: 20, padding: '14px 16px' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
                 <span style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: 13, color: '#111827' }}>Enviadas a emitir</span>
                 <span style={{ fontFamily: 'Inter', fontSize: 9.5, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', padding: '3px 8px', borderRadius: 99, background: '#ffffff', color: '#9ca3af' }}>
@@ -507,7 +507,7 @@ export default function Dashboard() {
             </div>
 
             {/* 7. Pregúntale a Anto — 3 opciones */}
-            <div style={{ background: '#f5f7fb', borderRadius: 20, padding: '16px' }}>
+            <div style={{ background: '#fff', borderRadius: 20, padding: '16px' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
                 <span style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: 13, color: '#111827' }}>Pregúntale a Anto</span>
                 <button

@@ -374,10 +374,7 @@ export default function DashboardLayout() {
 
               {/* Campana + usuario */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-                {/* Contenedor campana — blanco para contrastar sobre el fondo gris */}
-                <div style={{ width: 38, height: 38, borderRadius: 10, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <NotificationBell />
-                </div>
+                <NotificationBell />
                 {/* Pill usuario */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#fff', borderRadius: 999, padding: '4px 12px 4px 4px' }}>
                   <div style={{ width: 30, height: 30, borderRadius: '50%', background: 'linear-gradient(135deg,#4f46e5,#2D2A7A)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>

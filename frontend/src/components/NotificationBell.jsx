@@ -113,13 +113,13 @@ export default function NotificationBell() {
         style={{
           position: 'relative',
           width: 40, height: 40, borderRadius: '50%',
-          background: open ? '#d5d6dc' : '#e2e3e8',
+          background: open ? '#f0f0f5' : '#ffffff',
           border: 'none', cursor: 'pointer',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           transition: 'background 0.15s',
         }}
-        onMouseEnter={e => { if (!open) e.currentTarget.style.background = '#d5d6dc' }}
-        onMouseLeave={e => { if (!open) e.currentTarget.style.background = '#e2e3e8' }}
+        onMouseEnter={e => { if (!open) e.currentTarget.style.background = '#f0f0f5' }}
+        onMouseLeave={e => { if (!open) e.currentTarget.style.background = '#ffffff' }}
       >
         <Bell size={17} color="#374151" />
         {noLeidas > 0 && (
