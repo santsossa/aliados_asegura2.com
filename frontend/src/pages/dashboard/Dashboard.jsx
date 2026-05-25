@@ -141,7 +141,7 @@ function AvatarCircle({ avatarId, size = 80, initials = '?' }) {
     }}>
       {src
         ? <img src={src} alt="avatar" width={size} height={size}
-            style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }}
+            style={{ width: '95%', height: '95%', objectFit: 'cover', objectPosition: 'center top', borderRadius: '50%' }}
             decoding="async" fetchpriority="high" />
         : <span style={{ fontSize: Math.round(size * 0.36), fontWeight: 900, color: '#6366f1', textTransform: 'uppercase' }}>{initials}</span>
       }
@@ -241,12 +241,11 @@ function LoadingSkeleton() {
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
 export default function Dashboard() {
-  const { getToken, user } = useAuth()
+  const { getToken, user, avatarId } = useAuth()
   const { subscribe }      = useSSE()
   const navigate           = useNavigate()
   const [data, setData]       = useState(null)
   const [loading, setLoading] = useState(true)
-  const [avatarId, setAvatarId] = useState(null)
 
   const fetchDashboard = useCallback((silent = false) => {
     if (!silent) setLoading(true)
@@ -262,15 +261,6 @@ export default function Dashboard() {
 
   useEffect(() => { fetchDashboard() }, [fetchDashboard])
   useEffect(() => { return subscribe('poliza_update', () => fetchDashboard(true)) }, [subscribe, fetchDashboard])
-  useEffect(() => {
-    fetch(`${API}/api/aliados/me`, {
-      headers: { Authorization: `Bearer ${getToken()}` },
-      credentials: 'include',
-    })
-      .then(r => r.json())
-      .then(d => { if (d.status === 'success') setAvatarId(d.data.avatar || null) })
-      .catch(() => {})
-  }, [getToken])
   const enviRef = useRef(null)
 
   if (loading) return <LoadingSkeleton />

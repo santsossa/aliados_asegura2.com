@@ -58,7 +58,7 @@ function UserAvatar({ avatarId, initials, size = 30 }) {
     }}>
       {src
         ? <img src={src} alt="avatar" width={size} height={size}
-            style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }}
+            style={{ width: '95%', height: '95%', objectFit: 'cover', objectPosition: 'center top', borderRadius: '50%' }}
             decoding="async" fetchpriority="high" />
         : <span style={{ fontSize: Math.round(size * 0.38), fontWeight: 800, color: '#6366f1', textTransform: 'uppercase', lineHeight: 1 }}>{initials || '?'}</span>
       }
@@ -125,7 +125,7 @@ function SideTooltip({ label, sideOpen, children }) {
 export default function DashboardLayout() {
   const navigate                    = useNavigate()
   const isMobile                    = useIsMobile()
-  const { logout, user, getToken }  = useAuth()
+  const { logout, user, getToken, avatarId, setAvatarId } = useAuth()
   const [sideOpen, setSideOpen]     = useState(true)
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [logoHover, setLogoHover]   = useState(false)
@@ -137,14 +137,14 @@ export default function DashboardLayout() {
   const display  = nombre || user?.email?.split('@')[0] || 'Aliado'
   const correo   = user?.correo || user?.email || ''
 
-  const [avatarId, setAvatarId] = useState(null)
   const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
   useEffect(() => {
-    const token = user ? getToken?.() : null
+    if (!user || avatarId !== null) return
+    const token = getToken()
     if (!token) return
     fetch(`${API}/api/aliados/me`, { headers: { Authorization: `Bearer ${token}` }, credentials: 'include' })
       .then(r => r.json())
-      .then(d => { if (d.status === 'success') setAvatarId(d.data.avatar || null) })
+      .then(d => { if (d.status === 'success') setAvatarId(d.data.avatar || '') })
       .catch(() => {})
   }, [user])
 

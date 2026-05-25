@@ -7,8 +7,9 @@ const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 export function AuthProvider({ children }) {
   // ⚠️ accessToken en memoria (NO localStorage) — previene XSS
   const tokenRef = useRef(null)
-  const [user,    setUser]    = useState(null)
-  const [loading, setLoading] = useState(true)
+  const [user,      setUser]      = useState(null)
+  const [loading,   setLoading]   = useState(true)
+  const [avatarId,  setAvatarId]  = useState(null)
 
   useEffect(() => {
     // Al montar, intentar refresh con la cookie httpOnly
@@ -55,6 +56,7 @@ export function AuthProvider({ children }) {
   function clearAuth() {
     tokenRef.current = null
     setUser(null)
+    setAvatarId(null)
   }
 
   function getToken() {
@@ -77,7 +79,7 @@ export function AuthProvider({ children }) {
   const isAuth   = !!user
 
   return (
-    <AuthContext.Provider value={{ user, loading, isAuth, isAdmin, isAliado, saveToken, clearAuth, logout, silentRefresh, getToken }}>
+    <AuthContext.Provider value={{ user, loading, isAuth, isAdmin, isAliado, saveToken, clearAuth, logout, silentRefresh, getToken, avatarId, setAvatarId }}>
       {children}
     </AuthContext.Provider>
   )

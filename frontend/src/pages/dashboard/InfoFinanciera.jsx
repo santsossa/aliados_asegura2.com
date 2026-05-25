@@ -28,7 +28,7 @@ function AvatarCircle({ avatarId, size = 80 }) {
     }}>
       {src
         ? <img src={src} alt="avatar" width={size} height={size}
-            style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }}
+            style={{ width: '95%', height: '95%', objectFit: 'cover', objectPosition: 'center top', borderRadius: '50%' }}
             decoding="async" fetchpriority="high" />
         : <User size={size * 0.4} color="#6366f1" />
       }
@@ -37,7 +37,7 @@ function AvatarCircle({ avatarId, size = 80 }) {
 }
 
 export default function InfoFinanciera() {
-  const { getToken } = useAuth()
+  const { getToken, setAvatarId: setGlobalAvatar } = useAuth()
 
   const [perfil,  setPerfil]  = useState(null)
   const [banco,   setBanco]   = useState(null)
@@ -96,6 +96,7 @@ export default function InfoFinanciera() {
       const d = await r.json()
       if (!r.ok) { setErrAvatar(d.message || 'Error al guardar.'); return }
       setPerfil(p => ({ ...p, avatar: newAvatar }))
+      setGlobalAvatar(newAvatar)
       setEditAvatar(false)
     } catch { setErrAvatar('Error de conexión.') }
     finally { setSavingAvatar(false) }
