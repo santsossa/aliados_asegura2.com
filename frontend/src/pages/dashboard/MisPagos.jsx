@@ -23,17 +23,10 @@ function fechaStr(str) {
 
 // ─── Gráfica de barras mensual ────────────────────────────────────────────────
 function CommissionsChart({ months }) {
-  const max = Math.max(...months.map(m => m.valor), 1)
-  const yMid = Math.round(max / 2)
+  const hasData = months.some(m => m.valor > 0)
+  const max     = Math.max(...months.map(m => m.valor), 1)
+  const yMid    = hasData ? Math.round(max / 2) : 0
   const CHART_H = 110
-
-  if (months.every(m => m.valor === 0)) {
-    return (
-      <div style={{ display:'flex', alignItems:'center', justifyContent:'center', height: CHART_H + 28 }}>
-        <p style={{ fontSize:12, color:'#9ca3af', fontFamily:'Inter' }}>Aún no hay pagos registrados</p>
-      </div>
-    )
-  }
 
   return (
     <div style={{ display:'flex', gap:8 }}>
@@ -41,7 +34,7 @@ function CommissionsChart({ months }) {
       <div style={{ width:40, flexShrink:0, display:'flex', flexDirection:'column', justifyContent:'space-between', height: CHART_H + 22, paddingBottom:22 }}>
         {[max, yMid, 0].map((v, i) => (
           <span key={i} style={{ fontSize:8.5, fontFamily:'Inter', color:'#9ca3af', textAlign:'right', display:'block', lineHeight:1 }}>
-            {v === 0 ? '0' : fmtShort(v)}
+            {hasData ? (v === 0 ? '0' : fmtShort(v)) : '0'}
           </span>
         ))}
       </div>
@@ -54,7 +47,10 @@ function CommissionsChart({ months }) {
         <div style={{ display:'flex', gap:6, alignItems:'flex-end', height:CHART_H, position:'relative' }}>
           {months.map((m, i) => {
             const isCurrent = i === months.length - 1
-            const pct = max > 0 ? Math.max((m.valor / max) * 100, m.valor > 0 ? 12 : 3) : 3
+            const pct = hasData
+              ? Math.max((m.valor / max) * 100, m.valor > 0 ? 12 : isCurrent ? 6 : 3)
+              : (isCurrent ? 6 : 3)
+            const opacity = m.valor > 0 ? 1 : isCurrent ? 0.5 : 0.2
             return (
               <div key={i} style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', height:'100%', justifyContent:'flex-end' }}>
                 {m.valor > 0 && (
@@ -65,8 +61,8 @@ function CommissionsChart({ months }) {
                 <div style={{
                   width:'68%', borderRadius:'8px 8px 4px 4px',
                   background: isCurrent ? '#4f46e5' : '#c7d2fe',
-                  height:`${pct}%`, minHeight: m.valor > 0 ? 10 : 3,
-                  opacity: m.valor > 0 ? 1 : 0.25,
+                  height:`${pct}%`, minHeight: m.valor > 0 ? 10 : isCurrent ? 5 : 3,
+                  opacity,
                   transition:'height 0.4s ease',
                 }} />
               </div>
@@ -239,22 +235,22 @@ export default function MisPagos() {
     : '—'
 
   if (loading) return (
-    <div className="p-6 lg:p-8 max-w-5xl mx-auto"><Skeleton /></div>
+    <div style={{ padding:'0 24px 32px', maxWidth:'72rem', margin:'0 auto' }}><Skeleton /></div>
   )
 
   return (
-    <div className="p-6 lg:p-8 max-w-5xl mx-auto">
+    <div style={{ padding:'0 24px 32px', maxWidth:'72rem', margin:'0 auto' }}>
 
       {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Comisiones</h1>
-        <p className="text-gray-500 text-sm mt-1">
+      <div style={{ marginBottom:24, paddingTop:8 }}>
+        <h1 style={{ fontFamily:'Poppins', fontSize:22, fontWeight:700, color:'#111827', margin:0 }}>Comisiones</h1>
+        <p style={{ fontFamily:'Inter', fontSize:13, color:'#9ca3af', margin:'4px 0 0' }}>
           Acá ves lo que te hemos pagado y lo que está por pagarte. Los depósitos se hacen el 1 de cada mes.
         </p>
       </div>
 
       {/* ── 3 cards superiores ──────────────────────────────────── */}
-      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:16, marginBottom:24 }} className="min-[0px]:grid-cols-1 sm:grid-cols-3">
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(3, 1fr)', gap:16, marginBottom:24 }}>
 
         {/* Card 1: Gráfica */}
         <div style={{ background:'#fff', borderRadius:22, padding:'20px 20px 16px', gridColumn:'1 / span 1' }}>
@@ -311,7 +307,7 @@ export default function MisPagos() {
             <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
               <span style={{ fontFamily:'Inter', fontSize:12, color:'rgba(255,255,255,0.6)' }}>Mejor mes</span>
               <span style={{ fontFamily:'Poppins', fontSize:13, fontWeight:600, color:'#fff' }}>
-                {chartMeses.every(m => m.valor === 0) ? '—' : fmtShort(Math.max(...chartMeses.map(m => m.valor)))}
+                {fmtShort(Math.max(...chartMeses.map(m => m.valor)))}
               </span>
             </div>
           </div>
