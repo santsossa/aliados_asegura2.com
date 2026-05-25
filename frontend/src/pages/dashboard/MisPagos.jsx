@@ -1,8 +1,247 @@
-import { DollarSign, Clock, CheckCircle } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { DollarSign, Clock, TrendingUp, ChevronDown, ChevronUp, CheckCircle2, Hourglass, Shield } from 'lucide-react'
+import { useAuth } from '../../context/AuthContext'
 
-const PAGOS_HISTORIAL = []
+const API   = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+const MESES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic']
+const MESES_FULL = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']
 
+function fmt(n) {
+  return new Intl.NumberFormat('es-CO', { style:'currency', currency:'COP', maximumFractionDigits:0 }).format(Number(n) || 0)
+}
+function fmtShort(n) {
+  n = Number(n) || 0
+  if (n >= 1_000_000) return `$${(n / 1_000_000 % 1 === 0 ? (n/1_000_000).toFixed(0) : (n/1_000_000).toFixed(1))}M`
+  if (n >= 1_000)     return `$${Math.round(n/1_000)}k`
+  return `$${n}`
+}
+function fechaStr(str) {
+  if (!str) return '—'
+  const d = new Date(str)
+  return `${d.getDate()} ${MESES[d.getMonth()]} ${d.getFullYear()}`
+}
+
+// ─── Gráfica de barras mensual ────────────────────────────────────────────────
+function CommissionsChart({ months }) {
+  const max = Math.max(...months.map(m => m.valor), 1)
+  const yMid = Math.round(max / 2)
+  const CHART_H = 110
+
+  if (months.every(m => m.valor === 0)) {
+    return (
+      <div style={{ display:'flex', alignItems:'center', justifyContent:'center', height: CHART_H + 28 }}>
+        <p style={{ fontSize:12, color:'#9ca3af', fontFamily:'Inter' }}>Aún no hay pagos registrados</p>
+      </div>
+    )
+  }
+
+  return (
+    <div style={{ display:'flex', gap:8 }}>
+      {/* Y-axis */}
+      <div style={{ width:40, flexShrink:0, display:'flex', flexDirection:'column', justifyContent:'space-between', height: CHART_H + 22, paddingBottom:22 }}>
+        {[max, yMid, 0].map((v, i) => (
+          <span key={i} style={{ fontSize:8.5, fontFamily:'Inter', color:'#9ca3af', textAlign:'right', display:'block', lineHeight:1 }}>
+            {v === 0 ? '0' : fmtShort(v)}
+          </span>
+        ))}
+      </div>
+      {/* Bars */}
+      <div style={{ flex:1, position:'relative' }}>
+        <div style={{ position:'absolute', top:0, left:0, right:0, height:CHART_H, pointerEvents:'none' }}>
+          <div style={{ position:'absolute', top:0,     left:0, right:0, borderTop:'1px dashed #e2e4ea' }} />
+          <div style={{ position:'absolute', top:'50%', left:0, right:0, borderTop:'1px dashed #e2e4ea' }} />
+        </div>
+        <div style={{ display:'flex', gap:6, alignItems:'flex-end', height:CHART_H, position:'relative' }}>
+          {months.map((m, i) => {
+            const isCurrent = i === months.length - 1
+            const pct = max > 0 ? Math.max((m.valor / max) * 100, m.valor > 0 ? 12 : 3) : 3
+            return (
+              <div key={i} style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', height:'100%', justifyContent:'flex-end' }}>
+                {m.valor > 0 && (
+                  <span style={{ fontSize:8.5, fontFamily:'Inter', fontWeight:700, color: isCurrent ? '#4f46e5' : '#9ca3af', marginBottom:3 }}>
+                    {fmtShort(m.valor)}
+                  </span>
+                )}
+                <div style={{
+                  width:'68%', borderRadius:'8px 8px 4px 4px',
+                  background: isCurrent ? '#4f46e5' : '#c7d2fe',
+                  height:`${pct}%`, minHeight: m.valor > 0 ? 10 : 3,
+                  opacity: m.valor > 0 ? 1 : 0.25,
+                  transition:'height 0.4s ease',
+                }} />
+              </div>
+            )
+          })}
+        </div>
+        <div style={{ display:'flex', gap:6, marginTop:6 }}>
+          {months.map((m, i) => {
+            const isCurrent = i === months.length - 1
+            return (
+              <span key={i} style={{ flex:1, textAlign:'center', fontSize:9, fontFamily:'Inter', fontWeight:700, textTransform:'uppercase', letterSpacing:'0.05em', color: isCurrent ? '#4f46e5' : '#9ca3af' }}>
+                {m.mes}
+              </span>
+            )
+          })}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ─── Loading skeleton ─────────────────────────────────────────────────────────
+function Skeleton() {
+  const p = { background:'#f3f4f6', borderRadius:10, animation:'pulse 1.4s infinite' }
+  return (
+    <div style={{ padding:'0 0 32px' }}>
+      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:16, marginBottom:24 }}>
+        {[1,2,3].map(i => <div key={i} style={{ ...p, height:180, borderRadius:22 }} />)}
+      </div>
+      {[1,2,3].map(i => <div key={i} style={{ ...p, height:68, borderRadius:18, marginBottom:10 }} />)}
+      <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}`}</style>
+    </div>
+  )
+}
+
+// ─── Fila de pago expandible ──────────────────────────────────────────────────
+function PagoRow({ pago }) {
+  const [open, setOpen] = useState(false)
+  const pagado  = pago.estado === 'pagado' || pago.estado === 'procesado'
+  const mesLabel = pago.mes ? `${MESES_FULL[Number(pago.mes) - 1]} ${pago.anio}` : fechaStr(pago.created_at)
+  const polizaIds = pago.poliza_ids ? String(pago.poliza_ids).split(',').filter(Boolean) : []
+
+  return (
+    <div style={{ background:'#fff', borderRadius:20, border:'1px solid #f0f0f2', overflow:'hidden', transition:'box-shadow 0.15s' }}
+      onMouseEnter={e => e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.06)'}
+      onMouseLeave={e => e.currentTarget.style.boxShadow = 'none'}
+    >
+      {/* Fila principal */}
+      <button onClick={() => setOpen(o => !o)}
+        style={{ width:'100%', display:'flex', alignItems:'center', gap:16, padding:'16px 20px', background:'none', border:'none', cursor:'pointer', textAlign:'left' }}>
+        {/* Icono */}
+        <div style={{ width:42, height:42, borderRadius:14, flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center',
+          background: pagado ? '#dcfce7' : '#fef3c7' }}>
+          {pagado
+            ? <CheckCircle2 size={19} color="#16a34a" />
+            : <Hourglass size={19} color="#d97706" />}
+        </div>
+        {/* Info principal */}
+        <div style={{ flex:1, minWidth:0 }}>
+          <p style={{ margin:0, fontFamily:'Poppins', fontSize:14, fontWeight:600, color:'#111827' }}>{mesLabel}</p>
+          <p style={{ margin:'2px 0 0', fontFamily:'Inter', fontSize:12, color:'#9ca3af' }}>
+            {pago.num_polizas || polizaIds.length || 0} póliza{(pago.num_polizas || polizaIds.length) !== 1 ? 's' : ''} · {fechaStr(pago.fecha_pago || pago.created_at)}
+          </p>
+        </div>
+        {/* Monto + estado */}
+        <div style={{ textAlign:'right', flexShrink:0 }}>
+          <p style={{ margin:0, fontFamily:'Poppins', fontSize:15, fontWeight:700, color: pagado ? '#16a34a' : '#d97706' }}>
+            {fmt(pago.monto)}
+          </p>
+          <span style={{ fontSize:10, fontWeight:700, padding:'2px 8px', borderRadius:99,
+            background: pagado ? '#dcfce7' : '#fef3c7',
+            color:      pagado ? '#16a34a' : '#d97706' }}>
+            {pagado ? 'Depositado' : 'Pendiente'}
+          </span>
+        </div>
+        {/* Chevron */}
+        <div style={{ flexShrink:0, color:'#9ca3af', marginLeft:4 }}>
+          {open ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+        </div>
+      </button>
+
+      {/* Detalle expandido */}
+      {open && (
+        <div style={{ borderTop:'1px solid #f3f4f6', padding:'16px 20px', background:'#fafafa' }}>
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(160px, 1fr))', gap:12, marginBottom: polizaIds.length ? 14 : 0 }}>
+            <Detail label="Mes de comisión" value={mesLabel} />
+            <Detail label="Fecha de depósito" value={fechaStr(pago.fecha_pago || pago.created_at)} />
+            <Detail label="Monto depositado" value={fmt(pago.monto)} />
+            <Detail label="Estado" value={pagado ? 'Depositado ✓' : 'Pendiente'} color={pagado ? '#16a34a' : '#d97706'} />
+            {(pago.num_polizas || polizaIds.length) > 0 && (
+              <Detail label="Pólizas incluidas" value={`${pago.num_polizas || polizaIds.length}`} />
+            )}
+          </div>
+          {polizaIds.length > 0 && (
+            <div>
+              <p style={{ margin:'0 0 8px', fontFamily:'Inter', fontSize:11, fontWeight:600, color:'#9ca3af', textTransform:'uppercase', letterSpacing:'0.06em' }}>
+                IDs de pólizas
+              </p>
+              <div style={{ display:'flex', flexWrap:'wrap', gap:6 }}>
+                {polizaIds.map(id => (
+                  <span key={id} style={{ fontFamily:'Inter', fontSize:11, fontWeight:600, padding:'3px 10px', borderRadius:99, background:'#ede9fe', color:'#6d28d9' }}>
+                    #{id}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+          {pago.observaciones && (
+            <div style={{ marginTop:12, padding:'10px 14px', background:'#fff7ed', borderRadius:12, borderLeft:'3px solid #fb923c' }}>
+              <p style={{ margin:0, fontFamily:'Inter', fontSize:12, color:'#9a3412' }}>{pago.observaciones}</p>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
+function Detail({ label, value, color }) {
+  return (
+    <div>
+      <p style={{ margin:0, fontFamily:'Inter', fontSize:10, fontWeight:600, color:'#9ca3af', textTransform:'uppercase', letterSpacing:'0.05em', marginBottom:2 }}>{label}</p>
+      <p style={{ margin:0, fontFamily:'Poppins', fontSize:13, fontWeight:600, color: color || '#111827' }}>{value}</p>
+    </div>
+  )
+}
+
+// ─── Main ─────────────────────────────────────────────────────────────────────
 export default function MisPagos() {
+  const { getToken } = useAuth()
+  const [pagos,    setPagos]    = useState([])
+  const [proximo,  setProximo]  = useState(null)
+  const [loading,  setLoading]  = useState(true)
+
+  useEffect(() => {
+    const headers = { Authorization: `Bearer ${getToken()}` }
+    const opts    = { headers, credentials: 'include' }
+    Promise.all([
+      fetch(`${API}/api/pagos`,          opts).then(r => r.json()),
+      fetch(`${API}/api/pagos/proximo`,  opts).then(r => r.json()),
+    ])
+      .then(([pr, px]) => {
+        if (pr.status === 'success') setPagos(pr.data)
+        if (px.status === 'success') setProximo(px.data)
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false))
+  }, [])
+
+  // Total histórico (suma de todos los pagos ya realizados)
+  const totalHistorico = pagos
+    .filter(p => p.estado === 'pagado' || p.estado === 'procesado')
+    .reduce((acc, p) => acc + Number(p.monto || 0), 0)
+
+  // Gráfica: últimos 6 meses
+  const now = new Date()
+  const chartMeses = Array.from({ length: 6 }, (_, i) => {
+    const d    = new Date(now.getFullYear(), now.getMonth() - (5 - i), 1)
+    const mes  = d.getMonth() + 1
+    const anio = d.getFullYear()
+    const valor = pagos
+      .filter(p => Number(p.mes) === mes && Number(p.anio) === anio && (p.estado === 'pagado' || p.estado === 'procesado'))
+      .reduce((acc, p) => acc + Number(p.monto || 0), 0)
+    return { mes: MESES[mes - 1], anio, valor }
+  })
+
+  const mesActual     = MESES[now.getMonth()]
+  const proximoMesLabel = proximo?.fecha_pago
+    ? (() => { const [d,m,y] = proximo.fecha_pago.split('/'); return `1 ${MESES[parseInt(m)-1]} ${y}` })()
+    : '—'
+
+  if (loading) return (
+    <div className="p-6 lg:p-8 max-w-5xl mx-auto"><Skeleton /></div>
+  )
+
   return (
     <div className="p-6 lg:p-8 max-w-5xl mx-auto">
 
@@ -10,64 +249,99 @@ export default function MisPagos() {
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Comisiones</h1>
         <p className="text-gray-500 text-sm mt-1">
-          Acá ves lo que te hemos pagado y lo que está por pagarte. Las comisiones se depositan el 1 de cada mes por las pólizas que tu cliente ya pagó.
+          Acá ves lo que te hemos pagado y lo que está por pagarte. Los depósitos se hacen el 1 de cada mes.
         </p>
       </div>
 
-      {/* Próximo pago */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-6">
-        <div className="flex items-center gap-2 mb-4">
-          <Clock size={16} className="text-brand" />
-          <h2 className="font-semibold text-gray-900 text-sm">Próximo pago — 1 de junio 2025</h2>
+      {/* ── 3 cards superiores ──────────────────────────────────── */}
+      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:16, marginBottom:24 }} className="min-[0px]:grid-cols-1 sm:grid-cols-3">
+
+        {/* Card 1: Gráfica */}
+        <div style={{ background:'#fff', borderRadius:22, padding:'20px 20px 16px', gridColumn:'1 / span 1' }}>
+          <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:16 }}>
+            <span style={{ fontFamily:'Poppins', fontWeight:600, fontSize:14, color:'#111827' }}>Ganancias por mes</span>
+            <span style={{ fontFamily:'Inter', fontSize:9, fontWeight:700, textTransform:'uppercase', letterSpacing:'0.07em', padding:'3px 8px', borderRadius:99, background:'#f5f7fb', color:'#9ca3af' }}>
+              Últ. 6 meses
+            </span>
+          </div>
+          <CommissionsChart months={chartMeses} />
         </div>
 
-        <div className="flex items-end gap-2 mb-1">
-          <span className="text-4xl font-bold text-gray-900">$0</span>
-          <span className="text-gray-400 text-sm mb-1">COP</span>
+        {/* Card 2: Próximo pago */}
+        <div style={{ background:'#fff', borderRadius:22, padding:'20px 20px 16px', display:'flex', flexDirection:'column', justifyContent:'space-between' }}>
+          <div>
+            <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:14 }}>
+              <div style={{ width:34, height:34, borderRadius:12, background:'#fef3c7', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                <Clock size={16} color="#d97706" />
+              </div>
+              <span style={{ fontFamily:'Poppins', fontWeight:600, fontSize:14, color:'#111827' }}>Próximo pago</span>
+            </div>
+            <p style={{ margin:'0 0 4px', fontFamily:'Poppins', fontSize:28, fontWeight:800, color:'#111827', letterSpacing:'-0.5px' }}>
+              {fmt(proximo?.monto ?? 0)}
+            </p>
+            <p style={{ margin:0, fontFamily:'Inter', fontSize:12, color:'#9ca3af' }}>
+              {proximo?.polizas ?? 0} póliza{proximo?.polizas !== 1 ? 's' : ''} aprobadas este mes
+            </p>
+          </div>
+          <div style={{ marginTop:16, paddingTop:14, borderTop:'1px solid #f0f0f2' }}>
+            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+              <span style={{ fontFamily:'Inter', fontSize:12, color:'#9ca3af' }}>Fecha estimada</span>
+              <span style={{ fontFamily:'Poppins', fontSize:13, fontWeight:600, color:'#374151' }}>{proximoMesLabel}</span>
+            </div>
+          </div>
         </div>
-        <p className="text-xs text-gray-400">0 pólizas aprobadas este mes</p>
 
-        <div className="mt-4 pt-4 border-t border-gray-100">
-          <p className="text-xs text-gray-400">
-            Solo se incluyen pólizas donde el cliente haya pagado la primera cuota o el valor de contado.
-          </p>
+        {/* Card 3: Total histórico */}
+        <div style={{ background:'linear-gradient(135deg, #3730a3 0%, #4f46e5 100%)', borderRadius:22, padding:'20px 20px 16px', display:'flex', flexDirection:'column', justifyContent:'space-between' }}>
+          <div>
+            <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:14 }}>
+              <div style={{ width:34, height:34, borderRadius:12, background:'rgba(255,255,255,0.15)', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                <TrendingUp size={16} color="#fff" />
+              </div>
+              <span style={{ fontFamily:'Poppins', fontWeight:600, fontSize:14, color:'#fff' }}>Total ganado</span>
+            </div>
+            <p style={{ margin:'0 0 4px', fontFamily:'Poppins', fontSize:28, fontWeight:800, color:'#fff', letterSpacing:'-0.5px' }}>
+              {fmt(totalHistorico)}
+            </p>
+            <p style={{ margin:0, fontFamily:'Inter', fontSize:12, color:'rgba(255,255,255,0.6)' }}>
+              En {pagos.filter(p => p.estado === 'pagado' || p.estado === 'procesado').length} pago{pagos.filter(p => p.estado === 'pagado' || p.estado === 'procesado').length !== 1 ? 's' : ''} realizados
+            </p>
+          </div>
+          <div style={{ marginTop:16, paddingTop:14, borderTop:'1px solid rgba(255,255,255,0.15)' }}>
+            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+              <span style={{ fontFamily:'Inter', fontSize:12, color:'rgba(255,255,255,0.6)' }}>Mejor mes</span>
+              <span style={{ fontFamily:'Poppins', fontSize:13, fontWeight:600, color:'#fff' }}>
+                {chartMeses.every(m => m.valor === 0) ? '—' : fmtShort(Math.max(...chartMeses.map(m => m.valor)))}
+              </span>
+            </div>
+          </div>
         </div>
+
       </div>
 
-      {/* Historial */}
-      <div>
-        <h2 className="font-semibold text-gray-900 text-sm mb-3">Historial de pagos</h2>
-
-        {PAGOS_HISTORIAL.length === 0 ? (
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm flex flex-col items-center justify-center py-16 text-center">
-            <div className="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center mb-4">
-              <DollarSign size={24} className="text-gray-300" />
-            </div>
-            <p className="text-gray-400 font-medium text-sm">Sin pagos aún</p>
-            <p className="text-gray-300 text-xs mt-1">Tu historial de pagos aparecerá aquí</p>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {PAGOS_HISTORIAL.map(p => (
-              <div key={p.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm px-5 py-4 flex items-center justify-between gap-4">
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center">
-                    <CheckCircle size={18} className="text-green-500" />
-                  </div>
-                  <div>
-                    <p className="font-semibold text-gray-900 text-sm">{p.mes}</p>
-                    <p className="text-xs text-gray-400">{p.polizas} pólizas · Pagado el {p.fecha}</p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className="font-bold text-gray-900">{p.monto}</p>
-                  <p className="text-xs text-green-600">Depositado</p>
-                </div>
-              </div>
-            ))}
-          </div>
+      {/* ── Historial de pagos ─────────────────────────────────── */}
+      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0 4px', marginBottom:12 }}>
+        <span style={{ fontFamily:'Poppins', fontWeight:600, fontSize:14, color:'#111827' }}>Historial de pagos</span>
+        {pagos.length > 0 && (
+          <span style={{ fontFamily:'Inter', fontSize:12, color:'#9ca3af' }}>{pagos.length} registro{pagos.length !== 1 ? 's' : ''}</span>
         )}
       </div>
+
+      {pagos.length === 0 ? (
+        <div style={{ background:'#fff', borderRadius:22, border:'1px solid #f0f0f2', padding:'48px 24px', display:'flex', flexDirection:'column', alignItems:'center', textAlign:'center' }}>
+          <div style={{ width:56, height:56, borderRadius:20, background:'#f5f7fb', display:'flex', alignItems:'center', justifyContent:'center', marginBottom:16 }}>
+            <DollarSign size={24} color="#d1d5db" />
+          </div>
+          <p style={{ margin:'0 0 6px', fontFamily:'Poppins', fontSize:15, fontWeight:600, color:'#374151' }}>Sin pagos aún</p>
+          <p style={{ margin:0, fontFamily:'Inter', fontSize:13, color:'#9ca3af', maxWidth:280, lineHeight:1.6 }}>
+            Tu historial aparecerá aquí cuando se realice el primer depósito. Los pagos se hacen el 1 de cada mes.
+          </p>
+        </div>
+      ) : (
+        <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
+          {pagos.map(p => <PagoRow key={p.id} pago={p} />)}
+        </div>
+      )}
 
     </div>
   )
