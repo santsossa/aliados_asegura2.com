@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { DollarSign, FileText, Shield, TrendingUp, ChevronRight, ChevronLeft } from 'lucide-react'
+import { DollarSign, FileText, Shield, TrendingUp, ChevronRight, ChevronLeft, User } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { useSSE } from '../../context/SSEContext'
+import { getAvatarSrc } from '../../utils/avatars'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
@@ -129,17 +130,19 @@ function BarChart({ data = [], color = '#2D2A7A' }) {
   )
 }
 
-// ─── Avatar círculo simple ────────────────────────────────────────────────────
-function PlainAvatar({ size = 80, initials = '?' }) {
+// ─── Avatar círculo ───────────────────────────────────────────────────────────
+function AvatarCircle({ avatarId, size = 80, initials = '?' }) {
+  const src = getAvatarSrc(avatarId)
   return (
     <div style={{
-      width: size, height: size, borderRadius: '50%',
-      background: 'linear-gradient(135deg,#4f46e5,#2D2A7A)',
-      display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+      width: size, height: size, borderRadius: '50%', overflow: 'hidden', flexShrink: 0,
+      background: 'linear-gradient(135deg, #e8e6ff 0%, #c7d2fe 100%)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
     }}>
-      <span style={{ fontSize: Math.round(size * 0.36), fontWeight: 900, color: '#fff', textTransform: 'uppercase' }}>
-        {initials}
-      </span>
+      {src
+        ? <img src={src} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }} />
+        : <span style={{ fontSize: Math.round(size * 0.36), fontWeight: 900, color: '#6366f1', textTransform: 'uppercase' }}>{initials}</span>
+      }
     </div>
   )
 }
@@ -239,8 +242,9 @@ export default function Dashboard() {
   const { getToken, user } = useAuth()
   const { subscribe }      = useSSE()
   const navigate           = useNavigate()
-  const [data, setData]    = useState(null)
+  const [data, setData]       = useState(null)
   const [loading, setLoading] = useState(true)
+  const [avatarId, setAvatarId] = useState(null)
 
   const fetchDashboard = useCallback((silent = false) => {
     if (!silent) setLoading(true)
@@ -256,6 +260,15 @@ export default function Dashboard() {
 
   useEffect(() => { fetchDashboard() }, [fetchDashboard])
   useEffect(() => { return subscribe('poliza_update', () => fetchDashboard(true)) }, [subscribe, fetchDashboard])
+  useEffect(() => {
+    fetch(`${API}/api/aliados/me`, {
+      headers: { Authorization: `Bearer ${getToken()}` },
+      credentials: 'include',
+    })
+      .then(r => r.json())
+      .then(d => { if (d.status === 'success') setAvatarId(d.data.avatar || null) })
+      .catch(() => {})
+  }, [getToken])
   const enviRef = useRef(null)
 
   if (loading) return <LoadingSkeleton />
@@ -543,7 +556,7 @@ export default function Dashboard() {
             {/* 5. Tu rendimiento */}
             <div style={{ background: '#fff', borderRadius: 22, padding: '22px 16px 18px' }}>
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
-                <PlainAvatar size={72} initials={initials} />
+                <AvatarCircle avatarId={avatarId} size={72} initials={initials} />
                 <div style={{ textAlign: 'center' }}>
                   <p style={{ margin: '0 0 6px', fontFamily: 'Poppins', fontSize: 15, fontWeight: 600, color: '#111827' }}>
                     {saludo}, {nombreAliado}! 👋

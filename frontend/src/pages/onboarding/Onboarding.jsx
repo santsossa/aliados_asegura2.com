@@ -4,14 +4,7 @@ import { useAuth } from '../../context/AuthContext'
 import { LogoFull } from '../../components/Logo'
 import ComboBox from '../../components/ComboBox'
 
-import hombre1 from '../../assets/avatars_aliados/hombre1.png'
-import hombre2 from '../../assets/avatars_aliados/hombre2.png'
-import hombre3 from '../../assets/avatars_aliados/hombre3.png'
-import hombre4 from '../../assets/avatars_aliados/hombre4.png'
-import mujer1   from '../../assets/avatars_aliados/mujer1.png'
-import mujer2   from '../../assets/avatars_aliados/mujer2.png'
-import mujer3   from '../../assets/avatars_aliados/mujer3.png'
-import mujer4   from '../../assets/avatars_aliados/mujer4.png'
+import { AVATARES } from '../../utils/avatars'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
@@ -66,12 +59,6 @@ const BANCOS_OPTIONS      = BANCOS_COLOMBIA.map(b => ({ v: b, label: b }))
 const TIPO_CUENTA_OPTIONS = [{ v:'Ahorros', label:'Ahorros' }, { v:'Corriente', label:'Corriente' }]
 const TIPOS_OPTIONS       = TIPOS_ALIADO.map(t => ({ v: t, label: t }))
 
-const AVATARES = [
-  { id: 'hombre1', src: hombre1 }, { id: 'hombre2', src: hombre2 },
-  { id: 'hombre3', src: hombre3 }, { id: 'hombre4', src: hombre4 },
-  { id: 'mujer1',  src: mujer1  }, { id: 'mujer2',  src: mujer2  },
-  { id: 'mujer3',  src: mujer3  }, { id: 'mujer4',  src: mujer4  },
-]
 
 const STAGES = ['Datos personales', 'Información bancaria', 'Tu perfil', 'Completado']
 
