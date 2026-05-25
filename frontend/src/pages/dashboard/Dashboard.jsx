@@ -324,8 +324,8 @@ export default function Dashboard() {
                 <path d="M100 0 C100 0 108 92 200 100 C200 100 108 108 100 200 C100 200 92 108 0 100 C0 100 92 92 100 0Z" fill="white" />
               </svg>
 
-              <p className="t-label" style={{ margin: '0 0 8px', color: '#c7d2fe', letterSpacing: 1.4 }}>Portal de aliados</p>
-              <h2 className="t-display" style={{ margin: '0 0 20px', color: '#fff', lineHeight: 1.2, maxWidth: 340, fontSize: 28 }}>
+              <p style={{ margin: '0 0 8px', fontFamily: 'Inter', fontWeight: 700, fontSize: 9.5, color: '#c7d2fe', letterSpacing: '0.12em', textTransform: 'uppercase' }}>Portal de aliados</p>
+              <h2 style={{ margin: '0 0 20px', fontFamily: 'Poppins', fontWeight: 500, fontSize: 22, color: '#fff', lineHeight: 1.35, maxWidth: 260, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                 Cotiza un seguro en segundos y gana tu comisión
               </h2>
               <button
@@ -346,30 +346,27 @@ export default function Dashboard() {
               </button>
             </div>
 
-            {/* 2. Stats cards — cuadradas, título arriba, valor grande abajo */}
-            <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
+            {/* 2. Stats cards — compactas horizontales */}
+            <div className="grid grid-cols-2 xl:grid-cols-4 gap-2">
               {cards.map((c, i) => {
                 const Icon = c.icon
                 return (
                   <div key={i} style={{
                     background: '#fff',
-                    borderRadius: 16,
-                    padding: '14px 16px',
-                    display: 'flex', flexDirection: 'column', gap: 0,
+                    borderRadius: 14,
+                    padding: '10px 12px',
+                    display: 'flex', alignItems: 'center', gap: 9,
                   }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-                      <div style={{ width: 32, height: 32, borderRadius: 10, background: c.iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <Icon size={14} color={c.iconColor} />
-                      </div>
-                      <button style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 2, color: '#d1d5db', display: 'flex' }}>
-                        <MoreHorizontal size={13} />
-                      </button>
+                    <div style={{ width: 34, height: 34, borderRadius: '50%', background: c.iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <Icon size={14} color={c.iconColor} />
                     </div>
-                    <p style={{ margin: '0 0 3px', fontFamily: 'Inter', fontSize: 11, color: '#9ca3af', lineHeight: 1.3 }}>{c.label}</p>
-                    <p style={{ margin: 0, fontFamily: 'Poppins', fontSize: 17, fontWeight: 600, color: '#111827', letterSpacing: '-0.3px', lineHeight: 1.2, wordBreak: 'break-word', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{c.value}</p>
-                    <p style={{ margin: '4px 0 0', fontFamily: 'Inter', fontSize: 11, color: c.positive === false ? '#dc2626' : '#6b7280', lineHeight: 1.3 }}>
-                      {c.badge || c.sub}
-                    </p>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <p style={{ margin: 0, fontFamily: 'Inter', fontSize: 10, color: '#9ca3af', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{c.label}</p>
+                      <p style={{ margin: '1px 0 0', fontFamily: 'Poppins', fontSize: 13, fontWeight: 600, color: '#111827', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', letterSpacing: '-0.2px' }}>{c.value}{c.badge ? <span style={{ fontWeight: 400, fontSize: 10, color: '#6b7280' }}> · {c.badge}</span> : null}</p>
+                    </div>
+                    <button style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 2, color: '#e5e7eb', display: 'flex', flexShrink: 0 }}>
+                      <MoreHorizontal size={13} />
+                    </button>
                   </div>
                 )
               })}
@@ -377,7 +374,7 @@ export default function Dashboard() {
 
             {/* 3. Enviadas a emitir — full card, row list */}
             <div style={{ background: '#fff', borderRadius: 16, overflow: 'hidden', boxShadow: 'none' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', borderBottom: '1px solid #f3f4f6' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', borderBottom: 'none' }}>
                 <span style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: 14, color: '#111827' }}>Enviadas a emitir</span>
                 <button onClick={() => navigate('/dashboard/mis-polizas')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'Inter', fontSize: 12, color: '#7c3aed', fontWeight: 500 }}>
                   Ver todas →
@@ -395,7 +392,7 @@ export default function Dashboard() {
                       <div
                         key={p.id}
                         onClick={() => navigate('/dashboard/mis-polizas')}
-                        style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 20px', borderBottom: i < polizas_proceso.length - 1 ? '1px solid #f9fafb' : 'none', cursor: 'pointer', transition: 'background 0.12s' }}
+                        style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 20px', borderBottom: 'none', cursor: 'pointer', transition: 'background 0.12s' }}
                         onMouseEnter={e => e.currentTarget.style.background = '#fafafa'}
                         onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
                       >
@@ -428,7 +425,7 @@ export default function Dashboard() {
 
             {/* 4. Actividad reciente — full card, row list */}
             <div style={{ background: '#fff', borderRadius: 16, overflow: 'hidden', boxShadow: 'none' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', borderBottom: '1px solid #f3f4f6' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', borderBottom: 'none' }}>
                 <span style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: 14, color: '#111827' }}>Actividad reciente</span>
                 <button onClick={() => navigate('/dashboard/cotizaciones')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'Inter', fontSize: 12, color: '#7c3aed', fontWeight: 500 }}>
                   Ver todas →
@@ -456,7 +453,7 @@ export default function Dashboard() {
                     return (
                       <div
                         key={`${a.tipo}-${a.id}-${i}`}
-                        style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 20px', borderBottom: i < actividad.length - 1 ? '1px solid #f9fafb' : 'none' }}
+                        style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 20px', borderBottom: 'none' }}
                       >
                         <div style={{ width: 36, height: 36, borderRadius: 10, flexShrink: 0, background: a.estado === 'enviada' ? '#dcfce7' : '#dbeafe', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                           <FileText size={16} color={a.estado === 'enviada' ? '#16a34a' : '#2563eb'} />
@@ -478,8 +475,8 @@ export default function Dashboard() {
 
           </div>
 
-          {/* ═══ RIGHT COLUMN — sticky, responsive height ═══ */}
-          <div style={{ background: '#ffffff', borderRadius: 20, padding: 12, display: 'flex', flexDirection: 'column', gap: 0, position: 'sticky', top: 0, maxHeight: 'calc(100vh - 64px)', overflowY: 'auto' }}>
+          {/* ═══ RIGHT COLUMN — fija, altura completa pantalla ═══ */}
+          <div style={{ background: '#ffffff', borderRadius: 20, padding: 12, display: 'flex', flexDirection: 'column', gap: 0, position: 'sticky', top: 0, height: 'calc(100vh - 112px)', overflowY: 'auto' }}>
 
             {/* 5. Tu rendimiento — blanco, sin borde */}
             <div style={{ padding: '16px 16px 14px' }}>
@@ -502,8 +499,8 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* divider */}
-            <div style={{ height: 1, background: '#f5f7fb', marginInline: 4 }} />
+            {/* spacer */}
+            <div style={{ height: 4 }} />
 
             {/* 6. Enviadas a emitir — card gris */}
             <div style={{ background: '#f5f7fb', borderRadius: 16, padding: '16px', margin: '8px 4px' }}>
