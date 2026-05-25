@@ -21,9 +21,8 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* ── Dashboard scroll layout — ambas columnas scrollean juntas ─────────────── */
-.db-outer { height: 100%; overflow-y: auto; }
-.db-inner { padding: 16px 24px 24px; }
+/* ── Dashboard layout — el scroll lo maneja <main> en el layout ────────────── */
+.db-inner { padding: 0 24px 24px; }
 .db-grid  { display: grid; gap: 16px; grid-template-columns: 1fr 280px; max-width: 72rem; margin: 0 auto; width: 100%; align-items: start; }
 .db-left  { display: flex; flex-direction: column; gap: 16px; }
 .db-right { display: flex; flex-direction: column; gap: 12px; }

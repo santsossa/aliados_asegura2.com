@@ -12,6 +12,11 @@ function fmt(n) {
 function pct(n) {
   return `${n >= 0 ? '+' : ''}${n}%`
 }
+function fmtShort(n) {
+  if (n >= 1_000_000) return `$${(n / 1_000_000 % 1 === 0 ? (n/1_000_000).toFixed(0) : (n/1_000_000).toFixed(1))}M`
+  if (n >= 1_000)     return `$${Math.round(n / 1_000)}k`
+  return `$${n}`
+}
 
 const BADGE = {
   activa:        { bg: '#dbeafe', color: '#1d4ed8', label: 'Cotizada'         },
@@ -124,62 +129,64 @@ function PlainAvatar({ size = 80, initials = '?' }) {
   )
 }
 
-// ─── Period bar chart — pólizas enviadas a emitir por período ─────────────────
-function PeriodBarChart({ polizas = [] }) {
-  const now = new Date()
-  const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate()
-  const currMonth = now.getMonth()
-  const currYear  = now.getFullYear()
-
-  const counts = [0, 0, 0]
-  polizas.forEach(p => {
-    if (!p.created_at) return
-    const d = new Date(p.created_at)
-    if (d.getMonth() !== currMonth || d.getFullYear() !== currYear) return
-    const day = d.getDate()
-    if (day <= 10) counts[0]++
-    else if (day <= 20) counts[1]++
-    else counts[2]++
-  })
-
-  const max = Math.max(...counts, 0)
-  const labels = ['1-10', '11-20', `21-${lastDay}`]
-  // Y-axis ticks: deduped, meaningful scale
-  const yTicks = max === 0 ? [0]
-    : max === 1 ? [1, 0]
-    : max === 2 ? [2, 1, 0]
-    : [max, Math.round(max / 2), 0]
+// ─── Monthly commissions chart — last 3 months with dotted reference lines ────
+function MonthlyCommissionsChart({ meses = [] }) {
+  const max = Math.max(...meses.map(m => m.valor), 1)
+  const yMid = Math.round(max / 2)
+  const CHART_H = 104
 
   return (
-    <div style={{ display: 'flex', gap: 6 }}>
+    <div style={{ display: 'flex', gap: 8 }}>
       {/* Y-axis */}
-      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: 110, paddingBottom: 22, width: 16, flexShrink: 0 }}>
-        {yTicks.map((v, i) => (
-          <span key={i} style={{ fontSize: 8.5, fontFamily: 'Inter', color: '#9ca3af', lineHeight: 1, textAlign: 'right', display: 'block' }}>{v}</span>
+      <div style={{ width: 44, flexShrink: 0, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: CHART_H + 22, paddingBottom: 22 }}>
+        {[max, yMid, 0].map((v, i) => (
+          <span key={i} style={{ fontSize: 8.5, fontFamily: 'Inter', color: '#9ca3af', textAlign: 'right', display: 'block', lineHeight: 1 }}>
+            {v === 0 ? '0' : fmtShort(v)}
+          </span>
         ))}
       </div>
-      {/* Bars */}
-      <div style={{ flex: 1 }}>
-        <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end', height: 88 }}>
-          {counts.map((val, i) => (
-            <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100%', justifyContent: 'flex-end', gap: 0 }}>
-              {val > 0 && (
-                <span style={{ fontSize: 9, fontFamily: 'Inter', fontWeight: 700, color: '#4f46e5', marginBottom: 3 }}>{val}</span>
-              )}
-              <div style={{
-                width: '60%', background: '#4f46e5', borderRadius: '8px 8px 4px 4px',
-                height: `${max > 0 ? Math.max((val / max) * 100, val > 0 ? 20 : 4) : 4}%`,
-                minHeight: val > 0 ? 14 : 3,
-                transition: 'height 0.4s ease',
-                opacity: val > 0 ? 1 : 0.15,
-              }} />
-            </div>
-          ))}
+      {/* Bars + dotted lines */}
+      <div style={{ flex: 1, position: 'relative' }}>
+        {/* Dotted reference lines */}
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: CHART_H, pointerEvents: 'none' }}>
+          <div style={{ position: 'absolute', top: 0,     left: 0, right: 0, borderTop: '1px dashed #e2e4ea' }} />
+          <div style={{ position: 'absolute', top: '50%', left: 0, right: 0, borderTop: '1px dashed #e2e4ea' }} />
         </div>
-        <div style={{ display: 'flex', gap: 8, marginTop: 6 }}>
-          {labels.map((l, i) => (
-            <span key={i} className="t-label" style={{ flex: 1, textAlign: 'center', color: '#9ca3af', fontFamily: 'Inter' }}>{l}</span>
-          ))}
+        {/* Bars */}
+        <div style={{ display: 'flex', gap: 10, alignItems: 'flex-end', height: CHART_H, position: 'relative' }}>
+          {meses.map((m, i) => {
+            const isCurrent = i === meses.length - 1
+            const pct = max > 0 ? Math.max((m.valor / max) * 100, m.valor > 0 ? 12 : 3) : 3
+            return (
+              <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100%', justifyContent: 'flex-end' }}>
+                {m.valor > 0 && (
+                  <span style={{ fontSize: 9, fontFamily: 'Inter', fontWeight: 700, color: isCurrent ? '#4f46e5' : '#9ca3af', marginBottom: 3 }}>
+                    {fmtShort(m.valor)}
+                  </span>
+                )}
+                <div style={{
+                  width: '68%',
+                  background: isCurrent ? '#4f46e5' : '#c7d2fe',
+                  borderRadius: '8px 8px 4px 4px',
+                  height: `${pct}%`,
+                  minHeight: m.valor > 0 ? 10 : 3,
+                  opacity: m.valor > 0 ? 1 : 0.25,
+                  transition: 'height 0.4s ease',
+                }} />
+              </div>
+            )
+          })}
+        </div>
+        {/* X-axis labels */}
+        <div style={{ display: 'flex', gap: 10, marginTop: 6 }}>
+          {meses.map((m, i) => {
+            const isCurrent = i === meses.length - 1
+            return (
+              <span key={i} style={{ flex: 1, textAlign: 'center', fontSize: 9.5, fontFamily: 'Inter', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: isCurrent ? '#4f46e5' : '#9ca3af' }}>
+                {m.mes}
+              </span>
+            )
+          })}
         </div>
       </div>
     </div>
@@ -243,6 +250,19 @@ export default function Dashboard() {
   const mesLabel     = MESES[nowDate.getMonth()]
   const mesCorto     = MESES_CORTO[nowDate.getMonth()]
   const anioLabel    = nowDate.getFullYear()
+  const m0idx        = nowDate.getMonth()
+  const m1idx        = (m0idx - 1 + 12) % 12
+  const m2idx        = (m0idx - 2 + 12) % 12
+  const comisionActual   = rendimiento.comisiones_mes || 0
+  const varPct           = stats.total_ganado?.variacion || 0
+  const comisionAnterior = comisionActual > 0 && varPct !== 0
+    ? Math.round(comisionActual / (1 + varPct / 100))
+    : 0
+  const chartMeses = [
+    { mes: MESES_CORTO[m2idx], valor: 0 },
+    { mes: MESES_CORTO[m1idx], valor: comisionAnterior },
+    { mes: MESES_CORTO[m0idx], valor: comisionActual },
+  ]
   const nombreAliado = user?.nombre || 'aliado'
   const apellido     = user?.apellido || ''
   const initials     = ((nombreAliado[0] || '') + (apellido[0] || '')).toUpperCase() || '?'
@@ -292,9 +312,8 @@ export default function Dashboard() {
   ]
 
   return (
-    <div className="db-outer">
-      <div className="db-inner">
-        <div className="db-grid">
+    <div className="db-inner">
+      <div className="db-grid">
 
           {/* ═══ LEFT COLUMN — scrolls ═══ */}
           <div className="db-left">
@@ -495,65 +514,69 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* 6. Enviadas a emitir */}
-            <div style={{ background: '#fff', borderRadius: 20, padding: '14px 16px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-                <span style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: 13, color: '#111827' }}>Enviadas a emitir</span>
-                <span style={{ fontFamily: 'Inter', fontSize: 9.5, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', padding: '3px 8px', borderRadius: 99, background: '#ffffff', color: '#9ca3af' }}>
-                  {mesCorto}
-                </span>
-              </div>
-              <PeriodBarChart polizas={polizas_proceso} />
-            </div>
+            {/* 6+7. White outer card — Comisiones + Anto */}
+            <div style={{ background: '#fff', borderRadius: 20, padding: 8, display: 'flex', flexDirection: 'column', gap: 8 }}>
 
-            {/* 7. Pregúntale a Anto — 3 opciones */}
-            <div style={{ background: '#fff', borderRadius: 20, padding: '16px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-                <span style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: 13, color: '#111827' }}>Pregúntale a Anto</span>
+              {/* Comisiones mensuales — gray inner */}
+              <div style={{ background: '#f5f7fb', borderRadius: 14, padding: '14px 16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+                  <span style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: 13, color: '#111827' }}>Comisiones</span>
+                  <span style={{ fontFamily: 'Inter', fontSize: 9.5, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', padding: '3px 8px', borderRadius: 99, background: '#fff', color: '#9ca3af' }}>
+                    {MESES_CORTO[m2idx]} – {mesCorto}
+                  </span>
+                </div>
+                <MonthlyCommissionsChart meses={chartMeses} />
+              </div>
+
+              {/* Pregúntale a Anto — gray inner */}
+              <div style={{ background: '#f5f7fb', borderRadius: 14, padding: '14px 16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+                  <span style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: 13, color: '#111827' }}>Pregúntale a Anto</span>
+                  <button
+                    onClick={() => document.querySelector('[data-anto-pill]')?.click()}
+                    style={{ width: 24, height: 24, borderRadius: '50%', background: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, color: '#374151', lineHeight: 1, border: 'none' }}
+                  >+</button>
+                </div>
+                <div>
+                  {[
+                    { bg: '#ede9fe', color: '#4f46e5', emoji: '🛡️', title: 'Coberturas'            },
+                    { bg: '#e0f2fe', color: '#0284c7', emoji: '⚖️', title: 'Comparar aseguradoras'  },
+                    { bg: '#dcfce7', color: '#16a34a', emoji: '💬', title: 'Responder al cliente'   },
+                  ].map((item, i, arr) => (
+                    <div
+                      key={i}
+                      style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 0', borderBottom: i < arr.length - 1 ? '1px solid #e5e7eb' : 'none' }}
+                    >
+                      <div style={{ width: 34, height: 34, borderRadius: '50%', background: item.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 15 }}>
+                        {item.emoji}
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <p style={{ margin: 0, fontFamily: 'Poppins', fontSize: 12, fontWeight: 500, color: '#111827', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.title}</p>
+                        <p style={{ margin: 0, fontFamily: 'Inter', fontSize: 10, color: '#9ca3af' }}>Anto IA</p>
+                      </div>
+                      <button
+                        onClick={() => document.querySelector('[data-anto-pill]')?.click()}
+                        style={{ flexShrink: 0, fontFamily: 'Inter', fontSize: 11, fontWeight: 600, color: item.color, background: `${item.color}15`, border: 'none', borderRadius: 999, padding: '4px 9px', cursor: 'pointer' }}
+                      >
+                        Preguntar
+                      </button>
+                    </div>
+                  ))}
+                </div>
                 <button
                   onClick={() => document.querySelector('[data-anto-pill]')?.click()}
-                  style={{ width: 24, height: 24, borderRadius: '50%', background: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, color: '#374151', lineHeight: 1, border: 'none' }}
-                >+</button>
+                  style={{ width: '100%', fontFamily: 'Poppins', background: '#2D2A7A1a', color: '#2D2A7A', border: 'none', borderRadius: 999, padding: '10px', fontSize: 13, fontWeight: 600, cursor: 'pointer', transition: 'background 0.15s', marginTop: 12 }}
+                  onMouseEnter={e => e.currentTarget.style.background = '#2D2A7A33'}
+                  onMouseLeave={e => e.currentTarget.style.background = '#2D2A7A1a'}
+                >
+                  Preguntarle a Anto
+                </button>
               </div>
-              <div>
-                {[
-                  { bg: '#ede9fe', color: '#4f46e5', emoji: '🛡️', title: 'Coberturas'            },
-                  { bg: '#e0f2fe', color: '#0284c7', emoji: '⚖️', title: 'Comparar aseguradoras'  },
-                  { bg: '#dcfce7', color: '#16a34a', emoji: '💬', title: 'Responder al cliente'   },
-                ].map((item, i, arr) => (
-                  <div
-                    key={i}
-                    style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 0', borderBottom: i < arr.length - 1 ? '1px solid #eaedf2' : 'none' }}
-                  >
-                    <div style={{ width: 34, height: 34, borderRadius: '50%', background: item.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 15 }}>
-                      {item.emoji}
-                    </div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={{ margin: 0, fontFamily: 'Poppins', fontSize: 12, fontWeight: 500, color: '#111827', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.title}</p>
-                      <p style={{ margin: 0, fontFamily: 'Inter', fontSize: 10, color: '#9ca3af' }}>Anto IA</p>
-                    </div>
-                    <button
-                      onClick={() => document.querySelector('[data-anto-pill]')?.click()}
-                      style={{ flexShrink: 0, fontFamily: 'Inter', fontSize: 11, fontWeight: 600, color: item.color, background: `${item.color}15`, border: 'none', borderRadius: 999, padding: '4px 9px', cursor: 'pointer' }}
-                    >
-                      Preguntar
-                    </button>
-                  </div>
-                ))}
-              </div>
-              <button
-                onClick={() => document.querySelector('[data-anto-pill]')?.click()}
-                style={{ width: '100%', fontFamily: 'Poppins', background: '#2D2A7A1a', color: '#2D2A7A', border: 'none', borderRadius: 999, padding: '10px', fontSize: 13, fontWeight: 600, cursor: 'pointer', transition: 'background 0.15s', marginTop: 14 }}
-                onMouseEnter={e => e.currentTarget.style.background = '#2D2A7A33'}
-                onMouseLeave={e => e.currentTarget.style.background = '#2D2A7A1a'}
-              >
-                Preguntarle a Anto
-              </button>
+
             </div>
 
           </div>
 
-        </div>
       </div>
     </div>
   )
