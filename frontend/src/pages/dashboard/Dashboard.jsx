@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from 'react'
-import { DollarSign, FileText, Shield, TrendingUp, ChevronRight } from 'lucide-react'
+import { useState, useEffect, useCallback, useRef } from 'react'
+import { DollarSign, FileText, Shield, TrendingUp, ChevronRight, ChevronLeft } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { useSSE } from '../../context/SSEContext'
@@ -270,6 +270,7 @@ export default function Dashboard() {
   const saludo       = hora < 12 ? 'Buenos días' : hora < 18 ? 'Buenas tardes' : 'Buenas noches'
   const metaPct      = Math.min(100, Math.round((rendimiento.comisiones_mes / (rendimiento.meta_mes || 5000000)) * 100))
   const tickDias     = [1, 8, 15, 22, 29]
+  const enviRef      = useRef(null)
 
   const cards = [
     {
@@ -387,58 +388,82 @@ export default function Dashboard() {
               })}
             </div>
 
-            {/* 3. Enviadas a emitir */}
+            {/* 3. Enviadas a emitir — carrusel horizontal */}
             <div style={{ marginTop: 8 }}>
-              {/* Título fuera del card */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 4px', marginBottom: 10 }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 4px', marginBottom: 12 }}>
                 <span style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: 14, color: '#111827' }}>Enviadas a emitir</span>
-                <button onClick={() => navigate('/dashboard/mis-polizas')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'Inter', fontSize: 12, color: '#7c3aed', fontWeight: 600 }}>
-                  Ver todas →
-                </button>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <button
+                    onClick={() => enviRef.current?.scrollBy({ left: -190, behavior: 'smooth' })}
+                    style={{ width: 28, height: 28, borderRadius: '50%', background: '#fff', border: '1.5px solid #e5e7eb', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
+                  >
+                    <ChevronLeft size={13} color="#374151" />
+                  </button>
+                  <button
+                    onClick={() => enviRef.current?.scrollBy({ left: 190, behavior: 'smooth' })}
+                    style={{ width: 28, height: 28, borderRadius: '50%', background: '#2D2A7A', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
+                  >
+                    <ChevronRight size={13} color="#fff" />
+                  </button>
+                </div>
               </div>
-              <div style={{ background: '#fff', borderRadius: 24, overflow: 'hidden' }}>
-                {polizas_proceso.length === 0 ? (
-                  <div style={{ padding: '28px 20px', textAlign: 'center' }}>
-                    <p style={{ margin: 0, fontSize: 13, color: '#9ca3af' }}>Aún no has enviado ninguna cotización a emitir.</p>
-                  </div>
-                ) : (
-                  <div>
-                    {polizas_proceso.map((p, i) => {
-                      const cfg = getPcfg(p.estado)
-                      return (
-                        <div
-                          key={p.id}
-                          onClick={() => navigate('/dashboard/mis-polizas')}
-                          style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 20px', borderBottom: 'none', cursor: 'pointer', transition: 'background 0.12s' }}
-                          onMouseEnter={e => e.currentTarget.style.background = '#fafafa'}
-                          onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-                        >
-                          <div style={{ width: 36, height: 36, borderRadius: 10, background: cfg.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                            <span style={{ fontSize: 16 }}>🚗</span>
+
+              {polizas_proceso.length === 0 ? (
+                <div style={{ background: '#fff', borderRadius: 24, padding: '28px 20px', textAlign: 'center' }}>
+                  <p style={{ margin: 0, fontSize: 13, color: '#9ca3af' }}>Aún no has enviado ninguna cotización a emitir.</p>
+                </div>
+              ) : (
+                <div
+                  ref={enviRef}
+                  className="no-scrollbar"
+                  style={{ display: 'flex', gap: 12, overflowX: 'auto', paddingBottom: 4 }}
+                >
+                  {polizas_proceso.map((p) => {
+                    const cfg = getPcfg(p.estado)
+                    return (
+                      <div
+                        key={p.id}
+                        onClick={() => navigate('/dashboard/mis-polizas')}
+                        style={{
+                          minWidth: 175, maxWidth: 175, flexShrink: 0,
+                          background: '#fff', borderRadius: 20, padding: '14px',
+                          cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: 10,
+                          transition: 'transform 0.15s, box-shadow 0.15s',
+                        }}
+                        onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 6px 18px rgba(0,0,0,0.08)' }}
+                        onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none' }}
+                      >
+                        {/* Ícono + badge de estado */}
+                        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+                          <div style={{ width: 42, height: 42, borderRadius: 13, background: cfg.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>
+                            🚗
                           </div>
-                          <div style={{ flex: 1, minWidth: 0 }}>
-                            <p style={{ margin: '0 0 2px', fontSize: 13, fontWeight: 600, color: '#111827', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                              {p.cliente_nombre || 'Sin nombre'}
-                            </p>
-                            <p style={{ margin: 0, fontSize: 11, color: '#9ca3af' }}>
-                              {p.placa || '—'} · {p.aseguradora || '—'} · {p.hace}
-                            </p>
-                          </div>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-                            {p.valor_comision > 0 && (
-                              <span style={{ fontSize: 12, fontWeight: 600, color: '#16a34a' }}>+{fmt(p.valor_comision)}</span>
-                            )}
-                            <span style={{ fontSize: 10, fontWeight: 600, padding: '3px 8px', borderRadius: 99, background: cfg.bg, color: cfg.color, whiteSpace: 'nowrap' }}>
-                              {cfg.label}
-                            </span>
-                            <ChevronRight size={14} color="#d1d5db" />
-                          </div>
+                          <span style={{ fontSize: 10, fontWeight: 600, padding: '3px 8px', borderRadius: 99, background: cfg.bg, color: cfg.color, whiteSpace: 'nowrap' }}>
+                            {cfg.label}
+                          </span>
                         </div>
-                      )
-                    })}
-                  </div>
-                )}
-              </div>
+                        {/* Nombre + placa */}
+                        <div>
+                          <p style={{ margin: '0 0 3px', fontSize: 13, fontWeight: 600, color: '#111827', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            {p.cliente_nombre || 'Sin nombre'}
+                          </p>
+                          <p style={{ margin: 0, fontSize: 11, color: '#9ca3af', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            {p.placa || '—'} · {p.aseguradora || '—'}
+                          </p>
+                        </div>
+                        {/* Comisión + hace */}
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto' }}>
+                          {p.valor_comision > 0
+                            ? <span style={{ fontSize: 12, fontWeight: 700, color: '#16a34a' }}>+{fmt(p.valor_comision)}</span>
+                            : <span />
+                          }
+                          <span style={{ fontSize: 10, color: '#b0b4c1' }}>{p.hace}</span>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
             </div>
 
             {/* 4. Actividad reciente */}

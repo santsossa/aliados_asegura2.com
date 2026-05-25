@@ -22,6 +22,10 @@ body {
 }
 
 /* ── Dashboard layout — el scroll lo maneja <main> en el layout ────────────── */
+/* Hide scrollbar but keep scroll functionality */
+.no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+
 .db-inner { padding: 0 24px 24px; }
 .db-grid  { display: grid; gap: 16px; grid-template-columns: 1fr 280px; max-width: 72rem; margin: 0 auto; width: 100%; align-items: start; }
 .db-left  { display: flex; flex-direction: column; gap: 16px; }
