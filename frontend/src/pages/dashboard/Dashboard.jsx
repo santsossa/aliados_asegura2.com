@@ -241,6 +241,7 @@ export default function Dashboard() {
 
   useEffect(() => { fetchDashboard() }, [fetchDashboard])
   useEffect(() => { return subscribe('poliza_update', () => fetchDashboard(true)) }, [subscribe, fetchDashboard])
+  const enviRef = useRef(null)
 
   if (loading) return <LoadingSkeleton />
   if (!data) return <div style={{ padding: '20px 24px', color: '#6b7280', fontSize: 14 }}>No se pudo cargar el dashboard.</div>
@@ -270,7 +271,6 @@ export default function Dashboard() {
   const saludo       = hora < 12 ? 'Buenos días' : hora < 18 ? 'Buenas tardes' : 'Buenas noches'
   const metaPct      = Math.min(100, Math.round((rendimiento.comisiones_mes / (rendimiento.meta_mes || 5000000)) * 100))
   const tickDias     = [1, 8, 15, 22, 29]
-  const enviRef      = useRef(null)
 
   const cards = [
     {
