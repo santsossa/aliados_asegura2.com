@@ -428,7 +428,7 @@ const btnS = { background:'none', border:'1.5px solid #e5e7eb', borderRadius:99,
 export default function Cotizar() {
   const { getToken, user } = useAuth()
   const navigate = useNavigate()
-  const [phase, setPhase] = useState('placa')
+  const [phase, setPhase] = useState('select')
   const [plate, setPlate] = useState('')
   const [step,  setStep]  = useState(1)
   const [cities, setCities]   = useState([])
@@ -736,10 +736,83 @@ export default function Cotizar() {
   const celOk   = form.celular.replace(/\D/g,'').length === 10
   const step3Ok = emailOk && !!form.ciudad && celOk
 
+  /* ── SELECT ── */
+  if (phase === 'select') return (
+    <div className="p-6 lg:p-8" style={{ height:'100%', overflowY:'auto' }}>
+      <div style={{ maxWidth:540, margin:'0 auto' }}>
+        <h1 style={{ fontSize:22, fontWeight:800, color:'#111827', margin:'0 0 4px' }}>Nueva cotización</h1>
+        <p style={{ fontSize:13, color:'#6b7280', margin:'0 0 28px' }}>¿Qué tipo de vehículo quieres cotizar?</p>
+
+        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16 }}>
+
+          {/* Vehículo usado — activo */}
+          <button
+            onClick={() => setPhase('placa')}
+            style={{
+              background:'#fff', border:'2px solid #e5e7eb', borderRadius:20,
+              padding:'28px 20px', cursor:'pointer', textAlign:'left',
+              display:'flex', flexDirection:'column', gap:12,
+              transition:'border-color 0.15s, box-shadow 0.15s',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor='#2D2A7A'; e.currentTarget.style.boxShadow='0 4px 20px rgba(45,42,122,0.12)' }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor='#e5e7eb'; e.currentTarget.style.boxShadow='none' }}
+          >
+            <div style={{ width:48, height:48, borderRadius:14, background:'#edeef3', display:'flex', alignItems:'center', justifyContent:'center', fontSize:26 }}>
+              🚙
+            </div>
+            <div>
+              <p style={{ margin:'0 0 6px', fontFamily:'Poppins', fontSize:16, fontWeight:700, color:'#111827' }}>Vehículo usado</p>
+              <p style={{ margin:0, fontFamily:'Inter', fontSize:13, color:'#6b7280', lineHeight:1.55 }}>
+                Cotiza el seguro de un vehículo con placa registrada en el RUNT.
+              </p>
+            </div>
+            <div style={{ marginTop:'auto', paddingTop:8, display:'flex', alignItems:'center', gap:6, color:'#2D2A7A', fontSize:13, fontWeight:700 }}>
+              Continuar →
+            </div>
+          </button>
+
+          {/* Vehículo 0 km — próximamente */}
+          <div
+            style={{
+              background:'#fafafa', border:'2px solid #f0f0f2', borderRadius:20,
+              padding:'28px 20px', cursor:'not-allowed', textAlign:'left',
+              display:'flex', flexDirection:'column', gap:12,
+              position:'relative', opacity:0.72,
+            }}
+          >
+            <span style={{
+              position:'absolute', top:14, right:14,
+              background:'#fef3c7', color:'#d97706',
+              fontSize:10, fontWeight:700, padding:'3px 10px', borderRadius:99,
+            }}>
+              Próximamente
+            </span>
+            <div style={{ width:48, height:48, borderRadius:14, background:'#f3f4f6', display:'flex', alignItems:'center', justifyContent:'center', fontSize:26 }}>
+              🚗
+            </div>
+            <div>
+              <p style={{ margin:'0 0 6px', fontFamily:'Poppins', fontSize:16, fontWeight:700, color:'#374151' }}>Vehículo 0 km</p>
+              <p style={{ margin:0, fontFamily:'Inter', fontSize:13, color:'#9ca3af', lineHeight:1.55 }}>
+                Cotiza el primer seguro de un vehículo nuevo directo desde la agencia.
+              </p>
+            </div>
+            <div style={{ marginTop:'auto', paddingTop:8, display:'flex', alignItems:'center', gap:6, color:'#9ca3af', fontSize:13, fontWeight:600 }}>
+              Disponible pronto
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  )
+
   /* ── PLACA ── */
   if (phase === 'placa') return (
     <div className="p-6 lg:p-8" style={{ height:'100%', overflowY:'auto' }}>
       <div className="max-w-5xl mx-auto">
+      <div style={{ display:'flex', alignItems:'center', gap:12, maxWidth:520, margin:'0 auto 16px' }}>
+        <button onClick={() => setPhase('select')} style={{ fontSize:13, color:'#6b7280', background:'none', border:'none', cursor:'pointer', padding:0 }}>← Volver</button>
+      </div>
       <h1 style={{ fontSize:22,fontWeight:800,color:'#111827',marginBottom:4 }}>Nueva cotización</h1>
       <p style={{ fontSize:13,color:'#6b7280',marginBottom:24 }}>Ingresa la placa del vehículo del cliente para empezar.</p>
       <div style={card}>
