@@ -21,21 +21,14 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* ── Dashboard scroll layout ────────────────────────────────────────────────── */
-/* Columna derecha siempre estática y completa; columna izquierda scrollea */
-.db-outer { height: 100%; overflow: hidden; display: flex; flex-direction: column; }
-.db-inner { flex: 1; min-height: 0; padding: 16px 24px; display: flex; flex-direction: column; }
-.db-grid  { flex: 1; min-height: 0; display: grid; gap: 20px; grid-template-columns: 1fr 280px; max-width: 72rem; margin: 0 auto; width: 100%; }
-.db-left  { overflow-y: auto; display: flex; flex-direction: column; gap: 18px; min-height: 0; }
-.db-right { overflow: hidden; display: flex; flex-direction: column; }
+/* ── Dashboard scroll layout — ambas columnas scrollean juntas ─────────────── */
+.db-outer { height: 100%; overflow-y: auto; }
+.db-inner { padding: 16px 24px 24px; }
+.db-grid  { display: grid; gap: 16px; grid-template-columns: 1fr 280px; max-width: 72rem; margin: 0 auto; width: 100%; align-items: start; }
+.db-left  { display: flex; flex-direction: column; gap: 16px; }
+.db-right { display: flex; flex-direction: column; gap: 12px; }
 @media (min-width: 1280px) { .db-grid { grid-template-columns: 1fr 300px; } }
-/* Solo en móvil se apilan las columnas */
-@media (max-width: 640px) {
-  .db-outer { overflow-y: auto; }
-  .db-grid  { grid-template-columns: 1fr; height: auto; overflow: visible; }
-  .db-left  { overflow-y: visible; }
-  .db-right { overflow-y: auto; height: auto; }
-}
+@media (max-width: 640px)  { .db-grid { grid-template-columns: 1fr; } }
 
 /* ── Jerarquía tipográfica ─────────────────────────────────────────────────── */
 /* Display: Hero titles */

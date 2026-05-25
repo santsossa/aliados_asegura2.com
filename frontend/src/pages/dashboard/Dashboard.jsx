@@ -419,8 +419,8 @@ export default function Dashboard() {
               )}
             </div>
 
-            {/* 4. Actividad reciente — flex:1, solo la lista scrollea */}
-            <div style={{ background: '#fff', borderRadius: 22, overflow: 'hidden', display: 'flex', flexDirection: 'column', flex: 1, minHeight: 180 }}>
+            {/* 4. Actividad reciente */}
+            <div style={{ background: '#fff', borderRadius: 22, overflow: 'hidden', display: 'flex', flexDirection: 'column', minHeight: 180 }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 20px', flexShrink: 0 }}>
                 <span style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: 14, color: '#111827' }}>Actividad reciente</span>
                 <button onClick={() => navigate('/dashboard/cotizaciones')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'Inter', fontSize: 12, color: '#7c3aed', fontWeight: 500 }}>
@@ -439,7 +439,7 @@ export default function Dashboard() {
                   </button>
                 </div>
               ) : (
-                <div style={{ flex: 1, minHeight: 0, overflowY: 'auto' }}>
+                <div style={{ maxHeight: 320, overflowY: 'auto' }}>
                   {actividad.map((a, i) => {
                     const badge  = getBadge(a.estado, a.tipo)
                     const nombre = a.cliente_nombre || 'Sin nombre'
@@ -471,21 +471,21 @@ export default function Dashboard() {
 
           </div>
 
-          {/* ═══ RIGHT COLUMN — fija, no scrollea ═══ */}
-          <div className="db-right" style={{ background: '#ffffff', borderRadius: 20, padding: 8 }}>
+          {/* ═══ RIGHT COLUMN — scrollea junto a la izquierda ═══ */}
+          <div className="db-right">
 
-            {/* 5. Tu rendimiento — flex:2.5, desde arriba sin margen excesivo */}
-            <div style={{ flex: 2.5, padding: '12px 16px 10px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
+            {/* 5. Tu rendimiento */}
+            <div style={{ background: '#fff', borderRadius: 20, padding: '16px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
                 <span style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: 14, color: '#111827' }}>Tu rendimiento</span>
                 <span style={{ fontFamily: 'Inter', fontSize: 9.5, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', padding: '3px 8px', borderRadius: 99, background: '#f5f7fb', color: '#9ca3af' }}>
                   {mesCorto} {anioLabel}
                 </span>
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14, flex: 1, justifyContent: 'center' }}>
-                <PlainAvatar size={84} initials={initials} />
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, padding: '6px 0 8px' }}>
+                <PlainAvatar size={72} initials={initials} />
                 <div style={{ textAlign: 'center' }}>
-                  <p style={{ margin: '0 0 8px', fontFamily: 'Poppins', fontSize: 16, fontWeight: 600, color: '#111827' }}>
+                  <p style={{ margin: '0 0 6px', fontFamily: 'Poppins', fontSize: 15, fontWeight: 600, color: '#111827' }}>
                     {saludo}, {nombreAliado}! 🔥
                   </p>
                   <p style={{ margin: 0, fontFamily: 'Inter', fontSize: 12, color: '#6b7280', whiteSpace: 'nowrap' }}>
@@ -495,36 +495,59 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* 6. Enviadas a emitir — flex:1.8, chart anclado abajo */}
-            <div style={{ flex: 1.8, background: '#f5f7fb', borderRadius: 20, padding: '14px 16px', margin: '0 4px', display: 'flex', flexDirection: 'column' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 0, flexShrink: 0 }}>
+            {/* 6. Enviadas a emitir */}
+            <div style={{ background: '#f5f7fb', borderRadius: 20, padding: '14px 16px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
                 <span style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: 13, color: '#111827' }}>Enviadas a emitir</span>
                 <span style={{ fontFamily: 'Inter', fontSize: 9.5, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', padding: '3px 8px', borderRadius: 99, background: '#ffffff', color: '#9ca3af' }}>
                   {mesCorto}
                 </span>
               </div>
-              <div style={{ flex: 1, display: 'flex', alignItems: 'flex-end' }}>
-                <div style={{ width: '100%' }}>
-                  <PeriodBarChart polizas={polizas_proceso} />
-                </div>
-              </div>
+              <PeriodBarChart polizas={polizas_proceso} />
             </div>
 
-            {/* 7. Pregúntale a Anto — flex:1.3 */}
-            <div style={{ flex: 1.3, background: '#f5f7fb', borderRadius: 20, padding: '16px', margin: '4px 4px 4px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: 12 }}>
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 6 }}>
-                <p style={{ margin: 0, fontFamily: 'Poppins', fontWeight: 600, fontSize: 13, color: '#111827' }}>Pregúntale a Anto ✨</p>
-                <p style={{ margin: 0, fontFamily: 'Inter', fontSize: 11.5, color: '#6b7280', lineHeight: 1.55 }}>
-                  Tu copiloto de IA para coberturas, comparar aseguradoras y responder a tus clientes.
-                </p>
+            {/* 7. Pregúntale a Anto — 3 opciones */}
+            <div style={{ background: '#f5f7fb', borderRadius: 20, padding: '16px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+                <span style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: 13, color: '#111827' }}>Pregúntale a Anto</span>
+                <button
+                  onClick={() => document.querySelector('[data-anto-pill]')?.click()}
+                  style={{ width: 24, height: 24, borderRadius: '50%', background: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, color: '#374151', lineHeight: 1, border: 'none' }}
+                >+</button>
+              </div>
+              <div>
+                {[
+                  { bg: '#ede9fe', color: '#4f46e5', emoji: '🛡️', title: 'Coberturas'            },
+                  { bg: '#e0f2fe', color: '#0284c7', emoji: '⚖️', title: 'Comparar aseguradoras'  },
+                  { bg: '#dcfce7', color: '#16a34a', emoji: '💬', title: 'Responder al cliente'   },
+                ].map((item, i, arr) => (
+                  <div
+                    key={i}
+                    style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 0', borderBottom: i < arr.length - 1 ? '1px solid #eaedf2' : 'none' }}
+                  >
+                    <div style={{ width: 34, height: 34, borderRadius: '50%', background: item.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 15 }}>
+                      {item.emoji}
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <p style={{ margin: 0, fontFamily: 'Poppins', fontSize: 12, fontWeight: 500, color: '#111827', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.title}</p>
+                      <p style={{ margin: 0, fontFamily: 'Inter', fontSize: 10, color: '#9ca3af' }}>Anto IA</p>
+                    </div>
+                    <button
+                      onClick={() => document.querySelector('[data-anto-pill]')?.click()}
+                      style={{ flexShrink: 0, fontFamily: 'Inter', fontSize: 11, fontWeight: 600, color: item.color, background: `${item.color}15`, border: 'none', borderRadius: 999, padding: '4px 9px', cursor: 'pointer' }}
+                    >
+                      Preguntar
+                    </button>
+                  </div>
+                ))}
               </div>
               <button
                 onClick={() => document.querySelector('[data-anto-pill]')?.click()}
-                style={{ width: '100%', fontFamily: 'Poppins', background: '#2D2A7A', color: '#fff', border: 'none', borderRadius: 999, padding: '10px', fontSize: 13, fontWeight: 600, cursor: 'pointer', transition: 'opacity 0.15s', flexShrink: 0 }}
-                onMouseEnter={e => e.currentTarget.style.opacity = '0.85'}
-                onMouseLeave={e => e.currentTarget.style.opacity = '1'}
+                style={{ width: '100%', fontFamily: 'Poppins', background: '#2D2A7A1a', color: '#2D2A7A', border: 'none', borderRadius: 999, padding: '10px', fontSize: 13, fontWeight: 600, cursor: 'pointer', transition: 'background 0.15s', marginTop: 14 }}
+                onMouseEnter={e => e.currentTarget.style.background = '#2D2A7A33'}
+                onMouseLeave={e => e.currentTarget.style.background = '#2D2A7A1a'}
               >
-                Abrir Anto IA
+                Preguntarle a Anto
               </button>
             </div>
 

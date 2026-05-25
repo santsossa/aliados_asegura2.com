@@ -354,12 +354,11 @@ export default function DashboardLayout() {
           {/* ── Contenido principal ── */}
           <main style={{ background: '#f5f7fb', borderRadius: 24, overflow: 'hidden', height: '100%', display: 'flex', flexDirection: 'column' }}>
 
-            {/* Topbar — fondo blanco, de borde a borde del contenido */}
+            {/* Topbar — fondo gris igual que el contenido */}
             <div style={{
               display: 'flex', alignItems: 'center', gap: 12,
               padding: '0 24px', height: 64,
-              background: '#fff',
-              borderBottom: '1px solid #eeeef2',
+              background: '#f5f7fb',
               flexShrink: 0,
             }}>
               {/* Search bar */}
@@ -367,20 +366,20 @@ export default function DashboardLayout() {
                 <Search size={14} color="#9ca3af" style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
                 <input
                   placeholder="Buscar cliente, placa, póliza..."
-                  style={{ width: '100%', height: 38, padding: '0 16px 0 38px', borderRadius: 999, border: 'none', background: '#f5f7fb', fontSize: 13, color: '#111827', outline: 'none', boxSizing: 'border-box', fontFamily: 'Inter, system-ui, sans-serif' }}
+                  style={{ width: '100%', height: 38, padding: '0 16px 0 38px', borderRadius: 999, border: 'none', background: '#fff', fontSize: 13, color: '#111827', outline: 'none', boxSizing: 'border-box', fontFamily: 'Inter, system-ui, sans-serif' }}
                   onFocus={e => e.target.style.boxShadow = '0 0 0 2px #a5b4fc'}
                   onBlur={e => e.target.style.boxShadow = 'none'}
                 />
               </div>
 
-              {/* Campana en contenedor blanco + usuario */}
+              {/* Campana + usuario */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-                {/* Contenedor campana — igual color que cards blancas para contraste sobre gris */}
-                <div style={{ width: 38, height: 38, borderRadius: 10, background: '#f5f7fb', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                {/* Contenedor campana — blanco para contrastar sobre el fondo gris */}
+                <div style={{ width: 38, height: 38, borderRadius: 10, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <NotificationBell />
                 </div>
                 {/* Pill usuario */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#f5f7fb', borderRadius: 999, padding: '4px 12px 4px 4px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#fff', borderRadius: 999, padding: '4px 12px 4px 4px' }}>
                   <div style={{ width: 30, height: 30, borderRadius: '50%', background: 'linear-gradient(135deg,#4f46e5,#2D2A7A)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                     <span style={{ fontSize: 11, fontWeight: 800, color: '#fff', textTransform: 'uppercase', lineHeight: 1 }}>{initials || '?'}</span>
                   </div>
