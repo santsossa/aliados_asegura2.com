@@ -11,6 +11,7 @@ import { useAuth } from '../context/AuthContext'
 import { SSEProvider } from '../context/SSEContext'
 import NotificationBell from '../components/NotificationBell'
 import IAAssistant from '../components/IAAssistant'
+import { getAvatarSrc } from '../utils/avatars'
 
 const NAV_MAIN = [
   { to: '/dashboard',              icon: Home,        label: 'Inicio'       },
@@ -46,6 +47,24 @@ const navItemStyle = (isActive, sideOpen = true) => ({
 
 const hoverOn  = e => { if (!e.currentTarget.style.background.includes('edeef3')) e.currentTarget.style.background = HOVER_BG }
 const hoverOff = e => { if (!e.currentTarget.style.background.includes('edeef3')) e.currentTarget.style.background = 'transparent' }
+
+function UserAvatar({ avatarId, initials, size = 30 }) {
+  const src = getAvatarSrc(avatarId)
+  return (
+    <div style={{
+      width: size, height: size, borderRadius: '50%', overflow: 'hidden', flexShrink: 0,
+      background: 'linear-gradient(135deg, #e8e6ff 0%, #c7d2fe 100%)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+    }}>
+      {src
+        ? <img src={src} alt="avatar" width={size} height={size}
+            style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }}
+            decoding="async" fetchpriority="high" />
+        : <span style={{ fontSize: Math.round(size * 0.38), fontWeight: 800, color: '#6366f1', textTransform: 'uppercase', lineHeight: 1 }}>{initials || '?'}</span>
+      }
+    </div>
+  )
+}
 
 function Divider() {
   return (
@@ -106,7 +125,7 @@ function SideTooltip({ label, sideOpen, children }) {
 export default function DashboardLayout() {
   const navigate                    = useNavigate()
   const isMobile                    = useIsMobile()
-  const { logout, user }            = useAuth()
+  const { logout, user, getToken }  = useAuth()
   const [sideOpen, setSideOpen]     = useState(true)
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [logoHover, setLogoHover]   = useState(false)
@@ -117,6 +136,17 @@ export default function DashboardLayout() {
   const initials = ((nombre[0] || '') + (apellido[0] || nombre[1] || '')).toUpperCase()
   const display  = nombre || user?.email?.split('@')[0] || 'Aliado'
   const correo   = user?.correo || user?.email || ''
+
+  const [avatarId, setAvatarId] = useState(null)
+  const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+  useEffect(() => {
+    const token = user ? getToken?.() : null
+    if (!token) return
+    fetch(`${API}/api/aliados/me`, { headers: { Authorization: `Bearer ${token}` }, credentials: 'include' })
+      .then(r => r.json())
+      .then(d => { if (d.status === 'success') setAvatarId(d.data.avatar || null) })
+      .catch(() => {})
+  }, [user])
 
   // Cerrar sidebar al hacer clic fuera
   useEffect(() => {
@@ -197,8 +227,8 @@ export default function DashboardLayout() {
               </nav>
               <div style={{ padding:'10px', borderTop:'1px solid #f0f0f2' }}>
                 <div style={{ display:'flex',alignItems:'flex-start',gap:10,padding:'6px 8px 10px' }}>
-                  <div style={{ width:32,height:32,borderRadius:'50%',background:'linear-gradient(135deg,#4f46e5,#2D2A7A)',flexShrink:0,display:'flex',alignItems:'center',justifyContent:'center',marginTop:2 }}>
-                    <span style={{ fontSize:12,fontWeight:800,color:'#fff',textTransform:'uppercase' }}>{initials||'?'}</span>
+                  <div style={{ marginTop:2 }}>
+                    <UserAvatar avatarId={avatarId} initials={initials} size={32} />
                   </div>
                   <div style={{ minWidth:0,flex:1 }}>
                     <p style={{ margin:0,fontSize:13,fontWeight:700,color:'#111827',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis' }}>{display}</p>
@@ -349,9 +379,7 @@ export default function DashboardLayout() {
                 <div style={{ display:'flex', alignItems:'center', gap:8, flexShrink:0 }}>
                   <NotificationBell />
                   <div style={{ display:'flex', alignItems:'center', gap:8, background:'#fff', borderRadius:999, padding:'4px 12px 4px 4px' }}>
-                    <div style={{ width:30, height:30, borderRadius:'50%', background:'linear-gradient(135deg,#4f46e5,#2D2A7A)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
-                      <span style={{ fontSize:11, fontWeight:800, color:'#fff', textTransform:'uppercase', lineHeight:1 }}>{initials||'?'}</span>
-                    </div>
+                    <UserAvatar avatarId={avatarId} initials={initials} size={30} />
                     <span style={{ fontSize:13, fontWeight:500, color:'#111827', fontFamily:'Poppins', whiteSpace:'nowrap' }}>{display}</span>
                   </div>
                 </div>

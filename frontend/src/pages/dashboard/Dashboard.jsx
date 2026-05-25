@@ -8,12 +8,12 @@ import { getAvatarSrc } from '../../utils/avatars'
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
 const LOGO_MAP = {
-  allianz: '/logos/allianz.png', axa: '/logos/axa.png',
-  bolivar: '/logos/bolivar.png', equidad: '/logos/equidad.png',
-  hdi: '/logos/hdi.png', mapfre: '/logos/mapfre.png',
-  sbs: '/logos/sbs.png', solidaria: '/logos/solidaria.png',
-  sura: '/logos/sura.png', estado: '/logos/estado.png',
-  coomeva: '/logos/coomeva.png', qualitas: '/logos/qualitas.png',
+  allianz: '/logos/allianz.webp', axa: '/logos/axa.webp',
+  bolivar: '/logos/bolivar.webp', equidad: '/logos/equidad.webp',
+  hdi: '/logos/hdi.webp', mapfre: '/logos/mapfre.webp',
+  sbs: '/logos/sbs.webp', solidaria: '/logos/solidaria.webp',
+  sura: '/logos/sura.webp', estado: '/logos/estado.webp',
+  coomeva: '/logos/coomeva.webp', qualitas: '/logos/qualitas.webp',
 }
 function getLogoUrl(nombre) {
   if (!nombre) return null
@@ -140,7 +140,9 @@ function AvatarCircle({ avatarId, size = 80, initials = '?' }) {
       display: 'flex', alignItems: 'center', justifyContent: 'center',
     }}>
       {src
-        ? <img src={src} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }} />
+        ? <img src={src} alt="avatar" width={size} height={size}
+            style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }}
+            decoding="async" fetchpriority="high" />
         : <span style={{ fontSize: Math.round(size * 0.36), fontWeight: 900, color: '#6366f1', textTransform: 'uppercase' }}>{initials}</span>
       }
     </div>
@@ -465,7 +467,9 @@ export default function Dashboard() {
                       {/* Área logo — como el thumbnail de la imagen ref */}
                       <div style={{ height: 96, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                         {logo
-                          ? <img src={logo} alt={p.aseguradora} style={{ maxHeight: 50, maxWidth: 128, objectFit: 'contain' }} />
+                          ? <img src={logo} alt={p.aseguradora} width={128} height={50}
+                              style={{ maxHeight: 50, maxWidth: 128, objectFit: 'contain' }}
+                              loading="lazy" decoding="async" />
                           : <div style={{ width: 48, height: 48, borderRadius: 14, background: cfg.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>🚗</div>
                         }
                       </div>

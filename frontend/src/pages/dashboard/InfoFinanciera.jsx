@@ -27,7 +27,9 @@ function AvatarCircle({ avatarId, size = 80 }) {
       display: 'flex', alignItems: 'center', justifyContent: 'center',
     }}>
       {src
-        ? <img src={src} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }} />
+        ? <img src={src} alt="avatar" width={size} height={size}
+            style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }}
+            decoding="async" fetchpriority="high" />
         : <User size={size * 0.4} color="#6366f1" />
       }
     </div>
@@ -219,7 +221,9 @@ export default function InfoFinanciera() {
                     background: 'linear-gradient(135deg, #e8e6ff, #c7d2fe)',
                   }}
                 >
-                  <img src={a.src} alt={a.id} style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', objectPosition: 'center', display: 'block' }} />
+                  <img src={a.src} alt={a.id} width={80} height={80}
+                    style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', objectPosition: 'center', display: 'block' }}
+                    loading="lazy" decoding="async" />
                 </button>
               ))}
             </div>
