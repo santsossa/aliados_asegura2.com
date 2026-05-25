@@ -21,6 +21,20 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* ── Dashboard scroll layout ────────────────────────────────────────────────── */
+.db-outer { height: 100%; overflow: hidden; display: flex; flex-direction: column; }
+.db-inner { flex: 1; min-height: 0; padding: 16px 24px; display: flex; flex-direction: column; }
+.db-grid  { flex: 1; min-height: 0; display: grid; gap: 20px; max-width: 72rem; margin: 0 auto; width: 100%; }
+.db-left  { overflow-y: auto; display: flex; flex-direction: column; gap: 18px; min-height: 0; }
+.db-right { overflow: hidden; display: flex; flex-direction: column; }
+@media (min-width: 1280px) { .db-grid { grid-template-columns: 1fr 300px; } }
+@media (max-width: 1279px) {
+  .db-outer { overflow-y: auto; }
+  .db-grid  { height: auto; overflow: visible; }
+  .db-left  { overflow-y: visible; }
+  .db-right { overflow-y: auto; height: auto; }
+}
+
 /* ── Jerarquía tipográfica ─────────────────────────────────────────────────── */
 /* Display: Hero titles */
 .t-display { font-family: 'Poppins', sans-serif; font-weight: 700; font-size: clamp(28px, 4vw, 36px); }

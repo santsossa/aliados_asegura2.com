@@ -254,13 +254,12 @@ export default function Dashboard() {
   const cards = [
     {
       icon: DollarSign, iconBg: '#dcfce7', iconColor: '#16a34a',
-      label: 'Próximo pago',
+      label: stats.proximo_pago.mes
+        ? `Próximo pago · 1 ${MESES_CORTO[stats.proximo_pago.mes - 1]}`
+        : 'Próximo pago',
       value: fmt(stats.proximo_pago.monto ?? 0),
       badge: stats.proximo_pago.dias_restantes !== null ? `En ${stats.proximo_pago.dias_restantes} días` : null,
-      badgeBg: '#dcfce7', badgeColor: '#16a34a',
-      sub: stats.proximo_pago.mes
-        ? `1 de ${MESES[stats.proximo_pago.mes - 1]}, ${stats.proximo_pago.anio}`
-        : 'Sin pagos pendientes',
+      sub: stats.proximo_pago.mes ? `1 ${MESES_CORTO[stats.proximo_pago.mes - 1]} ${stats.proximo_pago.anio}` : 'Sin pagos pendientes',
       showArrow: false, spark: sparklines.ganancias, sparkColor: '#16a34a',
     },
     {
@@ -293,12 +292,12 @@ export default function Dashboard() {
   ]
 
   return (
-    <div className="p-4 lg:p-6" style={{ height: '100%', overflowY: 'auto' }}>
-      <div style={{ maxWidth: '72rem', margin: '0 auto' }}>
-        <div className="grid gap-5 grid-cols-1 xl:grid-cols-[1fr_300px] items-start">
+    <div className="db-outer">
+      <div className="db-inner">
+        <div className="db-grid">
 
-          {/* ═══ LEFT COLUMN ═══ */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+          {/* ═══ LEFT COLUMN — scrolls ═══ */}
+          <div className="db-left">
 
             {/* 1. Hero banner */}
             <div style={{
@@ -325,7 +324,7 @@ export default function Dashboard() {
               </svg>
 
               <p style={{ margin: '0 0 8px', fontFamily: 'Inter', fontWeight: 700, fontSize: 9.5, color: '#c7d2fe', letterSpacing: '0.12em', textTransform: 'uppercase' }}>Portal de aliados</p>
-              <h2 style={{ margin: '0 0 20px', fontFamily: 'Poppins', fontWeight: 500, fontSize: 22, color: '#fff', lineHeight: 1.35, maxWidth: 260, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+              <h2 style={{ margin: '0 0 20px', fontFamily: 'Poppins', fontWeight: 500, fontSize: 22, color: '#fff', lineHeight: 1.35, maxWidth: '52%' }}>
                 Cotiza un seguro en segundos y gana tu comisión
               </h2>
               <button
@@ -423,9 +422,9 @@ export default function Dashboard() {
               )}
             </div>
 
-            {/* 4. Actividad reciente — full card, row list */}
-            <div style={{ background: '#fff', borderRadius: 16, overflow: 'hidden', boxShadow: 'none' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', borderBottom: 'none' }}>
+            {/* 4. Actividad reciente — flex:1, solo la lista scrollea */}
+            <div style={{ background: '#fff', borderRadius: 16, overflow: 'hidden', display: 'flex', flexDirection: 'column', flex: 1, minHeight: 180 }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 20px', flexShrink: 0 }}>
                 <span style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: 14, color: '#111827' }}>Actividad reciente</span>
                 <button onClick={() => navigate('/dashboard/cotizaciones')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'Inter', fontSize: 12, color: '#7c3aed', fontWeight: 500 }}>
                   Ver todas →
@@ -443,7 +442,7 @@ export default function Dashboard() {
                   </button>
                 </div>
               ) : (
-                <div>
+                <div style={{ flex: 1, minHeight: 0, overflowY: 'auto' }}>
                   {actividad.map((a, i) => {
                     const badge  = getBadge(a.estado, a.tipo)
                     const nombre = a.cliente_nombre || 'Sin nombre'
@@ -453,7 +452,7 @@ export default function Dashboard() {
                     return (
                       <div
                         key={`${a.tipo}-${a.id}-${i}`}
-                        style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 20px', borderBottom: 'none' }}
+                        style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 20px' }}
                       >
                         <div style={{ width: 36, height: 36, borderRadius: 10, flexShrink: 0, background: a.estado === 'enviada' ? '#dcfce7' : '#dbeafe', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                           <FileText size={16} color={a.estado === 'enviada' ? '#16a34a' : '#2563eb'} />
@@ -475,35 +474,32 @@ export default function Dashboard() {
 
           </div>
 
-          {/* ═══ RIGHT COLUMN — fija, altura completa pantalla ═══ */}
-          <div style={{ background: '#ffffff', borderRadius: 20, padding: 12, display: 'flex', flexDirection: 'column', gap: 0, position: 'sticky', top: 0, height: 'calc(100vh - 112px)', overflowY: 'auto' }}>
+          {/* ═══ RIGHT COLUMN — fija, no scrollea ═══ */}
+          <div className="db-right" style={{ background: '#ffffff', borderRadius: 20, padding: 12 }}>
 
-            {/* 5. Tu rendimiento — blanco, sin borde */}
-            <div style={{ padding: '16px 16px 14px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+            {/* 5. Tu rendimiento — flex:2, más espacio */}
+            <div style={{ flex: 2, padding: '20px 16px 16px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
                 <span style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: 14, color: '#111827' }}>Tu rendimiento</span>
                 <span style={{ fontFamily: 'Inter', fontSize: 9.5, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', padding: '3px 8px', borderRadius: 99, background: '#f5f7fb', color: '#9ca3af' }}>
                   {mesCorto} {anioLabel}
                 </span>
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
-                <PlainAvatar size={72} initials={initials} />
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+                <PlainAvatar size={80} initials={initials} />
                 <div style={{ textAlign: 'center' }}>
-                  <p style={{ margin: '0 0 3px', fontFamily: 'Poppins', fontSize: 14, fontWeight: 600, color: '#111827' }}>
+                  <p style={{ margin: '0 0 6px', fontFamily: 'Poppins', fontSize: 15, fontWeight: 600, color: '#111827' }}>
                     {saludo}, {nombreAliado}! 🔥
                   </p>
-                  <p style={{ margin: 0, fontFamily: 'Inter', fontSize: 11, color: '#6b7280', lineHeight: 1.45 }}>
+                  <p style={{ margin: 0, fontFamily: 'Inter', fontSize: 12, color: '#6b7280', lineHeight: 1.5 }}>
                     Sigue enviando clientes a emitir<br />para generar más comisiones
                   </p>
                 </div>
               </div>
             </div>
 
-            {/* spacer */}
-            <div style={{ height: 4 }} />
-
-            {/* 6. Enviadas a emitir — card gris */}
-            <div style={{ background: '#f5f7fb', borderRadius: 16, padding: '16px', margin: '8px 4px' }}>
+            {/* 6. Enviadas a emitir — flex:1.5, más espacio que Anto */}
+            <div style={{ flex: 1.5, background: '#f5f7fb', borderRadius: 16, padding: '16px', margin: '0 4px' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
                 <span style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: 13, color: '#111827' }}>Enviadas a emitir</span>
                 <span style={{ fontFamily: 'Inter', fontSize: 9.5, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', padding: '3px 8px', borderRadius: 99, background: '#ffffff', color: '#9ca3af' }}>
@@ -513,8 +509,8 @@ export default function Dashboard() {
               <PeriodBarChart polizas={polizas_proceso} />
             </div>
 
-            {/* 7. Pregúntale a Anto — card gris, flex-1 para llenar espacio */}
-            <div style={{ background: '#f5f7fb', borderRadius: 16, padding: '16px', margin: '0 4px 4px', flex: 1, display: 'flex', flexDirection: 'column' }}>
+            {/* 7. Pregúntale a Anto — flex:1 */}
+            <div style={{ flex: 1, background: '#f5f7fb', borderRadius: 16, padding: '14px 16px', margin: '4px 4px 4px', display: 'flex', flexDirection: 'column' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
                 <span style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: 13, color: '#111827' }}>Pregúntale a Anto</span>
                 <button
