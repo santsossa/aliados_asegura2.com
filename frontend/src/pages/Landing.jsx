@@ -478,11 +478,6 @@ export default function Landing() {
 
           {/* Left */}
           <div>
-            <div className="inline-flex items-center gap-2 bg-brand-light text-brand text-xs font-semibold px-4 py-2 rounded-full mb-6 border border-brand/10">
-              <span className="w-1.5 h-1.5 rounded-full bg-brand animate-pulse" />
-              Portal de aliados · Asegura2.com
-            </div>
-
             {/* Título — centrado en móvil, izquierda en desktop */}
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight mb-5 text-center lg:text-left" style={{ letterSpacing: '-0.5px' }}>
               Convierte tus contactos en{' '}
