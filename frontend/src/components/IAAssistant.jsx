@@ -208,7 +208,8 @@ export default function IAAssistant() {
           <div
             ref={chatRef}
             style={{
-              overflowY:  chatH >= MAX_H ? 'auto' : 'hidden',
+              overflowY:  'auto',
+              maxHeight:  MAX_H,
               padding:    chatH > 0 ? '14px 18px 8px' : '0',
               flexShrink: 0,
             }}

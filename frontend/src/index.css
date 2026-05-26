@@ -46,16 +46,14 @@ body {
   .db-right { display: contents !important; }
 
   /* Orden de secciones en móvil */
-  .db-welcome-row { order: 1; display: grid !important; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .db-welcome     { display: flex !important; align-items: center; justify-content: center; padding: 14px 10px !important; }
-  .db-hero-row    { order: 2; display: grid !important; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .db-stats       { order: 3; }
-  .db-enviadas    { order: 4; }
-  .db-actividad   { order: 5; }
-  .db-right-main  { order: 6; }
+  .db-welcome    { order: 1; }
+  .db-hero-row   { order: 2; display: grid !important; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .db-stats      { order: 3; }
+  .db-enviadas   { order: 4; }
+  .db-actividad  { order: 5; }
+  .db-right-main { order: 6; }
 
   /* Mini elementos visibles solo en móvil */
-  .db-mini-stat     { display: flex !important; flex-direction: column; justify-content: space-between; }
   .db-earnings-mini { display: flex !important; flex-direction: column; justify-content: space-between; }
 
   /* Hero compacto para columna 50% */
