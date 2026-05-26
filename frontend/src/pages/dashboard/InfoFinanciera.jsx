@@ -160,7 +160,7 @@ export default function InfoFinanciera() {
     const B = '#f0f1f3'
     const s = (r, h, w = '100%') => <div style={{ background: B, borderRadius: r, height: h, width: w, flexShrink: 0 }} />
     return (
-      <div style={{ padding: '0 24px 32px', maxWidth: 820, margin: '0 auto', animation: 'skpulse 1.5s ease-in-out infinite' }}>
+      <div style={{ padding: '0 24px 32px', maxWidth: '72rem', margin: '0 auto', animation: 'skpulse 1.5s ease-in-out infinite' }}>
         <style>{`@keyframes skpulse{0%,100%{opacity:1}50%{opacity:.45}}`}</style>
         <div style={{ paddingTop: 8, marginBottom: 20 }}>
           {s(8, 28, 180)}<div style={{ marginTop: 6, marginBottom: 16 }}>{s(5, 14, 300)}</div>
@@ -188,7 +188,7 @@ export default function InfoFinanciera() {
 
   return (
     <>
-      <div style={{ padding: '0 24px 32px', maxWidth: 820, margin: '0 auto' }}>
+      <div style={{ padding: '0 24px 32px', maxWidth: '72rem', margin: '0 auto' }}>
 
         {/* ── Cabecera + tabs ── */}
         <div style={{ paddingTop: 8, marginBottom: 20 }}>
