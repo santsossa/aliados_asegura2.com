@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { Loader2, Shield, Scale, MessageCircle, FileCheck, Sparkles, Plus, Clock, ArrowUp } from 'lucide-react'
+import { Loader2, Shield, Scale, MessageCircle, FileCheck, Sparkles, Plus, Clock, ArrowUp, Copy, Check } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 
 
@@ -17,11 +17,20 @@ export default function Anto() {
   const { getToken, user } = useAuth()
   const nombre = user?.nombre || user?.email?.split('@')[0] || 'aliado'
 
-  const [messages, setMessages] = useState([])
-  const [input,    setInput]    = useState('')
-  const [loading,  setLoading]  = useState(false)
+  const [messages,    setMessages]    = useState([])
+  const [input,       setInput]       = useState('')
+  const [loading,     setLoading]     = useState(false)
+  const [hoveredMsg,  setHoveredMsg]  = useState(null)
+  const [copiedMsg,   setCopiedMsg]   = useState(null)
   const bottomRef = useRef(null)
   const inputRef  = useRef(null)
+
+  function copiar(idx, text) {
+    navigator.clipboard.writeText(text).then(() => {
+      setCopiedMsg(idx)
+      setTimeout(() => setCopiedMsg(null), 1500)
+    })
+  }
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -111,24 +120,48 @@ export default function Anto() {
               {messages.map((m, i) => {
                 const esIA = m.role === 'assistant'
                 return (
-                  <div key={i} style={{ marginBottom: 16, display: 'flex', justifyContent: esIA ? 'flex-start' : 'flex-end' }}>
+                  <div key={i} style={{ marginBottom: esIA ? 20 : 14, display: 'flex', justifyContent: esIA ? 'flex-start' : 'flex-end' }}>
                     {esIA && (
                       <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'linear-gradient(135deg,#4f46e5,#2D2A7A)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginRight: 10, marginTop: 2 }}>
                         <Sparkles size={12} color="#fff" />
                       </div>
                     )}
-                    <div style={{
-                      maxWidth: '78%',
-                      background: esIA ? '#f9fafb' : '#2D2A7A',
-                      color: esIA ? '#111827' : '#fff',
-                      border: esIA ? '1px solid #e5e7eb' : 'none',
-                      borderRadius: esIA ? '4px 16px 16px 16px' : '16px 4px 16px 16px',
-                      padding: '10px 14px',
-                      fontFamily: 'Inter', fontSize: 13.5, lineHeight: 1.65,
-                      whiteSpace: 'pre-wrap',
-                    }}>
-                      {m.content}
-                    </div>
+                    {esIA ? (
+                      /* Anto — sin burbuja, texto plano + copiar en hover */
+                      <div
+                        onMouseEnter={() => setHoveredMsg(i)}
+                        onMouseLeave={() => setHoveredMsg(null)}
+                        style={{ maxWidth: '78%' }}
+                      >
+                        <p style={{ margin: 0, fontFamily: 'Inter', fontSize: 13.5, lineHeight: 1.7, color: '#111827', whiteSpace: 'pre-wrap' }}>
+                          {m.content}
+                        </p>
+                        {hoveredMsg === i && (
+                          <button
+                            onClick={() => copiar(i, m.content)}
+                            style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 6, padding: '3px 8px', border: 'none', background: 'transparent', cursor: 'pointer', fontFamily: 'Inter', fontSize: 11, color: '#9ca3af', borderRadius: 6 }}
+                            onMouseEnter={e => e.currentTarget.style.color = '#6b7280'}
+                            onMouseLeave={e => e.currentTarget.style.color = '#9ca3af'}
+                          >
+                            {copiedMsg === i ? <Check size={11} /> : <Copy size={11} />}
+                            {copiedMsg === i ? 'Copiado' : 'Copiar'}
+                          </button>
+                        )}
+                      </div>
+                    ) : (
+                      /* Aliado — burbuja azul transparente */
+                      <div style={{
+                        maxWidth: '72%',
+                        background: 'rgba(45, 42, 122, 0.08)',
+                        color: '#1e1b4b',
+                        borderRadius: '16px 4px 16px 16px',
+                        padding: '9px 14px',
+                        fontFamily: 'Inter', fontSize: 13.5, lineHeight: 1.65,
+                        whiteSpace: 'pre-wrap',
+                      }}>
+                        {m.content}
+                      </div>
+                    )}
                   </div>
                 )
               })}
@@ -138,9 +171,9 @@ export default function Anto() {
                   <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'linear-gradient(135deg,#4f46e5,#2D2A7A)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginRight: 10, marginTop: 2 }}>
                     <Sparkles size={12} color="#fff" />
                   </div>
-                  <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '4px 16px 16px 16px', padding: '12px 16px', display: 'flex', gap: 5, alignItems: 'center' }}>
+                  <div style={{ paddingTop: 6, display: 'flex', gap: 5, alignItems: 'center' }}>
                     {[0, 0.2, 0.4].map((d, i) => (
-                      <span key={i} style={{ display: 'inline-block', width: 7, height: 7, borderRadius: '50%', background: '#9ca3af', animation: `dp 1.2s ease-in-out ${d}s infinite` }} />
+                      <span key={i} style={{ display: 'inline-block', width: 6, height: 6, borderRadius: '50%', background: '#9ca3af', animation: `dp 1.2s ease-in-out ${d}s infinite` }} />
                     ))}
                   </div>
                 </div>
