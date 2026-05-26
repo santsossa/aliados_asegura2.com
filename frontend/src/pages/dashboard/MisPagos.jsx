@@ -269,11 +269,12 @@ export default function MisPagos() {
     : '—'
 
   if (loading) return (
-    <div style={{ padding:'0 24px 32px', maxWidth:'72rem', margin:'0 auto' }}><Skeleton /></div>
+    <div style={{ padding:'0 24px 32px' }}><div style={{ maxWidth:'72rem', margin:'0 auto' }}><Skeleton /></div></div>
   )
 
   return (
-    <div style={{ padding:'0 24px 32px', maxWidth:'72rem', margin:'0 auto' }}>
+    <div style={{ padding:'0 24px 32px' }}>
+      <div style={{ maxWidth:'72rem', margin:'0 auto' }}>
 
       {/* Header */}
       <div style={{ marginBottom:24, paddingTop:8 }}>
@@ -373,6 +374,7 @@ export default function MisPagos() {
         </div>
       )}
 
+      </div>
     </div>
   )
 }

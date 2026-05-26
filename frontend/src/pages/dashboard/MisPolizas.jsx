@@ -432,7 +432,8 @@ export default function MisPolizas() {
   ]
 
   return (
-    <div style={{ padding:'0 24px 32px', maxWidth:'72rem', margin:'0 auto' }}>
+    <div style={{ padding:'0 24px 32px' }}>
+      <div style={{ maxWidth:'72rem', margin:'0 auto' }}>
 
       {/* Header */}
       <div style={{ marginBottom: 20, paddingTop: 8 }}>
@@ -597,6 +598,7 @@ export default function MisPolizas() {
           </div>
         </div>
       )}
+      </div>
     </div>
   )
 }

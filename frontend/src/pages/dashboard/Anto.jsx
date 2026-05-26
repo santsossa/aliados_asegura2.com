@@ -152,6 +152,7 @@ export default function Anto() {
 
         {/* ── Input bar ── */}
         <div style={{ padding: '12px 32px 20px', flexShrink: 0 }}>
+          <div style={{ maxWidth: 580, margin: '0 auto' }}>
           <div style={{
             display: 'flex', alignItems: 'center', gap: 6,
             border: '1.5px solid #e5e7eb', borderRadius: 999,
@@ -203,6 +204,7 @@ export default function Anto() {
           <p style={{ margin: '6px 0 0', fontFamily: 'Inter', fontSize: 11, color: '#d1d5db', textAlign: 'center' }}>
             Anto puede cometer errores. Verifica la información importante.
           </p>
+          </div>
         </div>
 
       <style>{`

@@ -648,7 +648,8 @@ export default function Cotizaciones() {
   }
 
   return (
-    <div style={{ padding:'0 24px 32px', maxWidth:'72rem', margin:'0 auto' }}>
+    <div style={{ padding:'0 24px 32px' }}>
+      <div style={{ maxWidth:'72rem', margin:'0 auto' }}>
       <div style={{ marginBottom:24, paddingTop:8 }}>
         <h1 style={{ fontFamily:'Poppins', fontSize:22, fontWeight:700, color:'#111827', margin:0 }}>Mis cotizaciones</h1>
         <p style={{ fontFamily:'Inter', fontSize:13, color:'#9ca3af', margin:'4px 0 0' }}>
@@ -788,6 +789,7 @@ export default function Cotizaciones() {
           onEmitida={handleEmitida}
         />
       )}
+      </div>
     </div>
   )
 }
