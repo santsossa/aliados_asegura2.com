@@ -20,6 +20,20 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     // Al montar, intentar refresh con la cookie httpOnly
     silentRefresh().finally(() => setLoading(false))
+
+    // Cuando el usuario vuelve a la pestaña tras inactividad → refrescar token
+    function onVisibilityChange() {
+      if (document.visibilityState === 'visible') silentRefresh()
+    }
+    document.addEventListener('visibilitychange', onVisibilityChange)
+
+    // Refresh proactivo cada 10 minutos para mantener el token vivo
+    const interval = setInterval(silentRefresh, 10 * 60 * 1000)
+
+    return () => {
+      document.removeEventListener('visibilitychange', onVisibilityChange)
+      clearInterval(interval)
+    }
   }, [])
 
   async function silentRefresh() {
