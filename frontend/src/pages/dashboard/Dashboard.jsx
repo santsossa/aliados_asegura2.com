@@ -421,54 +421,69 @@ export default function Dashboard() {
           {/* ═══ LEFT COLUMN — scrolls ═══ */}
           <div className="db-left">
 
-            {/* 1. Hero banner */}
-            <div style={{
-              background: 'linear-gradient(135deg, #3730a3 0%, #4f46e5 60%, #6366f1 100%)',
-              borderRadius: 28, padding: '28px 32px',
-              position: 'relative', overflow: 'hidden', minHeight: 148,
-              display: 'flex', flexDirection: 'column', justifyContent: 'center',
-            }}>
-              {/* Sparkles decorativos */}
-              <svg style={{ position: 'absolute', right: 32, top: '50%', transform: 'translateY(-50%)', opacity: 0.18, pointerEvents: 'none' }} width="110" height="110" viewBox="0 0 200 200">
-                <path d="M100 0 C100 0 108 92 200 100 C200 100 108 108 100 200 C100 200 92 108 0 100 C0 100 92 92 100 0Z" fill="white" />
-              </svg>
-              <svg style={{ position: 'absolute', right: 70, top: 18, opacity: 0.13, pointerEvents: 'none' }} width="32" height="32" viewBox="0 0 200 200">
-                <path d="M100 0 C100 0 108 92 200 100 C200 100 108 108 100 200 C100 200 92 108 0 100 C0 100 92 92 100 0Z" fill="white" />
-              </svg>
-              <svg style={{ position: 'absolute', right: 150, top: 12, opacity: 0.09, pointerEvents: 'none' }} width="20" height="20" viewBox="0 0 200 200">
-                <path d="M100 0 C100 0 108 92 200 100 C200 100 108 108 100 200 C100 200 92 108 0 100 C0 100 92 92 100 0Z" fill="white" />
-              </svg>
-              <svg style={{ position: 'absolute', right: 18, bottom: 16, opacity: 0.1, pointerEvents: 'none' }} width="26" height="26" viewBox="0 0 200 200">
-                <path d="M100 0 C100 0 108 92 200 100 C200 100 108 108 100 200 C100 200 92 108 0 100 C0 100 92 92 100 0Z" fill="white" />
-              </svg>
-              <svg style={{ position: 'absolute', right: 200, bottom: 20, opacity: 0.07, pointerEvents: 'none' }} width="16" height="16" viewBox="0 0 200 200">
-                <path d="M100 0 C100 0 108 92 200 100 C200 100 108 108 100 200 C100 200 92 108 0 100 C0 100 92 92 100 0Z" fill="white" />
-              </svg>
+            {/* 1. Hero banner + mini-stat */}
+            <div className="db-hero-row">
+              <div className="db-hero" style={{
+                background: 'linear-gradient(135deg, #3730a3 0%, #4f46e5 60%, #6366f1 100%)',
+                borderRadius: 28, padding: '28px 32px',
+                position: 'relative', overflow: 'hidden', minHeight: 148,
+                display: 'flex', flexDirection: 'column', justifyContent: 'center',
+              }}>
+                {/* Sparkles decorativos */}
+                <div className="db-hero-deco" style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
+                  <svg style={{ position: 'absolute', right: 32, top: '50%', transform: 'translateY(-50%)', opacity: 0.18 }} width="110" height="110" viewBox="0 0 200 200">
+                    <path d="M100 0 C100 0 108 92 200 100 C200 100 108 108 100 200 C100 200 92 108 0 100 C0 100 92 92 100 0Z" fill="white" />
+                  </svg>
+                  <svg style={{ position: 'absolute', right: 70, top: 18, opacity: 0.13 }} width="32" height="32" viewBox="0 0 200 200">
+                    <path d="M100 0 C100 0 108 92 200 100 C200 100 108 108 100 200 C100 200 92 108 0 100 C0 100 92 92 100 0Z" fill="white" />
+                  </svg>
+                  <svg style={{ position: 'absolute', right: 150, top: 12, opacity: 0.09 }} width="20" height="20" viewBox="0 0 200 200">
+                    <path d="M100 0 C100 0 108 92 200 100 C200 100 108 108 100 200 C100 200 92 108 0 100 C0 100 92 92 100 0Z" fill="white" />
+                  </svg>
+                  <svg style={{ position: 'absolute', right: 18, bottom: 16, opacity: 0.1 }} width="26" height="26" viewBox="0 0 200 200">
+                    <path d="M100 0 C100 0 108 92 200 100 C200 100 108 108 100 200 C100 200 92 108 0 100 C0 100 92 92 100 0Z" fill="white" />
+                  </svg>
+                  <svg style={{ position: 'absolute', right: 200, bottom: 20, opacity: 0.07 }} width="16" height="16" viewBox="0 0 200 200">
+                    <path d="M100 0 C100 0 108 92 200 100 C200 100 108 108 100 200 C100 200 92 108 0 100 C0 100 92 92 100 0Z" fill="white" />
+                  </svg>
+                </div>
 
-              <p style={{ margin: '0 0 8px', fontFamily: 'Inter', fontWeight: 700, fontSize: 9.5, color: '#c7d2fe', letterSpacing: '0.12em', textTransform: 'uppercase' }}>Portal de aliados</p>
-              <h2 style={{ margin: '0 0 20px', fontFamily: 'Poppins', fontWeight: 500, fontSize: 22, color: '#fff', lineHeight: 1.35, maxWidth: '72%' }}>
-                Cotiza un seguro en segundos y gana tu comisión
-              </h2>
-              <button
-                onClick={() => navigate('/dashboard/cotizar')}
-                style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 10,
-                  width: 'fit-content',
-                  background: '#0f0e1a', border: 'none', borderRadius: 999,
-                  cursor: 'pointer', padding: '9px 9px 9px 18px',
-                  color: '#fff', fontSize: 13, fontWeight: 700,
-                  transition: 'opacity 0.15s',
-                }}
-                onMouseEnter={e => e.currentTarget.style.opacity = '0.8'}
-                onMouseLeave={e => e.currentTarget.style.opacity = '1'}
-              >
-                Cotizar ahora
-                <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 26, height: 26, borderRadius: '50%', background: '#ffffff', fontSize: 16, color: '#0f0e1a', fontWeight: 900, lineHeight: 1 }}>›</span>
-              </button>
+                <p className="db-hero-label" style={{ margin: '0 0 8px', fontFamily: 'Inter', fontWeight: 700, fontSize: 9.5, color: '#c7d2fe', letterSpacing: '0.12em', textTransform: 'uppercase' }}>Portal de aliados</p>
+                <h2 className="db-hero-title" style={{ margin: '0 0 20px', fontFamily: 'Poppins', fontWeight: 500, fontSize: 22, color: '#fff', lineHeight: 1.35, maxWidth: '72%' }}>
+                  Cotiza un seguro en segundos y gana tu comisión
+                </h2>
+                <button
+                  className="db-hero-btn"
+                  onClick={() => navigate('/dashboard/cotizar')}
+                  style={{
+                    display: 'inline-flex', alignItems: 'center', gap: 10,
+                    width: 'fit-content',
+                    background: '#0f0e1a', border: 'none', borderRadius: 999,
+                    cursor: 'pointer', padding: '9px 9px 9px 18px',
+                    color: '#fff', fontSize: 13, fontWeight: 700,
+                    transition: 'opacity 0.15s',
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.opacity = '0.8'}
+                  onMouseLeave={e => e.currentTarget.style.opacity = '1'}
+                >
+                  Cotizar ahora
+                  <span className="db-hero-btn-icon" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 26, height: 26, borderRadius: '50%', background: '#ffffff', fontSize: 16, color: '#0f0e1a', fontWeight: 900, lineHeight: 1 }}>›</span>
+                </button>
+              </div>
+
+              {/* Mini-stat card — visible only on mobile */}
+              <div className="db-mini-stat" style={{ background: '#fff', borderRadius: 20, padding: '16px 14px' }}>
+                <p style={{ margin: 0, fontFamily: 'Inter', fontSize: 11, color: '#9ca3af' }}>Enviadas a emitir</p>
+                <div>
+                  <p style={{ margin: '4px 0 0', fontFamily: 'Poppins', fontSize: 28, fontWeight: 700, color: '#111827', lineHeight: 1 }}>{polizas_proceso.length}</p>
+                  <p style={{ margin: '4px 0 0', fontFamily: 'Inter', fontSize: 11, color: '#6b7280' }}>pólizas activas</p>
+                </div>
+                <Shield size={16} color="#2D2A7A" strokeWidth={2.2} style={{ marginTop: 8 }} />
+              </div>
             </div>
 
             {/* 2. Stats cards — compactas horizontales */}
-            <div className="grid grid-cols-2 xl:grid-cols-4 gap-2">
+            <div className="db-stats grid grid-cols-2 xl:grid-cols-4 gap-2">
               {cards.map((c, i) => {
                 const Icon = c.icon
                 return (
@@ -489,7 +504,7 @@ export default function Dashboard() {
             </div>
 
             {/* 3. Enviadas a emitir — carrusel horizontal */}
-            <div style={{ marginTop: 8 }}>
+            <div className="db-enviadas" style={{ marginTop: 8 }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 4px', marginBottom: 12 }}>
                 <span style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: 14, color: '#111827' }}>Enviadas a emitir</span>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -570,7 +585,7 @@ export default function Dashboard() {
             </div>
 
             {/* 4. Actividad reciente */}
-            <div style={{ marginTop: 8 }}>
+            <div className="db-actividad" style={{ marginTop: 8 }}>
               {/* Título fuera del card */}
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 4px', marginBottom: 10 }}>
                 <span style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: 14, color: '#111827' }}>Actividad reciente</span>
@@ -628,7 +643,7 @@ export default function Dashboard() {
           <div className="db-right">
 
             {/* 5. Tu rendimiento */}
-            <div style={{ background: '#fff', borderRadius: 22, padding: '22px 16px 18px' }}>
+            <div className="db-welcome" style={{ background: '#fff', borderRadius: 22, padding: '22px 16px 18px' }}>
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
                 <AvatarCircle avatarId={avatarId} size={92} initials={initials} />
                 <div style={{ textAlign: 'center' }}>
@@ -643,7 +658,7 @@ export default function Dashboard() {
             </div>
 
             {/* 6+7. White outer card — Comisiones + Anto */}
-            <div style={{ background: '#fff', borderRadius: 22, padding: '14px 14px 12px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <div className="db-right-main" style={{ background: '#fff', borderRadius: 22, padding: '14px 14px 12px', display: 'flex', flexDirection: 'column', gap: 10 }}>
 
               {/* Comisiones — título fuera de la gray card */}
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 2px' }}>
