@@ -670,11 +670,6 @@ export default function Landing() {
 
           {/* ── Header centrado ── */}
           <div style={{ textAlign:'center', marginBottom:52 }}>
-            {/* Badge */}
-            <div style={{ display:'inline-flex', alignItems:'center', gap:8, background:'#ede9fe', borderRadius:999, padding:'6px 18px 6px 12px', marginBottom:20 }}>
-              <span style={{ fontSize:13, color:'#7c3aed' }}>✦</span>
-              <span style={{ fontFamily:'Inter', fontSize:11, fontWeight:700, color:'#6d28d9', letterSpacing:'0.09em', textTransform:'uppercase' }}>Anto IA · Tu asesor inteligente</span>
-            </div>
             {/* Título */}
             <h2 style={{ fontFamily:'Poppins', fontSize:42, fontWeight:800, color:'#111827', margin:'0 0 16px', letterSpacing:'-0.5px', lineHeight:1.15 }}>
               Vende seguros sin saber nada<br />
@@ -969,28 +964,28 @@ export default function Landing() {
 
       {/* ── CTA final ───────────────────────────────────────────── */}
       <section className="py-16 px-6 bg-gray-50">
-        <div style={{ maxWidth:640, margin:'0 auto', background:'#fff', border:'1px solid #e5e7eb', borderRadius:28, padding:'52px 48px', textAlign:'center', boxShadow:'0 2px 24px rgba(0,0,0,0.05)' }}>
+        <div style={{ maxWidth:860, margin:'0 auto', background:'#fff', border:'1px solid #e5e7eb', borderRadius:28, padding:'56px 72px', textAlign:'center', boxShadow:'0 2px 24px rgba(0,0,0,0.05)' }}>
           {/* Badge */}
           <div style={{ display:'inline-flex', alignItems:'center', gap:8, marginBottom:22 }}>
             <div style={{ width:7, height:7, borderRadius:'50%', background:'#22c55e', flexShrink:0 }} />
             <span style={{ fontFamily:'Inter', fontSize:11, fontWeight:700, color:'#9ca3af', letterSpacing:'0.1em', textTransform:'uppercase' }}>Aliados · Asegura2.com</span>
           </div>
           {/* Título */}
-          <h2 style={{ fontFamily:'Poppins', fontSize:34, fontWeight:800, color:'#111827', lineHeight:1.2, margin:'0 0 14px', letterSpacing:'-0.5px' }}>
+          <h2 style={{ fontFamily:'Poppins', fontSize:36, fontWeight:800, color:'#111827', lineHeight:1.2, margin:'0 0 14px', letterSpacing:'-0.5px' }}>
             Empieza a vender seguros hoy
           </h2>
           {/* Subtítulo */}
-          <p style={{ fontFamily:'Inter', fontSize:15, color:'#6b7280', margin:'0 0 34px', lineHeight:1.65 }}>
+          <p style={{ fontFamily:'Inter', fontSize:15, color:'#6b7280', margin:'0 0 36px', lineHeight:1.65 }}>
             Cotiza desde el primer día y cobra el 1 de cada mes.<br />Sin costos, sin límites.
           </p>
           {/* Botones */}
-          <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:10 }}>
-            <Link to="/login" style={{ background:'#111827', color:'#fff', fontFamily:'Inter', fontSize:14, fontWeight:600, padding:'12px 28px', borderRadius:999, textDecoration:'none', display:'inline-flex', alignItems:'center', transition:'opacity .2s' }}
-              onMouseEnter={e=>e.currentTarget.style.opacity='.85'} onMouseLeave={e=>e.currentTarget.style.opacity='1'}>
+          <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:12 }}>
+            <Link to="/login" style={{ background:'#2D2A7A', color:'#fff', fontFamily:'Inter', fontSize:14, fontWeight:600, padding:'13px 32px', borderRadius:999, textDecoration:'none', display:'inline-flex', alignItems:'center', boxShadow:'0 6px 20px rgba(45,42,122,0.32)', transition:'opacity .2s' }}
+              onMouseEnter={e=>e.currentTarget.style.opacity='.88'} onMouseLeave={e=>e.currentTarget.style.opacity='1'}>
               Ingresar
             </Link>
-            <Link to="/registro" style={{ background:'#fff', color:'#111827', fontFamily:'Inter', fontSize:14, fontWeight:600, padding:'11px 28px', borderRadius:999, textDecoration:'none', border:'1.5px solid #e5e7eb', display:'inline-flex', alignItems:'center', transition:'background .2s' }}
-              onMouseEnter={e=>e.currentTarget.style.background='#f9fafb'} onMouseLeave={e=>e.currentTarget.style.background='#fff'}>
+            <Link to="/registro" style={{ background:'#fff', color:'#2D2A7A', fontFamily:'Inter', fontSize:14, fontWeight:600, padding:'12px 32px', borderRadius:999, textDecoration:'none', border:'1.5px solid #2D2A7A', display:'inline-flex', alignItems:'center', transition:'background .2s' }}
+              onMouseEnter={e=>e.currentTarget.style.background='#f5f3ff'} onMouseLeave={e=>e.currentTarget.style.background='#fff'}>
               Registrarse
             </Link>
           </div>
