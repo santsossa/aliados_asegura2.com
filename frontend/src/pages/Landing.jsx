@@ -422,38 +422,12 @@ export default function Landing() {
   const loginHref  = user ? (user.tipo === 'admin' ? '/admin' : '/dashboard') : '/login'
   const loginLabel = user ? 'Mi cuenta' : 'Entrar'
 
-  // ── Navbar hide-on-scroll-down / show-on-scroll-up ─────────────
-  const [navVisible, setNavVisible] = useState(true)
-  const lastScrollY = useRef(0)
-
-  useEffect(() => {
-    function onScroll() {
-      const current = window.scrollY
-      // Siempre visible si estamos cerca del top (< 60px)
-      if (current < 60) { setNavVisible(true); lastScrollY.current = current; return }
-      if (current > lastScrollY.current) {
-        setNavVisible(false)   // bajando → ocultar
-      } else {
-        setNavVisible(true)    // subiendo → mostrar
-      }
-      lastScrollY.current = current
-    }
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [])
 
   return (
     <div className="min-h-screen font-sans" style={{ background: 'linear-gradient(160deg, #f0f2ff 0%, #faf8ff 40%, #ffffff 100%)', overflowX: 'hidden' }}>
 
       {/* ── Navbar ──────────────────────────────────────────────── */}
-      <div
-        className="flex justify-center px-3 sm:px-6 pt-3 sm:pt-5 sticky top-0 z-20"
-        style={{
-          transform: navVisible ? 'translateY(0)' : 'translateY(-110%)',
-          opacity:   navVisible ? 1 : 0,
-          transition: 'transform 0.35s cubic-bezier(0.4,0,0.2,1), opacity 0.3s ease',
-        }}
-      >
+      <div className="flex justify-center px-3 sm:px-6 pt-3 sm:pt-5 sticky top-0 z-20">
         <nav className="flex items-center justify-between w-full max-w-5xl bg-white/90 backdrop-blur-md border border-gray-200/80 rounded-2xl px-4 sm:px-5 py-3 sm:py-2 shadow-md sm:shadow-sm">
           <LogoFull className="h-10 sm:h-11" />
           <div className="hidden md:flex items-center gap-6">
