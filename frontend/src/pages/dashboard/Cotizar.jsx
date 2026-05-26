@@ -738,92 +738,122 @@ export default function Cotizar() {
 
   /* ── SELECT ── */
   if (phase === 'select') return (
-    <div style={{ padding:'0 24px 32px', maxWidth:'72rem', margin:'0 auto' }}>
-      <div style={{ marginBottom:24, paddingTop:8 }}>
-        <h1 style={{ fontFamily:'Poppins', fontSize:22, fontWeight:700, color:'#111827', margin:0 }}>Nueva cotización</h1>
-        <p style={{ fontFamily:'Inter', fontSize:13, color:'#9ca3af', margin:'4px 0 0' }}>¿Qué tipo de vehículo quieres cotizar?</p>
+    <div style={{ padding:'0 24px 32px', maxWidth:'680px', margin:'0 auto' }}>
+      <div style={{ paddingTop:32, marginBottom:32, textAlign:'center' }}>
+        <h1 style={{ fontFamily:'Poppins', fontSize:24, fontWeight:800, color:'#111827', margin:'0 0 8px' }}>
+          ¿Qué tipo de vehículo quieres cotizar?
+        </h1>
+        <p style={{ fontFamily:'Inter', fontSize:14, color:'#9ca3af', margin:0, lineHeight:1.6 }}>
+          Elige el tipo de seguro que necesitas y empezamos al instante.
+        </p>
       </div>
 
-      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16 }}>
+      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:20 }}>
 
         {/* ── Vehículo usado ── */}
         <button
           onClick={() => setPhase('placa')}
           style={{
-            background:'#fff', border:'none', borderRadius:22,
-            padding:0, cursor:'pointer', textAlign:'left',
-            display:'flex', flexDirection:'column', overflow:'hidden',
-            transition:'box-shadow 0.15s',
-            boxShadow:'0 1px 4px rgba(0,0,0,0.04)',
+            background:'#fff',
+            border:'2px solid #e8e6ff',
+            borderRadius:24,
+            padding:0,
+            cursor:'pointer',
+            textAlign:'left',
+            display:'flex',
+            flexDirection:'column',
+            overflow:'hidden',
+            transition:'border-color 0.18s, box-shadow 0.18s',
+            boxShadow:'0 2px 8px rgba(45,42,122,0.06)',
           }}
-          onMouseEnter={e => e.currentTarget.style.boxShadow='0 6px 24px rgba(45,42,122,0.12)'}
-          onMouseLeave={e => e.currentTarget.style.boxShadow='0 1px 4px rgba(0,0,0,0.04)'}
+          onMouseEnter={e => {
+            e.currentTarget.style.borderColor = '#2D2A7A'
+            e.currentTarget.style.boxShadow = '0 8px 28px rgba(45,42,122,0.14)'
+          }}
+          onMouseLeave={e => {
+            e.currentTarget.style.borderColor = '#e8e6ff'
+            e.currentTarget.style.boxShadow = '0 2px 8px rgba(45,42,122,0.06)'
+          }}
         >
           {/* Área ilustración */}
           <div style={{
-            background:'#f5f7fb', height:200,
-            display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0,
-            position:'relative', overflow:'hidden',
+            background:'linear-gradient(145deg, #EEE7FD 0%, #ddd6fe 100%)',
+            height:210,
+            display:'flex', alignItems:'center', justifyContent:'center',
+            position:'relative', overflow:'hidden', flexShrink:0,
           }}>
-            {/* Círculo decorativo de fondo */}
-            <div style={{ position:'absolute', width:160, height:160, borderRadius:'50%', background:'#edeef3', opacity:0.7 }} />
-            <span style={{ fontSize:80, lineHeight:1, position:'relative' }}>🚙</span>
+            {/* Círculos decorativos */}
+            <div style={{ position:'absolute', width:180, height:180, borderRadius:'50%', background:'rgba(87,69,171,0.08)' }} />
+            <div style={{ position:'absolute', width:110, height:110, borderRadius:'50%', background:'rgba(87,69,171,0.12)', bottom:-20, right:-20 }} />
+            <div style={{ position:'absolute', width:60, height:60, borderRadius:'50%', background:'rgba(87,69,171,0.10)', top:16, left:20 }} />
+            {/* Icono SVG de carro */}
+            <svg width="96" height="96" viewBox="0 0 24 24" fill="none" style={{ position:'relative', filter:'drop-shadow(0 4px 12px rgba(87,69,171,0.25))' }}>
+              <rect width="24" height="24" rx="12" fill="#2D2A7A" />
+              <path d="M7 13l1.5-4h7L17 13" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              <rect x="5" y="13" width="14" height="4" rx="1" stroke="#fff" strokeWidth="1.5"/>
+              <circle cx="8.5" cy="17.5" r="1.5" fill="#fff"/>
+              <circle cx="15.5" cy="17.5" r="1.5" fill="#fff"/>
+            </svg>
           </div>
           {/* Contenido */}
           <div style={{ padding:'22px 24px 26px', display:'flex', flexDirection:'column', gap:10, flex:1 }}>
-            <p style={{ margin:0, fontFamily:'Poppins', fontSize:17, fontWeight:700, color:'#111827' }}>Vehículo usado</p>
+            <p style={{ margin:0, fontFamily:'Poppins', fontSize:16, fontWeight:700, color:'#111827' }}>
+              Vehículo usado
+            </p>
             <p style={{ margin:0, fontFamily:'Inter', fontSize:13, color:'#6b7280', lineHeight:1.65 }}>
               Cotiza el seguro de un vehículo con placa activa en el RUNT. Comparamos precios de todas las aseguradoras al instante.
             </p>
-            <div style={{
-              marginTop:6, alignSelf:'flex-start',
-              display:'inline-flex', alignItems:'center', gap:8,
-              background:'#2D2A7A', color:'#fff', borderRadius:999,
-              padding:'9px 20px', fontSize:13, fontWeight:700,
-            }}>
-              Empezar →
-            </div>
           </div>
         </button>
 
         {/* ── Vehículo 0 km ── */}
         <div
           style={{
-            background:'#fff', border:'none', borderRadius:22,
-            padding:0, cursor:'not-allowed', textAlign:'left',
-            display:'flex', flexDirection:'column', overflow:'hidden',
+            background:'#fff',
+            border:'2px solid #f0f0f4',
+            borderRadius:24,
+            padding:0,
+            cursor:'not-allowed',
+            textAlign:'left',
+            display:'flex',
+            flexDirection:'column',
+            overflow:'hidden',
             position:'relative',
-            boxShadow:'0 1px 4px rgba(0,0,0,0.04)',
-            opacity:0.6,
+            opacity:0.55,
           }}
         >
           <span style={{
             position:'absolute', top:14, right:14, zIndex:2,
             background:'#fef3c7', color:'#d97706',
             fontSize:11, fontWeight:700, padding:'4px 12px', borderRadius:99,
-          }}>Próximamente</span>
+          }}>
+            Próximamente
+          </span>
 
           <div style={{
-            background:'#f5f7fb', height:200,
-            display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0,
-            position:'relative', overflow:'hidden',
+            background:'linear-gradient(145deg, #f5f7fb 0%, #eaecf2 100%)',
+            height:210,
+            display:'flex', alignItems:'center', justifyContent:'center',
+            position:'relative', overflow:'hidden', flexShrink:0,
           }}>
-            <div style={{ position:'absolute', width:160, height:160, borderRadius:'50%', background:'#edeef3', opacity:0.7 }} />
-            <span style={{ fontSize:80, lineHeight:1, position:'relative' }}>🚗</span>
+            <div style={{ position:'absolute', width:180, height:180, borderRadius:'50%', background:'rgba(0,0,0,0.04)' }} />
+            <div style={{ position:'absolute', width:110, height:110, borderRadius:'50%', background:'rgba(0,0,0,0.04)', bottom:-20, right:-20 }} />
+            <svg width="96" height="96" viewBox="0 0 24 24" fill="none" style={{ position:'relative' }}>
+              <rect width="24" height="24" rx="12" fill="#9ca3af" />
+              <path d="M7 13l1.5-4h7L17 13" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              <rect x="5" y="13" width="14" height="4" rx="1" stroke="#fff" strokeWidth="1.5"/>
+              <circle cx="8.5" cy="17.5" r="1.5" fill="#fff"/>
+              <circle cx="15.5" cy="17.5" r="1.5" fill="#fff"/>
+              <path d="M12 6v4M10 8h4" stroke="#fff" strokeWidth="1.5" strokeLinecap="round"/>
+            </svg>
           </div>
           <div style={{ padding:'22px 24px 26px', display:'flex', flexDirection:'column', gap:10, flex:1 }}>
-            <p style={{ margin:0, fontFamily:'Poppins', fontSize:17, fontWeight:700, color:'#374151' }}>Vehículo 0 km</p>
+            <p style={{ margin:0, fontFamily:'Poppins', fontSize:16, fontWeight:700, color:'#374151' }}>
+              Vehículo 0 km
+            </p>
             <p style={{ margin:0, fontFamily:'Inter', fontSize:13, color:'#9ca3af', lineHeight:1.65 }}>
               Cotiza el primer seguro de un vehículo nuevo directo desde la agencia, sin placa aún registrada.
             </p>
-            <div style={{
-              marginTop:6, alignSelf:'flex-start',
-              display:'inline-flex', alignItems:'center', gap:8,
-              background:'#e5e7eb', color:'#9ca3af', borderRadius:999,
-              padding:'9px 20px', fontSize:13, fontWeight:600,
-            }}>
-              Disponible pronto
-            </div>
           </div>
         </div>
 

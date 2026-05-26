@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Car, X, Send, Clock, AlertCircle, CheckCircle2 } from 'lucide-react'
+import { Car, X, Send, Clock, AlertCircle } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
@@ -612,10 +612,9 @@ export default function Cotizaciones() {
   const [cotizaciones, setCotizaciones] = useState([])
   const [loading, setLoading] = useState(true)
   const [modalCot, setModalCot] = useState(null)
-  const [view, setView] = useState('todas') // 'todas' | 'activas' | 'enviadas'
 
   const hoy = new Date()
-  const [mesVer, setMesVer] = useState(hoy.getMonth() + 1)
+  const [mesVer, setMesVer] = useState(hoy.getMonth() + 1)   // 1-12
   const [anioVer, setAnioVer] = useState(hoy.getFullYear())
 
   const esActual = mesVer === hoy.getMonth() + 1 && anioVer === hoy.getFullYear()
@@ -639,7 +638,7 @@ export default function Cotizaciones() {
     else setMesVer(m => m - 1)
   }
   const irMesSiguiente = () => {
-    if (esActual) return
+    if (esActual) return // no ir al futuro
     if (mesVer === 12) { setMesVer(1); setAnioVer(a => a + 1) }
     else setMesVer(m => m + 1)
   }
@@ -648,25 +647,23 @@ export default function Cotizaciones() {
     setCotizaciones(prev => prev.map(c => c.id === id ? { ...c, estado: 'enviada' } : c))
   }
 
-  const nActivas  = cotizaciones.filter(c => c.estado !== 'enviada').length
-  const nEnviadas = cotizaciones.filter(c => c.estado === 'enviada').length
-  const filtered  = view === 'activas'  ? cotizaciones.filter(c => c.estado !== 'enviada')
-                  : view === 'enviadas' ? cotizaciones.filter(c => c.estado === 'enviada')
-                  : cotizaciones
-
   return (
     <div style={{ padding:'0 24px 32px', maxWidth:'72rem', margin:'0 auto' }}>
-
-      {/* Header + mes nav */}
       <div style={{ marginBottom:24, paddingTop:8 }}>
         <h1 style={{ fontFamily:'Poppins', fontSize:22, fontWeight:700, color:'#111827', margin:0 }}>Mis cotizaciones</h1>
         <p style={{ fontFamily:'Inter', fontSize:13, color:'#9ca3af', margin:'4px 0 0' }}>
-          {MESES_FULL[mesVer-1]} {anioVer} — Elige una categoría para filtrar o ve todas.
+          Aquí están todas las veces que cotizaste un seguro para un cliente. Puedes ver cuáles ya las enviaste a emitir y cuáles siguen abiertas.
+          {' '}
+          {esActual
+            ? `— ${MESES_FULL[mesVer-1]} ${anioVer}`
+            : `— ${MESES_FULL[mesVer-1]} ${anioVer}`}
         </p>
+        {/* Navegación de mes */}
         <div style={{ display:'flex', alignItems:'center', gap:8, marginTop:12 }}>
           <button
             onClick={irMesAnterior}
-            style={{ background:'#f3f4f6', border:'none', borderRadius:8, padding:'6px 12px', cursor:'pointer', fontSize:13, color:'#374151', fontWeight:600 }}>
+            style={{ background:'#f3f4f6', border:'none', borderRadius:8, padding:'6px 12px',
+                     cursor:'pointer', fontSize:13, color:'#374151', fontWeight:600 }}>
             ← Anterior
           </button>
           <span style={{ fontSize:13, fontWeight:700, color:'#111827', minWidth:140, textAlign:'center' }}>
@@ -676,218 +673,110 @@ export default function Cotizaciones() {
           <button
             onClick={irMesSiguiente}
             disabled={esActual}
-            style={{ background: esActual ? '#f9fafb' : '#f3f4f6', border:'none', borderRadius:8, padding:'6px 12px',
-                     cursor: esActual ? 'default' : 'pointer', fontSize:13, color: esActual ? '#d1d5db' : '#374151', fontWeight:600 }}>
+            style={{ background: esActual ? '#f9fafb' : '#f3f4f6', border:'none', borderRadius:8,
+                     padding:'6px 12px', cursor: esActual ? 'default' : 'pointer',
+                     fontSize:13, color: esActual ? '#d1d5db' : '#374151', fontWeight:600 }}>
             Siguiente →
           </button>
         </div>
       </div>
 
-      {/* ── Skeleton ── */}
       {loading ? (
-        <div style={{ animation:'skpulse 1.5s ease-in-out infinite' }}>
+        <div style={{ display:'flex', flexDirection:'column', gap:12, animation:'skpulse 1.5s ease-in-out infinite' }}>
           <style>{`@keyframes skpulse{0%,100%{opacity:1}50%{opacity:.45}}`}</style>
-          {/* selector cards skeleton */}
-          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16, marginBottom:24 }}>
-            {[0,1].map(i => (
-              <div key={i} style={{ background:'#fff', borderRadius:24, padding:'28px 24px', display:'flex', flexDirection:'column', alignItems:'center', gap:16 }}>
-                <div style={{ width:72, height:72, borderRadius:'50%', background:'#f0f1f3' }} />
-                <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:8, width:'100%' }}>
-                  <div style={{ height:16, width:'55%', background:'#f0f1f3', borderRadius:6 }} />
-                  <div style={{ height:12, width:'80%', background:'#f0f1f3', borderRadius:5 }} />
-                  <div style={{ height:12, width:'65%', background:'#f0f1f3', borderRadius:5 }} />
-                  <div style={{ height:22, width:90, background:'#f0f1f3', borderRadius:99, marginTop:4 }} />
-                </div>
+          {[0,1,2,3,4].map(i => (
+            <div key={i} style={{ background:'#fff', borderRadius:16, border:'1px solid #f3f4f6', padding:'16px 20px', display:'flex', alignItems:'center', gap:14 }}>
+              {/* ícono circular */}
+              <div style={{ width:38, height:38, borderRadius:'50%', background:'#f0f1f3', flexShrink:0 }} />
+              {/* texto */}
+              <div style={{ flex:1, display:'flex', flexDirection:'column', gap:7 }}>
+                <div style={{ background:'#f0f1f3', borderRadius:5, height:13, width:'48%' }} />
+                <div style={{ background:'#f0f1f3', borderRadius:5, height:11, width:'72%' }} />
               </div>
-            ))}
-          </div>
-          {/* list skeleton */}
-          <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
-            {[0,1,2,3,4].map(i => (
-              <div key={i} style={{ background:'#fff', borderRadius:16, border:'1px solid #f3f4f6', padding:'16px 20px', display:'flex', alignItems:'center', gap:14 }}>
-                <div style={{ width:38, height:38, borderRadius:'50%', background:'#f0f1f3', flexShrink:0 }} />
-                <div style={{ flex:1, display:'flex', flexDirection:'column', gap:7 }}>
-                  <div style={{ background:'#f0f1f3', borderRadius:5, height:13, width:'48%' }} />
-                  <div style={{ background:'#f0f1f3', borderRadius:5, height:11, width:'72%' }} />
-                </div>
-                <div style={{ display:'flex', alignItems:'center', gap:8, flexShrink:0 }}>
-                  <div style={{ background:'#f0f1f3', borderRadius:99, height:22, width:72 }} />
-                  <div style={{ background:'#f0f1f3', borderRadius:99, height:28, width:64 }} />
-                </div>
+              {/* badge + botón */}
+              <div style={{ display:'flex', alignItems:'center', gap:8, flexShrink:0 }}>
+                <div style={{ background:'#f0f1f3', borderRadius:99, height:22, width:72 }} />
+                <div style={{ background:'#f0f1f3', borderRadius:99, height:28, width:64 }} />
               </div>
-            ))}
+            </div>
+          ))}
+        </div>
+      ) : cotizaciones.length === 0 ? (
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm flex flex-col items-center justify-center py-20 text-center">
+          <div className="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center mb-4">
+            <Car size={24} className="text-gray-300" />
           </div>
+          <p className="text-gray-400 font-medium text-sm">Sin cotizaciones aún</p>
+          <p className="text-gray-300 text-xs mt-1">Inicia tu primera cotización desde el menú lateral</p>
         </div>
       ) : (
-        <>
-          {/* ── Selector cards ── */}
-          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16, marginBottom:24 }}>
+        <div className="space-y-3">
+          {cotizaciones.map(c => {
+            const raw = c.datos_cotizacion
+            let datos = {}
+            if (raw) { if (typeof raw === 'object') datos = raw; else try { datos = JSON.parse(raw) } catch {} }
+            const badge = getBadge(c.estado)
+            const fecha = new Date(c.created_at)
+            const fechaStr = `${fecha.getDate()} ${MESES[fecha.getMonth()]} ${fecha.getFullYear()}`
+            const nPlanes = (datos.quotes || []).length || ((datos.planes_full || 0) + (datos.planes_basico || 0))
+            const within24h = (Date.now() - fecha.getTime()) / 3600000 < 24
+            const noEnviada = c.estado !== 'enviada'
 
-            {/* Card: Sin enviar */}
-            <div
-              onClick={() => setView(v => v === 'activas' ? 'todas' : 'activas')}
-              style={{
-                background: view === 'activas' ? '#f5f4ff' : '#fff',
-                border: `2px solid ${view === 'activas' ? '#2D2A7A' : '#f0f0f4'}`,
-                borderRadius: 24,
-                padding: '28px 24px',
-                cursor: 'pointer',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: 16,
-                textAlign: 'center',
-                transition: 'border-color 0.18s, background 0.18s',
-                userSelect: 'none',
-              }}
-            >
-              <div style={{
-                width: 76, height: 76, borderRadius: '50%',
-                background: view === 'activas' ? '#EEE7FD' : '#f5f7fb',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                transition: 'background 0.18s',
-              }}>
-                <Clock size={34} color={view === 'activas' ? '#5745AB' : '#9ca3af'} />
-              </div>
-              <div>
-                <p style={{ margin: '0 0 6px', fontFamily: 'Poppins', fontWeight: 700, fontSize: 15, color: '#111827' }}>
-                  Sin enviar
-                </p>
-                <p style={{ margin: 0, fontFamily: 'Inter', fontSize: 12.5, color: '#9ca3af', lineHeight: 1.6, maxWidth: 220 }}>
-                  Cotizaciones abiertas. Aún puedes elegir un plan y enviarlas a emitir.
-                </p>
-                <span style={{
-                  display: 'inline-block', marginTop: 12,
-                  background: view === 'activas' ? '#EEE7FD' : '#f3f4f6',
-                  color: view === 'activas' ? '#5745AB' : '#6b7280',
-                  fontFamily: 'Poppins', fontSize: 12, fontWeight: 700,
-                  padding: '4px 14px', borderRadius: 99,
-                  transition: 'background 0.18s, color 0.18s',
-                }}>
-                  {nActivas} {nActivas === 1 ? 'cotización' : 'cotizaciones'}
-                </span>
-              </div>
-            </div>
-
-            {/* Card: Enviadas */}
-            <div
-              onClick={() => setView(v => v === 'enviadas' ? 'todas' : 'enviadas')}
-              style={{
-                background: view === 'enviadas' ? '#f0fdf4' : '#fff',
-                border: `2px solid ${view === 'enviadas' ? '#16a34a' : '#f0f0f4'}`,
-                borderRadius: 24,
-                padding: '28px 24px',
-                cursor: 'pointer',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: 16,
-                textAlign: 'center',
-                transition: 'border-color 0.18s, background 0.18s',
-                userSelect: 'none',
-              }}
-            >
-              <div style={{
-                width: 76, height: 76, borderRadius: '50%',
-                background: view === 'enviadas' ? '#dcfce7' : '#f5f7fb',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                transition: 'background 0.18s',
-              }}>
-                <CheckCircle2 size={34} color={view === 'enviadas' ? '#16a34a' : '#9ca3af'} />
-              </div>
-              <div>
-                <p style={{ margin: '0 0 6px', fontFamily: 'Poppins', fontWeight: 700, fontSize: 15, color: '#111827' }}>
-                  Enviadas a emitir
-                </p>
-                <p style={{ margin: 0, fontFamily: 'Inter', fontSize: 12.5, color: '#9ca3af', lineHeight: 1.6, maxWidth: 220 }}>
-                  El equipo de Asegura2 está gestionando la emisión de estas pólizas.
-                </p>
-                <span style={{
-                  display: 'inline-block', marginTop: 12,
-                  background: view === 'enviadas' ? '#dcfce7' : '#f3f4f6',
-                  color: view === 'enviadas' ? '#16a34a' : '#6b7280',
-                  fontFamily: 'Poppins', fontSize: 12, fontWeight: 700,
-                  padding: '4px 14px', borderRadius: 99,
-                  transition: 'background 0.18s, color 0.18s',
-                }}>
-                  {nEnviadas} {nEnviadas === 1 ? 'cotización' : 'cotizaciones'}
-                </span>
-              </div>
-            </div>
-
-          </div>
-
-          {/* ── Lista filtrada ── */}
-          {filtered.length === 0 ? (
-            <div style={{ background:'#fff', borderRadius:22, border:'1px solid #f0f0f4', padding:'48px 24px', display:'flex', flexDirection:'column', alignItems:'center', textAlign:'center' }}>
-              <div style={{ width:56, height:56, background:'#f5f7fb', borderRadius:20, display:'flex', alignItems:'center', justifyContent:'center', marginBottom:16 }}>
-                <Car size={24} color="#d1d5db" />
-              </div>
-              <p style={{ margin:'0 0 4px', fontFamily:'Poppins', fontSize:14, fontWeight:600, color:'#374151' }}>
-                {view === 'todas' ? 'Sin cotizaciones este mes' : view === 'activas' ? 'Sin cotizaciones pendientes' : 'Sin cotizaciones enviadas'}
-              </p>
-              <p style={{ margin:0, fontFamily:'Inter', fontSize:12, color:'#9ca3af' }}>
-                {view === 'todas' ? 'Inicia tu primera cotización desde el menú lateral' : 'Cambia el filtro o navega a otro mes'}
-              </p>
-            </div>
-          ) : (
-            <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
-              {filtered.map(c => {
-                const raw = c.datos_cotizacion
-                let datos = {}
-                if (raw) { if (typeof raw === 'object') datos = raw; else try { datos = JSON.parse(raw) } catch {} }
-                const badge = getBadge(c.estado)
-                const fecha = new Date(c.created_at)
-                const fechaFmt = `${fecha.getDate()} ${MESES[fecha.getMonth()]} ${fecha.getFullYear()}`
-                const within24h = (Date.now() - fecha.getTime()) / 3600000 < 24
-                const noEnviada = c.estado !== 'enviada'
-
-                return (
-                  <div
-                    key={c.id}
-                    style={{ background:'#fff', borderRadius:20, border:'1px solid #f0f0f4', padding:'16px 20px' }}
-                  >
-                    <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:16 }}>
-                      <div style={{ display:'flex', alignItems:'center', gap:14, minWidth:0 }}>
-                        <div style={{ width:40, height:40, background:'#EEF2FF', borderRadius:14, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
-                          <Car size={18} color="#4f46e5" />
-                        </div>
-                        <div style={{ minWidth:0 }}>
-                          <p style={{ margin:0, fontFamily:'Poppins', fontSize:13.5, fontWeight:600, color:'#111827', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
-                            {c.cliente_nombre || 'Cliente sin nombre'}
-                          </p>
-                          <p style={{ margin:'2px 0 0', fontFamily:'Inter', fontSize:12, color:'#9ca3af' }}>
-                            {c.cliente_tipo_doc && c.cliente_cedula ? `${c.cliente_tipo_doc} ${c.cliente_cedula} · ` : ''}
-                            {c.placa || 'Sin placa'} · {fechaFmt}
-                          </p>
-                        </div>
-                      </div>
-                      <div style={{ display:'flex', alignItems:'center', gap:10, flexShrink:0 }}>
-                        <div style={{ display:'flex', flexDirection:'column', alignItems:'flex-end', gap:3 }}>
-                          <span style={{ background:badge.bg, color:badge.color, fontSize:11, fontWeight:600, padding:'3px 10px', borderRadius:99, whiteSpace:'nowrap' }}>
-                            {badge.label}
-                          </span>
-                          {noEnviada && !within24h && (
-                            <span style={{ fontSize:10, color:'#ea580c', fontWeight:600 }}>Vencida</span>
-                          )}
-                        </div>
-                        <button
-                          onClick={() => setModalCot(c)}
-                          style={{ display:'flex', alignItems:'center', gap:4, background:'#f3f4f6', border:'none', borderRadius:99, padding:'7px 13px', cursor:'pointer', color:'#374151', fontSize:12, fontWeight:600, whiteSpace:'nowrap' }}
-                          onMouseEnter={e => e.currentTarget.style.background='#e5e7eb'}
-                          onMouseLeave={e => e.currentTarget.style.background='#f3f4f6'}
-                        >
-                          Ver más
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M9 18l6-6-6-6"/></svg>
-                        </button>
-                      </div>
+            return (
+              <div
+                key={c.id}
+                className="bg-white rounded-2xl border border-gray-100 shadow-sm px-5 py-4"
+              >
+                <div className="flex items-center justify-between gap-4">
+                  {/* Info izquierda */}
+                  <div className="flex items-center gap-4 min-w-0">
+                    <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center flex-shrink-0">
+                      <Car size={18} className="text-blue-600" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="font-semibold text-gray-900 text-sm truncate">
+                        {c.cliente_nombre || 'Cliente sin nombre'}
+                      </p>
+                      <p className="text-xs text-gray-400 mt-0.5">
+                        {c.cliente_tipo_doc && c.cliente_cedula
+                          ? `${c.cliente_tipo_doc} ${c.cliente_cedula} · `
+                          : ''}
+                        {c.placa || 'Sin placa'}
+                        {' · '}{fechaStr}
+                      </p>
                     </div>
                   </div>
-                )
-              })}
-            </div>
-          )}
-        </>
+
+                  {/* Derecha: estado + ver más */}
+                  <div className="flex items-center gap-3 flex-shrink-0">
+                    <div className="flex flex-col items-end gap-1">
+                      <span style={{ background: badge.bg, color: badge.color, fontSize: 11, fontWeight: 600, padding: '3px 10px', borderRadius: 99, whiteSpace:'nowrap' }}>
+                        {badge.label}
+                      </span>
+                      {noEnviada && !within24h && (
+                        <span style={{ fontSize:10, color:'#ea580c', fontWeight:600 }}>Vencida</span>
+                      )}
+                    </div>
+                    <button
+                      onClick={() => setModalCot(c)}
+                      style={{ display:'flex', alignItems:'center', gap:4, background:'#f3f4f6', border:'none',
+                               borderRadius:99, padding:'6px 12px', cursor:'pointer', color:'#374151',
+                               fontSize:12, fontWeight:600, whiteSpace:'nowrap',
+                               transition:'background 0.15s' }}
+                      onMouseEnter={e => e.currentTarget.style.background='#e5e7eb'}
+                      onMouseLeave={e => e.currentTarget.style.background='#f3f4f6'}
+                    >
+                      Ver más
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                        <path d="M9 18l6-6-6-6"/>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )
+          })}
+        </div>
       )}
 
       {modalCot && (
