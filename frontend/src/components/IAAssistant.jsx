@@ -39,38 +39,67 @@ function MdText({ text, style }) {
 
 // ── Componente ────────────────────────────────────────────────────────────────
 export default function IAAssistant() {
-  const [open,     setOpen]     = useState(false)
-  const [hover,    setHover]    = useState(false)
-  const [messages, setMessages] = useState([])
-  const [input,    setInput]    = useState('')
-  const [loading,  setLoading]  = useState(false)
-  const [chatH,    setChatH]    = useState(0)
+  const [open,       setOpen]       = useState(false)
+  const [hover,      setHover]      = useState(false)
+  const [messages,   setMessages]   = useState([])
+  const [input,      setInput]      = useState('')
+  const [loading,    setLoading]    = useState(false)
+  const [chatH,      setChatH]      = useState(0)
+  const [typingIdx,  setTypingIdx]  = useState(-1)
+  const [typingLen,  setTypingLen]  = useState(0)
 
   const inputRef  = useRef(null)
   const bottomRef = useRef(null)
   const chatRef   = useRef(null)
   const pillRef   = useRef(null)
+  const typingRef = useRef(null)
   const { getToken } = useAuth()
 
-  // Mide la altura real del contenido tras cada actualización
+  // Mide altura real del área de mensajes
   useEffect(() => {
     if (!chatRef.current) return
     const h = messages.length > 0 || loading
       ? Math.min(chatRef.current.scrollHeight, MAX_H)
       : 0
     setChatH(h)
-    if (h > 0) bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages, loading])
+    if (h > 0) bottomRef.current?.scrollIntoView({ behavior: 'instant' })
+  }, [messages, loading, typingLen])
 
   useEffect(() => {
     if (open) setTimeout(() => inputRef.current?.focus(), 340)
   }, [open])
 
+  // Typing animation para mensajes de Anto
+  useEffect(() => {
+    if (!messages.length) return
+    const last = messages[messages.length - 1]
+    if (last.role !== 'assistant') return
+    const idx = messages.length - 1
+    clearInterval(typingRef.current)
+    setTypingIdx(idx)
+    setTypingLen(0)
+    typingRef.current = setInterval(() => {
+      setTypingLen(prev => {
+        const next = prev + 4
+        if (next >= last.content.length) {
+          clearInterval(typingRef.current)
+          setTypingIdx(-1)
+          return last.content.length
+        }
+        return next
+      })
+    }, 8)
+    return () => clearInterval(typingRef.current)
+  }, [messages.length])
+
   const handleClose = useCallback(() => {
+    clearInterval(typingRef.current)
     setOpen(false)
     setInput('')
     setMessages([])
     setChatH(0)
+    setTypingIdx(-1)
+    setTypingLen(0)
   }, [])
 
   // Cerrar al hacer click fuera
@@ -110,8 +139,6 @@ export default function IAAssistant() {
   }
 
   const totalH = open ? 50 + (chatH > 0 ? chatH + 1 : 0) : 58
-  // Pill shape when closed or just input open; card shape once messages appear
-  const br = open && chatH > 0 ? 20 : 999
 
   return (
     <div style={{ position:'fixed', bottom:24, right:24, zIndex:300, display:'flex', alignItems:'flex-end' }}>
@@ -132,7 +159,7 @@ export default function IAAssistant() {
         <p style={{ margin:'3px 0 0', fontSize:11, color:'#6d28d9', lineHeight:1.3 }}>Coberturas · precios · comparaciones</p>
       </div>
 
-      {/* Contenedor principal — crece hacia arriba */}
+      {/* Contenedor principal */}
       <div
         ref={pillRef}
         onMouseEnter={() => !open && setHover(true)}
@@ -142,7 +169,8 @@ export default function IAAssistant() {
           position:'relative',
           width:        open ? 320 : 58,
           height:       totalH,
-          borderRadius: br,
+          // Pill cuando está cerrado; card (20px) cuando está abierto — sin transición de forma
+          borderRadius: open ? 20 : 999,
           background:   open ? '#fff' : 'linear-gradient(135deg,#4f46e5 0%,#2D2A7A 100%)',
           border:       open ? '1.5px solid #e5e7eb' : '1.5px solid transparent',
           boxShadow:    open
@@ -158,7 +186,6 @@ export default function IAAssistant() {
           transition: [
             'width 0.38s cubic-bezier(0.34,1.08,0.64,1)',
             'height 0.34s cubic-bezier(0.4,0,0.2,1)',
-            'border-radius 0.3s ease',
             'background 0.22s ease',
             'box-shadow 0.2s ease',
             'transform 0.2s ease',
@@ -187,7 +214,10 @@ export default function IAAssistant() {
             }}
           >
             {messages.map((m, i) => {
-              const esIA = m.role === 'assistant'
+              const esIA    = m.role === 'assistant'
+              const content = (typingIdx === i)
+                ? m.content.slice(0, typingLen)
+                : m.content
               return (
                 <div key={i} style={{ marginBottom:10, display:'flex', justifyContent: esIA ? 'flex-start' : 'flex-end' }}>
                   {esIA && (
@@ -197,7 +227,7 @@ export default function IAAssistant() {
                   )}
                   {esIA ? (
                     <MdText
-                      text={m.content}
+                      text={content}
                       style={{ fontFamily:'Inter', fontSize:12.5, lineHeight:1.7, color:'#111827', maxWidth:'82%' }}
                     />
                   ) : (

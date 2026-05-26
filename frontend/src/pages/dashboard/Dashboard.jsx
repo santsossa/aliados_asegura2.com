@@ -642,19 +642,39 @@ export default function Dashboard() {
           {/* ═══ RIGHT COLUMN — scrollea junto a la izquierda ═══ */}
           <div className="db-right">
 
-            {/* 5. Tu rendimiento */}
-            <div className="db-welcome" style={{ background: '#fff', borderRadius: 22, padding: '22px 16px 18px' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
-                <AvatarCircle avatarId={avatarId} size={92} initials={initials} />
-                <div style={{ textAlign: 'center' }}>
-                  <p style={{ margin: '0 0 6px', fontFamily: 'Poppins', fontSize: 15, fontWeight: 600, color: '#111827' }}>
-                    {saludo}, {nombreAliado}! 👋
-                  </p>
-                  <p style={{ margin: 0, fontFamily: 'Inter', fontSize: 12, color: '#6b7280' }}>
-                    Envía a emitir y gana más comisiones
-                  </p>
+            {/* Welcome + mini earnings — row en móvil */}
+            <div className="db-welcome-row">
+
+              {/* 5. Tu rendimiento */}
+              <div className="db-welcome" style={{ background: '#fff', borderRadius: 22, padding: '22px 16px 18px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+                  <AvatarCircle avatarId={avatarId} size={92} initials={initials} />
+                  <div style={{ textAlign: 'center' }}>
+                    <p style={{ margin: '0 0 6px', fontFamily: 'Poppins', fontSize: 15, fontWeight: 600, color: '#111827' }}>
+                      {saludo}, {nombreAliado}! 👋
+                    </p>
+                    <p style={{ margin: 0, fontFamily: 'Inter', fontSize: 12, color: '#6b7280' }}>
+                      Envía a emitir y gana más comisiones
+                    </p>
+                  </div>
                 </div>
               </div>
+
+              {/* Mini earnings — visible solo en móvil */}
+              <div className="db-earnings-mini" style={{ background: '#fff', borderRadius: 22, padding: '16px 14px' }}>
+                <div>
+                  <p style={{ margin: 0, fontFamily: 'Inter', fontSize: 10, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Comisiones</p>
+                  <p style={{ margin: '2px 0 0', fontFamily: 'Inter', fontSize: 10, fontWeight: 600, color: '#4f46e5' }}>{mesCorto}</p>
+                </div>
+                <div>
+                  <p style={{ margin: 0, fontFamily: 'Poppins', fontSize: 22, fontWeight: 700, color: '#111827', lineHeight: 1 }}>{fmtShort(comisionActual)}</p>
+                  <p style={{ margin: '3px 0 0', fontFamily: 'Inter', fontSize: 10, color: '#6b7280' }}>este mes</p>
+                </div>
+                <div style={{ height: 44 }}>
+                  <Sparkline data={sparklines.ganancias || []} color="#4f46e5" height={44} />
+                </div>
+              </div>
+
             </div>
 
             {/* 6+7. White outer card — Comisiones + Anto */}

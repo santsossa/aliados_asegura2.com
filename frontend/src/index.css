@@ -33,27 +33,30 @@ body {
 @media (min-width: 1280px) { .db-grid { grid-template-columns: 1fr 300px; } }
 
 /* Desktop: hide mobile-only elements */
-.db-mini-stat { display: none !important; }
+.db-mini-stat    { display: none !important; }
+.db-earnings-mini { display: none !important; }
 
 /* ── Mobile layout ──────────────────────────────────────────────────────────── */
 @media (max-width: 640px) {
   .db-inner { padding: 0 12px 20px; }
 
   /* Flatten columns — children participan directamente en db-grid */
-  .db-grid  { display: flex !important; flex-direction: column; gap: 12px; }
+  .db-grid  { display: flex !important; flex-direction: column; gap: 12px; align-items: stretch; }
   .db-left  { display: contents !important; }
   .db-right { display: contents !important; }
 
   /* Orden de secciones en móvil */
-  .db-welcome    { order: 1; }
-  .db-hero-row   { order: 2; display: grid !important; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .db-stats      { order: 3; }
-  .db-enviadas   { order: 4; }
-  .db-actividad  { order: 5; }
-  .db-right-main { order: 6; }
+  .db-welcome-row { order: 1; display: grid !important; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .db-welcome     { display: flex !important; align-items: center; justify-content: center; padding: 14px 10px !important; }
+  .db-hero-row    { order: 2; display: grid !important; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .db-stats       { order: 3; }
+  .db-enviadas    { order: 4; }
+  .db-actividad   { order: 5; }
+  .db-right-main  { order: 6; }
 
-  /* Mini-stat visible solo en móvil */
-  .db-mini-stat { display: flex !important; flex-direction: column; justify-content: space-between; }
+  /* Mini elementos visibles solo en móvil */
+  .db-mini-stat     { display: flex !important; flex-direction: column; justify-content: space-between; }
+  .db-earnings-mini { display: flex !important; flex-direction: column; justify-content: space-between; }
 
   /* Hero compacto para columna 50% */
   .db-hero { padding: 16px 14px !important; min-height: 0 !important; border-radius: 20px !important; }
