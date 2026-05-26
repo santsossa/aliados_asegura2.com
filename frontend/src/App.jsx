@@ -21,6 +21,7 @@ import Cotizar         from './pages/dashboard/Cotizar'
 import MisPolizas      from './pages/dashboard/MisPolizas'
 import MisPagos        from './pages/dashboard/MisPagos'
 import InfoFinanciera  from './pages/dashboard/InfoFinanciera'
+import Anto            from './pages/dashboard/Anto'
 
 // Admin panel
 import AdminLayout        from './layouts/AdminLayout'
@@ -55,6 +56,7 @@ export default function App() {
             <Route path="mis-polizas"             element={<MisPolizas />} />
             <Route path="mis-pagos"               element={<MisPagos />} />
             <Route path="informacion-financiera"  element={<InfoFinanciera />} />
+            <Route path="anto"                    element={<Anto />} />
           </Route>
 
           {/* ── Panel admin ──────────────────────────────── */}

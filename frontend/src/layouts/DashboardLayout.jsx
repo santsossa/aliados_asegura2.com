@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import {
   Home, FileText, ShieldCheck, Wallet, Calculator,
-  AlignJustify, X, LogOut, Sparkles, Settings, Headphones, Search, ChevronLeft,
+  AlignJustify, X, LogOut, Sparkles, Settings, Headphones, Search, ChevronLeft, ChevronRight,
 } from 'lucide-react'
 import { LogoIcon } from '../components/Logo'
 import { useIsMobile } from '../hooks/use-mobile'
@@ -209,14 +209,12 @@ export default function DashboardLayout() {
                   </NavLink>
                 ))}
                 <Divider />
-                <button onClick={() => { setDrawerOpen(false); document.querySelector('[data-anto-pill]')?.click() }}
-                  style={{ display:'flex',alignItems:'center',gap:10,height:38,padding:'0 8px',borderRadius:9,border:'none',background:'linear-gradient(135deg,#ede9fe,#ddd6fe)',color:'#4f46e5',fontWeight:700,fontSize:13.5,cursor:'pointer',width:'100%',overflow:'hidden',whiteSpace:'nowrap',transition:'background 0.15s',flexShrink:0,textAlign:'left',marginBottom:4 }}
-                  onMouseEnter={e=>e.currentTarget.style.background='linear-gradient(135deg,#ddd6fe,#c4b5fd)'}
-                  onMouseLeave={e=>e.currentTarget.style.background='linear-gradient(135deg,#ede9fe,#ddd6fe)'}
+                <NavLink to="/dashboard/anto" onClick={() => setDrawerOpen(false)}
+                  style={({ isActive }) => ({ display:'flex',alignItems:'center',gap:10,height:38,padding:'0 8px',borderRadius:9,border:'none',textDecoration:'none',background: isActive ? 'linear-gradient(135deg,#ddd6fe,#c4b5fd)' : 'linear-gradient(135deg,#ede9fe,#ddd6fe)',color:'#4f46e5',fontWeight:700,fontSize:13.5,cursor:'pointer',width:'100%',overflow:'hidden',whiteSpace:'nowrap',transition:'background 0.15s',flexShrink:0,textAlign:'left',marginBottom:4 })}
                 >
                   <span style={{ display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,width:26 }}><Sparkles size={17} color="#4f46e5"/></span>
                   <span>Anto IA</span>
-                </button>
+                </NavLink>
                 <Divider />
                 <button onClick={() => window.open('mailto:soporte@asegura2.com','_blank')} style={{ ...navItemStyle(false), marginBottom:4 }} onMouseEnter={hoverOn} onMouseLeave={hoverOff}>
                   <span style={{ display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,width:26 }}><Headphones size={17} color="#6b7280"/></span><span>Soporte</span>
@@ -312,16 +310,23 @@ export default function DashboardLayout() {
               <Divider />
 
               <SideTooltip label="Anto IA" sideOpen={sideOpen}>
-                <button
-                  data-anto-trigger
-                  onClick={() => { setSideOpen(false); document.querySelector('[data-anto-pill]')?.click() }}
-                  style={{ display:'flex', alignItems:'center', justifyContent: sideOpen ? 'flex-start' : 'center', gap: sideOpen ? 10 : 0, height:38, padding: sideOpen ? '0 8px' : '0', borderRadius:9, border:'none', background:'linear-gradient(135deg,#ede9fe,#ddd6fe)', color:'#4f46e5', fontWeight:700, fontSize:13.5, cursor:'pointer', width:'100%', overflow:'hidden', whiteSpace:'nowrap', transition:'background 0.15s, padding 0.25s', flexShrink:0, textAlign:'left', marginBottom:4 }}
+                <NavLink to="/dashboard/anto"
+                  onClick={() => setSideOpen(false)}
+                  style={({ isActive }) => ({
+                    display:'flex', alignItems:'center', justifyContent: sideOpen ? 'flex-start' : 'center',
+                    gap: sideOpen ? 10 : 0, height:38, padding: sideOpen ? '0 8px' : '0', borderRadius:9,
+                    border:'none', textDecoration:'none',
+                    background: isActive ? 'linear-gradient(135deg,#ddd6fe,#c4b5fd)' : 'linear-gradient(135deg,#ede9fe,#ddd6fe)',
+                    color:'#4f46e5', fontWeight:700, fontSize:13.5, cursor:'pointer', width:'100%',
+                    overflow:'hidden', whiteSpace:'nowrap', transition:'background 0.15s, padding 0.25s',
+                    flexShrink:0, textAlign:'left', marginBottom:4,
+                  })}
                   onMouseEnter={e=>e.currentTarget.style.background='linear-gradient(135deg,#ddd6fe,#c4b5fd)'}
                   onMouseLeave={e=>e.currentTarget.style.background='linear-gradient(135deg,#ede9fe,#ddd6fe)'}
                 >
                   <span style={{ display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, width:26 }}><Sparkles size={17} color="#4f46e5" /></span>
                   <NavLabel label="Anto IA" sideOpen={sideOpen} />
-                </button>
+                </NavLink>
               </SideTooltip>
             </nav>
 
