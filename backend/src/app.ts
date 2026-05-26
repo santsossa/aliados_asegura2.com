@@ -21,6 +21,9 @@ import iaRoutes               from './routes/ia.routes'
 
 const app = express()
 
+// Railway (y cualquier reverse proxy) setea X-Forwarded-For — necesario para rate limiting
+app.set('trust proxy', 1)
+
 // ── Seguridad global ───────────────────────────────────────────────────────
 app.use(helmetMiddleware)
 app.use(corsMiddleware)
