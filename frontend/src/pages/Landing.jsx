@@ -787,7 +787,7 @@ export default function Landing() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
 
             {/* Card 1 — Comisión (ancha) */}
-            <div className="sm:col-span-2 rounded-3xl border border-green-100 shadow-sm overflow-hidden hover:shadow-md transition-shadow" style={{ background: 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)' }}>
+            <div className="sm:col-span-2 rounded-3xl border border-green-100 shadow-sm overflow-hidden" style={{ background: 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)' }}>
               <div className="px-6 pt-6 pb-4">
                 <div className="rounded-2xl bg-white/70 backdrop-blur-sm border border-white p-4">
                   <div className="flex items-center justify-between mb-3">
@@ -819,7 +819,7 @@ export default function Landing() {
             </div>
 
             {/* Card 2 — Cotizador */}
-            <div className="rounded-3xl border border-blue-100 shadow-sm overflow-hidden hover:shadow-md transition-shadow" style={{ background: 'linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%)' }}>
+            <div className="rounded-3xl border border-blue-100 shadow-sm overflow-hidden" style={{ background: 'linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%)' }}>
               <div className="px-6 pt-6 pb-4">
                 <div className="rounded-2xl bg-white/70 backdrop-blur-sm border border-white p-4">
                   <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-3">Resultados · Honda Civic 2023</p>
@@ -848,7 +848,7 @@ export default function Landing() {
             </div>
 
             {/* Card 3 — Seguimiento */}
-            <div className="rounded-3xl border border-purple-100 shadow-sm overflow-hidden hover:shadow-md transition-shadow" style={{ background: 'linear-gradient(135deg, #faf5ff 0%, #ede9fe 100%)' }}>
+            <div className="rounded-3xl border border-purple-100 shadow-sm overflow-hidden" style={{ background: 'linear-gradient(135deg, #faf5ff 0%, #ede9fe 100%)' }}>
               <div className="px-6 pt-6 pb-4">
                 <div className="rounded-2xl bg-white/70 backdrop-blur-sm border border-white p-4">
                   <div className="flex items-center justify-between mb-3">
@@ -879,7 +879,7 @@ export default function Landing() {
             </div>
 
             {/* Card 4 — Respaldo (ancha) */}
-            <div className="sm:col-span-2 rounded-3xl border border-amber-100 shadow-sm overflow-hidden hover:shadow-md transition-shadow" style={{ background: 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)' }}>
+            <div className="sm:col-span-2 rounded-3xl border border-amber-100 shadow-sm overflow-hidden" style={{ background: 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)' }}>
               <div className="px-6 pt-6 pb-4">
                 <div className="rounded-2xl bg-white/70 backdrop-blur-sm border border-white p-4">
                   <div className="flex items-center justify-between mb-3">
