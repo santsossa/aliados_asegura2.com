@@ -134,7 +134,7 @@ router.post('/chat', async (req: Request, res: Response, next: NextFunction) => 
 
     const genAI = new GoogleGenerativeAI(env.GEMINI_API_KEY)
     const model = genAI.getGenerativeModel({
-      model:             'gemini-2.0-flash',
+      model:             'gemini-1.5-flash',
       systemInstruction: SYSTEM_PROMPT,
       generationConfig:  { maxOutputTokens: 1024 },
     })
