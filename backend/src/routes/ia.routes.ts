@@ -1,5 +1,5 @@
 import { Router, Request, Response, NextFunction } from 'express'
-import Anthropic from '@anthropic-ai/sdk'
+import { GoogleGenerativeAI } from '@google/generative-ai'
 import { requireAuth } from '../middleware/auth'
 import { env } from '../config/env'
 
@@ -97,7 +97,7 @@ Es el monto que el asegurado paga de su bolsillo antes de que la aseguradora cub
 
 router.post('/chat', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    if (!env.ANTHROPIC_API_KEY) {
+    if (!env.GEMINI_API_KEY) {
       res.status(503).json({ status: 'error', message: 'Asistente IA no configurado.' })
       return
     }
@@ -111,27 +111,37 @@ router.post('/chat', async (req: Request, res: Response, next: NextFunction) => 
       return
     }
 
-    const client = new Anthropic({ apiKey: env.ANTHROPIC_API_KEY })
-
     // Límite de historial: máximo 10 mensajes para controlar costos
     const limited = messages.slice(-10)
 
-    const response = await client.messages.create({
-      model:      'claude-haiku-4-5',
-      max_tokens: 1024,
-      // Prompt Caching: el system prompt se cachea → 90% descuento en tokens repetidos
-      system: [{ type: 'text', text: SYSTEM_PROMPT, cache_control: { type: 'ephemeral' } }] as any,
-      messages: limited,
+    // Separar último mensaje del historial previo
+    const lastMsg  = limited[limited.length - 1]
+    const history  = limited.slice(0, -1)
+
+    // Gemini usa "model" en lugar de "assistant"
+    const geminiHistory = history.map(m => ({
+      role:  m.role === 'assistant' ? 'model' : 'user',
+      parts: [{ text: m.content }],
+    }))
+
+    const genAI = new GoogleGenerativeAI(env.GEMINI_API_KEY)
+    const model = genAI.getGenerativeModel({
+      model:             'gemini-1.5-flash',
+      systemInstruction: SYSTEM_PROMPT,
+      generationConfig:  { maxOutputTokens: 1024 },
     })
 
-    const text = response.content[0].type === 'text'
-      ? response.content[0].text
-      : ''
+    const chat   = model.startChat({ history: geminiHistory })
+    const result = await chat.sendMessage(lastMsg.content)
+    const text   = result.response.text()
 
     res.json({ status: 'success', message: text })
   } catch (err: any) {
-    if (err?.status === 401) {
+    const msg = err?.message || ''
+    if (msg.includes('API_KEY_INVALID') || msg.includes('401')) {
       res.status(503).json({ status: 'error', message: 'API key de IA inválida.' })
+    } else if (msg.includes('RESOURCE_EXHAUSTED')) {
+      res.status(503).json({ status: 'error', message: 'Límite de IA alcanzado. Intenta en un momento.' })
     } else {
       next(err)
     }
