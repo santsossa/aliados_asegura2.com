@@ -189,7 +189,7 @@ export default function InfoFinanciera() {
   return (
     <>
       {/* ── Cabecera + tabs ── */}
-      <div style={{ background: '#fff', borderBottom: '1px solid #e5e7eb' }}>
+      <div style={{ borderBottom: '1px solid #e5e7eb' }}>
         <div style={{ maxWidth: 820, margin: '0 auto', padding: '28px 28px 0' }}>
           <h1 style={{ margin: '0 0 4px', fontFamily: 'Poppins', fontWeight: 700, fontSize: 22, color: '#111827' }}>Configuración</h1>
           <p style={{ margin: '0 0 20px', fontFamily: 'Inter', fontSize: 13, color: '#9ca3af' }}>
