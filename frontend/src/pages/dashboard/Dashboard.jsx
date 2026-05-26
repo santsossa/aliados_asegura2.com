@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { DollarSign, FileText, Shield, TrendingUp, ChevronRight, ChevronLeft, User } from 'lucide-react'
+import { DollarSign, FileText, Shield, TrendingUp, ChevronRight, ChevronLeft, User, MessageCircle, Scale, Zap } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { useSSE } from '../../context/SSEContext'
@@ -673,16 +673,16 @@ export default function Dashboard() {
               <div style={{ background: '#f5f7fb', borderRadius: 16, padding: '10px 14px 14px' }}>
                 <div>
                   {[
-                    { bg: '#ede9fe', color: '#4f46e5', emoji: '🛡️', title: 'Coberturas'            },
-                    { bg: '#e0f2fe', color: '#0284c7', emoji: '⚖️', title: 'Comparar aseguradoras'  },
-                    { bg: '#dcfce7', color: '#16a34a', emoji: '💬', title: 'Responder al cliente'   },
+                    { Icon: Shield,        title: 'Coberturas'           },
+                    { Icon: Scale,         title: 'Comparar aseguradoras' },
+                    { Icon: MessageCircle, title: 'Responder al cliente'  },
                   ].map((item, i, arr) => (
                     <div
                       key={i}
                       style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 0', borderBottom: i < arr.length - 1 ? '1px solid #e5e7eb' : 'none' }}
                     >
-                      <div style={{ width: 34, height: 34, borderRadius: '50%', background: item.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 15 }}>
-                        {item.emoji}
+                      <div style={{ width: 34, height: 34, borderRadius: '50%', background: '#EEE7FD', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                        <item.Icon size={16} color="#5745AB" />
                       </div>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <p style={{ margin: 0, fontFamily: 'Poppins', fontSize: 12, fontWeight: 500, color: '#111827', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.title}</p>
@@ -690,7 +690,7 @@ export default function Dashboard() {
                       </div>
                       <button
                         onClick={() => document.querySelector('[data-anto-pill]')?.click()}
-                        style={{ flexShrink: 0, fontFamily: 'Inter', fontSize: 11, fontWeight: 600, color: item.color, background: `${item.color}15`, border: 'none', borderRadius: 999, padding: '4px 9px', cursor: 'pointer' }}
+                        style={{ flexShrink: 0, fontFamily: 'Inter', fontSize: 11, fontWeight: 600, color: '#2D2A7A', background: 'transparent', border: '1.5px solid rgba(45,42,122,0.35)', borderRadius: 999, padding: '4px 9px', cursor: 'pointer' }}
                       >
                         Preguntar
                       </button>
