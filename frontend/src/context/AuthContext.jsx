@@ -9,12 +9,10 @@ export function AuthProvider({ children }) {
   const tokenRef = useRef(null)
   const [user,     setUser]    = useState(null)
   const [loading,  setLoading] = useState(true)
-  const [avatarId, setAvatarIdState] = useState(() => localStorage.getItem('aliados_avatar') || null)
+  const [avatarId, setAvatarIdState] = useState(null)
 
   function setAvatarId(id) {
-    if (id) localStorage.setItem('aliados_avatar', id)
-    else    localStorage.removeItem('aliados_avatar')
-    setAvatarIdState(id)
+    setAvatarIdState(id || null)
   }
 
   useEffect(() => {
@@ -66,6 +64,7 @@ export function AuthProvider({ children }) {
         apellido:        payload.apellido,
         onboarding_step: payload.onboarding_step ?? null,
       })
+      setAvatarIdState(payload.avatar_id || null)
     } catch { clearAuth() }
   }
 
@@ -76,7 +75,6 @@ export function AuthProvider({ children }) {
   function clearAuth() {
     tokenRef.current = null
     setUser(null)
-    localStorage.removeItem('aliados_avatar')
     setAvatarIdState(null)
   }
 

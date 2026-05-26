@@ -11,7 +11,8 @@ export function generateAccessToken(
   rol?: string,
   onboarding_step?: number,
   nombre?: string,
-  apellido?: string
+  apellido?: string,
+  avatar_id?: string
 ): string {
   return jwt.sign(
     {
@@ -22,6 +23,7 @@ export function generateAccessToken(
       ...(onboarding_step !== undefined && { onboarding_step }),
       ...(nombre && { nombre }),
       ...(apellido && { apellido }),
+      ...(avatar_id && { avatar_id }),
     },
     env.JWT_SECRET,
     { expiresIn: env.JWT_EXPIRES_IN as jwt.SignOptions['expiresIn'] }

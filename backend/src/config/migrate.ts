@@ -213,6 +213,7 @@ const ALTER_STMTS = [
   `ALTER TABLE polizas ADD COLUMN cliente_tipo_doc VARCHAR(10) NULL`,
   `ALTER TABLE polizas ADD COLUMN placa VARCHAR(10) NULL`,
   `ALTER TABLE polizas ADD COLUMN observaciones TEXT NULL`,
+  `ALTER TABLE aliados ADD COLUMN avatar_id VARCHAR(10) NULL`,
 ]
 
 // ── Columnas modificadas (v3) — idempotente, se ejecutan siempre ─────────

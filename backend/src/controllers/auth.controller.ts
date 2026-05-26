@@ -308,7 +308,7 @@ export async function verificarOTP(req: Request, res: Response, next: NextFuncti
 
     // Aliado
     const [rows] = await pool.execute<any[]>(
-      'SELECT id, nombre, apellido, correo, onboarding_step FROM aliados WHERE id = ? AND estado IN ("activo", "onboarding")',
+      'SELECT id, nombre, apellido, correo, onboarding_step, avatar_id FROM aliados WHERE id = ? AND estado IN ("activo", "onboarding")',
       [userId]
     )
     if (!rows.length) { res.status(404).json({ status:'error', message:'No encontrado.' }); return }
@@ -322,7 +322,7 @@ export async function verificarOTP(req: Request, res: Response, next: NextFuncti
 
     const aliado       = rows[0]
     const step         = aliado.onboarding_step ?? 0
-    const accessToken  = generateAccessToken(aliado.id, aliado.correo, 'aliado', undefined, step, aliado.nombre, aliado.apellido)
+    const accessToken  = generateAccessToken(aliado.id, aliado.correo, 'aliado', undefined, step, aliado.nombre, aliado.apellido, aliado.avatar_id ?? undefined)
     const refreshToken = await generateRefreshToken(aliado.id)
     await logAuth('aliado', aliado.id, aliado.correo, 'otp_ok', req)
     res.cookie('refreshToken', refreshToken, COOKIE_OPTS)
@@ -352,7 +352,7 @@ export async function refresh(req: Request, res: Response, next: NextFunction) {
       const [adminRows] = await pool.execute<any[]>('SELECT id, correo, rol FROM admins WHERE id = ? AND estado = "activo"', [result.aliadoId])
       if (adminRows.length) user = adminRows[0]
     } else {
-      const [aliadoRows] = await pool.execute<any[]>('SELECT id, nombre, apellido, correo, onboarding_step FROM aliados WHERE id = ? AND estado IN ("activo", "onboarding")', [result.aliadoId])
+      const [aliadoRows] = await pool.execute<any[]>('SELECT id, nombre, apellido, correo, onboarding_step, avatar_id FROM aliados WHERE id = ? AND estado IN ("activo", "onboarding")', [result.aliadoId])
       if (aliadoRows.length) user = aliadoRows[0]
     }
 
@@ -360,7 +360,7 @@ export async function refresh(req: Request, res: Response, next: NextFunction) {
 
     await revokeRefreshToken(result.tokenId, tipo)
     const newRefreshToken = await generateRefreshToken(user.id, tipo)
-    const accessToken     = generateAccessToken(user.id, user.correo, tipo, user.rol, tipo === 'aliado' ? (user.onboarding_step ?? undefined) : undefined, user.nombre, user.apellido)
+    const accessToken     = generateAccessToken(user.id, user.correo, tipo, user.rol, tipo === 'aliado' ? (user.onboarding_step ?? undefined) : undefined, user.nombre, user.apellido, tipo === 'aliado' ? (user.avatar_id ?? undefined) : undefined)
 
     res.cookie('refreshToken', newRefreshToken, COOKIE_OPTS)
     res.json({ status:'success', accessToken })

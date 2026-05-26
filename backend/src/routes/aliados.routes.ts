@@ -48,7 +48,7 @@ function padSparkline(rows: any[], minLength = 8): number[] {
 router.get('/me', async (req, res, next) => {
   try {
     const [rows] = await pool.execute<any[]>(
-      `SELECT a.id, a.nombre, a.apellido, a.cedula, a.correo, a.telefono, a.ciudad, a.tipo_aliado, a.estado, a.created_at,
+      `SELECT a.id, a.nombre, a.apellido, a.cedula, a.correo, a.telefono, a.ciudad, a.tipo_aliado, a.estado, a.created_at, a.avatar_id AS avatar,
               b.banco, b.tipo_cuenta, b.numero_cuenta, b.titular
        FROM aliados a
        LEFT JOIN aliado_banco b ON b.aliado_id = a.id
@@ -71,10 +71,10 @@ router.put('/me',
   validate,
   async (req: any, res: any, next: any) => {
     try {
-      const { nombre, apellido, telefono, ciudad } = req.body
+      const { nombre, apellido, telefono, ciudad, avatar } = req.body
       await pool.execute(
-        'UPDATE aliados SET nombre=COALESCE(?,nombre), apellido=COALESCE(?,apellido), telefono=COALESCE(?,telefono), ciudad=COALESCE(?,ciudad) WHERE id=?',
-        [nombre||null, apellido||null, telefono||null, ciudad||null, req.aliado!.sub]
+        'UPDATE aliados SET nombre=COALESCE(?,nombre), apellido=COALESCE(?,apellido), telefono=COALESCE(?,telefono), ciudad=COALESCE(?,ciudad), avatar_id=COALESCE(?,avatar_id) WHERE id=?',
+        [nombre||null, apellido||null, telefono||null, ciudad||null, avatar||null, req.aliado!.sub]
       )
       res.json({ status:'success', message:'Perfil actualizado.' })
     } catch (err) { next(err) }

@@ -25,60 +25,48 @@ function fechaStr(str) {
 function CommissionsChart({ months }) {
   const hasData = months.some(m => m.valor > 0)
   const max     = Math.max(...months.map(m => m.valor), 1)
-  const yMid    = hasData ? Math.round(max / 2) : 0
   const CHART_H = 110
 
   return (
-    <div style={{ display:'flex', gap:8 }}>
-      {/* Y-axis */}
-      <div style={{ width:40, flexShrink:0, display:'flex', flexDirection:'column', justifyContent:'space-between', height: CHART_H + 22, paddingBottom:22 }}>
-        {[max, yMid, 0].map((v, i) => (
-          <span key={i} style={{ fontSize:8.5, fontFamily:'Inter', color:'#9ca3af', textAlign:'right', display:'block', lineHeight:1 }}>
-            {hasData ? (v === 0 ? '0' : fmtShort(v)) : '0'}
-          </span>
-        ))}
+    <div style={{ position:'relative' }}>
+      <div style={{ position:'absolute', top:0, left:0, right:0, height:CHART_H, pointerEvents:'none' }}>
+        <div style={{ position:'absolute', top:0,     left:0, right:0, borderTop:'1px dashed #e2e4ea' }} />
+        <div style={{ position:'absolute', top:'50%', left:0, right:0, borderTop:'1px dashed #e2e4ea' }} />
       </div>
-      {/* Bars */}
-      <div style={{ flex:1, position:'relative' }}>
-        <div style={{ position:'absolute', top:0, left:0, right:0, height:CHART_H, pointerEvents:'none' }}>
-          <div style={{ position:'absolute', top:0,     left:0, right:0, borderTop:'1px dashed #e2e4ea' }} />
-          <div style={{ position:'absolute', top:'50%', left:0, right:0, borderTop:'1px dashed #e2e4ea' }} />
-        </div>
-        <div style={{ display:'flex', gap:6, alignItems:'flex-end', height:CHART_H, position:'relative' }}>
-          {months.map((m, i) => {
-            const isCurrent = i === months.length - 1
-            const pct = hasData
-              ? Math.max((m.valor / max) * 100, m.valor > 0 ? 12 : isCurrent ? 6 : 3)
-              : (isCurrent ? 6 : 3)
-            const opacity = m.valor > 0 ? 1 : isCurrent ? 0.5 : 0.2
-            return (
-              <div key={i} style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', height:'100%', justifyContent:'flex-end' }}>
-                {m.valor > 0 && (
-                  <span style={{ fontSize:8.5, fontFamily:'Inter', fontWeight:700, color: isCurrent ? '#4f46e5' : '#9ca3af', marginBottom:3 }}>
-                    {fmtShort(m.valor)}
-                  </span>
-                )}
-                <div style={{
-                  width:'68%', borderRadius:'8px 8px 4px 4px',
-                  background: isCurrent ? '#4f46e5' : '#c7d2fe',
-                  height:`${pct}%`, minHeight: m.valor > 0 ? 10 : isCurrent ? 5 : 3,
-                  opacity,
-                  transition:'height 0.4s ease',
-                }} />
-              </div>
-            )
-          })}
-        </div>
-        <div style={{ display:'flex', gap:6, marginTop:6 }}>
-          {months.map((m, i) => {
-            const isCurrent = i === months.length - 1
-            return (
-              <span key={i} style={{ flex:1, textAlign:'center', fontSize:9, fontFamily:'Inter', fontWeight:700, textTransform:'uppercase', letterSpacing:'0.05em', color: isCurrent ? '#4f46e5' : '#9ca3af' }}>
-                {m.mes}
-              </span>
-            )
-          })}
-        </div>
+      <div style={{ display:'flex', gap:5, alignItems:'flex-end', height:CHART_H, position:'relative' }}>
+        {months.map((m, i) => {
+          const isCurrent = i === months.length - 1
+          const pct = hasData
+            ? Math.max((m.valor / max) * 100, m.valor > 0 ? 12 : isCurrent ? 6 : 3)
+            : (isCurrent ? 6 : 3)
+          const opacity = m.valor > 0 ? 1 : isCurrent ? 0.5 : 0.2
+          return (
+            <div key={i} style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', height:'100%', justifyContent:'flex-end' }}>
+              {m.valor > 0 && (
+                <span style={{ fontSize:8.5, fontFamily:'Inter', fontWeight:700, color: isCurrent ? '#4f46e5' : '#9ca3af', marginBottom:3 }}>
+                  {fmtShort(m.valor)}
+                </span>
+              )}
+              <div style={{
+                width:'72%', borderRadius:'8px 8px 4px 4px',
+                background: isCurrent ? '#4f46e5' : '#c7d2fe',
+                height:`${pct}%`, minHeight: m.valor > 0 ? 10 : isCurrent ? 5 : 3,
+                opacity,
+                transition:'height 0.4s ease',
+              }} />
+            </div>
+          )
+        })}
+      </div>
+      <div style={{ display:'flex', gap:5, marginTop:6 }}>
+        {months.map((m, i) => {
+          const isCurrent = i === months.length - 1
+          return (
+            <span key={i} style={{ flex:1, textAlign:'center', fontSize:9, fontFamily:'Inter', fontWeight:700, textTransform:'uppercase', letterSpacing:'0.05em', color: isCurrent ? '#4f46e5' : '#9ca3af' }}>
+              {m.mes}
+            </span>
+          )
+        })}
       </div>
     </div>
   )
