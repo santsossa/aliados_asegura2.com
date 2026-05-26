@@ -491,29 +491,46 @@ export default function MisPolizas() {
 
       {/* Grid de pólizas */}
       {loading ? (
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(180px, 1fr))', gap:12 }}>
-          {[1,2,3,4,5,6].map(i => (
-            <div key={i} style={{ height:185, background:'#f3f4f6', borderRadius:20, animation:'pulse 1.4s infinite' }} />
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(180px, 1fr))', gap:12, animation:'skpulse 1.5s ease-in-out infinite' }}>
+          <style>{`@keyframes skpulse{0%,100%{opacity:1}50%{opacity:.45}}`}</style>
+          {[0,1,2,3,4,5].map(i => (
+            <div key={i} style={{ background:'#f5f7fb', borderRadius:20, overflow:'hidden' }}>
+              {/* Logo area */}
+              <div style={{ height:90, background:'#fff', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                <div style={{ width:80, height:32, background:'#f0f1f3', borderRadius:8 }} />
+              </div>
+              {/* Info area */}
+              <div style={{ padding:'11px 13px 13px', display:'flex', flexDirection:'column', gap:7 }}>
+                <div style={{ background:'#f0f1f3', borderRadius:99, height:20, width:64 }} />
+                <div style={{ background:'#f0f1f3', borderRadius:5, height:13, width:'80%' }} />
+                <div style={{ background:'#f0f1f3', borderRadius:5, height:11, width:'50%' }} />
+                <div style={{ display:'flex', justifyContent:'space-between', marginTop:4 }}>
+                  <div style={{ background:'#f0f1f3', borderRadius:5, height:12, width:56 }} />
+                  <div style={{ background:'#f0f1f3', borderRadius:5, height:10, width:36 }} />
+                </div>
+              </div>
+            </div>
           ))}
-          <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}`}</style>
-        </div>
-      ) : filtered.length === 0 ? (
-        <div style={{ background:'#fff', borderRadius:22, border:'1px solid #f0f0f2', padding:'48px 24px',
-                      display:'flex', flexDirection:'column', alignItems:'center', textAlign:'center' }}>
-          <div style={{ width:56, height:56, borderRadius:20, background:'#f5f7fb',
-                        display:'flex', alignItems:'center', justifyContent:'center', marginBottom:16 }}>
-            <Shield size={24} color="#d1d5db" />
-          </div>
-          <p style={{ margin:'0 0 6px', fontFamily:'Poppins', fontSize:15, fontWeight:600, color:'#374151' }}>
-            Sin pólizas en esta categoría
-          </p>
-          <p style={{ margin:0, fontFamily:'Inter', fontSize:13, color:'#9ca3af', maxWidth:260, lineHeight:1.6 }}>
-            Cuando envíes una cotización a emitir aparecerá aquí.
-          </p>
         </div>
       ) : (
         <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(180px, 1fr))', gap:12 }}>
-          {filtered.map(item => <ItemCard key={`${item._tipo}-${item.id}`} item={item} />)}
+          {filtered.length === 0 ? (
+            <div style={{ gridColumn:'1/-1', background:'#fff', borderRadius:22, border:'1px solid #f0f0f2', padding:'48px 24px',
+                          display:'flex', flexDirection:'column', alignItems:'center', textAlign:'center' }}>
+              <div style={{ width:56, height:56, borderRadius:20, background:'#f5f7fb',
+                            display:'flex', alignItems:'center', justifyContent:'center', marginBottom:16 }}>
+                <Shield size={24} color="#d1d5db" />
+              </div>
+              <p style={{ margin:'0 0 6px', fontFamily:'Poppins', fontSize:15, fontWeight:600, color:'#374151' }}>
+                Sin pólizas en esta categoría
+              </p>
+              <p style={{ margin:0, fontFamily:'Inter', fontSize:13, color:'#9ca3af', maxWidth:260, lineHeight:1.6 }}>
+                Cuando envíes una cotización a emitir aparecerá aquí.
+              </p>
+            </div>
+          ) : (
+            filtered.map(item => <ItemCard key={`${item._tipo}-${item.id}`} item={item} />)
+          )}
         </div>
       )}
 

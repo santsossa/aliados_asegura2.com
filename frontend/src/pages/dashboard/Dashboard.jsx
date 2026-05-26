@@ -215,26 +215,108 @@ function MonthlyCommissionsChart({ meses = [] }) {
 
 // ─── Loading skeleton ─────────────────────────────────────────────────────────
 function LoadingSkeleton() {
-  const pulse = {
-    background: 'linear-gradient(90deg,#f3f4f6 25%,#e5e7eb 50%,#f3f4f6 75%)',
-    backgroundSize: '200% 100%',
-    animation: 'pulse 1.5s infinite',
-    borderRadius: 8,
-  }
+  const B = '#f0f1f3'
+  const s = (r,h,w='100%',extra={}) => (
+    <div style={{ background:B, borderRadius:r, height:h, width:w, flexShrink:0, ...extra }} />
+  )
   return (
-    <div style={{ padding: '20px 24px' }}>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: 20 }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          <div style={{ ...pulse, height: 148, borderRadius: 18 }} />
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12 }}>
-            {[1,2,3,4].map(i => <div key={i} style={{ ...pulse, height: 130, borderRadius: 14 }} />)}
+    <div className="db-inner" style={{ animation:'skpulse 1.5s ease-in-out infinite' }}>
+      <style>{`@keyframes skpulse{0%,100%{opacity:1}50%{opacity:.45}}`}</style>
+      <div className="db-grid">
+        {/* Left */}
+        <div className="db-left">
+          {/* Hero */}
+          {s(28, 148)}
+          {/* 4 stat cards */}
+          <div className="grid grid-cols-2 xl:grid-cols-4 gap-2">
+            {[0,1,2,3].map(i => (
+              <div key={i} style={{ background:'#fff', borderRadius:24, padding:'15px 16px', display:'flex', alignItems:'center', gap:12 }}>
+                {s(50, 40, 40)}
+                <div style={{ flex:1, display:'flex', flexDirection:'column', gap:7 }}>
+                  {s(5, 10, '70%')}
+                  {s(5, 14, '55%')}
+                </div>
+              </div>
+            ))}
           </div>
-          <div style={{ ...pulse, height: 180, borderRadius: 16 }} />
-          <div style={{ ...pulse, height: 240, borderRadius: 16 }} />
+          {/* Enviadas a emitir */}
+          <div>
+            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0 4px', marginBottom:12 }}>
+              {s(6, 14, 110)}
+              <div style={{ display:'flex', gap:6 }}>{s(50,28,28)}{s(50,28,28)}</div>
+            </div>
+            <div style={{ background:'#fff', borderRadius:24, padding:12 }}>
+              <div style={{ display:'flex', gap:12, minHeight:192 }}>
+                {[0,1,2,3].map(i => (
+                  <div key={i} style={{ minWidth:170, maxWidth:170, background:'#f5f7fb', borderRadius:20, overflow:'hidden', flexShrink:0 }}>
+                    <div style={{ height:96, background:'#fff' }} />
+                    <div style={{ padding:'11px 13px 13px', display:'flex', flexDirection:'column', gap:7 }}>
+                      {s(99, 20, 64)}
+                      {s(5, 13, '80%')}
+                      {s(5, 11, '50%')}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+          {/* Actividad reciente */}
+          <div>
+            <div style={{ padding:'0 4px', marginBottom:10 }}>{s(6, 14, 120)}</div>
+            <div style={{ background:'#fff', borderRadius:24 }}>
+              {[0,1,2,3].map(i => (
+                <div key={i} style={{ display:'flex', alignItems:'center', gap:12, padding:'12px 20px' }}>
+                  {s(10, 36, 36)}
+                  <div style={{ flex:1, display:'flex', flexDirection:'column', gap:6 }}>
+                    {s(5, 13, '52%')}
+                    {s(5, 11, '35%')}
+                  </div>
+                  {s(6, 11, 52)}
+                  {s(99, 22, 76)}
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
-        <div style={{ ...pulse, height: 520, borderRadius: 18 }} />
+        {/* Right */}
+        <div className="db-right">
+          {/* Tu rendimiento */}
+          <div style={{ background:'#fff', borderRadius:22, padding:'22px 16px 18px', display:'flex', flexDirection:'column', alignItems:'center', gap:12 }}>
+            {s(50, 92, 92)}
+            {s(6, 14, '60%')}
+            {s(6, 12, '45%')}
+          </div>
+          {/* Comisiones */}
+          <div style={{ background:'#fff', borderRadius:22, padding:'14px 14px 12px', display:'flex', flexDirection:'column', gap:10 }}>
+            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0 2px' }}>
+              {s(6, 14, 90)}
+              {s(99, 22, 72)}
+            </div>
+            <div style={{ background:'#f5f7fb', borderRadius:16, padding:'14px 16px' }}>
+              <div style={{ display:'flex', alignItems:'flex-end', gap:6, height:104 }}>
+                {[55,35,75,45,90,60].map((h,i) => (
+                  <div key={i} style={{ flex:1, height:`${h}%`, background:B, borderRadius:'5px 5px 3px 3px' }} />
+                ))}
+              </div>
+              <div style={{ display:'flex', marginTop:6, gap:6 }}>
+                {[0,1,2,3,4,5].map(i => <div key={i} style={{ flex:1, ...{background:B, borderRadius:4, height:8} }} />)}
+              </div>
+            </div>
+            {/* Anto section placeholder */}
+            <div style={{ padding:'10px 2px 0' }}>{s(6, 14, 130)}</div>
+            {[0,1,2].map(i => (
+              <div key={i} style={{ display:'flex', alignItems:'center', gap:10, padding:'10px 12px', background:'#f9fafb', borderRadius:12 }}>
+                {s(10, 32, 32)}
+                <div style={{ flex:1, display:'flex', flexDirection:'column', gap:5 }}>
+                  {s(5, 12, '65%')}
+                  {s(5, 10, '45%')}
+                </div>
+                {s(99, 24, 72)}
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
-      <style>{`@keyframes pulse{0%,100%{background-position:200% 0}50%{background-position:-200% 0}}`}</style>
     </div>
   )
 }

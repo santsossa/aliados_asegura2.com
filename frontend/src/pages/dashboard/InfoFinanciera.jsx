@@ -140,14 +140,57 @@ export default function InfoFinanciera() {
   }
 
   /* ── Loading ───────────────────────────────────────── */
-  if (loading) return (
-    <div className="p-6 lg:p-8 max-w-3xl mx-auto">
-      <div className="h-7 w-52 bg-gray-100 rounded-lg mb-2 animate-pulse" />
-      <div className="h-4 w-80 bg-gray-100 rounded mb-6 animate-pulse" />
-      <div className="bg-white rounded-2xl border border-gray-100 h-64 mb-4 animate-pulse" />
-      <div className="bg-white rounded-2xl border border-gray-100 h-48 animate-pulse" />
-    </div>
-  )
+  if (loading) {
+    const B = '#f0f1f3'
+    const s = (r,h,w='100%') => <div style={{ background:B, borderRadius:r, height:h, width:w, flexShrink:0 }} />
+    return (
+      <div className="p-6 lg:p-8 max-w-3xl mx-auto" style={{ animation:'skpulse 1.5s ease-in-out infinite' }}>
+        <style>{`@keyframes skpulse{0%,100%{opacity:1}50%{opacity:.45}}`}</style>
+        {/* Header */}
+        <div style={{ marginBottom:24 }}>
+          {s(8, 28, 200)}<div style={{ marginTop:8 }}>{s(6, 16, 320)}</div>
+        </div>
+        {/* Avatar card */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-4">
+          <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:12 }}>
+            {s(50, 80, 80)}
+            {s(6, 14, 140)}
+            {s(5, 12, 180)}
+          </div>
+        </div>
+        {/* Datos personales card */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-4">
+          <div style={{ display:'flex', justifyContent:'space-between', marginBottom:20 }}>
+            <div style={{ display:'flex', alignItems:'center', gap:8 }}>{s(6,18,16)}{s(6,14,140)}</div>
+            {s(8, 32, 72)}
+          </div>
+          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+            {[0,1,2,3].map(i=>(
+              <div key={i} style={{ display:'flex', flexDirection:'column', gap:6 }}>
+                {s(4, 12, '55%')}
+                {s(10, 40)}
+              </div>
+            ))}
+          </div>
+        </div>
+        {/* Cuenta bancaria card */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+          <div style={{ display:'flex', justifyContent:'space-between', marginBottom:20 }}>
+            <div style={{ display:'flex', alignItems:'center', gap:8 }}>{s(6,18,16)}{s(6,14,130)}</div>
+            {s(8, 32, 72)}
+          </div>
+          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+            {[0,1,2,3].map(i=>(
+              <div key={i} style={{ display:'flex', flexDirection:'column', gap:6 }}>
+                {s(4, 12, '55%')}
+                {s(10, 40)}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   if (error) return (
     <div className="p-6 lg:p-8 max-w-3xl mx-auto">

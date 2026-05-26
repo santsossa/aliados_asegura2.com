@@ -86,14 +86,60 @@ function CommissionsChart({ months }) {
 
 // ─── Loading skeleton ─────────────────────────────────────────────────────────
 function Skeleton() {
-  const p = { background:'#f3f4f6', borderRadius:10, animation:'pulse 1.4s infinite' }
+  const B = '#f0f1f3'
+  const s = (r,h,w='100%') => <div style={{ background:B, borderRadius:r, height:h, width:w, flexShrink:0 }} />
   return (
-    <div style={{ padding:'0 0 32px' }}>
-      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:16, marginBottom:24 }}>
-        {[1,2,3].map(i => <div key={i} style={{ ...p, height:180, borderRadius:22 }} />)}
+    <div style={{ padding:'0 0 32px', animation:'skpulse 1.5s ease-in-out infinite' }}>
+      <style>{`@keyframes skpulse{0%,100%{opacity:1}50%{opacity:.45}}`}</style>
+      {/* 3 stat cards */}
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:16, marginBottom:24 }}>
+        {/* Card 1 — Ganancias (con gráfico) */}
+        <div style={{ background:'#fff', borderRadius:22, padding:'20px 20px 16px', display:'flex', flexDirection:'column', gap:12 }}>
+          <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+            {s(6, 14, 100)}{s(99, 20, 60)}
+          </div>
+          {/* Chart bars */}
+          <div style={{ background:'#f5f7fb', borderRadius:12, padding:'12px 10px' }}>
+            <div style={{ display:'flex', alignItems:'flex-end', gap:5, height:80 }}>
+              {[55,35,75,45,90,60].map((h,i)=>(
+                <div key={i} style={{ flex:1, height:`${h}%`, background:B, borderRadius:'4px 4px 2px 2px' }} />
+              ))}
+            </div>
+            <div style={{ display:'flex', gap:5, marginTop:5 }}>
+              {[0,1,2,3,4,5].map(i=><div key={i} style={{ flex:1, height:8, background:B, borderRadius:3 }} />)}
+            </div>
+          </div>
+        </div>
+        {/* Card 2 — Próximo pago */}
+        <div style={{ background:'#fff', borderRadius:22, padding:'20px 20px 16px', display:'flex', flexDirection:'column', gap:14 }}>
+          <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+            {s(12, 34, 34)}{s(6, 14, 90)}
+          </div>
+          {s(6, 32, '70%')}
+          {s(5, 12, '55%')}
+          <div style={{ borderTop:'1px solid #f0f0f2', paddingTop:14, display:'flex', flexDirection:'column', gap:8 }}>
+            <div style={{ display:'flex', justifyContent:'space-between' }}>{s(5,12,'45%')}{s(6,13,'35%')}</div>
+            <div style={{ display:'flex', justifyContent:'space-between' }}>{s(5,12,'40%')}{s(6,13,'30%')}</div>
+          </div>
+        </div>
+        {/* Card 3 — Total ganado (gradiente) */}
+        <div style={{ borderRadius:22, padding:'20px 20px 16px', background:B, display:'flex', flexDirection:'column', gap:14, minHeight:160 }} />
       </div>
-      {[1,2,3].map(i => <div key={i} style={{ ...p, height:68, borderRadius:18, marginBottom:10 }} />)}
-      <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}`}</style>
+      {/* PagoRow skeletons */}
+      {[0,1,2,3].map(i => (
+        <div key={i} style={{ background:'#fff', borderRadius:20, border:'1px solid #f0f0f2', marginBottom:10, padding:'16px 20px', display:'flex', alignItems:'center', gap:16 }}>
+          {s(14, 42, 42)}
+          <div style={{ flex:1, display:'flex', flexDirection:'column', gap:7 }}>
+            {s(5, 14, '45%')}
+            {s(5, 12, '65%')}
+          </div>
+          <div style={{ display:'flex', flexDirection:'column', gap:5, alignItems:'flex-end' }}>
+            {s(5, 15, 80)}
+            {s(99, 18, 56)}
+          </div>
+          {s(6, 16, 16)}
+        </div>
+      ))}
     </div>
   )
 }

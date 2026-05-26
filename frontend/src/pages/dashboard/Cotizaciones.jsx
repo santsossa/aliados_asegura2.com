@@ -682,8 +682,24 @@ export default function Cotizaciones() {
       </div>
 
       {loading ? (
-        <div className="space-y-3">
-          {[1,2,3].map(i => <div key={i} className="bg-white rounded-2xl border border-gray-100 h-20 animate-pulse" />)}
+        <div style={{ display:'flex', flexDirection:'column', gap:12, animation:'skpulse 1.5s ease-in-out infinite' }}>
+          <style>{`@keyframes skpulse{0%,100%{opacity:1}50%{opacity:.45}}`}</style>
+          {[0,1,2,3,4].map(i => (
+            <div key={i} style={{ background:'#fff', borderRadius:16, border:'1px solid #f3f4f6', padding:'16px 20px', display:'flex', alignItems:'center', gap:14 }}>
+              {/* ícono circular */}
+              <div style={{ width:38, height:38, borderRadius:'50%', background:'#f0f1f3', flexShrink:0 }} />
+              {/* texto */}
+              <div style={{ flex:1, display:'flex', flexDirection:'column', gap:7 }}>
+                <div style={{ background:'#f0f1f3', borderRadius:5, height:13, width:'48%' }} />
+                <div style={{ background:'#f0f1f3', borderRadius:5, height:11, width:'72%' }} />
+              </div>
+              {/* badge + botón */}
+              <div style={{ display:'flex', alignItems:'center', gap:8, flexShrink:0 }}>
+                <div style={{ background:'#f0f1f3', borderRadius:99, height:22, width:72 }} />
+                <div style={{ background:'#f0f1f3', borderRadius:99, height:28, width:64 }} />
+              </div>
+            </div>
+          ))}
         </div>
       ) : cotizaciones.length === 0 ? (
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm flex flex-col items-center justify-center py-20 text-center">
