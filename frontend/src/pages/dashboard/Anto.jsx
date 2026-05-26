@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { Send, Loader2, Shield, Scale, MessageCircle, FileCheck, Sparkles } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 
+
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
 const QUICK_CARDS = [
@@ -11,40 +12,6 @@ const QUICK_CARDS = [
   { icon: FileCheck,     bg: '#fff7ed', color: '#ea580c', title: 'Proceso de emisión',     prompt: '¿Cuáles son los pasos para emitir una póliza y qué documentos necesita el cliente?' },
 ]
 
-const FRECUENTES = [
-  {
-    categoria: 'Coberturas',
-    items: [
-      '¿Qué cubre la responsabilidad civil extracontractual?',
-      '¿Diferencia entre todo riesgo y cobertura básica?',
-      '¿Qué es pérdida total por hurto?',
-      '¿Qué cubre el auxilio en carretera?',
-    ],
-  },
-  {
-    categoria: 'Proceso',
-    items: [
-      '¿Qué documentos necesita el cliente para emitir?',
-      '¿Cuánto tiempo tarda la emisión de la póliza?',
-      '¿Cómo presento la cotización al cliente?',
-    ],
-  },
-  {
-    categoria: 'Comisiones',
-    items: [
-      '¿Cuándo me depositan mi comisión?',
-      '¿Cómo se calcula el valor de mi comisión?',
-    ],
-  },
-  {
-    categoria: 'Clientes',
-    items: [
-      '¿Cómo responder a objeciones del cliente?',
-      '¿Qué decirle a un cliente que está indeciso?',
-      '¿Cómo explicar el valor del seguro?',
-    ],
-  },
-]
 
 export default function Anto() {
   const { getToken, user } = useAuth()
@@ -96,13 +63,10 @@ export default function Anto() {
   }
 
   const hasMessages = messages.length > 0
-  const totalFrecuentes = FRECUENTES.reduce((s, g) => s + g.items.length, 0)
 
   return (
-    <div style={{ display: 'flex', height: '100%', background: '#fff', overflow: 'hidden' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: 'transparent', overflow: 'hidden' }}>
 
-      {/* ── Panel principal ── */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, position: 'relative' }}>
 
         {/* Área de mensajes / bienvenida */}
         <div style={{ flex: 1, overflowY: 'auto', padding: hasMessages ? '24px 32px' : '0 32px' }}>
@@ -196,7 +160,7 @@ export default function Anto() {
         </div>
 
         {/* ── Input bar ── */}
-        <div style={{ padding: '12px 32px 20px', borderTop: hasMessages ? '1px solid #f3f4f6' : 'none', flexShrink: 0 }}>
+        <div style={{ padding: '12px 32px 20px', borderTop: hasMessages ? '1px solid #e5e7eb' : 'none', flexShrink: 0 }}>
           <div style={{ maxWidth: hasMessages ? 640 : 520, margin: '0 auto' }}>
             <div style={{
               border: '1.5px solid #e5e7eb', borderRadius: 16,
@@ -247,50 +211,6 @@ export default function Anto() {
             </p>
           </div>
         </div>
-      </div>
-
-      {/* ── Sidebar derecho: Frecuentes ── */}
-      <div style={{
-        width: 260, borderLeft: '1px solid #f0f1f5', background: '#fafafa',
-        display: 'flex', flexDirection: 'column', flexShrink: 0, overflow: 'hidden',
-      }}>
-        <div style={{ padding: '20px 16px 12px', borderBottom: '1px solid #f0f1f5', flexShrink: 0 }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <span style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: 13, color: '#111827' }}>
-              Frecuentes
-            </span>
-            <span style={{ fontFamily: 'Inter', fontSize: 11, color: '#9ca3af', background: '#e5e7eb', borderRadius: 99, padding: '2px 8px' }}>
-              {totalFrecuentes}
-            </span>
-          </div>
-        </div>
-
-        <div style={{ flex: 1, overflowY: 'auto', padding: '8px 0' }}>
-          {FRECUENTES.map((grupo, gi) => (
-            <div key={gi} style={{ marginBottom: 4 }}>
-              <p style={{ margin: '12px 16px 6px', fontFamily: 'Inter', fontSize: 10, fontWeight: 700, color: '#9ca3af', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-                {grupo.categoria}
-              </p>
-              {grupo.items.map((pregunta, pi) => (
-                <button
-                  key={pi}
-                  onClick={() => enviar(pregunta)}
-                  style={{
-                    display: 'block', width: '100%', textAlign: 'left',
-                    padding: '8px 16px', border: 'none', background: 'transparent',
-                    fontFamily: 'Inter', fontSize: 12, color: '#374151', lineHeight: 1.45,
-                    cursor: 'pointer', transition: 'background 0.12s',
-                  }}
-                  onMouseEnter={e => e.currentTarget.style.background = '#f0f1f8'}
-                  onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-                >
-                  {pregunta}
-                </button>
-              ))}
-            </div>
-          ))}
-        </div>
-      </div>
 
       <style>{`
         @keyframes dp { 0%,80%,100%{transform:scale(0.6);opacity:0.4} 40%{transform:scale(1);opacity:1} }

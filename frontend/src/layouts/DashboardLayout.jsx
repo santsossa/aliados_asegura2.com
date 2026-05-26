@@ -1,4 +1,4 @@
-import { Outlet, NavLink, useNavigate } from 'react-router-dom'
+import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom'
 import { useState, useRef, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import {
@@ -130,6 +130,9 @@ export default function DashboardLayout() {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [logoHover, setLogoHover]   = useState(false)
   const sideRef                     = useRef(null)
+
+  const location = useLocation()
+  const isAnto   = location.pathname === '/dashboard/anto'
 
   const nombre   = user?.nombre   || ''
   const apellido = user?.apellido || ''
@@ -364,24 +367,26 @@ export default function DashboardLayout() {
             </div>
           </aside>
 
-          {/* ── Contenido principal — scrollea todo junto ── */}
-          <main style={{ background: '#f5f7fb', borderRadius: 24, height: '100%', overflow: 'auto' }}>
+          {/* ── Contenido principal ── */}
+          <main style={{ background: '#f5f7fb', borderRadius: 24, height: '100%', display: 'flex', flexDirection: 'column', overflow: isAnto ? 'hidden' : 'auto' }}>
 
-            {/* Topbar — parte del contenido, scrollea con la página */}
-            <div style={{ padding: '16px 24px 24px', background: '#f5f7fb' }}>
-              <div style={{ maxWidth: '72rem', margin: '0 auto', height: '100%', display: 'flex', alignItems: 'center', gap: 12 }}>
-                {/* Search */}
-                <div style={{ flex: 1, position: 'relative' }}>
-                  <Search size={14} color="#9ca3af" style={{ position:'absolute', left:14, top:'50%', transform:'translateY(-50%)', pointerEvents:'none' }} />
-                  <input
-                    placeholder="Buscar cliente, placa, póliza..."
-                    style={{ width:'100%', height:38, padding:'0 16px 0 38px', borderRadius:999, border:'none', background:'#fff', fontSize:13, color:'#111827', outline:'none', boxSizing:'border-box', fontFamily:'Inter, system-ui, sans-serif' }}
-                    onFocus={e => e.target.style.boxShadow = '0 0 0 2px #a5b4fc'}
-                    onBlur={e => e.target.style.boxShadow = 'none'}
-                  />
-                </div>
+            {/* Topbar */}
+            <div style={{ padding: isAnto ? '12px 24px' : '16px 24px 24px', background: '#f5f7fb', flexShrink: 0 }}>
+              <div style={{ maxWidth: '72rem', margin: '0 auto', display: 'flex', alignItems: 'center', gap: 12 }}>
+                {/* Search — oculto en Anto */}
+                {!isAnto && (
+                  <div style={{ flex: 1, position: 'relative' }}>
+                    <Search size={14} color="#9ca3af" style={{ position:'absolute', left:14, top:'50%', transform:'translateY(-50%)', pointerEvents:'none' }} />
+                    <input
+                      placeholder="Buscar cliente, placa, póliza..."
+                      style={{ width:'100%', height:38, padding:'0 16px 0 38px', borderRadius:999, border:'none', background:'#fff', fontSize:13, color:'#111827', outline:'none', boxSizing:'border-box', fontFamily:'Inter, system-ui, sans-serif' }}
+                      onFocus={e => e.target.style.boxShadow = '0 0 0 2px #a5b4fc'}
+                      onBlur={e => e.target.style.boxShadow = 'none'}
+                    />
+                  </div>
+                )}
                 {/* Bell + user */}
-                <div style={{ display:'flex', alignItems:'center', gap:8, flexShrink:0 }}>
+                <div style={{ display:'flex', alignItems:'center', gap:8, flexShrink:0, marginLeft: isAnto ? 'auto' : 0 }}>
                   <NotificationBell />
                   <div style={{ display:'flex', alignItems:'center', gap:8, background:'#fff', borderRadius:999, padding:'4px 12px 4px 4px' }}>
                     <UserAvatar avatarId={avatarId} initials={initials} size={30} />
@@ -391,7 +396,13 @@ export default function DashboardLayout() {
               </div>
             </div>
 
-            <Outlet />
+            {isAnto ? (
+              <div style={{ flex: 1, overflow: 'hidden', minHeight: 0 }}>
+                <Outlet />
+              </div>
+            ) : (
+              <Outlet />
+            )}
           </main>
 
         </div>
