@@ -12,7 +12,7 @@ const BLOQUEO_MINUTOS = 15
 const COOKIE_OPTS = {
   httpOnly:  true,
   secure:    env.NODE_ENV === 'production',
-  sameSite:  'strict' as const,
+  sameSite:  'lax' as const,
   maxAge:    7 * 24 * 60 * 60 * 1000,
   path:      '/',
 }
@@ -358,11 +358,8 @@ export async function refresh(req: Request, res: Response, next: NextFunction) {
 
     if (!user) { res.clearCookie('refreshToken'); res.status(401).json({ status:'error', message:'Usuario no encontrado.' }); return }
 
-    await revokeRefreshToken(result.tokenId, tipo)
-    const newRefreshToken = await generateRefreshToken(user.id, tipo)
-    const accessToken     = generateAccessToken(user.id, user.correo, tipo, user.rol, tipo === 'aliado' ? (user.onboarding_step ?? undefined) : undefined, user.nombre, user.apellido, tipo === 'aliado' ? (user.avatar_id ?? undefined) : undefined)
+    const accessToken = generateAccessToken(user.id, user.correo, tipo, user.rol, tipo === 'aliado' ? (user.onboarding_step ?? undefined) : undefined, user.nombre, user.apellido, tipo === 'aliado' ? (user.avatar_id ?? undefined) : undefined)
 
-    res.cookie('refreshToken', newRefreshToken, COOKIE_OPTS)
     res.json({ status:'success', accessToken })
   } catch (err) { next(err) }
 }
