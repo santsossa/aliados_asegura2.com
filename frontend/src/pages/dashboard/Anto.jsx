@@ -265,12 +265,12 @@ export default function Anto() {
 
       {/* ── Input bar ── */}
       <div style={{ padding: '12px 32px 20px', flexShrink: 0 }}>
-        <div style={{ maxWidth: 580, margin: '0 auto' }}>
+        <div style={{ maxWidth: 740, margin: '0 auto' }}>
           <div style={{
-            display: 'flex', alignItems: 'center', gap: 6,
+            display: 'flex', alignItems: 'center', gap: 8,
             border: '1.5px solid #e5e7eb', borderRadius: 999,
-            background: '#fff', padding: '6px 6px 6px 10px',
-            boxShadow: '0 1px 6px rgba(0,0,0,0.05)',
+            background: '#fff', padding: '8px 8px 8px 14px',
+            boxShadow: '0 2px 12px rgba(0,0,0,0.07)',
             transition: 'border-color 0.15s',
           }}
             onFocusCapture={e => e.currentTarget.style.borderColor = '#a5b4fc'}
@@ -290,7 +290,7 @@ export default function Anto() {
               placeholder="Escríbele algo a Anto..."
               style={{
                 flex: 1, border: 'none', outline: 'none',
-                fontFamily: 'Inter', fontSize: 13.5, color: '#111827',
+                fontFamily: 'Inter', fontSize: 14, color: '#111827',
                 background: 'transparent', lineHeight: 1.5, minWidth: 0,
               }}
             />
@@ -298,7 +298,7 @@ export default function Anto() {
               onClick={() => enviar()}
               disabled={!input.trim() || loading}
               style={{
-                width: 30, height: 30, borderRadius: '50%', border: 'none',
+                width: 34, height: 34, borderRadius: '50%', border: 'none',
                 cursor: input.trim() && !loading ? 'pointer' : 'default',
                 background: input.trim() && !loading ? '#2D2A7A' : '#e5e7eb',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
