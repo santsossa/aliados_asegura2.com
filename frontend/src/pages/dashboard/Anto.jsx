@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { Loader2, Shield, Scale, MessageCircle, FileCheck, Sparkles, ArrowUp, Copy, Check } from 'lucide-react'
+import { useLocation } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
@@ -69,6 +70,7 @@ function MarkdownText({ text, style }) {
 // ── Main component ────────────────────────────────────────────────────────────
 export default function Anto() {
   const { getToken, user } = useAuth()
+  const location = useLocation()
   const nombre = user?.nombre || user?.email?.split('@')[0] || 'aliado'
 
   const [messages,   setMessages]   = useState([])
@@ -78,9 +80,10 @@ export default function Anto() {
   const [copiedMsg,  setCopiedMsg]  = useState(null)
   const [typingIdx,  setTypingIdx]  = useState(null)
   const [typingLen,  setTypingLen]  = useState(0)
-  const bottomRef = useRef(null)
-  const inputRef  = useRef(null)
-  const typingRef = useRef(null)
+  const bottomRef      = useRef(null)
+  const inputRef       = useRef(null)
+  const typingRef      = useRef(null)
+  const initialSentRef = useRef(false)
 
   function copiar(idx, text) {
     navigator.clipboard.writeText(text).then(() => {
@@ -88,6 +91,16 @@ export default function Anto() {
       setTimeout(() => setCopiedMsg(null), 1500)
     })
   }
+
+  // Auto-send message arriving from the floating bubble
+  useEffect(() => {
+    const msg = location.state?.initialMessage
+    if (msg && !initialSentRef.current) {
+      initialSentRef.current = true
+      enviar(msg)
+      window.history.replaceState({}, '')
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
