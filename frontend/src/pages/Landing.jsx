@@ -422,12 +422,33 @@ export default function Landing() {
   const loginHref  = user ? (user.tipo === 'admin' ? '/admin' : '/dashboard') : '/login'
   const loginLabel = user ? 'Mi cuenta' : 'Entrar'
 
+  // Navbar: se oculta al bajar, reaparece al subir desde cualquier posición
+  const [navHidden, setNavHidden] = useState(false)
+  const lastScrollY = useRef(0)
+  useEffect(() => {
+    function onScroll() {
+      const y = window.scrollY
+      if (y < 80) { setNavHidden(false) }
+      else if (y > lastScrollY.current + 4) { setNavHidden(true) }
+      else if (y < lastScrollY.current - 4) { setNavHidden(false) }
+      lastScrollY.current = y
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
 
   return (
     <div className="min-h-screen font-sans" style={{ background: 'linear-gradient(160deg, #f0f2ff 0%, #faf8ff 40%, #ffffff 100%)', overflowX: 'hidden' }}>
 
-      {/* ── Navbar ──────────────────────────────────────────────── */}
-      <div className="flex justify-center px-3 sm:px-6 pt-3 sm:pt-5 sticky top-0 z-20">
+      {/* ── Navbar — fixed para que funcione con overflowX:hidden del padre ── */}
+      <div
+        className="flex justify-center px-3 sm:px-6 pt-3 sm:pt-5"
+        style={{
+          position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50,
+          transform: navHidden ? 'translateY(-110%)' : 'translateY(0)',
+          transition: 'transform 0.32s cubic-bezier(0.4,0,0.2,1)',
+        }}
+      >
         <nav className="flex items-center justify-between w-full max-w-5xl bg-white/90 backdrop-blur-md border border-gray-200/80 rounded-2xl px-4 sm:px-5 py-3 sm:py-2 shadow-md sm:shadow-sm">
           <LogoFull className="h-10 sm:h-11" />
           <div className="hidden md:flex items-center gap-6">
@@ -446,8 +467,11 @@ export default function Landing() {
         </nav>
       </div>
 
+      {/* Espaciador para compensar el navbar fixed (~76px) */}
+      <div style={{ height: 76 }} />
+
       {/* ── Hero ────────────────────────────────────────────────── */}
-      <section className="max-w-6xl mx-auto px-4 sm:px-6 pt-8 sm:pt-14 pb-12 sm:pb-20">
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 pt-2 sm:pt-6 pb-12 sm:pb-20">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-10">
 
           {/* Left */}
