@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { Loader2, Shield, Scale, MessageCircle, FileCheck, Sparkles, Plus, Clock, ArrowUp, Copy, Check } from 'lucide-react'
+import { Loader2, Shield, Scale, MessageCircle, FileCheck, Sparkles, ArrowUp, Copy, Check } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
@@ -282,18 +282,12 @@ export default function Anto() {
             onFocusCapture={e => e.currentTarget.style.borderColor = '#a5b4fc'}
             onBlurCapture={e => e.currentTarget.style.borderColor = '#e5e7eb'}
           >
-            <button style={{ width: 28, height: 28, borderRadius: '50%', border: '1.5px solid #e5e7eb', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0 }}>
-              <Plus size={13} color="#6b7280" />
-            </button>
-            <button style={{ width: 28, height: 28, borderRadius: '50%', border: 'none', background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0 }}>
-              <Clock size={13} color="#9ca3af" />
-            </button>
             <input
               ref={inputRef}
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); enviar() } }}
-              placeholder="Escríbele algo a Anto..."
+              placeholder="Pregúntale a Anto..."
               style={{
                 flex: 1, border: 'none', outline: 'none',
                 fontFamily: 'Inter', fontSize: 14, color: '#111827',
