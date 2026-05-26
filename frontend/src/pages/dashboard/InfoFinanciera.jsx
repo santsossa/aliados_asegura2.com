@@ -1,4 +1,4 @@
-import { CreditCard, User, Building2, Edit3, Check, X, Loader2, Pencil } from 'lucide-react'
+import { CreditCard, User, Building2, Edit3, Check, X, Loader2, Pencil, Shield, Bell, Lock } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { useAuth } from '../../context/AuthContext'
 import ComboBox from '../../components/ComboBox'
@@ -16,6 +16,13 @@ const BANCOS = [
   'Nequi','Daviplata','Lulo Bank','Nubank','Movii','Rappipay','Powwi','Dale!',
   'Confiar Cooperativa Financiera','Coofinep Cooperativa Financiera',
   'JFK Cooperativa Financiera','Cotrafa Cooperativa Financiera',
+]
+
+const TABS = [
+  { id: 'cuenta',    label: 'Mi cuenta'        },
+  { id: 'pagos',     label: 'Cuenta de pagos'  },
+  { id: 'seguridad', label: 'Seguridad'         },
+  { id: 'notifs',    label: 'Notificaciones'    },
 ]
 
 function AvatarCircle({ avatarId, size = 80 }) {
@@ -36,33 +43,43 @@ function AvatarCircle({ avatarId, size = 80 }) {
   )
 }
 
+function ComingSoon({ icon: Icon, title, desc }) {
+  return (
+    <div style={{ padding: '56px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+      <div style={{ width: 52, height: 52, borderRadius: '50%', background: '#f0f1f8', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <Icon size={22} color="#9ca3af" />
+      </div>
+      <p style={{ margin: 0, fontFamily: 'Poppins', fontWeight: 600, fontSize: 15, color: '#374151' }}>{title}</p>
+      <p style={{ margin: 0, fontFamily: 'Inter', fontSize: 13, color: '#9ca3af', textAlign: 'center', maxWidth: 320 }}>{desc}</p>
+      <span style={{ marginTop: 4, background: '#f0f1f8', color: '#9ca3af', fontFamily: 'Inter', fontSize: 11, fontWeight: 600, padding: '4px 12px', borderRadius: 99 }}>Próximamente</span>
+    </div>
+  )
+}
+
 export default function InfoFinanciera() {
   const { getToken, avatarId: globalAvatarId, setAvatarId: setGlobalAvatar } = useAuth()
 
-  const [perfil,  setPerfil]  = useState(null)
-  const [banco,   setBanco]   = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [error,   setError]   = useState('')
+  const [activeTab,  setActiveTab]  = useState('cuenta')
+  const [perfil,     setPerfil]     = useState(null)
+  const [banco,      setBanco]      = useState(null)
+  const [loading,    setLoading]    = useState(true)
+  const [error,      setError]      = useState('')
 
-  // Edición perfil
-  const [editPerfil,  setEditPerfil]  = useState(false)
-  const [savingPerfil,setSavingPerfil]= useState(false)
-  const [errPerfil,   setErrPerfil]   = useState('')
-  const [formPerfil,  setFormPerfil]  = useState({})
+  const [editPerfil,   setEditPerfil]   = useState(false)
+  const [savingPerfil, setSavingPerfil] = useState(false)
+  const [errPerfil,    setErrPerfil]    = useState('')
+  const [formPerfil,   setFormPerfil]   = useState({})
 
-  // Edición banco
-  const [editBanco,  setEditBanco]  = useState(false)
-  const [savingBanco,setSavingBanco]= useState(false)
-  const [errBanco,   setErrBanco]   = useState('')
-  const [formBanco,  setFormBanco]  = useState({})
+  const [editBanco,   setEditBanco]   = useState(false)
+  const [savingBanco, setSavingBanco] = useState(false)
+  const [errBanco,    setErrBanco]    = useState('')
+  const [formBanco,   setFormBanco]   = useState({})
 
-  // Edición avatar (modal)
-  const [editAvatar,  setEditAvatar]  = useState(false)
-  const [newAvatar,   setNewAvatar]   = useState(null)
-  const [savingAvatar,setSavingAvatar]= useState(false)
-  const [errAvatar,   setErrAvatar]   = useState('')
+  const [editAvatar,   setEditAvatar]   = useState(false)
+  const [newAvatar,    setNewAvatar]    = useState(null)
+  const [savingAvatar, setSavingAvatar] = useState(false)
+  const [errAvatar,    setErrAvatar]    = useState('')
 
-  /* ── Carga inicial ─────────────────────────────────── */
   useEffect(() => {
     fetch(`${API}/api/aliados/me`, {
       headers: { Authorization: `Bearer ${getToken()}` },
@@ -83,7 +100,6 @@ export default function InfoFinanciera() {
       .finally(() => setLoading(false))
   }, [])
 
-  /* ── Guardar avatar ───────────────────────────────── */
   async function guardarAvatar() {
     if (!newAvatar) return
     setSavingAvatar(true); setErrAvatar('')
@@ -103,7 +119,6 @@ export default function InfoFinanciera() {
     finally { setSavingAvatar(false) }
   }
 
-  /* ── Guardar perfil ────────────────────────────────── */
   async function guardarPerfil() {
     setSavingPerfil(true); setErrPerfil('')
     try {
@@ -121,7 +136,6 @@ export default function InfoFinanciera() {
     finally { setSavingPerfil(false) }
   }
 
-  /* ── Guardar banco ─────────────────────────────────── */
   async function guardarBanco() {
     setSavingBanco(true); setErrBanco('')
     try {
@@ -139,53 +153,27 @@ export default function InfoFinanciera() {
     finally { setSavingBanco(false) }
   }
 
-  /* ── Loading ───────────────────────────────────────── */
+  const inp = 'w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand transition-colors'
+  const dis  = 'w-full border border-gray-100 rounded-xl px-4 py-2.5 text-sm text-gray-700 bg-gray-50'
+
   if (loading) {
     const B = '#f0f1f3'
-    const s = (r,h,w='100%') => <div style={{ background:B, borderRadius:r, height:h, width:w, flexShrink:0 }} />
+    const s = (r, h, w = '100%') => <div style={{ background: B, borderRadius: r, height: h, width: w, flexShrink: 0 }} />
     return (
-      <div className="p-6 lg:p-8 max-w-3xl mx-auto" style={{ animation:'skpulse 1.5s ease-in-out infinite' }}>
+      <div style={{ animation: 'skpulse 1.5s ease-in-out infinite' }}>
         <style>{`@keyframes skpulse{0%,100%{opacity:1}50%{opacity:.45}}`}</style>
-        {/* Header */}
-        <div style={{ marginBottom:24 }}>
-          {s(8, 28, 200)}<div style={{ marginTop:8 }}>{s(6, 16, 320)}</div>
-        </div>
-        {/* Avatar card */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-4">
-          <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:12 }}>
-            {s(50, 80, 80)}
-            {s(6, 14, 140)}
-            {s(5, 12, 180)}
+        <div style={{ padding: '28px 28px 0', borderBottom: '1px solid #e5e7eb', marginBottom: 0 }}>
+          {s(8, 28, 180)}<div style={{ marginTop: 6, marginBottom: 20 }}>{s(5, 14, 300)}</div>
+          <div style={{ display: 'flex', gap: 24 }}>
+            {[140, 130, 90, 120].map((w, i) => <div key={i} style={{ height: 36, width: w, background: B, borderRadius: 6 }} />)}
           </div>
         </div>
-        {/* Datos personales card */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-4">
-          <div style={{ display:'flex', justifyContent:'space-between', marginBottom:20 }}>
-            <div style={{ display:'flex', alignItems:'center', gap:8 }}>{s(6,18,16)}{s(6,14,140)}</div>
-            {s(8, 32, 72)}
-          </div>
-          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
-            {[0,1,2,3].map(i=>(
-              <div key={i} style={{ display:'flex', flexDirection:'column', gap:6 }}>
-                {s(4, 12, '55%')}
-                {s(10, 40)}
-              </div>
-            ))}
-          </div>
-        </div>
-        {/* Cuenta bancaria card */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-          <div style={{ display:'flex', justifyContent:'space-between', marginBottom:20 }}>
-            <div style={{ display:'flex', alignItems:'center', gap:8 }}>{s(6,18,16)}{s(6,14,130)}</div>
-            {s(8, 32, 72)}
-          </div>
-          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
-            {[0,1,2,3].map(i=>(
-              <div key={i} style={{ display:'flex', flexDirection:'column', gap:6 }}>
-                {s(4, 12, '55%')}
-                {s(10, 40)}
-              </div>
-            ))}
+        <div style={{ padding: '28px 28px' }}>
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-4">
+            <div style={{ display: 'flex', gap: 16, marginBottom: 20 }}>{s(50, 72, 72)}<div style={{ flex: 1 }}>{s(6, 14, '40%')}<div style={{ marginTop: 8 }}>{s(5, 12, '55%')}</div></div></div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              {[0,1,2,3].map(i => <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>{s(4, 12, '50%')}{s(10, 40)}</div>)}
+            </div>
           </div>
         </div>
       </div>
@@ -193,102 +181,279 @@ export default function InfoFinanciera() {
   }
 
   if (error) return (
-    <div className="p-6 lg:p-8 max-w-3xl mx-auto">
-      <p className="text-red-500 text-sm">{error}</p>
+    <div style={{ padding: 28 }}>
+      <p style={{ color: '#ef4444', fontSize: 14 }}>{error}</p>
     </div>
   )
 
-  const inp = 'w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand transition-colors'
-  const dis  = 'w-full border border-gray-100 rounded-xl px-4 py-2.5 text-sm text-gray-700 bg-gray-50'
-
   return (
-    <div className="p-6 lg:p-8 max-w-3xl mx-auto">
-
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Mi información</h1>
-        <p className="text-gray-500 text-sm mt-1">
-          Acá puedes ver y actualizar tus datos personales y la cuenta bancaria donde te depositamos tus comisiones.
-        </p>
-      </div>
-
-      {/* ── Avatar card ──────────────────────────────── */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-4">
-        <div className="flex flex-col items-center">
-          <div className="relative mb-3">
-            <AvatarCircle avatarId={globalAvatarId || perfil?.avatar} size={80} />
-            <button
-              onClick={() => { setNewAvatar(perfil?.avatar || null); setErrAvatar(''); setEditAvatar(true) }}
-              className="absolute bottom-0 right-0 w-7 h-7 rounded-full bg-brand border-2 border-white flex items-center justify-center hover:bg-brand-dark transition-colors"
-              style={{ background: '#2D2A7A' }}
-            >
-              <Pencil size={11} color="#fff" />
-            </button>
-          </div>
-          <p className="font-semibold text-gray-900 text-sm">
-            {[perfil?.nombre, perfil?.apellido].filter(Boolean).join(' ') || 'Sin nombre'}
+    <>
+      {/* ── Cabecera + tabs ── */}
+      <div style={{ background: '#fff', borderBottom: '1px solid #e5e7eb' }}>
+        <div style={{ maxWidth: 820, margin: '0 auto', padding: '28px 28px 0' }}>
+          <h1 style={{ margin: '0 0 4px', fontFamily: 'Poppins', fontWeight: 700, fontSize: 22, color: '#111827' }}>Configuración</h1>
+          <p style={{ margin: '0 0 20px', fontFamily: 'Inter', fontSize: 13, color: '#9ca3af' }}>
+            Administra tu cuenta y preferencias como aliado.
           </p>
-          <p className="text-xs text-gray-400 mt-0.5">{perfil?.correo}</p>
+          {/* Tab bar */}
+          <div style={{ display: 'flex', gap: 0 }}>
+            {TABS.map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                style={{
+                  padding: '10px 16px',
+                  border: 'none',
+                  borderBottom: activeTab === tab.id ? '2px solid #2D2A7A' : '2px solid transparent',
+                  background: 'none',
+                  cursor: 'pointer',
+                  fontFamily: 'Inter',
+                  fontSize: 13,
+                  fontWeight: activeTab === tab.id ? 600 : 400,
+                  color: activeTab === tab.id ? '#2D2A7A' : '#6b7280',
+                  marginBottom: '-1px',
+                  transition: 'color 0.15s, border-color 0.15s',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
-      {/* ── Modal selector de avatar ─────────────────── */}
+      {/* ── Contenido ── */}
+      <div style={{ maxWidth: 820, margin: '0 auto', padding: '28px 28px' }}>
+
+        {/* ═══ TAB: Mi cuenta ═══ */}
+        {activeTab === 'cuenta' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+
+            {/* Sección: Foto de perfil */}
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+              <div style={{ marginBottom: 18 }}>
+                <h2 style={{ margin: '0 0 2px', fontFamily: 'Poppins', fontWeight: 600, fontSize: 14, color: '#111827' }}>Foto de perfil</h2>
+                <p style={{ margin: 0, fontFamily: 'Inter', fontSize: 12, color: '#9ca3af' }}>Elige un avatar que te represente.</p>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                <div style={{ position: 'relative' }}>
+                  <AvatarCircle avatarId={globalAvatarId || perfil?.avatar} size={72} />
+                  <button
+                    onClick={() => { setNewAvatar(perfil?.avatar || null); setErrAvatar(''); setEditAvatar(true) }}
+                    style={{ position: 'absolute', bottom: 0, right: 0, width: 26, height: 26, borderRadius: '50%', background: '#2D2A7A', border: '2px solid #fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+                  >
+                    <Pencil size={10} color="#fff" />
+                  </button>
+                </div>
+                <div>
+                  <p style={{ margin: '0 0 2px', fontFamily: 'Poppins', fontWeight: 600, fontSize: 14, color: '#111827' }}>
+                    {[perfil?.nombre, perfil?.apellido].filter(Boolean).join(' ') || 'Sin nombre'}
+                  </p>
+                  <p style={{ margin: '0 0 10px', fontFamily: 'Inter', fontSize: 12, color: '#9ca3af' }}>{perfil?.correo}</p>
+                  <button
+                    onClick={() => { setNewAvatar(perfil?.avatar || null); setErrAvatar(''); setEditAvatar(true) }}
+                    style={{ fontFamily: 'Inter', fontSize: 12, fontWeight: 600, color: '#2D2A7A', background: 'transparent', border: '1.5px solid rgba(45,42,122,0.3)', borderRadius: 8, padding: '5px 14px', cursor: 'pointer' }}
+                  >
+                    Cambiar avatar
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Sección: Datos personales */}
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 18 }}>
+                <div>
+                  <h2 style={{ margin: '0 0 2px', fontFamily: 'Poppins', fontWeight: 600, fontSize: 14, color: '#111827' }}>Datos personales</h2>
+                  <p style={{ margin: 0, fontFamily: 'Inter', fontSize: 12, color: '#9ca3af' }}>Tu nombre, teléfono y ciudad de operación.</p>
+                </div>
+                {!editPerfil ? (
+                  <button onClick={() => setEditPerfil(true)}
+                    style={{ display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'Inter', fontSize: 12, fontWeight: 600, color: '#2D2A7A', background: 'transparent', border: '1.5px solid rgba(45,42,122,0.3)', borderRadius: 8, padding: '5px 14px', cursor: 'pointer' }}>
+                    <Edit3 size={12} /> Editar
+                  </button>
+                ) : (
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <button onClick={() => { setEditPerfil(false); setErrPerfil('') }}
+                      style={{ fontFamily: 'Inter', fontSize: 12, color: '#9ca3af', background: 'none', border: '1px solid #e5e7eb', borderRadius: 8, padding: '5px 12px', cursor: 'pointer' }}>
+                      Cancelar
+                    </button>
+                    <button onClick={guardarPerfil} disabled={savingPerfil}
+                      style={{ display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'Inter', fontSize: 12, fontWeight: 600, color: '#fff', background: '#2D2A7A', border: 'none', borderRadius: 8, padding: '5px 14px', cursor: 'pointer', opacity: savingPerfil ? 0.6 : 1 }}>
+                      {savingPerfil ? <Loader2 size={12} style={{ animation: 'spin 1s linear infinite' }} /> : <Check size={12} />}
+                      Guardar
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-medium text-gray-500 mb-1 block">Nombre</label>
+                  {editPerfil
+                    ? <input className={inp} value={formPerfil.nombre} onChange={e => setFormPerfil(p => ({ ...p, nombre: e.target.value }))} />
+                    : <div className={dis}>{perfil?.nombre || <span className="text-gray-300">—</span>}</div>}
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-gray-500 mb-1 block">Apellido</label>
+                  {editPerfil
+                    ? <input className={inp} value={formPerfil.apellido} onChange={e => setFormPerfil(p => ({ ...p, apellido: e.target.value }))} />
+                    : <div className={dis}>{perfil?.apellido || <span className="text-gray-300">—</span>}</div>}
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-gray-500 mb-1 block">Teléfono</label>
+                  {editPerfil
+                    ? <input className={inp} type="tel" value={formPerfil.telefono} onChange={e => setFormPerfil(p => ({ ...p, telefono: e.target.value }))} />
+                    : <div className={dis}>{perfil?.telefono || <span className="text-gray-300">—</span>}</div>}
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-gray-500 mb-1 block">Ciudad</label>
+                  {editPerfil
+                    ? <input className={inp} value={formPerfil.ciudad} onChange={e => setFormPerfil(p => ({ ...p, ciudad: e.target.value }))} />
+                    : <div className={dis}>{perfil?.ciudad || <span className="text-gray-300">—</span>}</div>}
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-gray-500 mb-1 block">Correo electrónico <span style={{ color: '#d1d5db', fontWeight: 400 }}>(no editable)</span></label>
+                  <div className={dis + ' cursor-not-allowed'}>{perfil?.correo}</div>
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-gray-500 mb-1 block">Número de cédula <span style={{ color: '#d1d5db', fontWeight: 400 }}>(no editable)</span></label>
+                  <div className={dis + ' cursor-not-allowed'}>{perfil?.cedula || <span className="text-gray-300">—</span>}</div>
+                </div>
+                <div className="sm:col-span-2">
+                  <label className="text-xs font-medium text-gray-500 mb-1 block">Tipo de aliado</label>
+                  <div className={dis + ' cursor-not-allowed'}>{perfil?.tipo_aliado || <span className="text-gray-300">—</span>}</div>
+                </div>
+              </div>
+              {errPerfil && <p style={{ color: '#ef4444', fontSize: 12, marginTop: 12 }}>{errPerfil}</p>}
+            </div>
+
+          </div>
+        )}
+
+        {/* ═══ TAB: Cuenta de pagos ═══ */}
+        {activeTab === 'pagos' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 18 }}>
+                <div>
+                  <h2 style={{ margin: '0 0 2px', fontFamily: 'Poppins', fontWeight: 600, fontSize: 14, color: '#111827' }}>Datos bancarios</h2>
+                  <p style={{ margin: 0, fontFamily: 'Inter', fontSize: 12, color: '#9ca3af' }}>Cuenta donde recibirás tus comisiones el 1 de cada mes.</p>
+                </div>
+                {!editBanco ? (
+                  <button onClick={() => setEditBanco(true)}
+                    style={{ display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'Inter', fontSize: 12, fontWeight: 600, color: '#2D2A7A', background: 'transparent', border: '1.5px solid rgba(45,42,122,0.3)', borderRadius: 8, padding: '5px 14px', cursor: 'pointer' }}>
+                    <Edit3 size={12} /> Editar
+                  </button>
+                ) : (
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <button onClick={() => { setEditBanco(false); setErrBanco('') }}
+                      style={{ fontFamily: 'Inter', fontSize: 12, color: '#9ca3af', background: 'none', border: '1px solid #e5e7eb', borderRadius: 8, padding: '5px 12px', cursor: 'pointer' }}>
+                      Cancelar
+                    </button>
+                    <button onClick={guardarBanco} disabled={savingBanco}
+                      style={{ display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'Inter', fontSize: 12, fontWeight: 600, color: '#fff', background: '#2D2A7A', border: 'none', borderRadius: 8, padding: '5px 14px', cursor: 'pointer', opacity: savingBanco ? 0.6 : 1 }}>
+                      {savingBanco ? <Loader2 size={12} style={{ animation: 'spin 1s linear infinite' }} /> : <Check size={12} />}
+                      Guardar
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-medium text-gray-500 mb-1 block">Banco o billetera</label>
+                  {editBanco
+                    ? <ComboBox value={formBanco.banco} onChange={v => setFormBanco(p => ({ ...p, banco: v }))} options={BANCOS.map(b => ({ v: b, label: b }))} placeholder="Busca tu banco..." />
+                    : <div className={dis}>{banco?.banco || <span className="text-gray-300">—</span>}</div>}
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-gray-500 mb-1 block">Tipo de cuenta</label>
+                  {editBanco
+                    ? <ComboBox value={formBanco.tipo_cuenta} onChange={v => setFormBanco(p => ({ ...p, tipo_cuenta: v }))} options={[{ v: 'Ahorros', label: 'Ahorros' }, { v: 'Corriente', label: 'Corriente' }]} placeholder="Selecciona..." />
+                    : <div className={dis}>{banco?.tipo_cuenta || <span className="text-gray-300">—</span>}</div>}
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-gray-500 mb-1 block">Número de cuenta</label>
+                  {editBanco
+                    ? <input className={inp} value={formBanco.numero_cuenta} onChange={e => setFormBanco(p => ({ ...p, numero_cuenta: e.target.value }))} />
+                    : <div className={dis}>{banco?.numero_cuenta || <span className="text-gray-300">—</span>}</div>}
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-gray-500 mb-1 block">Titular de la cuenta</label>
+                  {editBanco
+                    ? <input className={inp} value={formBanco.titular} onChange={e => setFormBanco(p => ({ ...p, titular: e.target.value }))} />
+                    : <div className={dis}>{banco?.titular || <span className="text-gray-300">—</span>}</div>}
+                </div>
+              </div>
+              {errBanco && <p style={{ color: '#ef4444', fontSize: 12, marginTop: 12 }}>{errBanco}</p>}
+
+              <div style={{ marginTop: 20, paddingTop: 16, borderTop: '1px solid #f3f4f6', display: 'flex', alignItems: 'center', gap: 8 }}>
+                <Building2 size={13} color="#9ca3af" />
+                <p style={{ margin: 0, fontFamily: 'Inter', fontSize: 12, color: '#9ca3af' }}>
+                  Los pagos se depositan el 1 de cada mes. Asegúrate de que los datos sean correctos para evitar demoras.
+                </p>
+              </div>
+            </div>
+
+          </div>
+        )}
+
+        {/* ═══ TAB: Seguridad ═══ */}
+        {activeTab === 'seguridad' && (
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+            <ComingSoon
+              icon={Lock}
+              title="Seguridad de la cuenta"
+              desc="Pronto podrás cambiar tu número de teléfono para el código OTP y gestionar tus sesiones activas."
+            />
+          </div>
+        )}
+
+        {/* ═══ TAB: Notificaciones ═══ */}
+        {activeTab === 'notifs' && (
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+            <ComingSoon
+              icon={Bell}
+              title="Preferencias de notificaciones"
+              desc="Pronto podrás elegir qué notificaciones recibir por correo o WhatsApp: pagos, cotizaciones aprobadas y más."
+            />
+          </div>
+        )}
+
+      </div>
+
+      {/* ── Modal selector de avatar ── */}
       {editAvatar && (
-        <div
-          style={{ position: 'fixed', inset: 0, zIndex: 50, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}
-        >
+        <div style={{ position: 'fixed', inset: 0, zIndex: 50, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
           <div style={{ background: '#fff', borderRadius: 24, padding: 28, width: '100%', maxWidth: 360, boxShadow: '0 20px 60px rgba(0,0,0,0.18)' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
               <h3 style={{ margin: 0, fontFamily: 'Poppins', fontWeight: 600, fontSize: 16, color: '#111827' }}>Elige tu avatar</h3>
-              <button
-                onClick={() => { setEditAvatar(false); setErrAvatar('') }}
-                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af', display: 'flex', alignItems: 'center' }}
-              >
+              <button onClick={() => { setEditAvatar(false); setErrAvatar('') }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af', display: 'flex' }}>
                 <X size={18} />
               </button>
             </div>
-
-            {/* Preview del seleccionado */}
             <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 20 }}>
               <AvatarCircle avatarId={newAvatar} size={72} />
             </div>
-
-            {/* Grid 4×2 */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 10, marginBottom: 20 }}>
               {AVATARES.map(a => (
-                <button
-                  key={a.id}
-                  onClick={() => setNewAvatar(a.id)}
-                  style={{
-                    padding: 0, border: 'none', borderRadius: 16, overflow: 'hidden', cursor: 'pointer',
-                    outline: newAvatar === a.id ? '2.5px solid #2D2A7A' : '2.5px solid transparent',
-                    outlineOffset: 2,
-                    transition: 'outline 0.12s',
-                    background: 'linear-gradient(135deg, #e8e6ff, #c7d2fe)',
-                    aspectRatio: '1',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  }}
-                >
-                  <img src={a.src} alt={a.id} width={80} height={80}
-                    style={{ width: '85%', height: '85%', objectFit: 'contain', objectPosition: 'center', display: 'block' }}
-                    loading="lazy" decoding="async" />
+                <button key={a.id} onClick={() => setNewAvatar(a.id)}
+                  style={{ padding: 0, border: 'none', borderRadius: 16, overflow: 'hidden', cursor: 'pointer', outline: newAvatar === a.id ? '2.5px solid #2D2A7A' : '2.5px solid transparent', outlineOffset: 2, transition: 'outline 0.12s', background: 'linear-gradient(135deg,#e8e6ff,#c7d2fe)', aspectRatio: '1', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <img src={a.src} alt={a.id} width={80} height={80} style={{ width: '85%', height: '85%', objectFit: 'contain', objectPosition: 'center', display: 'block' }} loading="lazy" decoding="async" />
                 </button>
               ))}
             </div>
-
             {errAvatar && <p style={{ margin: '0 0 12px', fontSize: 12, color: '#ef4444', textAlign: 'center' }}>{errAvatar}</p>}
-
             <div style={{ display: 'flex', gap: 8 }}>
-              <button
-                onClick={() => { setEditAvatar(false); setErrAvatar('') }}
-                style={{ flex: 1, padding: '10px', borderRadius: 12, border: '1.5px solid #e5e7eb', background: '#fff', fontFamily: 'Poppins', fontSize: 13, fontWeight: 500, color: '#6b7280', cursor: 'pointer' }}
-              >
+              <button onClick={() => { setEditAvatar(false); setErrAvatar('') }}
+                style={{ flex: 1, padding: '10px', borderRadius: 12, border: '1.5px solid #e5e7eb', background: '#fff', fontFamily: 'Poppins', fontSize: 13, fontWeight: 500, color: '#6b7280', cursor: 'pointer' }}>
                 Cancelar
               </button>
-              <button
-                onClick={guardarAvatar}
-                disabled={savingAvatar || !newAvatar}
-                style={{ flex: 2, padding: '10px', borderRadius: 12, border: 'none', background: '#2D2A7A', fontFamily: 'Poppins', fontSize: 13, fontWeight: 600, color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, opacity: (!newAvatar || savingAvatar) ? 0.6 : 1 }}
-              >
+              <button onClick={guardarAvatar} disabled={savingAvatar || !newAvatar}
+                style={{ flex: 2, padding: '10px', borderRadius: 12, border: 'none', background: '#2D2A7A', fontFamily: 'Poppins', fontSize: 13, fontWeight: 600, color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, opacity: (!newAvatar || savingAvatar) ? 0.6 : 1 }}>
                 {savingAvatar ? <Loader2 size={14} style={{ animation: 'spin 1s linear infinite' }} /> : <Check size={14} />}
                 Guardar avatar
               </button>
@@ -297,149 +462,7 @@ export default function InfoFinanciera() {
         </div>
       )}
 
-      {/* ── Datos personales ─────────────────────────── */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-4">
-        <div className="flex items-center justify-between mb-5">
-          <div className="flex items-center gap-2">
-            <User size={16} className="text-brand" />
-            <h2 className="font-semibold text-gray-900 text-sm">Datos personales</h2>
-          </div>
-          {!editPerfil ? (
-            <button onClick={() => setEditPerfil(true)}
-              className="flex items-center gap-1.5 text-xs text-brand font-medium hover:underline">
-              <Edit3 size={13} /> Editar
-            </button>
-          ) : (
-            <div className="flex items-center gap-2">
-              <button onClick={() => { setEditPerfil(false); setErrPerfil('') }}
-                className="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600">
-                <X size={13} /> Cancelar
-              </button>
-              <button onClick={guardarPerfil} disabled={savingPerfil}
-                className="flex items-center gap-1.5 text-xs text-white bg-brand px-3 py-1.5 rounded-lg font-medium hover:bg-brand-dark transition-colors disabled:opacity-60">
-                {savingPerfil ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />}
-                Guardar
-              </button>
-            </div>
-          )}
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label className="text-xs font-medium text-gray-500 mb-1 block">Nombre</label>
-            {editPerfil
-              ? <input className={inp} value={formPerfil.nombre} onChange={e => setFormPerfil(p => ({ ...p, nombre: e.target.value }))} />
-              : <div className={dis}>{perfil?.nombre || <span className="text-gray-300">—</span>}</div>}
-          </div>
-          <div>
-            <label className="text-xs font-medium text-gray-500 mb-1 block">Apellido</label>
-            {editPerfil
-              ? <input className={inp} value={formPerfil.apellido} onChange={e => setFormPerfil(p => ({ ...p, apellido: e.target.value }))} />
-              : <div className={dis}>{perfil?.apellido || <span className="text-gray-300">—</span>}</div>}
-          </div>
-          <div>
-            <label className="text-xs font-medium text-gray-500 mb-1 block">Número de cédula</label>
-            <div className={dis + ' cursor-not-allowed'}>{perfil?.cedula || <span className="text-gray-300">—</span>}</div>
-          </div>
-          <div>
-            <label className="text-xs font-medium text-gray-500 mb-1 block">Teléfono</label>
-            {editPerfil
-              ? <input className={inp} type="tel" value={formPerfil.telefono} onChange={e => setFormPerfil(p => ({ ...p, telefono: e.target.value }))} />
-              : <div className={dis}>{perfil?.telefono || <span className="text-gray-300">—</span>}</div>}
-          </div>
-          <div>
-            <label className="text-xs font-medium text-gray-500 mb-1 block">Ciudad</label>
-            {editPerfil
-              ? <input className={inp} value={formPerfil.ciudad} onChange={e => setFormPerfil(p => ({ ...p, ciudad: e.target.value }))} />
-              : <div className={dis}>{perfil?.ciudad || <span className="text-gray-300">—</span>}</div>}
-          </div>
-          <div>
-            <label className="text-xs font-medium text-gray-500 mb-1 block">Correo electrónico</label>
-            <div className={dis + ' cursor-not-allowed'}>{perfil?.correo}</div>
-          </div>
-          <div className="sm:col-span-2">
-            <label className="text-xs font-medium text-gray-500 mb-1 block">Tipo de aliado</label>
-            <div className={dis + ' cursor-not-allowed'}>{perfil?.tipo_aliado || <span className="text-gray-300">—</span>}</div>
-          </div>
-        </div>
-
-        {errPerfil && <p className="text-red-500 text-xs mt-3">{errPerfil}</p>}
-      </div>
-
-      {/* ── Cuenta bancaria ──────────────────────────── */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-        <div className="flex items-center justify-between mb-5">
-          <div className="flex items-center gap-2">
-            <CreditCard size={16} className="text-brand" />
-            <h2 className="font-semibold text-gray-900 text-sm">Cuenta bancaria</h2>
-          </div>
-          {!editBanco ? (
-            <button onClick={() => setEditBanco(true)}
-              className="flex items-center gap-1.5 text-xs text-brand font-medium hover:underline">
-              <Edit3 size={13} /> Editar
-            </button>
-          ) : (
-            <div className="flex items-center gap-2">
-              <button onClick={() => { setEditBanco(false); setErrBanco('') }}
-                className="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600">
-                <X size={13} /> Cancelar
-              </button>
-              <button onClick={guardarBanco} disabled={savingBanco}
-                className="flex items-center gap-1.5 text-xs text-white bg-brand px-3 py-1.5 rounded-lg font-medium hover:bg-brand-dark transition-colors disabled:opacity-60">
-                {savingBanco ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />}
-                Guardar
-              </button>
-            </div>
-          )}
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label className="text-xs font-medium text-gray-500 mb-1 block">Banco o billetera</label>
-            {editBanco
-              ? <ComboBox
-                  value={formBanco.banco}
-                  onChange={v => setFormBanco(p => ({ ...p, banco: v }))}
-                  options={BANCOS.map(b => ({ v:b, label:b }))}
-                  placeholder="Busca tu banco..."
-                />
-              : <div className={dis}>{banco?.banco || <span className="text-gray-300">—</span>}</div>}
-          </div>
-          <div>
-            <label className="text-xs font-medium text-gray-500 mb-1 block">Tipo de cuenta</label>
-            {editBanco
-              ? <ComboBox
-                  value={formBanco.tipo_cuenta}
-                  onChange={v => setFormBanco(p => ({ ...p, tipo_cuenta: v }))}
-                  options={[{ v:'Ahorros', label:'Ahorros' }, { v:'Corriente', label:'Corriente' }]}
-                  placeholder="Selecciona..."
-                />
-              : <div className={dis}>{banco?.tipo_cuenta || <span className="text-gray-300">—</span>}</div>}
-          </div>
-          <div>
-            <label className="text-xs font-medium text-gray-500 mb-1 block">Número de cuenta</label>
-            {editBanco
-              ? <input className={inp} value={formBanco.numero_cuenta} onChange={e => setFormBanco(p => ({ ...p, numero_cuenta: e.target.value }))} />
-              : <div className={dis}>{banco?.numero_cuenta || <span className="text-gray-300">—</span>}</div>}
-          </div>
-          <div>
-            <label className="text-xs font-medium text-gray-500 mb-1 block">Titular de la cuenta</label>
-            {editBanco
-              ? <input className={inp} value={formBanco.titular} onChange={e => setFormBanco(p => ({ ...p, titular: e.target.value }))} />
-              : <div className={dis}>{banco?.titular || <span className="text-gray-300">—</span>}</div>}
-          </div>
-        </div>
-
-        {errBanco && <p className="text-red-500 text-xs mt-3">{errBanco}</p>}
-
-        <div className="mt-4 pt-4 border-t border-gray-100 flex items-center gap-2">
-          <Building2 size={13} className="text-gray-400" />
-          <p className="text-xs text-gray-400">
-            Los pagos se depositan el 1 de cada mes. La cédula y el correo no se pueden cambiar.
-          </p>
-        </div>
-      </div>
-
-    </div>
+      <style>{`@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}`}</style>
+    </>
   )
 }
