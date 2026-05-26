@@ -160,15 +160,15 @@ export default function InfoFinanciera() {
     const B = '#f0f1f3'
     const s = (r, h, w = '100%') => <div style={{ background: B, borderRadius: r, height: h, width: w, flexShrink: 0 }} />
     return (
-      <div style={{ animation: 'skpulse 1.5s ease-in-out infinite' }}>
+      <div style={{ padding: '0 24px 32px', maxWidth: 820, margin: '0 auto', animation: 'skpulse 1.5s ease-in-out infinite' }}>
         <style>{`@keyframes skpulse{0%,100%{opacity:1}50%{opacity:.45}}`}</style>
-        <div style={{ padding: '28px 28px 0', borderBottom: '1px solid #e5e7eb', marginBottom: 0 }}>
-          {s(8, 28, 180)}<div style={{ marginTop: 6, marginBottom: 20 }}>{s(5, 14, 300)}</div>
+        <div style={{ paddingTop: 8, marginBottom: 20 }}>
+          {s(8, 28, 180)}<div style={{ marginTop: 6, marginBottom: 16 }}>{s(5, 14, 300)}</div>
           <div style={{ display: 'flex', gap: 24 }}>
             {[140, 130, 90, 120].map((w, i) => <div key={i} style={{ height: 36, width: w, background: B, borderRadius: 6 }} />)}
           </div>
         </div>
-        <div style={{ padding: '28px 28px' }}>
+        <div>
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-4">
             <div style={{ display: 'flex', gap: 16, marginBottom: 20 }}>{s(50, 72, 72)}<div style={{ flex: 1 }}>{s(6, 14, '40%')}<div style={{ marginTop: 8 }}>{s(5, 12, '55%')}</div></div></div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
@@ -188,11 +188,12 @@ export default function InfoFinanciera() {
 
   return (
     <>
-      {/* ── Cabecera + tabs ── */}
-      <div style={{ borderBottom: '1px solid #e5e7eb' }}>
-        <div style={{ maxWidth: 820, margin: '0 auto', padding: '28px 28px 0' }}>
-          <h1 style={{ margin: '0 0 4px', fontFamily: 'Poppins', fontWeight: 700, fontSize: 22, color: '#111827' }}>Configuración</h1>
-          <p style={{ margin: '0 0 20px', fontFamily: 'Inter', fontSize: 13, color: '#9ca3af' }}>
+      <div style={{ padding: '0 24px 32px', maxWidth: 820, margin: '0 auto' }}>
+
+        {/* ── Cabecera + tabs ── */}
+        <div style={{ paddingTop: 8, marginBottom: 20 }}>
+          <h1 style={{ margin: 0, fontFamily: 'Poppins', fontWeight: 700, fontSize: 22, color: '#111827' }}>Configuración</h1>
+          <p style={{ margin: '4px 0 16px', fontFamily: 'Inter', fontSize: 13, color: '#9ca3af' }}>
             Administra tu cuenta y preferencias como aliado.
           </p>
           {/* Tab bar */}
@@ -211,7 +212,6 @@ export default function InfoFinanciera() {
                   fontSize: 13,
                   fontWeight: activeTab === tab.id ? 600 : 400,
                   color: activeTab === tab.id ? '#2D2A7A' : '#6b7280',
-                  marginBottom: '-1px',
                   transition: 'color 0.15s, border-color 0.15s',
                   whiteSpace: 'nowrap',
                 }}
@@ -221,10 +221,9 @@ export default function InfoFinanciera() {
             ))}
           </div>
         </div>
-      </div>
 
-      {/* ── Contenido ── */}
-      <div style={{ maxWidth: 820, margin: '0 auto', padding: '28px 28px' }}>
+        {/* ── Contenido ── */}
+        <div>
 
         {/* ═══ TAB: Mi cuenta ═══ */}
         {activeTab === 'cuenta' && (
@@ -423,6 +422,7 @@ export default function InfoFinanciera() {
           </div>
         )}
 
+        </div>
       </div>
 
       {/* ── Modal selector de avatar ── */}
