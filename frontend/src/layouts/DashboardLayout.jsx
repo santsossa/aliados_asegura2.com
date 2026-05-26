@@ -245,7 +245,7 @@ export default function DashboardLayout() {
           </>
         )}
       </div>
-      <IAAssistant />
+      {!isAnto && <IAAssistant />}
       </SSEProvider>
     )
   }
@@ -373,6 +373,15 @@ export default function DashboardLayout() {
             {/* Topbar */}
             <div style={{ padding: isAnto ? '12px 24px' : '16px 24px 24px', background: '#f5f7fb', flexShrink: 0 }}>
               <div style={{ maxWidth: '72rem', margin: '0 auto', display: 'flex', alignItems: 'center', gap: 12 }}>
+                {/* Título Anto IA — solo en Anto */}
+                {isAnto && (
+                  <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'linear-gradient(135deg,#4f46e5,#2D2A7A)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <Sparkles size={13} color="#fff" />
+                    </div>
+                    <span style={{ fontFamily: 'Poppins', fontWeight: 700, fontSize: 15, color: '#111827' }}>Anto IA</span>
+                  </div>
+                )}
                 {/* Search — oculto en Anto */}
                 {!isAnto && (
                   <div style={{ flex: 1, position: 'relative' }}>
@@ -386,7 +395,7 @@ export default function DashboardLayout() {
                   </div>
                 )}
                 {/* Bell + user */}
-                <div style={{ display:'flex', alignItems:'center', gap:8, flexShrink:0, marginLeft: isAnto ? 'auto' : 0 }}>
+                <div style={{ display:'flex', alignItems:'center', gap:8, flexShrink:0 }}>
                   <NotificationBell />
                   <div style={{ display:'flex', alignItems:'center', gap:8, background:'#fff', borderRadius:999, padding:'4px 12px 4px 4px' }}>
                     <UserAvatar avatarId={avatarId} initials={initials} size={30} />
@@ -408,7 +417,7 @@ export default function DashboardLayout() {
         </div>
       </div>
     </div>
-    <IAAssistant />
+    {!isAnto && <IAAssistant />}
     </SSEProvider>
   )
 }

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { Send, Loader2, Shield, Scale, MessageCircle, FileCheck, Sparkles } from 'lucide-react'
+import { Loader2, Shield, Scale, MessageCircle, FileCheck, Sparkles, Plus, Clock, ArrowUp } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 
 
@@ -20,21 +20,12 @@ export default function Anto() {
   const [messages, setMessages] = useState([])
   const [input,    setInput]    = useState('')
   const [loading,  setLoading]  = useState(false)
-  const bottomRef  = useRef(null)
-  const inputRef   = useRef(null)
-  const textareaRef = useRef(null)
+  const bottomRef = useRef(null)
+  const inputRef  = useRef(null)
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, loading])
-
-  // Auto-resize textarea
-  useEffect(() => {
-    const ta = textareaRef.current
-    if (!ta) return
-    ta.style.height = 'auto'
-    ta.style.height = Math.min(ta.scrollHeight, 160) + 'px'
-  }, [input])
 
   async function enviar(texto) {
     const pregunta = (texto ?? input).trim()
@@ -160,56 +151,58 @@ export default function Anto() {
         </div>
 
         {/* ── Input bar ── */}
-        <div style={{ padding: '12px 32px 20px', borderTop: hasMessages ? '1px solid #e5e7eb' : 'none', flexShrink: 0 }}>
-          <div style={{ maxWidth: hasMessages ? 640 : 520, margin: '0 auto' }}>
-            <div style={{
-              border: '1.5px solid #e5e7eb', borderRadius: 16,
-              background: '#fff', overflow: 'hidden',
-              boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
-              transition: 'border-color 0.15s',
-            }}
-              onFocusCapture={e => e.currentTarget.style.borderColor = '#a5b4fc'}
-              onBlurCapture={e => e.currentTarget.style.borderColor = '#e5e7eb'}
+        <div style={{ padding: '12px 32px 20px', flexShrink: 0 }}>
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 6,
+            border: '1.5px solid #e5e7eb', borderRadius: 999,
+            background: '#fff', padding: '6px 6px 6px 10px',
+            boxShadow: '0 1px 6px rgba(0,0,0,0.05)',
+            transition: 'border-color 0.15s',
+          }}
+            onFocusCapture={e => e.currentTarget.style.borderColor = '#a5b4fc'}
+            onBlurCapture={e => e.currentTarget.style.borderColor = '#e5e7eb'}
+          >
+            {/* Botones izquierda */}
+            <button style={{ width: 28, height: 28, borderRadius: '50%', border: '1.5px solid #e5e7eb', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0 }}>
+              <Plus size={13} color="#6b7280" />
+            </button>
+            <button style={{ width: 28, height: 28, borderRadius: '50%', border: 'none', background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0 }}>
+              <Clock size={13} color="#9ca3af" />
+            </button>
+            {/* Input */}
+            <input
+              ref={inputRef}
+              value={input}
+              onChange={e => setInput(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); enviar() } }}
+              placeholder="Escríbele algo a Anto..."
+              style={{
+                flex: 1, border: 'none', outline: 'none',
+                fontFamily: 'Inter', fontSize: 13.5, color: '#111827',
+                background: 'transparent', lineHeight: 1.5, minWidth: 0,
+              }}
+            />
+            {/* Enviar */}
+            <button
+              onClick={() => enviar()}
+              disabled={!input.trim() || loading}
+              style={{
+                width: 30, height: 30, borderRadius: '50%', border: 'none',
+                cursor: input.trim() && !loading ? 'pointer' : 'default',
+                background: input.trim() && !loading ? '#2D2A7A' : '#e5e7eb',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                transition: 'background 0.15s', flexShrink: 0,
+              }}
             >
-              <textarea
-                ref={textareaRef}
-                value={input}
-                onChange={e => setInput(e.target.value)}
-                onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); enviar() } }}
-                placeholder="Pregúntale algo a Anto..."
-                rows={1}
-                style={{
-                  width: '100%', border: 'none', outline: 'none', resize: 'none',
-                  padding: '14px 16px 8px', fontFamily: 'Inter', fontSize: 14, color: '#111827',
-                  background: 'transparent', lineHeight: 1.5, boxSizing: 'border-box',
-                  minHeight: 48,
-                }}
-              />
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '6px 12px 10px' }}>
-                <span style={{ fontFamily: 'Inter', fontSize: 11, color: '#9ca3af' }}>
-                  Shift + Enter para nueva línea
-                </span>
-                <button
-                  onClick={() => enviar()}
-                  disabled={!input.trim() || loading}
-                  style={{
-                    width: 34, height: 34, borderRadius: '50%', border: 'none', cursor: input.trim() && !loading ? 'pointer' : 'default',
-                    background: input.trim() && !loading ? '#2D2A7A' : '#e5e7eb',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    transition: 'background 0.15s', flexShrink: 0,
-                  }}
-                >
-                  {loading
-                    ? <Loader2 size={14} color="#9ca3af" style={{ animation: 'spin 1s linear infinite' }} />
-                    : <Send size={14} color={input.trim() ? '#fff' : '#9ca3af'} />
-                  }
-                </button>
-              </div>
-            </div>
-            <p style={{ margin: '8px 0 0', fontFamily: 'Inter', fontSize: 11, color: '#d1d5db', textAlign: 'center' }}>
-              Anto puede cometer errores. Verifica la información importante.
-            </p>
+              {loading
+                ? <Loader2 size={13} color="#9ca3af" style={{ animation: 'spin 1s linear infinite' }} />
+                : <ArrowUp size={13} color={input.trim() ? '#fff' : '#9ca3af'} />
+              }
+            </button>
           </div>
+          <p style={{ margin: '6px 0 0', fontFamily: 'Inter', fontSize: 11, color: '#d1d5db', textAlign: 'center' }}>
+            Anto puede cometer errores. Verifica la información importante.
+          </p>
         </div>
 
       <style>{`
