@@ -476,15 +476,13 @@ export default function Dashboard() {
                     background: '#fff',
                     borderRadius: 24,
                     padding: '15px 16px',
-                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                    display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between',
                   }}>
                     <div style={{ minWidth: 0 }}>
                       <p style={{ margin: 0, fontFamily: 'Inter', fontSize: 11, color: '#9ca3af', lineHeight: 1.4, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{c.label}</p>
                       <p style={{ margin: '2px 0 0', fontFamily: 'Poppins', fontSize: 14.5, fontWeight: 600, color: '#111827', letterSpacing: '-0.2px' }}>{c.value}</p>
                     </div>
-                    <div style={{ width: 38, height: 38, borderRadius: 12, background: c.iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginLeft: 10 }}>
-                      <Icon size={16} color={c.iconColor} />
-                    </div>
+                    <Icon size={17} color="#2D2A7A" strokeWidth={2.2} style={{ flexShrink: 0, marginLeft: 10, marginTop: 1 }} />
                   </div>
                 )
               })}
