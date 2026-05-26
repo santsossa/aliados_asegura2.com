@@ -641,6 +641,29 @@ export default function Landing() {
 
       </section>
 
+      {/* ── Banda de aseguradoras (ticker) ──────────────────────── */}
+      <section className="py-10 bg-white border-y border-gray-100 overflow-hidden">
+        <p className="text-center text-xs font-semibold text-gray-400 uppercase tracking-widest mb-7">
+          Respaldados por las principales aseguradoras del mercado
+        </p>
+        <div
+          className="relative w-full overflow-hidden"
+          style={{
+            maskImage: 'linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%)',
+            WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%)',
+          }}
+        >
+          <div className="ticker-track">
+            {[...ASEGURADORAS, ...ASEGURADORAS, ...ASEGURADORAS, ...ASEGURADORAS].map((a, i) => (
+              <div key={i} className="ticker-item flex items-center gap-2.5 px-8 border-r border-gray-200 cursor-default" style={{ whiteSpace: 'nowrap' }}>
+                <img src={a.img} alt={a.name} decoding="async" width={80} height={24} className="h-6 w-auto object-contain" />
+                <span className="text-sm font-semibold">{a.name}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ── Anto IA ─────────────────────────────────────────────── */}
       <section id="anto" style={{ background:'#f2effe', padding:'80px 0 90px', overflow:'hidden' }}>
         <div className="max-w-6xl mx-auto px-6">
@@ -700,8 +723,8 @@ export default function Landing() {
             </div>
 
             {/* Mockup central — imagen real */}
-            <div style={{ borderRadius:20, overflow:'hidden', boxShadow:'0 32px 80px rgba(87,69,171,0.18)' }}>
-              <img src={imgPantallanto} alt="Anto IA — panel de control" style={{ width:'100%', display:'block' }} />
+            <div style={{ borderRadius:28, overflow:'hidden', boxShadow:'0 32px 80px rgba(87,69,171,0.18)' }}>
+              <img src={imgPantallanto} alt="Anto IA — panel de control" style={{ width:'calc(100% + 4px)', marginLeft:-2, marginTop:-2, marginBottom:-2, display:'block' }} />
             </div>
 
             {/* Cards derecha */}
@@ -896,132 +919,6 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ── Banda de aseguradoras (ticker) ──────────────────────── */}
-      <section className="py-10 bg-gray-50 border-y border-gray-100 overflow-hidden">
-        <p className="text-center text-xs font-semibold text-gray-400 uppercase tracking-widest mb-7">
-          Respaldados por las principales aseguradoras del mercado
-        </p>
-
-        {/* Ticker con fade en bordes */}
-        <div
-          className="relative w-full overflow-hidden"
-          style={{
-            maskImage: 'linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%)',
-            WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%)',
-          }}
-        >
-          <div className="ticker-track">
-            {[...ASEGURADORAS, ...ASEGURADORAS, ...ASEGURADORAS, ...ASEGURADORAS].map((a, i) => (
-              <div
-                key={i}
-                className="ticker-item flex items-center gap-2.5 px-8 border-r border-gray-200 cursor-default"
-                style={{ whiteSpace: 'nowrap' }}
-              >
-                <img
-                  src={a.img}
-                  alt={a.name}
-                  decoding="async"
-                  width={80} height={24}
-                  className="h-6 w-auto object-contain"
-                />
-                <span className="text-sm font-semibold">{a.name}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── ¿Para quién es? ──────────────────────────────────────── */}
-      <section id="para-quien" className="py-20 bg-gray-50">
-        <div className="max-w-6xl mx-auto px-6">
-
-          <div className="text-center mb-12">
-            <p className="text-xs font-semibold text-brand uppercase tracking-widest mb-3">Perfiles</p>
-            <h2 className="text-3xl font-bold text-gray-900 mb-3">¿Este modelo es para ti?</h2>
-            <p className="text-gray-400 text-sm max-w-lg mx-auto">Si tienes acceso a personas con carros o que están a punto de comprarlo, ya tienes todo lo que necesitas para ganar comisiones.</p>
-          </div>
-
-          {/* Grid de perfiles */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto">
-            {[
-              {
-                bg:    '#2D2A7A',
-                emoji: '🏎️',
-                title: 'Asesor de concesionario',
-                desc:  'Cada entrega de carro nuevo es una comisión directa. El cliente ya confía en ti.',
-                rotate: '-12deg',
-              },
-              {
-                bg:    '#d97706',
-                emoji: '🚗',
-                title: 'Vendedor de carros usados',
-                desc:  'Alto volumen de clientes que quieren proteger su inversión desde el primer día.',
-                rotate: '10deg',
-              },
-              {
-                bg:    '#0f766e',
-                emoji: '🔧',
-                title: 'Mecánico o taller',
-                desc:  'Tus clientes ya tienen carro y confían en tu criterio. Recomienda su seguro y gana.',
-                rotate: '-8deg',
-              },
-              {
-                bg:    '#7c3aed',
-                emoji: '📋',
-                title: 'Tramitador vehicular',
-                desc:  'Traspasos, RUNT, trámites — cada dueño de carro que atiendes es un cliente potencial.',
-                rotate: '14deg',
-              },
-              {
-                bg:    '#be185d',
-                emoji: '🚕',
-                title: 'Conductor o flota',
-                desc:  'Conductores de apps, dueños de flotas, transportadores. Tu red ya tiene carros.',
-                rotate: '-10deg',
-              },
-              {
-                bg:    '#1d4ed8',
-                emoji: '💼',
-                title: 'Quiero ingresos extra',
-                desc:  'No importa tu trabajo actual. Si conoces personas con carros, puedes ser aliado.',
-                rotate: '8deg',
-              },
-            ].map((c, i) => (
-              <div
-                key={i}
-                className="relative rounded-2xl overflow-hidden flex flex-col justify-end p-5"
-                style={{ backgroundColor: c.bg, minHeight: 200 }}
-              >
-                {/* Círculo decorativo */}
-                <div className="absolute rounded-full bg-white/10"
-                  style={{ width: 120, height: 120, top: -30, left: -30 }} />
-
-                {/* Emoji flotante */}
-                <div className="absolute select-none leading-none"
-                  style={{ top: 16, right: 16, fontSize: 72, transform: `rotate(${c.rotate})`, opacity: 0.9 }}>
-                  {c.emoji}
-                </div>
-
-                <div className="relative z-10">
-                  <h3 className="text-sm font-bold text-white mb-1 leading-tight">{c.title}</h3>
-                  <p className="text-xs text-white/60 leading-snug">{c.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* CTA final */}
-          <div className="text-center mt-10">
-            <p className="text-sm text-gray-500 mb-4">
-              Si tienes dudas, regístrate gratis — no hay costo ni compromiso.
-            </p>
-            <Link to="/registro" className="inline-flex items-center gap-2 bg-brand hover:bg-brand-dark text-white font-semibold px-6 py-3 rounded-xl text-sm transition-colors shadow-md shadow-brand/20">
-              Regístrate y empieza a ganar
-              <ArrowRight size={15} />
-            </Link>
-          </div>
-        </div>
-      </section>
 
       {/* ── Testimonios ─────────────────────────────────────────── */}
       <section className="py-20 bg-white">
@@ -1071,21 +968,30 @@ export default function Landing() {
       </section>
 
       {/* ── CTA final ───────────────────────────────────────────── */}
-      <section className="py-20 px-6">
-        <div className="max-w-4xl mx-auto bg-brand rounded-3xl p-8 sm:p-12 text-center relative overflow-hidden">
-          <div className="absolute -top-20 -right-20 w-72 h-72 bg-white/5 rounded-full" />
-          <div className="absolute -bottom-24 -left-24 w-80 h-80 bg-accent/10 rounded-full" />
-          <div className="relative">
-            <p className="text-xs font-semibold text-white/60 uppercase tracking-widest mb-4">Contacto</p>
-            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-              Empieza a vender seguros hoy
-            </h2>
-            <p className="text-white/60 mb-8 max-w-lg mx-auto">
-              Regístrate gratis, cotiza desde el primer día y cobra el 1 de cada mes. Sin costos ocultos.
-            </p>
-            <Link to="/registro" className="inline-flex items-center gap-2 bg-accent hover:bg-accent-dark text-white font-bold px-8 py-4 rounded-xl transition-colors shadow-lg">
-              Crear mi cuenta gratis
-              <ArrowRight size={18} />
+      <section className="py-16 px-6 bg-gray-50">
+        <div style={{ maxWidth:640, margin:'0 auto', background:'#fff', border:'1px solid #e5e7eb', borderRadius:28, padding:'52px 48px', textAlign:'center', boxShadow:'0 2px 24px rgba(0,0,0,0.05)' }}>
+          {/* Badge */}
+          <div style={{ display:'inline-flex', alignItems:'center', gap:8, marginBottom:22 }}>
+            <div style={{ width:7, height:7, borderRadius:'50%', background:'#22c55e', flexShrink:0 }} />
+            <span style={{ fontFamily:'Inter', fontSize:11, fontWeight:700, color:'#9ca3af', letterSpacing:'0.1em', textTransform:'uppercase' }}>Aliados · Asegura2.com</span>
+          </div>
+          {/* Título */}
+          <h2 style={{ fontFamily:'Poppins', fontSize:34, fontWeight:800, color:'#111827', lineHeight:1.2, margin:'0 0 14px', letterSpacing:'-0.5px' }}>
+            Empieza a vender seguros hoy
+          </h2>
+          {/* Subtítulo */}
+          <p style={{ fontFamily:'Inter', fontSize:15, color:'#6b7280', margin:'0 0 34px', lineHeight:1.65 }}>
+            Cotiza desde el primer día y cobra el 1 de cada mes.<br />Sin costos, sin límites.
+          </p>
+          {/* Botones */}
+          <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:10 }}>
+            <Link to="/login" style={{ background:'#111827', color:'#fff', fontFamily:'Inter', fontSize:14, fontWeight:600, padding:'12px 28px', borderRadius:999, textDecoration:'none', display:'inline-flex', alignItems:'center', transition:'opacity .2s' }}
+              onMouseEnter={e=>e.currentTarget.style.opacity='.85'} onMouseLeave={e=>e.currentTarget.style.opacity='1'}>
+              Ingresar
+            </Link>
+            <Link to="/registro" style={{ background:'#fff', color:'#111827', fontFamily:'Inter', fontSize:14, fontWeight:600, padding:'11px 28px', borderRadius:999, textDecoration:'none', border:'1.5px solid #e5e7eb', display:'inline-flex', alignItems:'center', transition:'background .2s' }}
+              onMouseEnter={e=>e.currentTarget.style.background='#f9fafb'} onMouseLeave={e=>e.currentTarget.style.background='#fff'}>
+              Registrarse
             </Link>
           </div>
         </div>
