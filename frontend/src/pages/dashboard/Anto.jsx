@@ -216,17 +216,23 @@ export default function Anto() {
                         text={displayText}
                         style={{ fontFamily: 'Inter', fontSize: 13.5, lineHeight: 1.75, color: '#111827' }}
                       />
-                      {hoveredMsg === i && typingIdx !== i && (
-                        <button
-                          onClick={() => copiar(i, m.content)}
-                          style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 6, padding: '3px 8px', border: 'none', background: 'transparent', cursor: 'pointer', fontFamily: 'Inter', fontSize: 11, color: '#9ca3af', borderRadius: 6 }}
-                          onMouseEnter={e => e.currentTarget.style.color = '#6b7280'}
-                          onMouseLeave={e => e.currentTarget.style.color = '#9ca3af'}
-                        >
-                          {copiedMsg === i ? <Check size={11} /> : <Copy size={11} />}
-                          {copiedMsg === i ? 'Copiado' : 'Copiar'}
-                        </button>
-                      )}
+                      <button
+                        onClick={() => copiar(i, m.content)}
+                        style={{
+                          display: 'flex', alignItems: 'center', gap: 4, marginTop: 6,
+                          padding: '3px 8px', border: 'none', background: 'transparent',
+                          cursor: 'pointer', fontFamily: 'Inter', fontSize: 11, color: '#9ca3af',
+                          borderRadius: 6,
+                          opacity: (hoveredMsg === i && typingIdx !== i) ? 1 : 0,
+                          pointerEvents: (hoveredMsg === i && typingIdx !== i) ? 'auto' : 'none',
+                          transition: 'opacity 0.15s',
+                        }}
+                        onMouseEnter={e => e.currentTarget.style.color = '#6b7280'}
+                        onMouseLeave={e => e.currentTarget.style.color = '#9ca3af'}
+                      >
+                        {copiedMsg === i ? <Check size={11} /> : <Copy size={11} />}
+                        {copiedMsg === i ? 'Copiado' : 'Copiar'}
+                      </button>
                     </div>
                   ) : (
                     /* Aliado — burbuja azul transparente */
