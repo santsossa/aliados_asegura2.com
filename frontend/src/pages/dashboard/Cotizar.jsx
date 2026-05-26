@@ -1,5 +1,6 @@
 import React, { useState, useEffect, Fragment } from 'react'
-import { Car } from 'lucide-react'
+import cotizarplacaImg from '../../assets/cotizarplaca.webp'
+import cotizar0kmImg from '../../assets/cotizar0km.webp'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import ComboBox from '../../components/ComboBox'
@@ -430,6 +431,7 @@ export default function Cotizar() {
   const { getToken, user } = useAuth()
   const navigate = useNavigate()
   const [phase, setPhase] = useState('select')
+  const [usadoHov, setUsadoHov] = useState(false)
   const [plate, setPlate] = useState('')
   const [step,  setStep]  = useState(1)
   const [cities, setCities]   = useState([])
@@ -740,60 +742,68 @@ export default function Cotizar() {
   /* ── SELECT ── */
   if (phase === 'select') return (
     <div style={{
-      minHeight:'100%', display:'flex', flexDirection:'column',
+      height:'100%', display:'flex', flexDirection:'column',
       alignItems:'center', justifyContent:'center',
-      padding:'48px 24px 48px', background:'#f4f5fb',
+      padding:'20px 24px', background:'#f4f5fb', overflow:'hidden',
     }}>
       {/* Header */}
-      <div style={{ textAlign:'center', marginBottom:44 }}>
-        <h1 style={{ fontFamily:'Poppins', fontSize:26, fontWeight:800, color:'#111827', margin:'0 0 14px' }}>
+      <div style={{ textAlign:'center', marginBottom:28 }}>
+        <h1 style={{ fontFamily:'Poppins', fontSize:24, fontWeight:800, color:'#111827', margin:'0 0 12px' }}>
           ¿Qué tipo de vehículo quieres cotizar?
         </h1>
         <div style={{ width:40, height:3, background:'#5745AB', borderRadius:99, margin:'0 auto' }} />
       </div>
 
       {/* Cards */}
-      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:20, width:'100%', maxWidth:640 }}>
+      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:20, width:'100%', maxWidth:600 }}>
 
         {/* ── Vehículo usado ── */}
         <button
           onClick={() => setPhase('placa')}
+          onMouseEnter={() => setUsadoHov(true)}
+          onMouseLeave={() => setUsadoHov(false)}
           style={{
-            background:'#fff', border:'2px solid #5745AB', borderRadius:20,
-            padding:'32px 28px 80px', cursor:'pointer', textAlign:'left',
-            display:'flex', flexDirection:'column', position:'relative',
-            boxShadow:'0 4px 20px rgba(87,69,171,0.10)',
-            transition:'box-shadow 0.18s',
+            background:'#fff',
+            border: usadoHov ? '2px solid #5745AB' : '2px solid #e8eaf0',
+            borderRadius:20, padding:'28px 24px 72px', cursor:'pointer',
+            textAlign:'left', display:'flex', flexDirection:'column', position:'relative',
+            boxShadow: usadoHov ? '0 8px 32px rgba(87,69,171,0.14)' : '0 2px 8px rgba(0,0,0,0.04)',
+            transition:'border-color 0.18s, box-shadow 0.18s',
           }}
-          onMouseEnter={e => e.currentTarget.style.boxShadow = '0 8px 32px rgba(87,69,171,0.18)'}
-          onMouseLeave={e => e.currentTarget.style.boxShadow = '0 4px 20px rgba(87,69,171,0.10)'}
         >
-          {/* Circle illustration */}
-          <div style={{ display:'flex', justifyContent:'center', marginBottom:28 }}>
+          <div style={{ display:'flex', justifyContent:'center', marginBottom:22 }}>
             <div style={{
-              width:160, height:160, borderRadius:'50%', background:'#EEE7FD',
-              display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:10,
+              width:148, height:148, borderRadius:'50%',
+              background: usadoHov ? '#EEE7FD' : '#f0f2f8',
+              display:'flex', alignItems:'center', justifyContent:'center',
+              transition:'background 0.18s',
             }}>
-              <Car size={58} color="#2D2A7A" strokeWidth={1.6} />
-              <div style={{
-                background:'#2D2A7A', color:'#fff', fontFamily:'Inter',
-                fontSize:10, fontWeight:700, letterSpacing:'0.06em',
-                padding:'2px 9px', borderRadius:5,
-              }}>
-                ABC-123
-              </div>
+              <img
+                src={cotizarplacaImg}
+                alt="Vehículo usado"
+                style={{
+                  width:100, height:100, objectFit:'contain',
+                  filter: usadoHov ? 'none' : 'grayscale(1)',
+                  transition:'filter 0.18s',
+                }}
+              />
             </div>
           </div>
-          <p style={{ margin:'0 0 5px', fontFamily:'Poppins', fontSize:17, fontWeight:700, color:'#111827' }}>
+          <p style={{ margin:'0 0 4px', fontFamily:'Poppins', fontSize:16, fontWeight:700, color:'#111827' }}>
             Vehículo usado
           </p>
           <p style={{ margin:0, fontFamily:'Inter', fontSize:13, color:'#6b7280' }}>
             Solo con la placa.
           </p>
-          {/* Arrow */}
-          <div style={{ position:'absolute', bottom:24, right:24, width:44, height:44, borderRadius:'50%', background:'#5745AB', display:'flex', alignItems:'center', justifyContent:'center' }}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-              <path d="M5 12h14M13 6l6 6-6 6" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
+          <div style={{
+            position:'absolute', bottom:22, right:22, width:42, height:42,
+            borderRadius:'50%',
+            background: usadoHov ? '#5745AB' : '#e8eaf0',
+            display:'flex', alignItems:'center', justifyContent:'center',
+            transition:'background 0.18s',
+          }}>
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+              <path d="M5 12h14M13 6l6 6-6 6" stroke={usadoHov ? '#fff' : '#9ca3af'} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </div>
         </button>
@@ -801,30 +811,34 @@ export default function Cotizar() {
         {/* ── Vehículo 0 km ── */}
         <div style={{
           background:'#fff', border:'2px solid #e8eaf0', borderRadius:20,
-          padding:'32px 28px 80px', cursor:'not-allowed', textAlign:'left',
+          padding:'28px 24px 72px', cursor:'not-allowed', textAlign:'left',
           display:'flex', flexDirection:'column', position:'relative',
           boxShadow:'0 2px 8px rgba(0,0,0,0.04)',
         }}>
-          {/* Circle illustration */}
-          <div style={{ display:'flex', justifyContent:'center', marginBottom:28 }}>
+          <div style={{ display:'flex', justifyContent:'center', marginBottom:22 }}>
             <div style={{
-              width:160, height:160, borderRadius:'50%', background:'#f0f2f8',
+              width:148, height:148, borderRadius:'50%', background:'#f0f2f8',
               display:'flex', alignItems:'center', justifyContent:'center',
-              position:'relative',
             }}>
-              <Car size={58} color="#9ca3af" strokeWidth={1.6} />
-              <span style={{ position:'absolute', top:30, right:34, fontSize:18, color:'#9ca3af', lineHeight:1 }}>✦</span>
+              <img
+                src={cotizar0kmImg}
+                alt="Vehículo 0 km"
+                style={{ width:100, height:100, objectFit:'contain', filter:'grayscale(1)' }}
+              />
             </div>
           </div>
-          <p style={{ margin:'0 0 5px', fontFamily:'Poppins', fontSize:17, fontWeight:700, color:'#374151' }}>
+          <p style={{ margin:'0 0 4px', fontFamily:'Poppins', fontSize:16, fontWeight:700, color:'#374151' }}>
             Vehículo 0 km
           </p>
           <p style={{ margin:0, fontFamily:'Inter', fontSize:13, color:'#9ca3af' }}>
             Sin placa requerida.
           </p>
-          {/* Arrow (disabled) */}
-          <div style={{ position:'absolute', bottom:24, right:24, width:44, height:44, borderRadius:'50%', background:'#e8eaf0', display:'flex', alignItems:'center', justifyContent:'center' }}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <div style={{
+            position:'absolute', bottom:22, right:22, width:42, height:42,
+            borderRadius:'50%', background:'#e8eaf0',
+            display:'flex', alignItems:'center', justifyContent:'center',
+          }}>
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
               <path d="M5 12h14M13 6l6 6-6 6" stroke="#9ca3af" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </div>
