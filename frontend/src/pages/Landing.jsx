@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { ArrowRight, ChevronDown, ChevronUp, Shield, DollarSign, Zap, BarChart3, Star, UserPlus, Send } from 'lucide-react'
+import { ArrowRight, ChevronDown, ChevronUp, Shield, DollarSign, Zap, BarChart3, Star, UserPlus, Send, Users, Clock, FileText, MessageCircle, Mail, TrendingUp, Lock, Sparkles } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { LogoFull } from '../components/Logo'
 import { useAuth } from '../context/AuthContext'
@@ -8,6 +8,7 @@ import imgHeroPhone  from '../assets/herophone.png'
 import imgCcManizales from '../assets/ccMANIZALES.png'
 import imgCcCucuta    from '../assets/ccCUCUTA.png'
 
+import imgPantallanto from '../assets/pantallanto.png'
 import imgQualitas  from '../assets/qualitas.png'
 import imgAxa       from '../assets/axa.webp'
 import imgBolivar   from '../assets/bolivar.webp'
@@ -663,12 +664,14 @@ export default function Landing() {
             {/* Pills de características */}
             <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:10, flexWrap:'wrap' }}>
               {[
-                { icon:'⚡', text:'Respuestas al instante' },
-                { icon:'✦', text:'Entrenada con tu negocio' },
-                { icon:'🔒', text:'100% segura y privada' },
+                { Icon:Zap,       text:'Respuestas al instante' },
+                { Icon:Sparkles,  text:'Entrenada con tu negocio' },
+                { Icon:Lock,      text:'100% segura y privada' },
               ].map(p => (
-                <div key={p.text} style={{ display:'inline-flex', alignItems:'center', gap:7, background:'#fff', border:'1px solid #e5e7eb', borderRadius:999, padding:'7px 16px', fontSize:13, fontWeight:600, color:'#374151', fontFamily:'Inter' }}>
-                  <span style={{ fontSize:14 }}>{p.icon}</span>
+                <div key={p.text} style={{ display:'inline-flex', alignItems:'center', gap:8, background:'#fff', border:'1px solid #e5e7eb', borderRadius:999, padding:'7px 18px 7px 10px', fontSize:13, fontWeight:600, color:'#374151', fontFamily:'Inter' }}>
+                  <div style={{ width:26, height:26, borderRadius:8, background:'#EEE7FD', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                    <p.Icon size={14} color="#5745AB" />
+                  </div>
                   {p.text}
                 </div>
               ))}
@@ -681,12 +684,14 @@ export default function Landing() {
             {/* Cards izquierda */}
             <div style={{ display:'flex', flexDirection:'column', gap:14 }}>
               {[
-                { icon:'⚡', color:'#f59e0b', title:'Respuestas al instante', desc:'Anto responde en segundos lo que antes te tomaba minutos.' },
-                { icon:'🛡️', color:'#6d28d9', title:'Información confiable',  desc:'Basada en las condiciones de tus pólizas y tu negocio.' },
+                { Icon:Zap,    title:'Respuestas al instante', desc:'Anto responde en segundos lo que antes te tomaba minutos.' },
+                { Icon:Shield, title:'Información confiable',  desc:'Basada en las condiciones de tus pólizas y tu negocio.' },
               ].map(c => (
                 <div key={c.title} style={{ background:'#fff', borderRadius:16, padding:'16px', boxShadow:'0 2px 16px rgba(0,0,0,0.07)' }}>
                   <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:7 }}>
-                    <div style={{ width:30, height:30, borderRadius:9, background:'#f5f7fb', display:'flex', alignItems:'center', justifyContent:'center', fontSize:16, flexShrink:0 }}>{c.icon}</div>
+                    <div style={{ width:32, height:32, borderRadius:9, background:'#EEE7FD', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                      <c.Icon size={16} color="#5745AB" />
+                    </div>
                     <p style={{ margin:0, fontFamily:'Poppins', fontWeight:700, fontSize:13, color:'#111827' }}>{c.title}</p>
                   </div>
                   <p style={{ margin:0, fontFamily:'Inter', fontSize:12, color:'#6b7280', lineHeight:1.55 }}>{c.desc}</p>
@@ -694,135 +699,22 @@ export default function Landing() {
               ))}
             </div>
 
-            {/* Mockup central */}
-            <div style={{ borderRadius:20, overflow:'hidden', boxShadow:'0 20px 64px rgba(109,40,217,0.14)', background:'#fff', border:'1px solid #e5e7eb' }}>
-              {/* Barra de navegador */}
-              <div style={{ background:'#1e1b4b', padding:'10px 16px', display:'flex', alignItems:'center', gap:10 }}>
-                <div style={{ display:'flex', gap:5 }}>
-                  {['#ff5f57','#febc2e','#28c840'].map(c => <div key={c} style={{ width:9, height:9, borderRadius:'50%', background:c }} />)}
-                </div>
-                <div style={{ flex:1, background:'rgba(255,255,255,0.09)', borderRadius:6, padding:'3px 12px', fontSize:10, color:'rgba(255,255,255,0.4)', fontFamily:'Inter' }}>
-                  app.asegura2.com/dashboard/anto
-                </div>
-              </div>
-              {/* Contenido: sidebar + chat + panel acciones */}
-              <div style={{ display:'grid', gridTemplateColumns:'130px 1fr 178px', height:420 }}>
-
-                {/* Sidebar oscuro */}
-                <div style={{ background:'#1e1b4b', padding:'14px 10px', display:'flex', flexDirection:'column', gap:2, borderRight:'1px solid rgba(255,255,255,0.06)' }}>
-                  {/* Logo */}
-                  <div style={{ display:'flex', alignItems:'center', gap:7, marginBottom:14, paddingBottom:12, borderBottom:'1px solid rgba(255,255,255,0.1)' }}>
-                    <div style={{ width:26, height:26, borderRadius:8, background:'#4f46e5', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
-                      <span style={{ color:'#fff', fontSize:12, lineHeight:1 }}>✦</span>
-                    </div>
-                    <span style={{ fontFamily:'Poppins', fontWeight:700, fontSize:11.5, color:'#fff', lineHeight:1 }}>Anto IA</span>
-                  </div>
-                  {/* Nav */}
-                  {[
-                    { label:'Chat',          active:true  },
-                    { label:'Clientes',      active:false },
-                    { label:'Productos',     active:false },
-                    { label:'Cotizaciones',  active:false },
-                    { label:'Reportes',      active:false },
-                    { label:'Configuración', active:false },
-                  ].map(item => (
-                    <div key={item.label} style={{ display:'flex', alignItems:'center', gap:7, padding:'6px 8px', borderRadius:7, background: item.active ? 'rgba(255,255,255,0.13)' : 'transparent' }}>
-                      <div style={{ width:14, height:14, borderRadius:3, background: item.active ? 'rgba(99,102,241,0.5)' : 'rgba(255,255,255,0.12)', flexShrink:0 }} />
-                      <span style={{ fontFamily:'Inter', fontSize:10.5, color: item.active ? '#fff' : 'rgba(255,255,255,0.55)', fontWeight: item.active ? 600 : 400 }}>{item.label}</span>
-                    </div>
-                  ))}
-                  {/* Desempeño */}
-                  <div style={{ marginTop:'auto', paddingTop:10, borderTop:'1px solid rgba(255,255,255,0.1)' }}>
-                    <p style={{ fontFamily:'Inter', fontSize:8.5, color:'rgba(255,255,255,0.45)', margin:'0 0 3px' }}>Tu desempeño</p>
-                    <p style={{ fontFamily:'Inter', fontSize:9, color:'rgba(255,255,255,0.65)', margin:'0 0 1px' }}>Ventas con Anto</p>
-                    <p style={{ fontFamily:'Poppins', fontSize:17, fontWeight:800, color:'#4ade80', margin:'2px 0 1px', lineHeight:1 }}>+32%</p>
-                    <p style={{ fontFamily:'Inter', fontSize:8.5, color:'rgba(255,255,255,0.4)', margin:'0 0 7px' }}>vs. mes anterior</p>
-                    <svg width="100%" height="26" viewBox="0 0 110 26" fill="none">
-                      <polyline points="0,22 22,16 44,18 66,8 88,11 110,3" stroke="#818cf8" strokeWidth="1.8" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
-                      <polygon points="0,22 22,16 44,18 66,8 88,11 110,3 110,26 0,26" fill="rgba(99,102,241,0.15)"/>
-                    </svg>
-                  </div>
-                </div>
-
-                {/* Chat */}
-                <div style={{ display:'flex', flexDirection:'column', borderRight:'1px solid #f0f0f2' }}>
-                  <div style={{ padding:'12px 16px', borderBottom:'1px solid #f0f0f2', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
-                    <span style={{ fontFamily:'Poppins', fontWeight:700, fontSize:14, color:'#111827' }}>Chat con Anto</span>
-                    <div style={{ display:'flex', alignItems:'center', gap:6 }}>
-                      <div style={{ width:7, height:7, borderRadius:'50%', background:'#22c55e' }} />
-                      <span style={{ fontFamily:'Inter', fontSize:11, color:'#6b7280' }}>En línea</span>
-                    </div>
-                  </div>
-                  <div style={{ flex:1, overflowY:'auto', padding:'14px 14px 8px', display:'flex', flexDirection:'column', gap:10 }}>
-                    {/* User */}
-                    <div style={{ display:'flex', justifyContent:'flex-end' }}>
-                      <div style={{ background:'#4f46e5', color:'#fff', borderRadius:'14px 14px 4px 14px', padding:'9px 13px', fontSize:12, maxWidth:'76%', lineHeight:1.5, fontFamily:'Inter' }}>
-                        Mi cliente pregunta qué cubre el robo de auto
-                      </div>
-                    </div>
-                    {/* Anto */}
-                    <div style={{ display:'flex', justifyContent:'flex-start' }}>
-                      <div style={{ background:'#f9fafb', border:'1px solid #f0f0f2', borderRadius:'4px 14px 14px 14px', padding:'10px 13px', fontSize:12, maxWidth:'88%', lineHeight:1.6, color:'#111827', fontFamily:'Inter' }}>
-                        <p style={{ margin:'0 0 6px' }}>El robo total cubre la pérdida completa del vehículo por robo con violencia o sin violencia, según la póliza.</p>
-                        <p style={{ margin:'0 0 6px', fontWeight:600 }}>Generalmente incluye:</p>
-                        {['Robo total del vehículo','Daños al intentar recuperar el auto','Gastos por cerraduras y llaves','Auto sustituto (según tu plan)'].map(item => (
-                          <div key={item} style={{ display:'flex', alignItems:'center', gap:6, margin:'3px 0' }}>
-                            <div style={{ width:14, height:14, borderRadius:'50%', background:'#4f46e5', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
-                              <span style={{ color:'#fff', fontSize:8, fontWeight:900, lineHeight:1 }}>✓</span>
-                            </div>
-                            <span style={{ fontSize:11, color:'#374151' }}>{item}</span>
-                          </div>
-                        ))}
-                        <p style={{ margin:'8px 0 0', fontSize:10, color:'#9ca3af' }}>Fuentes: Condiciones Generales · Plan Amplio 2024</p>
-                      </div>
-                    </div>
-                    {/* Reactions */}
-                    <div style={{ display:'flex', gap:6, paddingLeft:2 }}>
-                      {['👍','🔄','💾'].map(e => (
-                        <div key={e} style={{ width:26, height:26, background:'#f3f4f6', borderRadius:8, display:'flex', alignItems:'center', justifyContent:'center', fontSize:12, cursor:'pointer' }}>{e}</div>
-                      ))}
-                    </div>
-                  </div>
-                  {/* Input */}
-                  <div style={{ padding:'9px 12px', borderTop:'1px solid #f0f0f2', display:'flex', alignItems:'center', gap:8 }}>
-                    <span style={{ flex:1, fontFamily:'Inter', fontSize:12, color:'#9ca3af' }}>Escribe tu pregunta...</span>
-                    <div style={{ width:28, height:28, borderRadius:8, background:'#4f46e5', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
-                      <span style={{ color:'#fff', fontSize:16, lineHeight:1, marginTop:-1 }}>›</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Panel acciones rápidas */}
-                <div style={{ padding:'14px 12px', background:'#fafafa', overflowY:'auto', display:'flex', flexDirection:'column' }}>
-                  <p style={{ margin:'0 0 10px', fontFamily:'Poppins', fontSize:12, fontWeight:700, color:'#111827' }}>Acciones rápidas</p>
-                  {['Explicar coberturas','Comparar seguros','Objeciones comunes','Redactar respuesta','Siguiente paso'].map(action => (
-                    <div key={action} style={{ display:'flex', alignItems:'center', gap:7, padding:'7px 8px', borderRadius:8, marginBottom:4, background:'#fff', border:'1px solid #f0f0f2', cursor:'pointer' }}>
-                      <div style={{ width:16, height:16, borderRadius:4, background:'#ede9fe', flexShrink:0 }} />
-                      <span style={{ fontFamily:'Inter', fontSize:11, color:'#374151', fontWeight:500 }}>{action}</span>
-                    </div>
-                  ))}
-                  <div style={{ marginTop:10, background:'#fff', borderRadius:10, border:'1px solid #e5e7eb', padding:'10px' }}>
-                    <p style={{ margin:'0 0 4px', fontFamily:'Poppins', fontSize:11, fontWeight:700, color:'#111827' }}>Sugerencia para ti</p>
-                    <p style={{ margin:'0 0 8px', fontFamily:'Inter', fontSize:10, color:'#6b7280', lineHeight:1.4 }}>Este cliente mostró interés en seguro de auto.</p>
-                    <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', background:'#f5f7fb', borderRadius:7, padding:'6px 8px' }}>
-                      <span style={{ fontFamily:'Inter', fontSize:11, fontWeight:600, color:'#4f46e5' }}>Enviar propuesta</span>
-                      <span style={{ color:'#4f46e5', fontSize:14, fontWeight:700 }}>›</span>
-                    </div>
-                  </div>
-                </div>
-
-              </div>
+            {/* Mockup central — imagen real */}
+            <div style={{ borderRadius:24, overflow:'hidden', boxShadow:'0 24px 72px rgba(87,69,171,0.22)', border:'1px solid rgba(87,69,171,0.1)' }}>
+              <img src={imgPantallanto} alt="Anto IA — panel de control" style={{ width:'100%', display:'block' }} />
             </div>
 
             {/* Cards derecha */}
             <div style={{ display:'flex', flexDirection:'column', gap:14 }}>
               {[
-                { icon:'👥', title:'Aumenta tus ventas',  desc:'Responde mejor, genera confianza y cierra más negocios.' },
-                { icon:'⏰', title:'Ahorra tiempo',        desc:'Automatiza respuestas y enfócate en lo que importa: tus clientes.' },
+                { Icon:Users, title:'Aumenta tus ventas', desc:'Responde mejor, genera confianza y cierra más negocios.' },
+                { Icon:Clock, title:'Ahorra tiempo',       desc:'Automatiza respuestas y enfócate en lo que importa: tus clientes.' },
               ].map(c => (
                 <div key={c.title} style={{ background:'#fff', borderRadius:16, padding:'16px', boxShadow:'0 2px 16px rgba(0,0,0,0.07)' }}>
                   <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:7 }}>
-                    <div style={{ width:30, height:30, borderRadius:9, background:'#f5f7fb', display:'flex', alignItems:'center', justifyContent:'center', fontSize:16, flexShrink:0 }}>{c.icon}</div>
+                    <div style={{ width:32, height:32, borderRadius:9, background:'#EEE7FD', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                      <c.Icon size={16} color="#5745AB" />
+                    </div>
                     <p style={{ margin:0, fontFamily:'Poppins', fontWeight:700, fontSize:13, color:'#111827' }}>{c.title}</p>
                   </div>
                   <p style={{ margin:0, fontFamily:'Inter', fontSize:12, color:'#6b7280', lineHeight:1.55 }}>{c.desc}</p>
@@ -838,15 +730,15 @@ export default function Landing() {
           </div>
           <div style={{ display:'grid', gridTemplateColumns:'repeat(5, 1fr)', gap:14 }}>
             {[
-              { icon:'📋', title:'Explica coberturas',     desc:'De forma clara y sencilla, como si fueras un experto.' },
-              { icon:'💬', title:'Resuelve objeciones',    desc:'Te da argumentos listos para cada situación.' },
-              { icon:'⚖️', title:'Compara opciones',       desc:'Muestra diferencias entre planes al instante.' },
-              { icon:'✉️', title:'Redacta mensajes',       desc:'Crea respuestas listas para enviar por WhatsApp.' },
-              { icon:'📊', title:'Aprende de tu negocio',  desc:'Entre más la usas, mejor te ayuda a vender.' },
+              { Icon:FileText,    title:'Explica coberturas',    desc:'De forma clara y sencilla, como si fueras un experto.' },
+              { Icon:MessageCircle, title:'Resuelve objeciones', desc:'Te da argumentos listos para cada situación.' },
+              { Icon:BarChart3,   title:'Compara opciones',      desc:'Muestra diferencias entre planes al instante.' },
+              { Icon:Mail,        title:'Redacta mensajes',      desc:'Crea respuestas listas para enviar por WhatsApp.' },
+              { Icon:TrendingUp,  title:'Aprende de tu negocio', desc:'Entre más la usas, mejor te ayuda a vender.' },
             ].map(item => (
-              <div key={item.title} style={{ background:'#fff', borderRadius:18, padding:'20px 16px', border:'1px solid #ede9fe', textAlign:'center', boxShadow:'0 1px 8px rgba(109,40,217,0.05)' }}>
-                <div style={{ width:44, height:44, borderRadius:13, background:'#ede9fe', display:'flex', alignItems:'center', justifyContent:'center', fontSize:20, margin:'0 auto 12px' }}>
-                  {item.icon}
+              <div key={item.title} style={{ background:'#fff', borderRadius:18, padding:'20px 16px', border:'1px solid #EEE7FD', textAlign:'center', boxShadow:'0 1px 8px rgba(87,69,171,0.06)' }}>
+                <div style={{ width:44, height:44, borderRadius:13, background:'#EEE7FD', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 12px' }}>
+                  <item.Icon size={20} color="#5745AB" />
                 </div>
                 <p style={{ margin:'0 0 6px', fontFamily:'Poppins', fontWeight:700, fontSize:13, color:'#111827' }}>{item.title}</p>
                 <p style={{ margin:0, fontFamily:'Inter', fontSize:12, color:'#6b7280', lineHeight:1.55 }}>{item.desc}</p>
