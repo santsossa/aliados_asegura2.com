@@ -8,7 +8,7 @@ import imgHeroPhone  from '../assets/herophone.png'
 import imgCcManizales from '../assets/ccMANIZALES.png'
 import imgCcCucuta    from '../assets/ccCUCUTA.png'
 
-import imgPantallanto from '../assets/pantallanto.png'
+import imgPantallanto from '../assets/pantallanto.webp'
 import imgQualitas  from '../assets/qualitas.png'
 import imgAxa       from '../assets/axa.webp'
 import imgBolivar   from '../assets/bolivar.webp'
