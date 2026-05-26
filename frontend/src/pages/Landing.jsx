@@ -679,7 +679,7 @@ export default function Landing() {
           </div>
 
           {/* ── 3 columnas: cards izq | mockup | cards der ── */}
-          <div style={{ display:'grid', gridTemplateColumns:'200px 1fr 200px', gap:24, alignItems:'center', marginBottom:64 }}>
+          <div style={{ display:'grid', gridTemplateColumns:'170px 1fr 170px', gap:20, alignItems:'center', marginBottom:64 }}>
 
             {/* Cards izquierda */}
             <div style={{ display:'flex', flexDirection:'column', gap:14 }}>
@@ -700,7 +700,7 @@ export default function Landing() {
             </div>
 
             {/* Mockup central — imagen real */}
-            <div style={{ borderRadius:24, overflow:'hidden', boxShadow:'0 24px 72px rgba(87,69,171,0.22)', border:'1px solid rgba(87,69,171,0.1)' }}>
+            <div style={{ borderRadius:20, overflow:'hidden', boxShadow:'0 32px 80px rgba(87,69,171,0.18)' }}>
               <img src={imgPantallanto} alt="Anto IA — panel de control" style={{ width:'100%', display:'block' }} />
             </div>
 
