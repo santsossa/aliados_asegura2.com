@@ -2,7 +2,6 @@ import { useState, useRef, useEffect } from 'react'
 import { Loader2, Shield, Scale, MessageCircle, FileCheck, Sparkles, Plus, Clock, ArrowUp, Copy, Check } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 
-
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
 const QUICK_CARDS = [
@@ -12,18 +11,76 @@ const QUICK_CARDS = [
   { icon: FileCheck,     bg: '#fff7ed', color: '#ea580c', title: 'Proceso de emisión',     prompt: '¿Cuáles son los pasos para emitir una póliza y qué documentos necesita el cliente?' },
 ]
 
+// ── Inline markdown: **bold**, *italic* ───────────────────────────────────────
+function parseInline(text, baseKey = 0) {
+  const parts = []
+  const regex = /(\*\*(.+?)\*\*|\*(.+?)\*)/g
+  let last = 0
+  let k = baseKey
+  let m
+  while ((m = regex.exec(text)) !== null) {
+    if (m.index > last) parts.push(<span key={k++}>{text.slice(last, m.index)}</span>)
+    if (m[0].startsWith('**')) {
+      parts.push(<strong key={k++} style={{ fontWeight: 600 }}>{m[2]}</strong>)
+    } else {
+      parts.push(<em key={k++}>{m[3]}</em>)
+    }
+    last = m.index + m[0].length
+  }
+  if (last < text.length) parts.push(<span key={k++}>{text.slice(last)}</span>)
+  return parts.length ? parts : [<span key={k}>{text}</span>]
+}
 
+// ── Block markdown renderer ───────────────────────────────────────────────────
+function MarkdownText({ text, style }) {
+  const lines = text.split('\n')
+  const els = []
+  lines.forEach((line, i) => {
+    if (line.startsWith('### ')) {
+      els.push(<div key={i} style={{ fontWeight: 700, fontSize: 14.5, color: '#111827', marginTop: i > 0 ? 10 : 0, marginBottom: 3 }}>{parseInline(line.slice(4))}</div>)
+    } else if (line.startsWith('## ')) {
+      els.push(<div key={i} style={{ fontWeight: 700, fontSize: 15, color: '#111827', marginTop: i > 0 ? 12 : 0, marginBottom: 3 }}>{parseInline(line.slice(3))}</div>)
+    } else if (line.startsWith('# ')) {
+      els.push(<div key={i} style={{ fontWeight: 700, fontSize: 16, color: '#111827', marginTop: i > 0 ? 14 : 0, marginBottom: 4 }}>{parseInline(line.slice(2))}</div>)
+    } else if (line.startsWith('- ') || line.startsWith('* ')) {
+      els.push(
+        <div key={i} style={{ display: 'flex', gap: 6, marginBottom: 3, paddingLeft: 4 }}>
+          <span style={{ color: '#6b7280', flexShrink: 0 }}>•</span>
+          <span>{parseInline(line.slice(2))}</span>
+        </div>
+      )
+    } else if (/^\d+\.\s/.test(line)) {
+      const nm = line.match(/^(\d+)\.\s(.+)/)
+      if (nm) els.push(
+        <div key={i} style={{ display: 'flex', gap: 6, marginBottom: 3, paddingLeft: 4 }}>
+          <span style={{ color: '#6b7280', flexShrink: 0, minWidth: 14 }}>{nm[1]}.</span>
+          <span>{parseInline(nm[2])}</span>
+        </div>
+      )
+    } else if (line.trim() === '') {
+      els.push(<div key={i} style={{ height: 8 }} />)
+    } else {
+      els.push(<div key={i} style={{ marginBottom: 2 }}>{parseInline(line)}</div>)
+    }
+  })
+  return <div style={style}>{els}</div>
+}
+
+// ── Main component ────────────────────────────────────────────────────────────
 export default function Anto() {
   const { getToken, user } = useAuth()
   const nombre = user?.nombre || user?.email?.split('@')[0] || 'aliado'
 
-  const [messages,    setMessages]    = useState([])
-  const [input,       setInput]       = useState('')
-  const [loading,     setLoading]     = useState(false)
-  const [hoveredMsg,  setHoveredMsg]  = useState(null)
-  const [copiedMsg,   setCopiedMsg]   = useState(null)
+  const [messages,   setMessages]   = useState([])
+  const [input,      setInput]      = useState('')
+  const [loading,    setLoading]    = useState(false)
+  const [hoveredMsg, setHoveredMsg] = useState(null)
+  const [copiedMsg,  setCopiedMsg]  = useState(null)
+  const [typingIdx,  setTypingIdx]  = useState(null)
+  const [typingLen,  setTypingLen]  = useState(0)
   const bottomRef = useRef(null)
   const inputRef  = useRef(null)
+  const typingRef = useRef(null)
 
   function copiar(idx, text) {
     navigator.clipboard.writeText(text).then(() => {
@@ -35,6 +92,27 @@ export default function Anto() {
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, loading])
+
+  // Typing animation — starts when a new assistant message is added
+  useEffect(() => {
+    const last = messages[messages.length - 1]
+    if (!last || last.role !== 'assistant') return
+    const idx = messages.length - 1
+    setTypingIdx(idx)
+    setTypingLen(0)
+    clearInterval(typingRef.current)
+    let i = 0
+    typingRef.current = setInterval(() => {
+      i += 4 // 4 chars per tick → very fast
+      setTypingLen(i)
+      bottomRef.current?.scrollIntoView({ behavior: 'instant' })
+      if (i >= last.content.length) {
+        clearInterval(typingRef.current)
+        setTypingIdx(null)
+      }
+    }, 8)
+    return () => clearInterval(typingRef.current)
+  }, [messages.length]) // eslint-disable-line react-hooks/exhaustive-deps
 
   async function enviar(texto) {
     const pregunta = (texto ?? input).trim()
@@ -67,125 +145,127 @@ export default function Anto() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: 'transparent', overflow: 'hidden' }}>
 
+      {/* Área de mensajes / bienvenida */}
+      <div style={{ flex: 1, overflowY: 'auto', padding: hasMessages ? '24px 32px' : '0 32px' }}>
 
-        {/* Área de mensajes / bienvenida */}
-        <div style={{ flex: 1, overflowY: 'auto', padding: hasMessages ? '24px 32px' : '0 32px' }}>
-
-          {!hasMessages ? (
-            /* ── Bienvenida ── */
-            <div style={{ maxWidth: 520, margin: '0 auto', paddingTop: 56, paddingBottom: 24 }}>
-              <div style={{ marginBottom: 32, textAlign: 'center' }}>
-                <div style={{ width: 52, height: 52, borderRadius: '50%', background: 'linear-gradient(135deg,#4f46e5,#2D2A7A)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 18px' }}>
-                  <Sparkles size={22} color="#fff" />
-                </div>
-                <h1 style={{ margin: '0 0 10px', fontFamily: 'Poppins', fontWeight: 700, fontSize: 26, color: '#111827' }}>
-                  Hola, {nombre} 👋
-                </h1>
-                <p style={{ margin: 0, fontFamily: 'Inter', fontSize: 14, color: '#6b7280', lineHeight: 1.6 }}>
-                  Soy Anto, tu asistente de seguros.<br />Pregúntame lo que necesites saber.
-                </p>
+        {!hasMessages ? (
+          /* ── Bienvenida ── */
+          <div style={{ maxWidth: 520, margin: '0 auto', paddingTop: 56, paddingBottom: 24 }}>
+            <div style={{ marginBottom: 32, textAlign: 'center' }}>
+              <div style={{ width: 52, height: 52, borderRadius: '50%', background: 'linear-gradient(135deg,#4f46e5,#2D2A7A)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 18px' }}>
+                <Sparkles size={22} color="#fff" />
               </div>
-
-              {/* Cards rápidas 2×2 */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                {QUICK_CARDS.map((c, i) => {
-                  const Icon = c.icon
-                  return (
-                    <button
-                      key={i}
-                      onClick={() => enviar(c.prompt)}
-                      style={{
-                        display: 'flex', alignItems: 'center', gap: 12,
-                        background: '#fff', border: '1.5px solid #e5e7eb',
-                        borderRadius: 14, padding: '14px 16px',
-                        cursor: 'pointer', textAlign: 'left',
-                        transition: 'border-color 0.15s, box-shadow 0.15s',
-                      }}
-                      onMouseEnter={e => { e.currentTarget.style.borderColor = '#c4b5fd'; e.currentTarget.style.boxShadow = '0 4px 16px rgba(87,69,171,0.1)' }}
-                      onMouseLeave={e => { e.currentTarget.style.borderColor = '#e5e7eb'; e.currentTarget.style.boxShadow = 'none' }}
-                    >
-                      <div style={{ width: 36, height: 36, borderRadius: 10, background: c.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                        <Icon size={17} color={c.color} />
-                      </div>
-                      <span style={{ fontFamily: 'Inter', fontSize: 13, fontWeight: 500, color: '#374151', flex: 1 }}>{c.title}</span>
-                      <span style={{ fontSize: 16, color: '#9ca3af', flexShrink: 0, fontWeight: 300 }}>+</span>
-                    </button>
-                  )
-                })}
-              </div>
+              <h1 style={{ margin: '0 0 10px', fontFamily: 'Poppins', fontWeight: 700, fontSize: 26, color: '#111827' }}>
+                Hola, {nombre} 👋
+              </h1>
+              <p style={{ margin: 0, fontFamily: 'Inter', fontSize: 14, color: '#6b7280', lineHeight: 1.6 }}>
+                Soy Anto, tu asistente de seguros.<br />Pregúntame lo que necesites saber.
+              </p>
             </div>
-          ) : (
-            /* ── Chat messages ── */
-            <div style={{ maxWidth: 640, margin: '0 auto' }}>
-              {messages.map((m, i) => {
-                const esIA = m.role === 'assistant'
+
+            {/* Cards rápidas 2×2 */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              {QUICK_CARDS.map((c, i) => {
+                const Icon = c.icon
                 return (
-                  <div key={i} style={{ marginBottom: esIA ? 20 : 14, display: 'flex', justifyContent: esIA ? 'flex-start' : 'flex-end' }}>
-                    {esIA && (
-                      <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'linear-gradient(135deg,#4f46e5,#2D2A7A)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginRight: 10, marginTop: 2 }}>
-                        <Sparkles size={12} color="#fff" />
-                      </div>
-                    )}
-                    {esIA ? (
-                      /* Anto — sin burbuja, texto plano + copiar en hover */
-                      <div
-                        onMouseEnter={() => setHoveredMsg(i)}
-                        onMouseLeave={() => setHoveredMsg(null)}
-                        style={{ maxWidth: '78%' }}
-                      >
-                        <p style={{ margin: 0, fontFamily: 'Inter', fontSize: 13.5, lineHeight: 1.7, color: '#111827', whiteSpace: 'pre-wrap' }}>
-                          {m.content}
-                        </p>
-                        {hoveredMsg === i && (
-                          <button
-                            onClick={() => copiar(i, m.content)}
-                            style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 6, padding: '3px 8px', border: 'none', background: 'transparent', cursor: 'pointer', fontFamily: 'Inter', fontSize: 11, color: '#9ca3af', borderRadius: 6 }}
-                            onMouseEnter={e => e.currentTarget.style.color = '#6b7280'}
-                            onMouseLeave={e => e.currentTarget.style.color = '#9ca3af'}
-                          >
-                            {copiedMsg === i ? <Check size={11} /> : <Copy size={11} />}
-                            {copiedMsg === i ? 'Copiado' : 'Copiar'}
-                          </button>
-                        )}
-                      </div>
-                    ) : (
-                      /* Aliado — burbuja azul transparente */
-                      <div style={{
-                        maxWidth: '72%',
-                        background: 'rgba(45, 42, 122, 0.08)',
-                        color: '#1e1b4b',
-                        borderRadius: '16px 4px 16px 16px',
-                        padding: '9px 14px',
-                        fontFamily: 'Inter', fontSize: 13.5, lineHeight: 1.65,
-                        whiteSpace: 'pre-wrap',
-                      }}>
-                        {m.content}
-                      </div>
-                    )}
-                  </div>
+                  <button
+                    key={i}
+                    onClick={() => enviar(c.prompt)}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 12,
+                      background: '#fff', border: '1.5px solid #e5e7eb',
+                      borderRadius: 14, padding: '14px 16px',
+                      cursor: 'pointer', textAlign: 'left',
+                      transition: 'border-color 0.15s, box-shadow 0.15s',
+                    }}
+                    onMouseEnter={e => { e.currentTarget.style.borderColor = '#c4b5fd'; e.currentTarget.style.boxShadow = '0 4px 16px rgba(87,69,171,0.1)' }}
+                    onMouseLeave={e => { e.currentTarget.style.borderColor = '#e5e7eb'; e.currentTarget.style.boxShadow = 'none' }}
+                  >
+                    <div style={{ width: 36, height: 36, borderRadius: 10, background: c.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <Icon size={17} color={c.color} />
+                    </div>
+                    <span style={{ fontFamily: 'Inter', fontSize: 13, fontWeight: 500, color: '#374151', flex: 1 }}>{c.title}</span>
+                    <span style={{ fontSize: 16, color: '#9ca3af', flexShrink: 0, fontWeight: 300 }}>+</span>
+                  </button>
                 )
               })}
-
-              {loading && (
-                <div style={{ display: 'flex', alignItems: 'flex-start', marginBottom: 16 }}>
-                  <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'linear-gradient(135deg,#4f46e5,#2D2A7A)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginRight: 10, marginTop: 2 }}>
-                    <Sparkles size={12} color="#fff" />
-                  </div>
-                  <div style={{ paddingTop: 6, display: 'flex', gap: 5, alignItems: 'center' }}>
-                    {[0, 0.2, 0.4].map((d, i) => (
-                      <span key={i} style={{ display: 'inline-block', width: 6, height: 6, borderRadius: '50%', background: '#9ca3af', animation: `dp 1.2s ease-in-out ${d}s infinite` }} />
-                    ))}
-                  </div>
-                </div>
-              )}
-              <div ref={bottomRef} />
             </div>
-          )}
-        </div>
+          </div>
+        ) : (
+          /* ── Chat messages ── */
+          <div style={{ maxWidth: 640, margin: '0 auto' }}>
+            {messages.map((m, i) => {
+              const esIA = m.role === 'assistant'
+              const displayText = typingIdx === i ? m.content.slice(0, typingLen) : m.content
+              return (
+                <div key={i} style={{ marginBottom: esIA ? 20 : 14, display: 'flex', justifyContent: esIA ? 'flex-start' : 'flex-end' }}>
+                  {esIA && (
+                    <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'linear-gradient(135deg,#4f46e5,#2D2A7A)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginRight: 10, marginTop: 2 }}>
+                      <Sparkles size={12} color="#fff" />
+                    </div>
+                  )}
 
-        {/* ── Input bar ── */}
-        <div style={{ padding: '12px 32px 20px', flexShrink: 0 }}>
-          <div style={{ maxWidth: 580, margin: '0 auto' }}>
+                  {esIA ? (
+                    /* Anto — sin burbuja, markdown + copiar en hover */
+                    <div
+                      onMouseEnter={() => setHoveredMsg(i)}
+                      onMouseLeave={() => setHoveredMsg(null)}
+                      style={{ maxWidth: '78%' }}
+                    >
+                      <MarkdownText
+                        text={displayText}
+                        style={{ fontFamily: 'Inter', fontSize: 13.5, lineHeight: 1.75, color: '#111827' }}
+                      />
+                      {hoveredMsg === i && typingIdx !== i && (
+                        <button
+                          onClick={() => copiar(i, m.content)}
+                          style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 6, padding: '3px 8px', border: 'none', background: 'transparent', cursor: 'pointer', fontFamily: 'Inter', fontSize: 11, color: '#9ca3af', borderRadius: 6 }}
+                          onMouseEnter={e => e.currentTarget.style.color = '#6b7280'}
+                          onMouseLeave={e => e.currentTarget.style.color = '#9ca3af'}
+                        >
+                          {copiedMsg === i ? <Check size={11} /> : <Copy size={11} />}
+                          {copiedMsg === i ? 'Copiado' : 'Copiar'}
+                        </button>
+                      )}
+                    </div>
+                  ) : (
+                    /* Aliado — burbuja azul transparente */
+                    <div style={{
+                      maxWidth: '72%',
+                      background: 'rgba(45, 42, 122, 0.08)',
+                      color: '#1e1b4b',
+                      borderRadius: '16px 4px 16px 16px',
+                      padding: '9px 14px',
+                      fontFamily: 'Inter', fontSize: 13.5, lineHeight: 1.65,
+                      whiteSpace: 'pre-wrap',
+                    }}>
+                      {m.content}
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+
+            {loading && (
+              <div style={{ display: 'flex', alignItems: 'flex-start', marginBottom: 16 }}>
+                <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'linear-gradient(135deg,#4f46e5,#2D2A7A)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginRight: 10, marginTop: 2 }}>
+                  <Sparkles size={12} color="#fff" />
+                </div>
+                <div style={{ paddingTop: 6, display: 'flex', gap: 5, alignItems: 'center' }}>
+                  {[0, 0.2, 0.4].map((d, j) => (
+                    <span key={j} style={{ display: 'inline-block', width: 6, height: 6, borderRadius: '50%', background: '#9ca3af', animation: `dp 1.2s ease-in-out ${d}s infinite` }} />
+                  ))}
+                </div>
+              </div>
+            )}
+            <div ref={bottomRef} />
+          </div>
+        )}
+      </div>
+
+      {/* ── Input bar ── */}
+      <div style={{ padding: '12px 32px 20px', flexShrink: 0 }}>
+        <div style={{ maxWidth: 580, margin: '0 auto' }}>
           <div style={{
             display: 'flex', alignItems: 'center', gap: 6,
             border: '1.5px solid #e5e7eb', borderRadius: 999,
@@ -196,14 +276,12 @@ export default function Anto() {
             onFocusCapture={e => e.currentTarget.style.borderColor = '#a5b4fc'}
             onBlurCapture={e => e.currentTarget.style.borderColor = '#e5e7eb'}
           >
-            {/* Botones izquierda */}
             <button style={{ width: 28, height: 28, borderRadius: '50%', border: '1.5px solid #e5e7eb', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0 }}>
               <Plus size={13} color="#6b7280" />
             </button>
             <button style={{ width: 28, height: 28, borderRadius: '50%', border: 'none', background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0 }}>
               <Clock size={13} color="#9ca3af" />
             </button>
-            {/* Input */}
             <input
               ref={inputRef}
               value={input}
@@ -216,7 +294,6 @@ export default function Anto() {
                 background: 'transparent', lineHeight: 1.5, minWidth: 0,
               }}
             />
-            {/* Enviar */}
             <button
               onClick={() => enviar()}
               disabled={!input.trim() || loading}
@@ -237,8 +314,8 @@ export default function Anto() {
           <p style={{ margin: '6px 0 0', fontFamily: 'Inter', fontSize: 11, color: '#d1d5db', textAlign: 'center' }}>
             Anto puede cometer errores. Verifica la información importante.
           </p>
-          </div>
         </div>
+      </div>
 
       <style>{`
         @keyframes dp { 0%,80%,100%{transform:scale(0.6);opacity:0.4} 40%{transform:scale(1);opacity:1} }
