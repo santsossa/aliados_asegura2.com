@@ -16,20 +16,22 @@ export function AuthProvider({ children }) {
   }
 
   useEffect(() => {
-    // Al montar, intentar refresh con la cookie httpOnly
     silentRefresh().finally(() => setLoading(false))
 
-    // Cuando el usuario vuelve a la pestaña tras inactividad → refrescar token
+    // Delay de 1.5s al volver visible: la red puede tardar en reconectarse tras el sueño del PC
     function onVisibilityChange() {
-      if (document.visibilityState === 'visible') silentRefresh()
+      if (document.visibilityState === 'visible') setTimeout(silentRefresh, 1500)
     }
-    document.addEventListener('visibilitychange', onVisibilityChange)
+    // Refresh inmediato cuando se recupera la conexión a internet
+    function onOnline() { silentRefresh() }
 
-    // Refresh proactivo cada 10 minutos para mantener el token vivo
+    document.addEventListener('visibilitychange', onVisibilityChange)
+    window.addEventListener('online', onOnline)
     const interval = setInterval(silentRefresh, 10 * 60 * 1000)
 
     return () => {
       document.removeEventListener('visibilitychange', onVisibilityChange)
+      window.removeEventListener('online', onOnline)
       clearInterval(interval)
     }
   }, [])
@@ -38,16 +40,19 @@ export function AuthProvider({ children }) {
     try {
       const res = await fetch(`${API}/api/auth/refresh`, {
         method: 'POST',
-        credentials: 'include',   // envía la cookie refreshToken
+        credentials: 'include',
       })
       if (res.ok) {
         const data = await res.json()
         applyToken(data.accessToken)
-      } else {
+      } else if (res.status === 401) {
+        // Solo cerrar sesión si el servidor rechaza explícitamente el refresh token
         clearAuth()
       }
+      // En 5xx u otros errores HTTP: mantener estado actual, reintentar en el próximo ciclo
     } catch {
-      clearAuth()
+      // Error de red (sin internet, PC en sueño, etc.) — NO cerrar sesión.
+      // La cookie sigue válida; se reintenta al volver la conexión o tras el intervalo.
     }
   }
 
