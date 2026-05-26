@@ -743,11 +743,12 @@ export default function Cotizar() {
   if (phase === 'select') return (
     <div style={{
       height:'100%', display:'flex', flexDirection:'column',
-      alignItems:'center', justifyContent:'center',
-      padding:'20px 24px', background:'#f4f5fb', overflow:'hidden',
+      alignItems:'center', justifyContent:'flex-start',
+      paddingTop:48, paddingLeft:24, paddingRight:24, paddingBottom:24,
+      background:'#f4f5fb', overflow:'hidden',
     }}>
       {/* Header */}
-      <div style={{ textAlign:'center', marginBottom:28 }}>
+      <div style={{ textAlign:'center', marginBottom:32 }}>
         <h1 style={{ fontFamily:'Poppins', fontSize:24, fontWeight:800, color:'#111827', margin:'0 0 12px' }}>
           ¿Qué tipo de vehículo quieres cotizar?
         </h1>
@@ -766,28 +767,27 @@ export default function Cotizar() {
             background:'#fff',
             border: usadoHov ? '2px solid #5745AB' : '2px solid #e8eaf0',
             borderRadius:20, padding:'28px 24px 72px', cursor:'pointer',
-            textAlign:'left', display:'flex', flexDirection:'column', position:'relative',
+            textAlign:'center', display:'flex', flexDirection:'column', alignItems:'center', position:'relative',
             boxShadow: usadoHov ? '0 8px 32px rgba(87,69,171,0.14)' : '0 2px 8px rgba(0,0,0,0.04)',
             transition:'border-color 0.18s, box-shadow 0.18s',
           }}
         >
-          <div style={{ display:'flex', justifyContent:'center', marginBottom:22 }}>
-            <div style={{
-              width:148, height:148, borderRadius:'50%',
-              background: usadoHov ? '#EEE7FD' : '#f0f2f8',
-              display:'flex', alignItems:'center', justifyContent:'center',
-              transition:'background 0.18s',
-            }}>
-              <img
-                src={cotizarplacaImg}
-                alt="Vehículo usado"
-                style={{
-                  width:100, height:100, objectFit:'contain',
-                  filter: usadoHov ? 'none' : 'grayscale(1)',
-                  transition:'filter 0.18s',
-                }}
-              />
-            </div>
+          <div style={{
+            width:148, height:148, borderRadius:'50%',
+            background: usadoHov ? '#EEE7FD' : '#f0f2f8',
+            display:'flex', alignItems:'center', justifyContent:'center',
+            marginBottom:20, overflow:'hidden',
+            transition:'background 0.18s',
+          }}>
+            <img
+              src={cotizarplacaImg}
+              alt="Vehículo usado"
+              style={{
+                width:148, height:148, objectFit:'cover',
+                filter: usadoHov ? 'none' : 'grayscale(1)',
+                transition:'filter 0.18s',
+              }}
+            />
           </div>
           <p style={{ margin:'0 0 4px', fontFamily:'Poppins', fontSize:16, fontWeight:700, color:'#111827' }}>
             Vehículo usado
@@ -811,21 +811,20 @@ export default function Cotizar() {
         {/* ── Vehículo 0 km ── */}
         <div style={{
           background:'#fff', border:'2px solid #e8eaf0', borderRadius:20,
-          padding:'28px 24px 72px', cursor:'not-allowed', textAlign:'left',
-          display:'flex', flexDirection:'column', position:'relative',
+          padding:'28px 24px 72px', cursor:'not-allowed', textAlign:'center',
+          display:'flex', flexDirection:'column', alignItems:'center', position:'relative',
           boxShadow:'0 2px 8px rgba(0,0,0,0.04)',
         }}>
-          <div style={{ display:'flex', justifyContent:'center', marginBottom:22 }}>
-            <div style={{
-              width:148, height:148, borderRadius:'50%', background:'#f0f2f8',
-              display:'flex', alignItems:'center', justifyContent:'center',
-            }}>
-              <img
-                src={cotizar0kmImg}
-                alt="Vehículo 0 km"
-                style={{ width:100, height:100, objectFit:'contain', filter:'grayscale(1)' }}
-              />
-            </div>
+          <div style={{
+            width:148, height:148, borderRadius:'50%', background:'#f0f2f8',
+            display:'flex', alignItems:'center', justifyContent:'center',
+            marginBottom:20, overflow:'hidden',
+          }}>
+            <img
+              src={cotizar0kmImg}
+              alt="Vehículo 0 km"
+              style={{ width:148, height:148, objectFit:'cover', filter:'grayscale(1)' }}
+            />
           </div>
           <p style={{ margin:'0 0 4px', fontFamily:'Poppins', fontSize:16, fontWeight:700, color:'#374151' }}>
             Vehículo 0 km
