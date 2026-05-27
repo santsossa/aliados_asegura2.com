@@ -37,7 +37,7 @@ body {
   .db-inner { padding: 0 12px 20px; }
 
   /* Grid de 2 columnas — los hijos de db-left y db-right participan directamente */
-  .db-grid  { display: grid !important; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .db-grid  { display: grid !important; grid-template-columns: 1fr 1fr; gap: 12px; align-items: center; }
   .db-left  { display: contents !important; }
   .db-right { display: contents !important; }
 
