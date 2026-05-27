@@ -51,17 +51,19 @@ body {
   .db-anto       { grid-column: 1 / -1; grid-row: 6; }
 
   /* Hero compacto en columna 50% — centrado en eje Y */
-  .db-hero { padding: 18px 14px !important; min-height: 0 !important; border-radius: 20px !important; justify-content: center !important; }
+  .db-hero { padding: 14px 12px !important; min-height: 0 !important; border-radius: 20px !important; justify-content: center !important; }
   .db-hero-label { display: none !important; }
-  .db-hero-title { font-size: 13px !important; margin-bottom: 14px !important; max-width: 100% !important; line-height: 1.45 !important; }
-  .db-hero-btn   { font-size: 11px !important; padding: 7px 7px 7px 11px !important; gap: 7px !important; }
-  .db-hero-btn-icon { width: 20px !important; height: 20px !important; font-size: 12px !important; }
+  .db-hero-title { font-size: 11.5px !important; margin-bottom: 10px !important; max-width: 100% !important; line-height: 1.4 !important; }
+  .db-hero-btn   { font-size: 10px !important; padding: 6px 6px 6px 10px !important; gap: 6px !important; }
+  .db-hero-btn-icon { width: 18px !important; height: 18px !important; font-size: 11px !important; }
   /* Sparkles visibles pero muy sutiles — detrás del texto gracias al orden del DOM */
   .db-hero-deco  { opacity: 0.45; }
 
   /* Comisiones compacto en columna 50% — centrado en eje Y */
-  .db-comisiones { padding: 12px 10px !important; justify-content: center !important; }
+  .db-comisiones { padding: 10px 10px 8px !important; justify-content: center !important; }
   .db-comisiones > div:first-child span:last-child { display: none; }  /* ocultar badge de rango */
+  /* Gráfica ocupa todo el ancho del card — sin contenedor gris interno */
+  .db-comisiones > div:last-child { padding: 4px 0 0 !important; background: transparent !important; border-radius: 0 !important; }
 }
 
 /* ── Jerarquía tipográfica ─────────────────────────────────────────────────── */
