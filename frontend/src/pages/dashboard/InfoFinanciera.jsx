@@ -226,7 +226,7 @@ export default function InfoFinanciera() {
         </div>
 
         {/* ── Contenido ── */}
-        <div>
+        <div style={{ minHeight: 560 }}>
 
         {/* ═══ TAB: Mi cuenta ═══ */}
         {activeTab === 'cuenta' && (
