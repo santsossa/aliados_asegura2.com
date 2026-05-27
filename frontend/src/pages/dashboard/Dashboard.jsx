@@ -421,70 +421,53 @@ export default function Dashboard() {
           {/* ═══ LEFT COLUMN — scrolls ═══ */}
           <div className="db-left">
 
-            {/* 1. Hero banner + mini-stat */}
-            <div className="db-hero-row">
-              <div className="db-hero" style={{
-                background: 'linear-gradient(135deg, #3730a3 0%, #4f46e5 60%, #6366f1 100%)',
-                borderRadius: 28, padding: '28px 32px',
-                position: 'relative', overflow: 'hidden', minHeight: 148,
-                display: 'flex', flexDirection: 'column', justifyContent: 'center',
-              }}>
-                {/* Sparkles decorativos */}
-                <div className="db-hero-deco" style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
-                  <svg style={{ position: 'absolute', right: 32, top: '50%', transform: 'translateY(-50%)', opacity: 0.18 }} width="110" height="110" viewBox="0 0 200 200">
-                    <path d="M100 0 C100 0 108 92 200 100 C200 100 108 108 100 200 C100 200 92 108 0 100 C0 100 92 92 100 0Z" fill="white" />
-                  </svg>
-                  <svg style={{ position: 'absolute', right: 70, top: 18, opacity: 0.13 }} width="32" height="32" viewBox="0 0 200 200">
-                    <path d="M100 0 C100 0 108 92 200 100 C200 100 108 108 100 200 C100 200 92 108 0 100 C0 100 92 92 100 0Z" fill="white" />
-                  </svg>
-                  <svg style={{ position: 'absolute', right: 150, top: 12, opacity: 0.09 }} width="20" height="20" viewBox="0 0 200 200">
-                    <path d="M100 0 C100 0 108 92 200 100 C200 100 108 108 100 200 C100 200 92 108 0 100 C0 100 92 92 100 0Z" fill="white" />
-                  </svg>
-                  <svg style={{ position: 'absolute', right: 18, bottom: 16, opacity: 0.1 }} width="26" height="26" viewBox="0 0 200 200">
-                    <path d="M100 0 C100 0 108 92 200 100 C200 100 108 108 100 200 C100 200 92 108 0 100 C0 100 92 92 100 0Z" fill="white" />
-                  </svg>
-                  <svg style={{ position: 'absolute', right: 200, bottom: 20, opacity: 0.07 }} width="16" height="16" viewBox="0 0 200 200">
-                    <path d="M100 0 C100 0 108 92 200 100 C200 100 108 108 100 200 C100 200 92 108 0 100 C0 100 92 92 100 0Z" fill="white" />
-                  </svg>
-                </div>
-
-                <p className="db-hero-label" style={{ margin: '0 0 8px', fontFamily: 'Inter', fontWeight: 700, fontSize: 9.5, color: '#c7d2fe', letterSpacing: '0.12em', textTransform: 'uppercase' }}>Portal de aliados</p>
-                <h2 className="db-hero-title" style={{ margin: '0 0 20px', fontFamily: 'Poppins', fontWeight: 500, fontSize: 22, color: '#fff', lineHeight: 1.35, maxWidth: '72%' }}>
-                  Cotiza un seguro en segundos y gana tu comisión
-                </h2>
-                <button
-                  className="db-hero-btn"
-                  onClick={() => navigate('/dashboard/cotizar')}
-                  style={{
-                    display: 'inline-flex', alignItems: 'center', gap: 10,
-                    width: 'fit-content',
-                    background: '#0f0e1a', border: 'none', borderRadius: 999,
-                    cursor: 'pointer', padding: '9px 9px 9px 18px',
-                    color: '#fff', fontSize: 13, fontWeight: 700,
-                    transition: 'opacity 0.15s',
-                  }}
-                  onMouseEnter={e => e.currentTarget.style.opacity = '0.8'}
-                  onMouseLeave={e => e.currentTarget.style.opacity = '1'}
-                >
-                  Cotizar ahora
-                  <span className="db-hero-btn-icon" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 26, height: 26, borderRadius: '50%', background: '#ffffff', fontSize: 16, color: '#0f0e1a', fontWeight: 900, lineHeight: 1 }}>›</span>
-                </button>
+            {/* 1. Hero banner */}
+            <div className="db-hero" style={{
+              background: 'linear-gradient(135deg, #3730a3 0%, #4f46e5 60%, #6366f1 100%)',
+              borderRadius: 28, padding: '28px 32px',
+              position: 'relative', overflow: 'hidden', minHeight: 148,
+              display: 'flex', flexDirection: 'column', justifyContent: 'center',
+            }}>
+              {/* Sparkles decorativos */}
+              <div className="db-hero-deco" style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
+                <svg style={{ position: 'absolute', right: 32, top: '50%', transform: 'translateY(-50%)', opacity: 0.18 }} width="110" height="110" viewBox="0 0 200 200">
+                  <path d="M100 0 C100 0 108 92 200 100 C200 100 108 108 100 200 C100 200 92 108 0 100 C0 100 92 92 100 0Z" fill="white" />
+                </svg>
+                <svg style={{ position: 'absolute', right: 70, top: 18, opacity: 0.13 }} width="32" height="32" viewBox="0 0 200 200">
+                  <path d="M100 0 C100 0 108 92 200 100 C200 100 108 108 100 200 C100 200 92 108 0 100 C0 100 92 92 100 0Z" fill="white" />
+                </svg>
+                <svg style={{ position: 'absolute', right: 150, top: 12, opacity: 0.09 }} width="20" height="20" viewBox="0 0 200 200">
+                  <path d="M100 0 C100 0 108 92 200 100 C200 100 108 108 100 200 C100 200 92 108 0 100 C0 100 92 92 100 0Z" fill="white" />
+                </svg>
+                <svg style={{ position: 'absolute', right: 18, bottom: 16, opacity: 0.1 }} width="26" height="26" viewBox="0 0 200 200">
+                  <path d="M100 0 C100 0 108 92 200 100 C200 100 108 108 100 200 C100 200 92 108 0 100 C0 100 92 92 100 0Z" fill="white" />
+                </svg>
+                <svg style={{ position: 'absolute', right: 200, bottom: 20, opacity: 0.07 }} width="16" height="16" viewBox="0 0 200 200">
+                  <path d="M100 0 C100 0 108 92 200 100 C200 100 108 108 100 200 C100 200 92 108 0 100 C0 100 92 92 100 0Z" fill="white" />
+                </svg>
               </div>
 
-              {/* Mini comisiones — visible solo en móvil */}
-              <div className="db-earnings-mini" style={{ background: '#fff', borderRadius: 20, padding: '16px 14px' }}>
-                <div>
-                  <p style={{ margin: 0, fontFamily: 'Inter', fontSize: 10, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Comisiones</p>
-                  <p style={{ margin: '2px 0 0', fontFamily: 'Inter', fontSize: 10, fontWeight: 600, color: '#4f46e5' }}>{mesCorto}</p>
-                </div>
-                <div>
-                  <p style={{ margin: 0, fontFamily: 'Poppins', fontSize: 22, fontWeight: 700, color: '#111827', lineHeight: 1 }}>{fmtShort(comisionActual)}</p>
-                  <p style={{ margin: '3px 0 0', fontFamily: 'Inter', fontSize: 10, color: '#6b7280' }}>este mes</p>
-                </div>
-                <div style={{ height: 44 }}>
-                  <Sparkline data={sparklines.ganancias || []} color="#4f46e5" height={44} />
-                </div>
-              </div>
+              <p className="db-hero-label" style={{ margin: '0 0 8px', fontFamily: 'Inter', fontWeight: 700, fontSize: 9.5, color: '#c7d2fe', letterSpacing: '0.12em', textTransform: 'uppercase' }}>Portal de aliados</p>
+              <h2 className="db-hero-title" style={{ margin: '0 0 20px', fontFamily: 'Poppins', fontWeight: 500, fontSize: 22, color: '#fff', lineHeight: 1.35, maxWidth: '72%' }}>
+                Cotiza un seguro en segundos y gana tu comisión
+              </h2>
+              <button
+                className="db-hero-btn"
+                onClick={() => navigate('/dashboard/cotizar')}
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 10,
+                  width: 'fit-content',
+                  background: '#0f0e1a', border: 'none', borderRadius: 999,
+                  cursor: 'pointer', padding: '9px 9px 9px 18px',
+                  color: '#fff', fontSize: 13, fontWeight: 700,
+                  transition: 'opacity 0.15s',
+                }}
+                onMouseEnter={e => e.currentTarget.style.opacity = '0.8'}
+                onMouseLeave={e => e.currentTarget.style.opacity = '1'}
+              >
+                Cotizar ahora
+                <span className="db-hero-btn-icon" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 26, height: 26, borderRadius: '50%', background: '#ffffff', fontSize: 16, color: '#0f0e1a', fontWeight: 900, lineHeight: 1 }}>›</span>
+              </button>
             </div>
 
             {/* 2. Stats cards — compactas horizontales */}
@@ -662,32 +645,28 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* 6+7. White outer card — Comisiones + Anto */}
-            <div className="db-right-main" style={{ background: '#fff', borderRadius: 22, padding: '14px 14px 12px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-
-              {/* Comisiones — título fuera de la gray card */}
+            {/* Comisiones */}
+            <div className="db-comisiones" style={{ background: '#fff', borderRadius: 22, padding: '14px 14px 12px', display: 'flex', flexDirection: 'column', gap: 10 }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 2px' }}>
                 <span style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: 14, color: '#111827' }}>Comisiones</span>
                 <span style={{ fontFamily: 'Inter', fontSize: 9.5, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', padding: '3px 8px', borderRadius: 99, background: '#f5f7fb', color: '#9ca3af' }}>
                   {MESES_CORTO[m2idx]} – {mesCorto}
                 </span>
               </div>
-
-              {/* Gray inner: chart */}
               <div style={{ background: '#f5f7fb', borderRadius: 16, padding: '14px 16px' }}>
                 <MonthlyCommissionsChart meses={chartMeses} />
               </div>
+            </div>
 
-              {/* Pregúntale a Anto — título fuera de la gray card */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 2px 0' }}>
+            {/* Anto */}
+            <div className="db-anto" style={{ background: '#fff', borderRadius: 22, padding: '14px 14px 12px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 2px' }}>
                 <span style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: 14, color: '#111827' }}>Pregúntale a Anto</span>
                 <button
                   onClick={() => document.querySelector('[data-anto-pill]')?.click()}
                   style={{ width: 24, height: 24, borderRadius: '50%', background: '#f5f7fb', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, color: '#374151', lineHeight: 1, border: 'none' }}
                 >+</button>
               </div>
-
-              {/* Gray inner: Anto opciones */}
               <div style={{ background: '#f5f7fb', borderRadius: 16, padding: '10px 14px 14px' }}>
                 <div>
                   {[
@@ -724,7 +703,6 @@ export default function Dashboard() {
                   Preguntarle a Anto
                 </button>
               </div>
-
             </div>
 
           </div>
