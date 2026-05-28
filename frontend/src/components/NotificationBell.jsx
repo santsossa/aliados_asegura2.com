@@ -53,6 +53,12 @@ export default function NotificationBell() {
 
   useEffect(() => { fetchNotifs() }, [fetchNotifs])
 
+  // Polling cada 60 s como fallback ante caída de SSE
+  useEffect(() => {
+    const id = setInterval(fetchNotifs, 60_000)
+    return () => clearInterval(id)
+  }, [fetchNotifs])
+
   // Refetch cuando el tab vuelve al foco (fallback ante caída de SSE)
   useEffect(() => {
     return subscribe('__refresh', fetchNotifs)
@@ -83,19 +89,22 @@ export default function NotificationBell() {
     return () => document.removeEventListener('mousedown', handler)
   }, [open])
 
-  // ── Abrir dropdown → marca como leídas ───────────────────────────────
+  // ── Abrir dropdown → refresca lista y marca como leídas ────────────────
   async function handleOpen() {
     const next = !open
     setOpen(next)
-    if (next && noLeidas > 0) {
-      try {
-        await fetch(`${API}/api/notificaciones/marcar-leidas`, {
-          method: 'PATCH',
-          headers: { Authorization: `Bearer ${token}` },
-        })
-        setNotifs(prev => prev.map(n => ({ ...n, leida: true })))
-        setNoLeidas(0)
-      } catch { /* silencioso */ }
+    if (next) {
+      await fetchNotifs()
+      if (noLeidas > 0) {
+        try {
+          await fetch(`${API}/api/notificaciones/marcar-leidas`, {
+            method: 'PATCH',
+            headers: { Authorization: `Bearer ${token}` },
+          })
+          setNotifs(prev => prev.map(n => ({ ...n, leida: true })))
+          setNoLeidas(0)
+        } catch { /* silencioso */ }
+      }
     }
   }
 

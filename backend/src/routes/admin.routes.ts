@@ -157,7 +157,7 @@ router.patch('/leads/:id/estado',
         }).catch(() => {})
       }
 
-      // Crear notificación y empujar en tiempo real al aliado
+      // Notificación persistente (bloque aislado — fallo no interrumpe el resto)
       try {
         const placaStr = lead.placa ? ` · ${lead.placa}` : ''
         let notifTipo   = ''
@@ -166,24 +166,24 @@ router.patch('/leads/:id/estado',
 
         if (estado === 'aprobada') {
           notifTipo   = 'poliza_aprobada'
-          notifTitulo = `¡Póliza aprobada!${placaStr}`
-          notifMsg    = `La póliza de ${lead.cliente_nombre} con ${lead.aseguradora}${placaStr} fue aprobada. Tu comisión es $${comision.toLocaleString('es-CO')}.`
+          notifTitulo = `Poliza aprobada${placaStr}`
+          notifMsg    = `La poliza de ${lead.cliente_nombre} con ${lead.aseguradora}${placaStr} fue aprobada. Tu comision es $${comision.toLocaleString('es-CO')}.`
         } else if (estado === 'no_convertida') {
           notifTipo   = 'poliza_no_aprobada'
-          notifTitulo = `Póliza no aprobada${placaStr}`
-          notifMsg    = `La póliza de ${lead.cliente_nombre} con ${lead.aseguradora}${placaStr} no fue aprobada.${observaciones ? ' Motivo: ' + observaciones : ''}`
+          notifTitulo = `Poliza no aprobada${placaStr}`
+          notifMsg    = `La poliza de ${lead.cliente_nombre} con ${lead.aseguradora}${placaStr} no fue aprobada.${observaciones ? ' Motivo: ' + observaciones : ''}`
         } else if (estado === 'en_contacto') {
           notifTipo   = 'estado_actualizado'
           notifTitulo = `Estamos contactando al cliente${placaStr}`
-          notifMsg    = `Tu solicitud para ${lead.cliente_nombre} con ${lead.aseguradora}${placaStr} avanza. Nuestro asesor está intentando comunicarse con el cliente.`
+          notifMsg    = `Tu solicitud para ${lead.cliente_nombre} con ${lead.aseguradora}${placaStr} avanza. Nuestro asesor esta intentando comunicarse con el cliente.`
         } else if (estado === 'en_proceso') {
           notifTipo   = 'estado_actualizado'
-          notifTitulo = `¡El cliente quiere la póliza!${placaStr}`
-          notifMsg    = `El cliente de ${lead.cliente_nombre}${placaStr} está interesado en la póliza con ${lead.aseguradora}. Estamos haciendo los trámites para emitirla.`
+          notifTitulo = `El cliente quiere la poliza${placaStr}`
+          notifMsg    = `El cliente ${lead.cliente_nombre}${placaStr} esta interesado en la poliza con ${lead.aseguradora}. Estamos haciendo los tramites para emitirla.`
         } else if (estado === 'poliza_emitida') {
           notifTipo   = 'estado_actualizado'
-          notifTitulo = `Póliza emitida ✍️${placaStr}`
-          notifMsg    = `Se emitió la póliza para ${lead.cliente_nombre} con ${lead.aseguradora}${placaStr}. Esperamos el primer pago del cliente para confirmar tu comisión.`
+          notifTitulo = `Poliza emitida${placaStr}`
+          notifMsg    = `Se emitio la poliza para ${lead.cliente_nombre} con ${lead.aseguradora}${placaStr}. Esperamos el primer pago del cliente para confirmar tu comision.`
         }
 
         if (notifTipo) {
@@ -198,12 +198,17 @@ router.patch('/leads/:id/estado',
             mensaje: notifMsg, leida: false, created_at: notifNow,
           })
         }
+      } catch (err) {
+        console.error('[notif] Error al guardar notificacion (lead', leadId, '):', err)
+      }
 
-        // Evento de actualización de estado (usa lead.id, no el param del CRM)
+      // Evento de estado en tiempo real — bloque separado, siempre se empuja
+      try {
         const [polRow] = await pool.execute<any[]>('SELECT id, valor_comision FROM polizas WHERE lead_id = ? LIMIT 1', [lead.id])
         ssePush(lead.aliado_id, 'poliza_update', {
           lead_id:        lead.id,
           poliza_id:      polRow[0]?.id || null,
+          cotizacion_id:  lead.cotizacion_id || null,
           estado,
           aseguradora:    lead.aseguradora,
           cliente_nombre: lead.cliente_nombre,
@@ -212,7 +217,9 @@ router.patch('/leads/:id/estado',
           placa:          lead.placa || null,
           created_at:     new Date().toISOString(),
         })
-      } catch { /* no interrumpir flujo principal */ }
+      } catch (err) {
+        console.error('[notif] Error al empujar poliza_update SSE (lead', leadId, '):', err)
+      }
 
       res.json({ status:'success', message:`Lead marcado como ${estado}.` })
     } catch(err) { next(err) }
@@ -293,7 +300,7 @@ router.patch('/polizas/:id/estado',
         }).catch(() => {})
       }
 
-      // Crear notificación y empujar en tiempo real al aliado
+      // Notificación persistente (bloque aislado — fallo no interrumpe el resto)
       try {
         const placaStr = pol.placa ? ` · ${pol.placa}` : ''
         let notifTipo   = ''
@@ -302,24 +309,24 @@ router.patch('/polizas/:id/estado',
 
         if (estado === 'aprobada') {
           notifTipo   = 'poliza_aprobada'
-          notifTitulo = `¡Póliza aprobada!${placaStr}`
-          notifMsg    = `La póliza de ${pol.cliente_nombre} con ${pol.aseguradora}${placaStr} fue aprobada. Tu comisión es $${polComision.toLocaleString('es-CO')}.`
+          notifTitulo = `Poliza aprobada${placaStr}`
+          notifMsg    = `La poliza de ${pol.cliente_nombre} con ${pol.aseguradora}${placaStr} fue aprobada. Tu comision es $${polComision.toLocaleString('es-CO')}.`
         } else if (estado === 'no_convertida') {
           notifTipo   = 'poliza_no_aprobada'
-          notifTitulo = `Póliza no aprobada${placaStr}`
-          notifMsg    = `La póliza de ${pol.cliente_nombre} con ${pol.aseguradora}${placaStr} no fue aprobada.${observaciones ? ' Motivo: ' + observaciones : ''}`
+          notifTitulo = `Poliza no aprobada${placaStr}`
+          notifMsg    = `La poliza de ${pol.cliente_nombre} con ${pol.aseguradora}${placaStr} no fue aprobada.${observaciones ? ' Motivo: ' + observaciones : ''}`
         } else if (estado === 'en_contacto') {
           notifTipo   = 'estado_actualizado'
           notifTitulo = `Estamos contactando al cliente${placaStr}`
-          notifMsg    = `Tu solicitud para ${pol.cliente_nombre} con ${pol.aseguradora}${placaStr} avanza. Nuestro asesor está intentando comunicarse con el cliente.`
+          notifMsg    = `Tu solicitud para ${pol.cliente_nombre} con ${pol.aseguradora}${placaStr} avanza. Nuestro asesor esta intentando comunicarse con el cliente.`
         } else if (estado === 'en_proceso') {
           notifTipo   = 'estado_actualizado'
-          notifTitulo = `¡El cliente quiere la póliza!${placaStr}`
-          notifMsg    = `El cliente de ${pol.cliente_nombre}${placaStr} está interesado en la póliza con ${pol.aseguradora}. Estamos haciendo los trámites para emitirla.`
+          notifTitulo = `El cliente quiere la poliza${placaStr}`
+          notifMsg    = `El cliente ${pol.cliente_nombre}${placaStr} esta interesado en la poliza con ${pol.aseguradora}. Estamos haciendo los tramites para emitirla.`
         } else if (estado === 'poliza_emitida') {
           notifTipo   = 'estado_actualizado'
-          notifTitulo = `Póliza emitida ✍️${placaStr}`
-          notifMsg    = `Se emitió la póliza para ${pol.cliente_nombre} con ${pol.aseguradora}${placaStr}. Esperamos el primer pago del cliente para confirmar tu comisión.`
+          notifTitulo = `Poliza emitida${placaStr}`
+          notifMsg    = `Se emitio la poliza para ${pol.cliente_nombre} con ${pol.aseguradora}${placaStr}. Esperamos el primer pago del cliente para confirmar tu comision.`
         }
 
         if (notifTipo) {
@@ -334,8 +341,12 @@ router.patch('/polizas/:id/estado',
             mensaje: notifMsg, leida: false, created_at: notifNow,
           })
         }
+      } catch (err) {
+        console.error('[notif] Error al guardar notificacion (poliza', req.params.id, '):', err)
+      }
 
-        // Evento de actualización de estado (para MisPolizas y Dashboard en tiempo real)
+      // Evento de estado en tiempo real — bloque separado, siempre se empuja
+      try {
         ssePush(pol.aliado_id, 'poliza_update', {
           lead_id:        pol.lead_id || null,
           poliza_id:      req.params.id,
@@ -347,7 +358,9 @@ router.patch('/polizas/:id/estado',
           placa:          pol.placa || null,
           created_at:     new Date().toISOString(),
         })
-      } catch { /* no interrumpir flujo principal */ }
+      } catch (err) {
+        console.error('[notif] Error al empujar poliza_update SSE (poliza', req.params.id, '):', err)
+      }
 
       res.json({ status:'success', message:`Póliza marcada como ${estado}.` })
     } catch(err) { next(err) }

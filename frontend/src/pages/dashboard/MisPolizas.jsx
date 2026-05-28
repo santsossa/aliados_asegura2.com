@@ -349,8 +349,10 @@ export default function MisPolizas() {
           return { ...prev, estado: ev.estado }
         return prev
       })
+      // Sincroniza con el servidor para asegurar datos completos
+      fetchData(true)
     })
-  }, [subscribe])
+  }, [subscribe, fetchData])
 
   const allItems = [
     ...data.polizas.map(p => ({ ...p, _tipo:'poliza' })),
