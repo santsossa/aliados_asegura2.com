@@ -443,45 +443,46 @@ export default function MisPolizas() {
         </p>
       </div>
 
-      {/* Tabs + botón de leyenda */}
-      <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:20 }}>
-        <div className="mis-polizas-tabs" style={{ display:'flex', alignItems:'center', gap:8, flex:1 }}>
-          {tabs.map(t => {
-            const count = t.key === 'en_tramite'
-              ? allItems.filter(it => EN_TRAMITE.has(it.estado)).length
-              : allItems.filter(it => it.estado === t.key).length
-            const active = tab === t.key
-            return (
-              <button key={t.key} onClick={() => setTab(t.key)}
-                className="mis-polizas-tab"
-                style={{
-                  display:'flex', alignItems:'center', gap:8,
-                  padding:'10px 18px', borderRadius:12, border:'none', cursor:'pointer',
-                  fontWeight: active ? 700 : 500, fontSize:14, fontFamily:'Poppins',
-                  background: active ? t.E.bg : '#f3f4f6',
-                  color:      active ? t.E.color : '#6b7280',
-                  transition:'all 0.15s',
-                  boxShadow:  active ? `0 0 0 2px ${t.E.color}33` : 'none',
-                }}>
-                {t.label}
-                <span style={{
-                  background: active ? t.E.color : '#d1d5db',
-                  color:'#fff', fontSize:11, fontWeight:700,
-                  padding:'1px 7px', borderRadius:99, minWidth:20, textAlign:'center',
-                }}>
-                  {count}
-                </span>
-              </button>
-            )
-          })}
-        </div>
-        {/* Info legend trigger — solo visible en "En trámite" */}
-        {tab === 'en_tramite' && (
+      {/* Tabs */}
+      <div className="mis-polizas-tabs" style={{ display:'flex', alignItems:'center', gap:8, marginBottom: tab === 'en_tramite' ? 10 : 20 }}>
+        {tabs.map(t => {
+          const count = t.key === 'en_tramite'
+            ? allItems.filter(it => EN_TRAMITE.has(it.estado)).length
+            : allItems.filter(it => it.estado === t.key).length
+          const active = tab === t.key
+          return (
+            <button key={t.key} onClick={() => setTab(t.key)}
+              className="mis-polizas-tab"
+              style={{
+                display:'flex', alignItems:'center', gap:8,
+                padding:'10px 18px', borderRadius:12, border:'none', cursor:'pointer',
+                fontWeight: active ? 700 : 500, fontSize:14, fontFamily:'Poppins',
+                background: active ? t.E.bg : '#f3f4f6',
+                color:      active ? t.E.color : '#6b7280',
+                transition:'all 0.15s',
+                boxShadow:  active ? `0 0 0 2px ${t.E.color}33` : 'none',
+              }}>
+              {t.label}
+              <span style={{
+                background: active ? t.E.color : '#d1d5db',
+                color:'#fff', fontSize:11, fontWeight:700,
+                padding:'1px 7px', borderRadius:99, minWidth:20, textAlign:'center',
+              }}>
+                {count}
+              </span>
+            </button>
+          )
+        })}
+      </div>
+
+      {/* Botón de leyenda — fila propia, solo en "En trámite" */}
+      {tab === 'en_tramite' && (
+        <div style={{ marginBottom:20 }}>
           <button
             onClick={() => setLegendModal(true)}
             style={{
-              flexShrink:0, display:'flex', alignItems:'center', gap:6,
-              padding:'9px 14px', borderRadius:12, border:'1.5px solid #e8e8f0',
+              display:'flex', alignItems:'center', gap:6,
+              padding:'8px 14px', borderRadius:12, border:'1.5px solid #e8e8f0',
               cursor:'pointer', background:'#fff', color:'#6b7280',
               fontSize:12, fontWeight:600, fontFamily:'Inter',
               transition:'border-color 0.15s, color 0.15s', whiteSpace:'nowrap',
@@ -492,8 +493,8 @@ export default function MisPolizas() {
             <Info size={13} />
             ¿Qué significa cada estado?
           </button>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Grid de pólizas */}
       {loading ? (

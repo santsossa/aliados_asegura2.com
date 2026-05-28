@@ -269,11 +269,11 @@ export default function MisPagos() {
     : '—'
 
   if (loading) return (
-    <div style={{ padding:'0 24px 32px' }}><div style={{ maxWidth:'72rem', margin:'0 auto' }}><Skeleton /></div></div>
+    <div className="page-wrapper"><div style={{ maxWidth:'72rem', margin:'0 auto' }}><Skeleton /></div></div>
   )
 
   return (
-    <div style={{ padding:'0 24px 32px' }}>
+    <div className="page-wrapper">
       <div style={{ maxWidth:'72rem', margin:'0 auto' }}>
 
       {/* Header */}
@@ -285,10 +285,10 @@ export default function MisPagos() {
       </div>
 
       {/* ── 3 cards superiores ──────────────────────────────────── */}
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(3, 1fr)', gap:16, marginBottom:24 }}>
+      <div className="mp-grid" style={{ display:'grid', gridTemplateColumns:'repeat(3, 1fr)', gap:16, marginBottom:24 }}>
 
         {/* Card 1: Gráfica */}
-        <div style={{ background:'#fff', borderRadius:22, padding:'20px 20px 16px', gridColumn:'1 / span 1' }}>
+        <div className="mp-card-chart" style={{ background:'#fff', borderRadius:22, padding:'20px 20px 16px' }}>
           <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:16 }}>
             <span style={{ fontFamily:'Poppins', fontWeight:600, fontSize:14, color:'#111827' }}>Ganancias por mes</span>
             <span style={{ fontFamily:'Inter', fontSize:9, fontWeight:700, textTransform:'uppercase', letterSpacing:'0.07em', padding:'3px 8px', borderRadius:99, background:'#f5f7fb', color:'#9ca3af' }}>
@@ -299,7 +299,7 @@ export default function MisPagos() {
         </div>
 
         {/* Card 2: Próximo pago */}
-        <div style={{ background:'#fff', borderRadius:22, padding:'20px 20px 16px', display:'flex', flexDirection:'column', justifyContent:'space-between' }}>
+        <div className="mp-card-proximo" style={{ background:'#fff', borderRadius:22, padding:'20px 20px 16px', display:'flex', flexDirection:'column', justifyContent:'space-between' }}>
           <div>
             <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:14 }}>
               <div style={{ width:34, height:34, borderRadius:12, background:'#fef3c7', display:'flex', alignItems:'center', justifyContent:'center' }}>
@@ -307,7 +307,7 @@ export default function MisPagos() {
               </div>
               <span style={{ fontFamily:'Poppins', fontWeight:600, fontSize:14, color:'#111827' }}>Próximo pago</span>
             </div>
-            <p style={{ margin:'0 0 4px', fontFamily:'Poppins', fontSize:28, fontWeight:800, color:'#111827', letterSpacing:'-0.5px' }}>
+            <p className="mp-amount" style={{ margin:'0 0 4px', fontFamily:'Poppins', fontSize:28, fontWeight:800, color:'#111827', letterSpacing:'-0.5px' }}>
               {fmt(proximo?.monto ?? 0)}
             </p>
             <p style={{ margin:0, fontFamily:'Inter', fontSize:12, color:'#9ca3af' }}>
@@ -323,7 +323,7 @@ export default function MisPagos() {
         </div>
 
         {/* Card 3: Total histórico */}
-        <div style={{ background:'linear-gradient(135deg, #3730a3 0%, #4f46e5 100%)', borderRadius:22, padding:'20px 20px 16px', display:'flex', flexDirection:'column', justifyContent:'space-between' }}>
+        <div className="mp-card-total" style={{ background:'linear-gradient(135deg, #3730a3 0%, #4f46e5 100%)', borderRadius:22, padding:'20px 20px 16px', display:'flex', flexDirection:'column', justifyContent:'space-between' }}>
           <div>
             <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:14 }}>
               <div style={{ width:34, height:34, borderRadius:12, background:'rgba(255,255,255,0.15)', display:'flex', alignItems:'center', justifyContent:'center' }}>
@@ -331,7 +331,7 @@ export default function MisPagos() {
               </div>
               <span style={{ fontFamily:'Poppins', fontWeight:600, fontSize:14, color:'#fff' }}>Total ganado</span>
             </div>
-            <p style={{ margin:'0 0 4px', fontFamily:'Poppins', fontSize:28, fontWeight:800, color:'#fff', letterSpacing:'-0.5px' }}>
+            <p className="mp-amount" style={{ margin:'0 0 4px', fontFamily:'Poppins', fontSize:28, fontWeight:800, color:'#fff', letterSpacing:'-0.5px' }}>
               {fmt(totalHistorico)}
             </p>
             <p style={{ margin:0, fontFamily:'Inter', fontSize:12, color:'rgba(255,255,255,0.6)' }}>

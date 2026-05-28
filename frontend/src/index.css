@@ -89,6 +89,18 @@ body {
 .page-wrapper { padding: 0 24px 32px; }
 @media (max-width: 640px) { .page-wrapper { padding: 0 12px 24px; } }
 
+/* MisPagos — móvil: Próximo pago + Total ganado arriba, gráfica abajo */
+@media (max-width: 640px) {
+  .mp-grid         { grid-template-columns: 1fr 1fr !important; }
+  .mp-card-proximo { grid-column: 1; grid-row: 1; }
+  .mp-card-total   { grid-column: 2; grid-row: 1; }
+  .mp-card-chart   { grid-column: 1 / -1; grid-row: 2; }
+  /* Números de monto más compactos en columna estrecha */
+  .mp-amount { font-size: 20px !important; }
+  .mp-card-proximo,
+  .mp-card-total { padding: 16px 14px 14px !important; }
+}
+
 /* MisPolizas — tabs en fila en móvil */
 @media (max-width: 640px) {
   .mis-polizas-tabs { gap: 5px !important; flex-wrap: nowrap !important; }
