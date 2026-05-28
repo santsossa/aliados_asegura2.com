@@ -65,6 +65,10 @@ body {
   .db-comisiones > div:first-child span:last-child { display: none; }  /* ocultar badge de rango */
   /* Gráfica ocupa todo el ancho del card — sin contenedor gris interno */
   .db-comisiones > div:last-child { padding: 4px 0 0 !important; background: transparent !important; border-radius: 0 !important; }
+
+  /* Anto card en móvil — mostrar avatar visual */
+  .db-anto-hero { display: flex !important; }
+  .db-anto { padding: 16px 16px 14px !important; }
 }
 
 /* ── Jerarquía tipográfica ─────────────────────────────────────────────────── */

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { DollarSign, FileText, Shield, TrendingUp, ChevronRight, ChevronLeft, User, MessageCircle, Scale, Zap } from 'lucide-react'
+import { DollarSign, FileText, Shield, TrendingUp, ChevronRight, ChevronLeft, User, MessageCircle, Scale, Zap, Sparkles } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { useSSE } from '../../context/SSEContext'
@@ -660,6 +660,16 @@ export default function Dashboard() {
 
             {/* Anto */}
             <div className="db-anto" style={{ background: '#fff', borderRadius: 22, padding: '14px 14px 12px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+
+              {/* Avatar de Anto — solo visible en móvil */}
+              <div className="db-anto-hero" style={{ display: 'none', flexDirection: 'column', alignItems: 'center', textAlign: 'center', padding: '10px 0 2px' }}>
+                <div style={{ width: 52, height: 52, borderRadius: '50%', background: 'linear-gradient(135deg,#4f46e5,#2D2A7A)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 10, boxShadow: '0 4px 18px rgba(79,70,229,0.28)' }}>
+                  <Sparkles size={22} color="#fff" />
+                </div>
+                <p style={{ margin: '0 0 3px', fontFamily: 'Poppins', fontWeight: 700, fontSize: 14, color: '#111827' }}>Anto IA</p>
+                <p style={{ margin: 0, fontFamily: 'Inter', fontSize: 12, color: '#9ca3af' }}>Tu asistente de seguros</p>
+              </div>
+
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 2px' }}>
                 <span style={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: 14, color: '#111827' }}>Pregúntale a Anto</span>
                 <button
