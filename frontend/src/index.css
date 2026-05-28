@@ -89,6 +89,11 @@ body {
 .page-wrapper { padding: 0 24px 32px; }
 @media (max-width: 640px) { .page-wrapper { padding: 0 12px 24px; } }
 
+/* Cotizar — cards en columna única en móvil */
+@media (max-width: 640px) {
+  .cotizar-select-grid { grid-template-columns: 1fr !important; max-width: 340px !important; }
+}
+
 /* MisPagos — móvil: Próximo pago + Total ganado arriba, gráfica abajo */
 @media (max-width: 640px) {
   .mp-grid         { grid-template-columns: 1fr 1fr !important; }

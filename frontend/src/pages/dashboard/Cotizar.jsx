@@ -756,7 +756,7 @@ export default function Cotizar() {
       </div>
 
       {/* Cards */}
-      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:20, width:'100%', maxWidth:600 }}>
+      <div className="cotizar-select-grid" style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:20, width:'100%', maxWidth:600 }}>
 
         {/* ── Vehículo usado ── */}
         <button

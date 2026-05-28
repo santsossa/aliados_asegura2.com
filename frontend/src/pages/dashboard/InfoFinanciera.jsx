@@ -1,4 +1,4 @@
-import { CreditCard, User, Building2, Edit3, Check, X, Loader2, Pencil, Shield, Bell, Lock } from 'lucide-react'
+import { CreditCard, User, Building2, Edit3, Check, X, Loader2, Pencil, Shield, Lock } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { useAuth } from '../../context/AuthContext'
 import ComboBox from '../../components/ComboBox'
@@ -19,10 +19,9 @@ const BANCOS = [
 ]
 
 const TABS = [
-  { id: 'cuenta',    label: 'Mi cuenta'        },
-  { id: 'pagos',     label: 'Cuenta de pagos'  },
-  { id: 'seguridad', label: 'Seguridad'         },
-  { id: 'notifs',    label: 'Notificaciones'    },
+  { id: 'cuenta',    label: 'Mi cuenta'       },
+  { id: 'pagos',     label: 'Cuenta de pagos' },
+  { id: 'seguridad', label: 'Seguridad'        },
 ]
 
 function AvatarCircle({ avatarId, size = 80 }) {
@@ -414,16 +413,6 @@ export default function InfoFinanciera() {
           </div>
         )}
 
-        {/* ═══ TAB: Notificaciones ═══ */}
-        {activeTab === 'notifs' && (
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-            <ComingSoon
-              icon={Bell}
-              title="Preferencias de notificaciones"
-              desc="Pronto podrás elegir qué notificaciones recibir por correo o WhatsApp: pagos, cotizaciones aprobadas y más."
-            />
-          </div>
-        )}
 
         </div>
         </div>
