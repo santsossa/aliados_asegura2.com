@@ -5,6 +5,7 @@
  * - Emite '__refresh' para que los componentes recarguen sus datos
  */
 import { createContext, useContext, useEffect, useRef, useCallback, useMemo } from 'react'
+import { useAuth } from './AuthContext'
 
 const SSECtx = createContext({ subscribe: () => () => {} })
 
@@ -12,6 +13,7 @@ const API    = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 const EVENTS = ['notificacion', 'poliza_update']
 
 export function SSEProvider({ children }) {
+  const { getToken }  = useAuth()
   const listeners = useRef({})   // eventName → Set<handler>
   const esRef     = useRef(null)
   const retryRef  = useRef(null)
@@ -22,7 +24,7 @@ export function SSEProvider({ children }) {
     // Cerrar conexión anterior
     if (esRef.current)    { esRef.current.close(); esRef.current = null }
 
-    const token = localStorage.getItem('token')
+    const token = getToken()
     if (!token) return
 
     const url = `${API}/api/notificaciones/stream?token=${encodeURIComponent(token)}`

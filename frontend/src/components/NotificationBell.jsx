@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { Bell, CheckCircle, XCircle, FileText, Clock, X } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useSSE } from '../context/SSEContext'
+import { useAuth } from '../context/AuthContext'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
@@ -33,12 +34,13 @@ export default function NotificationBell() {
   const [notifs, setNotifs]     = useState([])
   const [noLeidas, setNoLeidas] = useState(0)
   const dropdownRef             = useRef(null)
-  const token                   = localStorage.getItem('token')
+  const { getToken }            = useAuth()
   const { subscribe }           = useSSE()
   const navigate                = useNavigate()
 
   // ── Carga / recarga ───────────────────────────────────────────────────────
   const fetchNotifs = useCallback(async () => {
+    const token = getToken()
     if (!token) return
     try {
       const r = await fetch(`${API}/api/notificaciones`, {
@@ -49,7 +51,7 @@ export default function NotificationBell() {
       setNotifs(data.data || [])
       setNoLeidas(data.no_leidas || 0)
     } catch { /* silencioso */ }
-  }, [token])
+  }, [getToken])
 
   useEffect(() => { fetchNotifs() }, [fetchNotifs])
 
@@ -104,7 +106,7 @@ export default function NotificationBell() {
         try {
           await fetch(`${API}/api/notificaciones/marcar-leidas`, {
             method: 'PATCH',
-            headers: { Authorization: `Bearer ${token}` },
+            headers: { Authorization: `Bearer ${getToken()}` },
           })
           setNotifs(prev => prev.map(n => ({ ...n, leida: true })))
           setNoLeidas(0)
