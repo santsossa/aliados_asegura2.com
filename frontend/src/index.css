@@ -89,9 +89,17 @@ body {
 .page-wrapper { padding: 0 24px 32px; }
 @media (max-width: 640px) { .page-wrapper { padding: 0 12px 24px; } }
 
-/* Cotizar — cards en columna única en móvil */
+/* Cotizar — cards horizontales en móvil (caben sin scroll) */
 @media (max-width: 640px) {
-  .cotizar-select-grid { grid-template-columns: 1fr !important; max-width: 340px !important; }
+  .cotizar-select-wrap { padding-top: 20px !important; padding-bottom: 20px !important; }
+  .cotizar-select-hdr  { margin-bottom: 16px !important; }
+  .cotizar-select-h1   { font-size: 17px !important; }
+  .cotizar-select-grid { grid-template-columns: 1fr !important; max-width: 100% !important; gap: 12px !important; }
+  .cotizar-select-card { flex-direction: row !important; align-items: center !important; padding: 18px 20px !important; gap: 16px !important; text-align: left !important; }
+  .cotizar-card-img-wrap { width: 80px !important; height: 80px !important; margin-bottom: 0 !important; flex-shrink: 0 !important; border-radius: 16px !important; }
+  .cotizar-card-img    { width: 80px !important; height: 80px !important; }
+  .cotizar-card-txt    { flex: 1 !important; }
+  .cotizar-card-arrow  { position: static !important; width: 36px !important; height: 36px !important; flex-shrink: 0 !important; }
 }
 
 /* MisPagos — móvil: Próximo pago + Total ganado arriba, gráfica abajo */

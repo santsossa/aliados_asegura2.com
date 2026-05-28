@@ -226,9 +226,9 @@ function LoadingSkeleton() {
         {/* Left */}
         <div className="db-left">
           {/* Hero */}
-          {s(28, 148)}
+          <div className="db-hero">{s(28, 148)}</div>
           {/* 4 stat cards */}
-          <div className="grid grid-cols-2 xl:grid-cols-4 gap-2">
+          <div className="db-stats grid grid-cols-2 xl:grid-cols-4 gap-2">
             {[0,1,2,3].map(i => (
               <div key={i} style={{ background:'#fff', borderRadius:24, padding:'15px 16px', display:'flex', alignItems:'center', gap:12 }}>
                 {s(50, 40, 40)}
@@ -240,7 +240,7 @@ function LoadingSkeleton() {
             ))}
           </div>
           {/* Enviadas a emitir */}
-          <div>
+          <div className="db-enviadas">
             <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0 4px', marginBottom:12 }}>
               {s(6, 14, 110)}
               <div style={{ display:'flex', gap:6 }}>{s(50,28,28)}{s(50,28,28)}</div>
@@ -261,7 +261,7 @@ function LoadingSkeleton() {
             </div>
           </div>
           {/* Actividad reciente */}
-          <div>
+          <div className="db-actividad">
             <div style={{ padding:'0 4px', marginBottom:10 }}>{s(6, 14, 120)}</div>
             <div style={{ background:'#fff', borderRadius:24 }}>
               {[0,1,2,3].map(i => (
@@ -281,13 +281,13 @@ function LoadingSkeleton() {
         {/* Right */}
         <div className="db-right">
           {/* Tu rendimiento */}
-          <div style={{ background:'#fff', borderRadius:22, padding:'22px 16px 18px', display:'flex', flexDirection:'column', alignItems:'center', gap:12 }}>
+          <div className="db-welcome" style={{ background:'#fff', borderRadius:22, padding:'22px 16px 18px', display:'flex', flexDirection:'column', alignItems:'center', gap:12 }}>
             {s(50, 92, 92)}
             {s(6, 14, '60%')}
             {s(6, 12, '45%')}
           </div>
           {/* Comisiones */}
-          <div style={{ background:'#fff', borderRadius:22, padding:'14px 14px 12px', display:'flex', flexDirection:'column', gap:10 }}>
+          <div className="db-comisiones" style={{ background:'#fff', borderRadius:22, padding:'14px 14px 12px', display:'flex', flexDirection:'column', gap:10 }}>
             <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0 2px' }}>
               {s(6, 14, 90)}
               {s(99, 22, 72)}

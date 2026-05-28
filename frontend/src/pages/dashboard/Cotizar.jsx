@@ -741,15 +741,15 @@ export default function Cotizar() {
 
   /* ── SELECT ── */
   if (phase === 'select') return (
-    <div style={{
+    <div className="cotizar-select-wrap" style={{
       height:'100%', display:'flex', flexDirection:'column',
-      alignItems:'center', justifyContent:'flex-start',
+      alignItems:'center', justifyContent:'center',
       paddingTop:48, paddingLeft:24, paddingRight:24, paddingBottom:24,
       background:'#f4f5fb', overflow:'hidden',
     }}>
       {/* Header */}
-      <div style={{ textAlign:'center', marginBottom:32 }}>
-        <h1 style={{ fontFamily:'Poppins', fontSize:24, fontWeight:800, color:'#111827', margin:'0 0 12px' }}>
+      <div className="cotizar-select-hdr" style={{ textAlign:'center', marginBottom:32 }}>
+        <h1 className="cotizar-select-h1" style={{ fontFamily:'Poppins', fontSize:24, fontWeight:800, color:'#111827', margin:'0 0 12px' }}>
           ¿Qué tipo de vehículo quieres cotizar?
         </h1>
         <div style={{ width:40, height:3, background:'#5745AB', borderRadius:99, margin:'0 auto' }} />
@@ -760,6 +760,7 @@ export default function Cotizar() {
 
         {/* ── Vehículo usado ── */}
         <button
+          className="cotizar-select-card"
           onClick={() => setPhase('placa')}
           onMouseEnter={() => setUsadoHov(true)}
           onMouseLeave={() => setUsadoHov(false)}
@@ -772,7 +773,7 @@ export default function Cotizar() {
             transition:'border-color 0.18s, box-shadow 0.18s',
           }}
         >
-          <div style={{
+          <div className="cotizar-card-img-wrap" style={{
             width:148, height:148, borderRadius:'50%',
             background: usadoHov ? '#EEE7FD' : '#f0f2f8',
             display:'flex', alignItems:'center', justifyContent:'center',
@@ -780,6 +781,7 @@ export default function Cotizar() {
             transition:'background 0.18s',
           }}>
             <img
+              className="cotizar-card-img"
               src={cotizarplacaImg}
               alt="Vehículo usado"
               style={{
@@ -789,13 +791,15 @@ export default function Cotizar() {
               }}
             />
           </div>
-          <p style={{ margin:'0 0 4px', fontFamily:'Poppins', fontSize:16, fontWeight:700, color:'#111827' }}>
-            Vehículo usado
-          </p>
-          <p style={{ margin:0, fontFamily:'Inter', fontSize:13, color:'#6b7280' }}>
-            Solo con la placa.
-          </p>
-          <div style={{
+          <div className="cotizar-card-txt">
+            <p style={{ margin:'0 0 4px', fontFamily:'Poppins', fontSize:16, fontWeight:700, color:'#111827' }}>
+              Vehículo usado
+            </p>
+            <p style={{ margin:0, fontFamily:'Inter', fontSize:13, color:'#6b7280' }}>
+              Solo con la placa.
+            </p>
+          </div>
+          <div className="cotizar-card-arrow" style={{
             position:'absolute', bottom:22, right:22, width:42, height:42,
             borderRadius:'50%',
             background: usadoHov ? '#5745AB' : '#e8eaf0',
@@ -809,30 +813,33 @@ export default function Cotizar() {
         </button>
 
         {/* ── Vehículo 0 km ── */}
-        <div style={{
+        <div className="cotizar-select-card" style={{
           background:'#fff', border:'2px solid #e8eaf0', borderRadius:20,
           padding:'28px 24px 72px', cursor:'not-allowed', textAlign:'center',
           display:'flex', flexDirection:'column', alignItems:'center', position:'relative',
           boxShadow:'0 2px 8px rgba(0,0,0,0.04)',
         }}>
-          <div style={{
+          <div className="cotizar-card-img-wrap" style={{
             width:148, height:148, borderRadius:'50%', background:'#f0f2f8',
             display:'flex', alignItems:'center', justifyContent:'center',
             marginBottom:20, overflow:'hidden',
           }}>
             <img
+              className="cotizar-card-img"
               src={cotizar0kmImg}
               alt="Vehículo 0 km"
               style={{ width:148, height:148, objectFit:'cover', filter:'grayscale(1)' }}
             />
           </div>
-          <p style={{ margin:'0 0 4px', fontFamily:'Poppins', fontSize:16, fontWeight:700, color:'#374151' }}>
-            Vehículo 0 km
-          </p>
-          <p style={{ margin:0, fontFamily:'Inter', fontSize:13, color:'#9ca3af' }}>
-            Sin placa requerida.
-          </p>
-          <div style={{
+          <div className="cotizar-card-txt">
+            <p style={{ margin:'0 0 4px', fontFamily:'Poppins', fontSize:16, fontWeight:700, color:'#374151' }}>
+              Vehículo 0 km
+            </p>
+            <p style={{ margin:0, fontFamily:'Inter', fontSize:13, color:'#9ca3af' }}>
+              Sin placa requerida.
+            </p>
+          </div>
+          <div className="cotizar-card-arrow" style={{
             position:'absolute', bottom:22, right:22, width:42, height:42,
             borderRadius:'50%', background:'#e8eaf0',
             display:'flex', alignItems:'center', justifyContent:'center',

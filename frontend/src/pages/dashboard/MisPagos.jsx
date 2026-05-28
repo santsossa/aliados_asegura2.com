@@ -77,12 +77,12 @@ function Skeleton() {
   const B = '#f0f1f3'
   const s = (r,h,w='100%') => <div style={{ background:B, borderRadius:r, height:h, width:w, flexShrink:0 }} />
   return (
-    <div style={{ padding:'0 0 32px', animation:'skpulse 1.5s ease-in-out infinite' }}>
+    <div className="page-wrapper" style={{ animation:'skpulse 1.5s ease-in-out infinite' }}>
       <style>{`@keyframes skpulse{0%,100%{opacity:1}50%{opacity:.45}}`}</style>
       {/* 3 stat cards */}
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:16, marginBottom:24 }}>
+      <div className="mp-grid" style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:16, marginBottom:24 }}>
         {/* Card 1 — Ganancias (con gráfico) */}
-        <div style={{ background:'#fff', borderRadius:22, padding:'20px 20px 16px', display:'flex', flexDirection:'column', gap:12 }}>
+        <div className="mp-card-chart" style={{ background:'#fff', borderRadius:22, padding:'20px 20px 16px', display:'flex', flexDirection:'column', gap:12 }}>
           <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
             {s(6, 14, 100)}{s(99, 20, 60)}
           </div>
@@ -99,7 +99,7 @@ function Skeleton() {
           </div>
         </div>
         {/* Card 2 — Próximo pago */}
-        <div style={{ background:'#fff', borderRadius:22, padding:'20px 20px 16px', display:'flex', flexDirection:'column', gap:14 }}>
+        <div className="mp-card-proximo" style={{ background:'#fff', borderRadius:22, padding:'20px 20px 16px', display:'flex', flexDirection:'column', gap:14 }}>
           <div style={{ display:'flex', alignItems:'center', gap:8 }}>
             {s(12, 34, 34)}{s(6, 14, 90)}
           </div>
@@ -111,7 +111,7 @@ function Skeleton() {
           </div>
         </div>
         {/* Card 3 — Total ganado (gradiente) */}
-        <div style={{ borderRadius:22, padding:'20px 20px 16px', background:B, display:'flex', flexDirection:'column', gap:14, minHeight:160 }} />
+        <div className="mp-card-total" style={{ borderRadius:22, padding:'20px 20px 16px', background:B, display:'flex', flexDirection:'column', gap:14, minHeight:160 }} />
       </div>
       {/* PagoRow skeletons */}
       {[0,1,2,3].map(i => (

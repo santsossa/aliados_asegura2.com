@@ -90,7 +90,10 @@ export default function Anto() {
   }
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+    const raf = requestAnimationFrame(() => {
+      bottomRef.current?.scrollIntoView({ behavior: 'auto' })
+    })
+    return () => cancelAnimationFrame(raf)
   }, [messages, loading])
 
   // Typing animation — starts when a new assistant message is added
@@ -146,7 +149,7 @@ export default function Anto() {
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: 'transparent', overflow: 'hidden' }}>
 
       {/* Área de mensajes / bienvenida */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: hasMessages ? '24px 32px' : '0 32px' }}>
+      <div className="anto-msgs" style={{ flex: 1, overflowY: 'auto', padding: hasMessages ? '24px 32px' : '0 32px' }}>
 
         {!hasMessages ? (
           /* ── Bienvenida ── */
@@ -270,7 +273,7 @@ export default function Anto() {
       </div>
 
       {/* ── Input bar ── */}
-      <div style={{ padding: '12px 32px 20px', flexShrink: 0 }}>
+      <div className="anto-input" style={{ padding: '12px 32px 20px', flexShrink: 0 }}>
         <div style={{ maxWidth: 740, margin: '0 auto' }}>
           <div style={{
             display: 'flex', alignItems: 'center', gap: 8,
@@ -320,6 +323,10 @@ export default function Anto() {
       <style>{`
         @keyframes dp { 0%,80%,100%{transform:scale(0.6);opacity:0.4} 40%{transform:scale(1);opacity:1} }
         @keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+        @media (max-width: 640px) {
+          .anto-msgs  { padding: 16px 16px !important; }
+          .anto-input { padding: 8px 16px 16px !important; }
+        }
       `}</style>
     </div>
   )
