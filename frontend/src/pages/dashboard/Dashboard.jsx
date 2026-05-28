@@ -558,8 +558,8 @@ export default function Dashboard() {
                           {p.placa || '—'}
                         </p>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto', paddingTop: 4 }}>
-                          {p.valor_comision > 0
-                            ? <span style={{ fontSize: 12, fontWeight: 700, color: '#16a34a' }}>+{fmt(p.valor_comision)}</span>
+                          {p.valor_prima > 0
+                            ? <span style={{ fontSize: 12, fontWeight: 700, color: '#16a34a' }}>+{fmt(Math.round(p.valor_prima / 1.19 * 0.06))}</span>
                             : <span />
                           }
                           <span style={{ fontSize: 10, color: '#b0b4c1' }}>{p.hace}</span>

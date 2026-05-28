@@ -108,25 +108,28 @@ router.patch('/leads/:id/estado',
 
       // Buscar póliza existente vinculada a este lead (siempre por lead.id, no por el param del CRM)
       const [polRows] = await pool.execute<any[]>('SELECT id FROM polizas WHERE lead_id = ? LIMIT 1', [lead.id])
-      const now = new Date()
+      const now       = new Date()
+      const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1)
+      const nextMes   = nextMonth.getMonth() + 1
+      const nextAnio  = nextMonth.getFullYear()
 
       if (polRows.length) {
-        // Actualizar póliza existente
+        // Actualizar póliza existente — si se aprueba, actualizar mes/anio al pago del mes siguiente
         await pool.execute(
           `UPDATE polizas SET estado=?, observaciones=COALESCE(?,observaciones),
+           mes = CASE WHEN ?='aprobada' THEN ? ELSE mes END,
+           anio = CASE WHEN ?='aprobada' THEN ? ELSE anio END,
            primer_pago_at=CASE WHEN ?='aprobada' THEN ? ELSE primer_pago_at END
            WHERE lead_id=?`,
-          [estado, observaciones || null, estado, now, lead.id]
+          [estado, observaciones || null, estado, nextMes, estado, nextAnio, estado, now, lead.id]
         )
       } else {
-        // Crear póliza nueva a partir del lead
-        const mes  = now.getMonth() + 1
-        const anio = now.getFullYear()
+        // Crear póliza nueva — mes/anio apuntan al 1 del mes siguiente (fecha de pago)
         await pool.execute(
           `INSERT INTO polizas (aliado_id, lead_id, cliente_nombre, aseguradora, valor_prima, estado, mes, anio, primer_pago_at)
            VALUES (?,?,?,?,?,?,?,?,?)`,
           [lead.aliado_id, lead.id, lead.cliente_nombre, lead.aseguradora,
-           lead.valor_prima, estado, mes, anio,
+           lead.valor_prima, estado, nextMes, nextAnio,
            estado === 'aprobada' ? now : null]
         )
       }
@@ -239,7 +242,10 @@ router.patch('/polizas/:id/estado',
   async (req: any, res: any, next: any) => {
     try {
       const { estado, observaciones } = req.body
-      const now = new Date()
+      const now       = new Date()
+      const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1)
+      const nextMes   = nextMonth.getMonth() + 1
+      const nextAnio  = nextMonth.getFullYear()
 
       // Buscar póliza con datos del aliado
       const [rows] = await pool.execute<any[]>(
@@ -257,9 +263,11 @@ router.patch('/polizas/:id/estado',
       await pool.execute(
         `UPDATE polizas SET estado=?,
          observaciones=COALESCE(?,observaciones),
+         mes = CASE WHEN ?='aprobada' THEN ? ELSE mes END,
+         anio = CASE WHEN ?='aprobada' THEN ? ELSE anio END,
          primer_pago_at=CASE WHEN ?='aprobada' THEN ? ELSE primer_pago_at END
          WHERE id=?`,
-        [estado, observaciones || null, estado, now, req.params.id]
+        [estado, observaciones || null, estado, nextMes, estado, nextAnio, estado, now, req.params.id]
       )
 
       // Email al aliado

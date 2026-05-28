@@ -109,7 +109,7 @@ function DetalleModal({ item, onClose, token }) {
   const comercialValue  = det?.comercial_value  || item.comercial_value
   const aseguradora     = det?.aseguradora      || item.aseguradora      || '—'
   const valorPrima      = det?.valor_prima      || item.valor_prima      || 0
-  const valorComision   = det?.valor_comision   || item.valor_comision   || Math.round(valorPrima / 1.19 * 0.06)
+  const valorComision   = Math.round(valorPrima / 1.19 * 0.06)
   const observaciones   = det?.observaciones    || item.observaciones
   const createdAt       = det?.created_at       || item.created_at
 
@@ -410,8 +410,8 @@ export default function MisPolizas() {
               {[item.placa, item.aseguradora].filter(Boolean).join(' · ') || '—'}
             </p>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto', paddingTop: 6 }}>
-              {item.estado === 'aprobada' && item.valor_comision > 0
-                ? <span style={{ fontFamily: 'Inter', fontSize: 12, fontWeight: 700, color: '#16a34a' }}>+{fmt(item.valor_comision)}</span>
+              {item.estado === 'aprobada' && item.valor_prima > 0
+                ? <span style={{ fontFamily: 'Inter', fontSize: 12, fontWeight: 700, color: '#16a34a' }}>+{fmt(Math.round(item.valor_prima / 1.19 * 0.06))}</span>
                 : item.valor_prima > 0
                 ? <span style={{ fontFamily: 'Inter', fontSize: 11, color: '#9ca3af' }}>{fmt(item.valor_prima)}</span>
                 : <span />
