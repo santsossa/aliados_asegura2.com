@@ -648,7 +648,7 @@ export default function Cotizaciones() {
   }
 
   return (
-    <div style={{ padding:'0 24px 32px' }}>
+    <div className="page-wrapper">
       <div style={{ maxWidth:'72rem', margin:'0 auto' }}>
       <div style={{ marginBottom:24, paddingTop:8 }}>
         <h1 style={{ fontFamily:'Poppins', fontSize:22, fontWeight:700, color:'#111827', margin:0 }}>Mis cotizaciones</h1>
@@ -726,52 +726,49 @@ export default function Cotizaciones() {
             return (
               <div
                 key={c.id}
-                className="bg-white rounded-2xl border border-gray-100 shadow-sm px-5 py-4"
+                className="bg-white rounded-2xl border border-gray-100 shadow-sm px-4 py-3"
               >
-                <div className="flex items-center justify-between gap-4">
-                  {/* Info izquierda */}
-                  <div className="flex items-center gap-4 min-w-0">
-                    <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center flex-shrink-0">
-                      <Car size={18} className="text-blue-600" />
-                    </div>
-                    <div className="min-w-0">
+                <div className="flex items-center gap-3">
+                  {/* Ícono */}
+                  <div className="w-9 h-9 bg-blue-50 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <Car size={16} className="text-blue-600" />
+                  </div>
+                  {/* Contenido — ocupa el ancho restante */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-2">
                       <p className="font-semibold text-gray-900 text-sm truncate">
                         {c.cliente_nombre || 'Cliente sin nombre'}
                       </p>
-                      <p className="text-xs text-gray-400 mt-0.5">
-                        {c.cliente_tipo_doc && c.cliente_cedula
-                          ? `${c.cliente_tipo_doc} ${c.cliente_cedula} · `
-                          : ''}
-                        {c.placa || 'Sin placa'}
-                        {' · '}{fechaStr}
-                      </p>
+                      <button
+                        onClick={() => setModalCot(c)}
+                        style={{ display:'flex', alignItems:'center', gap:3, background:'#f3f4f6', border:'none',
+                                 borderRadius:99, padding:'5px 11px', cursor:'pointer', color:'#374151',
+                                 fontSize:12, fontWeight:600, whiteSpace:'nowrap', flexShrink:0,
+                                 transition:'background 0.15s' }}
+                        onMouseEnter={e => e.currentTarget.style.background='#e5e7eb'}
+                        onMouseLeave={e => e.currentTarget.style.background='#f3f4f6'}
+                      >
+                        Ver más
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                          <path d="M9 18l6-6-6-6"/>
+                        </svg>
+                      </button>
                     </div>
-                  </div>
-
-                  {/* Derecha: estado + ver más */}
-                  <div className="flex items-center gap-3 flex-shrink-0">
-                    <div className="flex flex-col items-end gap-1">
-                      <span style={{ background: badge.bg, color: badge.color, fontSize: 11, fontWeight: 600, padding: '3px 10px', borderRadius: 99, whiteSpace:'nowrap' }}>
+                    <p className="text-xs text-gray-400 mt-0.5">
+                      {c.cliente_tipo_doc && c.cliente_cedula
+                        ? `${c.cliente_tipo_doc} ${c.cliente_cedula} · `
+                        : ''}
+                      {c.placa || 'Sin placa'}
+                      {' · '}{fechaStr}
+                    </p>
+                    <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                      <span style={{ background: badge.bg, color: badge.color, fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 99, whiteSpace:'nowrap' }}>
                         {badge.label}
                       </span>
                       {noEnviada && !within24h && (
                         <span style={{ fontSize:10, color:'#ea580c', fontWeight:600 }}>Vencida</span>
                       )}
                     </div>
-                    <button
-                      onClick={() => setModalCot(c)}
-                      style={{ display:'flex', alignItems:'center', gap:4, background:'#f3f4f6', border:'none',
-                               borderRadius:99, padding:'6px 12px', cursor:'pointer', color:'#374151',
-                               fontSize:12, fontWeight:600, whiteSpace:'nowrap',
-                               transition:'background 0.15s' }}
-                      onMouseEnter={e => e.currentTarget.style.background='#e5e7eb'}
-                      onMouseLeave={e => e.currentTarget.style.background='#f3f4f6'}
-                    >
-                      Ver más
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                        <path d="M9 18l6-6-6-6"/>
-                      </svg>
-                    </button>
                   </div>
                 </div>
               </div>

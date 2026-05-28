@@ -85,6 +85,17 @@ body {
 /* UI: Nav / tables */
 .t-ui      { font-family: 'Poppins', sans-serif; font-weight: 500; font-size: 14px; letter-spacing: 0.01em; }
 
+/* ── Páginas interiores — wrapper responsivo ───────────────────────────────── */
+.page-wrapper { padding: 0 24px 32px; }
+@media (max-width: 640px) { .page-wrapper { padding: 0 12px 24px; } }
+
+/* MisPolizas — tabs en fila en móvil */
+@media (max-width: 640px) {
+  .mis-polizas-tabs { gap: 5px !important; flex-wrap: nowrap !important; }
+  .mis-polizas-tab  { flex: 1 !important; padding: 8px 5px !important; font-size: 12px !important; border-radius: 10px !important; justify-content: center !important; }
+  .mis-polizas-tab span { padding: 1px 5px !important; font-size: 10px !important; }
+}
+
 /* ── Ticker / banda de aseguradoras ── */
 
 .ticker-item img {
