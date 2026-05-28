@@ -869,7 +869,6 @@ export default function Cotizar() {
           <input value={displayPlate(plate)} onChange={e => setPlate(formatPlate(e.target.value))}
             placeholder="ABC 123" maxLength={7} autoFocus
             style={{ flex:1,border:'none',background:'transparent',fontSize:26,fontWeight:800,color:'#111827',letterSpacing:'0.1em',outline:'none' }} />
-          {isValidPlate(plate) && <span style={{ color:'#16a34a',fontSize:20 }}>✓</span>}
         </div>
         {plate.length>0 && !isValidPlate(plate) && (
           <p style={{ color:'#dc2626',fontSize:12,marginBottom:8 }}>Formato: 3 letras y 3 números (ej. ABC 123)</p>
