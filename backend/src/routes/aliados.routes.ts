@@ -283,7 +283,7 @@ router.get('/me/polizas', async (req, res, next) => {
     // Pólizas procesadas por el equipo admin — con datos de cotización vía lead
     const [polizas] = await pool.execute<any[]>(
       `SELECT p.id, p.cliente_nombre, p.aseguradora, p.valor_prima, p.valor_comision,
-              p.estado, p.created_at, p.mes, p.anio, 'poliza' as tipo,
+              p.estado, p.created_at, p.mes, p.anio, p.primer_pago_at, 'poliza' as tipo,
               l.cotizacion_id, l.observaciones,
               c.placa, c.comercial_value, c.datos_cotizacion,
               c.cliente_correo, c.cliente_telefono, c.cliente_cedula, c.cliente_tipo_doc
@@ -306,7 +306,7 @@ router.get('/me/cotizaciones/:id/detalle', async (req, res, next) => {
     const [cotRows] = await pool.execute<any[]>(
       `SELECT c.*, l.id lead_id, l.aseguradora, l.valor_prima, l.observaciones, l.crm_lead_id,
               l.cliente_telefono lead_telefono,
-              p.id poliza_id, p.estado poliza_estado, p.valor_comision, p.mes, p.anio
+              p.id poliza_id, p.estado poliza_estado, p.valor_comision, p.mes, p.anio, p.primer_pago_at
        FROM cotizaciones c
        LEFT JOIN leads l ON l.cotizacion_id = c.id AND l.aliado_id = c.aliado_id
        LEFT JOIN polizas p ON p.lead_id = l.id

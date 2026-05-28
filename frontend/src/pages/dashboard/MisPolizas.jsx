@@ -112,6 +112,12 @@ function DetalleModal({ item, onClose, token }) {
   const valorComision   = Math.round(valorPrima / 1.19 * 0.06)
   const observaciones   = det?.observaciones    || item.observaciones
   const createdAt       = det?.created_at       || item.created_at
+  // Fecha de pago: 1 del mes siguiente al de la aprobación (primer_pago_at)
+  const primerPagoAt    = det?.primer_pago_at   || item.primer_pago_at
+  const pagoDate        = primerPagoAt ? (() => {
+    const d = new Date(primerPagoAt)
+    return new Date(d.getFullYear(), d.getMonth() + 1, 1)
+  })() : null
 
   return (
     <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:500,
@@ -216,9 +222,9 @@ function DetalleModal({ item, onClose, token }) {
               </Sec>
               <Sec title="Seguimiento">
                 <Row label="Lead enviado" value={fechaStr(createdAt)} />
-                {estadoActual === 'aprobada' && (det?.mes || item.mes) &&
+                {estadoActual === 'aprobada' && pagoDate &&
                   <Row label="Pago programado"
-                       value={`1 de ${MESES[((det?.mes || item.mes) - 1)]} ${det?.anio || item.anio}`}
+                       value={`1 de ${MESES[pagoDate.getMonth()]} ${pagoDate.getFullYear()}`}
                        highlight />}
               </Sec>
               {estadoActual === 'aprobada' ? (
