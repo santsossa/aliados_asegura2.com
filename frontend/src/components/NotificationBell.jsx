@@ -64,6 +64,11 @@ export default function NotificationBell() {
     return subscribe('__refresh', fetchNotifs)
   }, [subscribe, fetchNotifs])
 
+  // Refrescar bandeja cuando cambia el estado de una póliza (poliza_update)
+  useEffect(() => {
+    return subscribe('poliza_update', () => fetchNotifs())
+  }, [subscribe, fetchNotifs])
+
   // ── SSE: nueva notificación en tiempo real ─────────────────────────────
   useEffect(() => {
     return subscribe('notificacion', (notif) => {

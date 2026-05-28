@@ -189,17 +189,18 @@ router.patch('/leads/:id/estado',
         if (notifTipo) {
           const notifId  = randomUUID()
           const notifNow = new Date().toISOString()
-          await pool.execute(
-            `INSERT INTO notificaciones (id, aliado_id, tipo, titulo, mensaje) VALUES (?, ?, ?, ?, ?)`,
-            [notifId, lead.aliado_id, notifTipo, notifTitulo, notifMsg]
-          )
+          // SSE primero — no depende de la DB
           ssePush(lead.aliado_id, 'notificacion', {
             id: notifId, tipo: notifTipo, titulo: notifTitulo,
             mensaje: notifMsg, leida: false, created_at: notifNow,
           })
+          pool.execute(
+            `INSERT INTO notificaciones (id, aliado_id, tipo, titulo, mensaje) VALUES (?, ?, ?, ?, ?)`,
+            [notifId, lead.aliado_id, notifTipo, notifTitulo, notifMsg]
+          ).catch(err => console.error('[notif] Error al guardar notificacion (lead', leadId, '):', err))
         }
       } catch (err) {
-        console.error('[notif] Error al guardar notificacion (lead', leadId, '):', err)
+        console.error('[notif] Error en bloque notificacion (lead', leadId, '):', err)
       }
 
       // Evento de estado en tiempo real — bloque separado, siempre se empuja
@@ -332,17 +333,18 @@ router.patch('/polizas/:id/estado',
         if (notifTipo) {
           const notifId  = randomUUID()
           const notifNow = new Date().toISOString()
-          await pool.execute(
-            `INSERT INTO notificaciones (id, aliado_id, tipo, titulo, mensaje) VALUES (?, ?, ?, ?, ?)`,
-            [notifId, pol.aliado_id, notifTipo, notifTitulo, notifMsg]
-          )
+          // SSE primero — no depende de la DB
           ssePush(pol.aliado_id, 'notificacion', {
             id: notifId, tipo: notifTipo, titulo: notifTitulo,
             mensaje: notifMsg, leida: false, created_at: notifNow,
           })
+          pool.execute(
+            `INSERT INTO notificaciones (id, aliado_id, tipo, titulo, mensaje) VALUES (?, ?, ?, ?, ?)`,
+            [notifId, pol.aliado_id, notifTipo, notifTitulo, notifMsg]
+          ).catch(err => console.error('[notif] Error al guardar notificacion (poliza', req.params.id, '):', err))
         }
       } catch (err) {
-        console.error('[notif] Error al guardar notificacion (poliza', req.params.id, '):', err)
+        console.error('[notif] Error en bloque notificacion (poliza', req.params.id, '):', err)
       }
 
       // Evento de estado en tiempo real — bloque separado, siempre se empuja

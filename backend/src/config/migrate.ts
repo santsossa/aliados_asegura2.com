@@ -214,6 +214,8 @@ const ALTER_STMTS = [
   `ALTER TABLE polizas ADD COLUMN placa VARCHAR(10) NULL`,
   `ALTER TABLE polizas ADD COLUMN observaciones TEXT NULL`,
   `ALTER TABLE aliados ADD COLUMN avatar_id VARCHAR(10) NULL`,
+  // Tabla notificaciones — safety net para DBs creadas antes de que se añadiera al bloque principal
+  `CREATE TABLE IF NOT EXISTS notificaciones (id VARCHAR(36) PRIMARY KEY, aliado_id VARCHAR(36) NOT NULL, tipo VARCHAR(50) NOT NULL, titulo VARCHAR(200) NOT NULL, mensaje TEXT NOT NULL, leida BOOLEAN NOT NULL DEFAULT FALSE, created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY (aliado_id) REFERENCES aliados(id) ON DELETE CASCADE) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`,
 ]
 
 // ── Columnas modificadas (v3) — idempotente, se ejecutan siempre ─────────
