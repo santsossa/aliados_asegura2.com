@@ -34,8 +34,8 @@ router.get('/resumen', async (req: any, res: any, next: any) => {
          COUNT(*) AS total_polizas,
          SUM(CASE WHEN estado='aprobada' THEN 1 ELSE 0 END) AS aprobadas,
          SUM(CASE WHEN estado='en_proceso' THEN 1 ELSE 0 END) AS en_proceso,
-         COALESCE(SUM(CASE WHEN estado='aprobada' THEN valor_comision ELSE 0 END), 0) AS comision_mes,
-         COALESCE(SUM(valor_comision), 0) AS comision_total_historica
+         COALESCE(SUM(CASE WHEN estado='aprobada' THEN ROUND(valor_prima/1.19*comision_pct/100,2) ELSE 0 END), 0) AS comision_mes,
+         COALESCE(SUM(ROUND(valor_prima/1.19*comision_pct/100,2)), 0) AS comision_total_historica
        FROM polizas
        WHERE aliado_id=? AND (
          (mes=? AND anio=?) OR
@@ -45,9 +45,9 @@ router.get('/resumen', async (req: any, res: any, next: any) => {
     )
 
     const [proximoPago] = await pool.execute<any[]>(
-      `SELECT COALESCE(SUM(valor_comision),0) AS monto
+      `SELECT COALESCE(SUM(ROUND(valor_prima/1.19*comision_pct/100,2)),0) AS monto
        FROM polizas
-       WHERE aliado_id=? AND estado='aprobada' AND mes=? AND anio=?`,
+       WHERE aliado_id=? AND estado='aprobada' AND MONTH(primer_pago_at)=? AND YEAR(primer_pago_at)=?`,
       [req.aliado!.sub, mes, anio]
     )
 

@@ -29,9 +29,9 @@ router.get('/proximo', async (req: any, res: any, next: any) => {
     const anio= d.getFullYear()
 
     const [rows] = await pool.execute<any[]>(
-      `SELECT COUNT(*) AS polizas, COALESCE(SUM(valor_comision),0) AS monto
+      `SELECT COUNT(*) AS polizas, COALESCE(SUM(ROUND(valor_prima/1.19*comision_pct/100,2)),0) AS monto
        FROM polizas
-       WHERE aliado_id=? AND estado='aprobada' AND mes=? AND anio=?
+       WHERE aliado_id=? AND estado='aprobada' AND MONTH(primer_pago_at)=? AND YEAR(primer_pago_at)=?
          AND id NOT IN (SELECT poliza_id FROM pago_detalles)`,
       [req.aliado!.sub, mes, anio]
     )

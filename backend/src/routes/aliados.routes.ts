@@ -137,7 +137,7 @@ router.get('/dashboard', async (req, res, next) => {
 
     // Próximo pago = comisiones aprobadas este mes → se pagan el 1 del mes siguiente
     const [[comisionesMes]] = await pool.execute<any[]>(
-      `SELECT COALESCE(SUM(valor_comision),0) total FROM polizas WHERE aliado_id=? AND estado='aprobada' AND MONTH(created_at)=? AND YEAR(created_at)=?`,
+      `SELECT COALESCE(SUM(ROUND(valor_prima/1.19*comision_pct/100,2)),0) total FROM polizas WHERE aliado_id=? AND estado='aprobada' AND MONTH(primer_pago_at)=? AND YEAR(primer_pago_at)=?`,
       [id, mes, anio]
     )
     const proximoMes  = mes === 12 ? 1 : mes + 1
@@ -171,7 +171,7 @@ router.get('/dashboard', async (req, res, next) => {
         ORDER BY created_at DESC LIMIT 7)
        UNION ALL
        (SELECT 'poliza' tipo, id, cliente_nombre, aseguradora,
-               valor_comision monto, estado, created_at
+               ROUND(valor_prima/1.19*comision_pct/100,2) monto, estado, created_at
         FROM polizas WHERE aliado_id=?
         ORDER BY created_at DESC LIMIT 3)
        ORDER BY created_at DESC LIMIT 8`,
@@ -180,7 +180,7 @@ router.get('/dashboard', async (req, res, next) => {
 
     // Comisiones este mes por día (para gráfica de barras) — filtra por fecha real de aprobación
     const [graficaRows] = await pool.execute<any[]>(
-      `SELECT DAY(created_at) dia, SUM(valor_comision) monto FROM polizas WHERE aliado_id=? AND estado='aprobada' AND MONTH(created_at)=? AND YEAR(created_at)=? GROUP BY DAY(created_at) ORDER BY dia`,
+      `SELECT DAY(primer_pago_at) dia, SUM(ROUND(valor_prima/1.19*comision_pct/100,2)) monto FROM polizas WHERE aliado_id=? AND estado='aprobada' AND MONTH(primer_pago_at)=? AND YEAR(primer_pago_at)=? GROUP BY DAY(primer_pago_at) ORDER BY dia`,
       [id, mes, anio]
     )
 
@@ -194,7 +194,7 @@ router.get('/dashboard', async (req, res, next) => {
       [id]
     )
     const [spGan] = await pool.execute<any[]>(
-      `SELECT WEEK(created_at) semana, SUM(valor_comision) total FROM polizas WHERE aliado_id=? AND estado='aprobada' AND created_at>=DATE_SUB(NOW(),INTERVAL 8 WEEK) GROUP BY WEEK(created_at) ORDER BY semana`,
+      `SELECT WEEK(primer_pago_at) semana, SUM(ROUND(valor_prima/1.19*comision_pct/100,2)) total FROM polizas WHERE aliado_id=? AND estado='aprobada' AND primer_pago_at>=DATE_SUB(NOW(),INTERVAL 8 WEEK) GROUP BY WEEK(primer_pago_at) ORDER BY semana`,
       [id]
     )
 
