@@ -38,10 +38,12 @@ const BADGE = {
   activa:        { bg: '#dbeafe', color: '#1d4ed8', label: 'Cotizada'         },
   enviada:       { bg: '#dcfce7', color: '#16a34a', label: 'Enviada a emitir' },
   cerrada:       { bg: '#f3f4f6', color: '#6b7280', label: 'Cerrada'          },
-  lead:          { bg: '#dcfce7', color: '#16a34a', label: 'Enviada a emitir' },
-  en_proceso:    { bg: '#fef3c7', color: '#d97706', label: 'En proceso'       },
-  aprobada:      { bg: '#d1fae5', color: '#065f46', label: 'Aprobada'         },
-  no_convertida: { bg: '#fee2e2', color: '#dc2626', label: 'No aprobado'      },
+  lead:           { bg: '#dcfce7', color: '#16a34a', label: 'Enviada a emitir' },
+  en_contacto:    { bg: '#e0f2fe', color: '#0284c7', label: 'En contacto'      },
+  en_proceso:     { bg: '#fef3c7', color: '#d97706', label: 'En gestión'       },
+  poliza_emitida: { bg: '#ede9fe', color: '#7c3aed', label: 'Póliza emitida'   },
+  aprobada:       { bg: '#d1fae5', color: '#065f46', label: 'Aprobada'         },
+  no_convertida:  { bg: '#fee2e2', color: '#dc2626', label: 'No aprobado'      },
   procesado:     { bg: '#d1fae5', color: '#065f46', label: 'Completado'       },
 }
 function getBadge(estado, tipo) {
@@ -50,9 +52,11 @@ function getBadge(estado, tipo) {
 }
 
 const POLIZA_CFG = {
-  en_proceso:    { bg: '#fef3c7', color: '#92400e', label: 'En proceso'  },
-  aprobada:      { bg: '#d1fae5', color: '#065f46', label: 'Aprobada'    },
-  no_convertida: { bg: '#fee2e2', color: '#991b1b', label: 'No aprobado' },
+  en_contacto:    { bg: '#e0f2fe', color: '#0284c7', label: 'En contacto'    },
+  en_proceso:     { bg: '#fef3c7', color: '#92400e', label: 'En gestión'     },
+  poliza_emitida: { bg: '#ede9fe', color: '#7c3aed', label: 'Póliza emitida' },
+  aprobada:       { bg: '#d1fae5', color: '#065f46', label: 'Aprobada'       },
+  no_convertida:  { bg: '#fee2e2', color: '#991b1b', label: 'No aprobado'    },
 }
 function getPcfg(estado) {
   return POLIZA_CFG[estado] || { bg: '#f3f4f6', color: '#374151', label: estado }
