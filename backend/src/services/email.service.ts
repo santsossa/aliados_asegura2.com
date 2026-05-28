@@ -628,19 +628,19 @@ export async function sendPolizaAprobadaEmail(opts: {
 
       <!-- Comisión destacada -->
       <table cellpadding="0" cellspacing="0" width="100%"
-             style="background:#2D2A7A;border-radius:14px;margin-bottom:20px">
+             style="background:#ffffff;border:2px solid #2D2A7A;border-radius:14px;margin-bottom:20px">
         <tr>
           <td style="padding:22px;text-align:center">
-            <p style="margin:0 0 4px;color:#c7d2fe;font-size:11px;font-weight:700;
+            <p style="margin:0 0 4px;color:#6b7280;font-size:11px;font-weight:700;
                       text-transform:uppercase;letter-spacing:0.08em;font-family:Arial,sans-serif">
               Tu comisi&#243;n
             </p>
-            <p style="margin:0;color:#ffffff;font-size:38px;font-weight:800;
+            <p style="margin:0;color:#2D2A7A;font-size:38px;font-weight:800;
                       letter-spacing:-1px;font-family:Arial,sans-serif">
               ${fmtCOP(opts.valor_comision)}
             </p>
-            <p style="margin:8px 0 0;color:#a5b4fc;font-size:13px;font-family:Arial,sans-serif">
-              Se depositar&#225; el <strong style="color:#fff">${fechaPago}</strong>
+            <p style="margin:8px 0 0;color:#6b7280;font-size:13px;font-family:Arial,sans-serif">
+              Se depositar&#225; el <strong style="color:#111827">${fechaPago}</strong>
             </p>
           </td>
         </tr>
