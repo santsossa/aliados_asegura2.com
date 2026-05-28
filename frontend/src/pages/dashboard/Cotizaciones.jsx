@@ -735,10 +735,25 @@ export default function Cotizaciones() {
                   </div>
                   {/* Contenido — ocupa el ancho restante */}
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-2">
-                      <p className="font-semibold text-gray-900 text-sm truncate">
-                        {c.cliente_nombre || 'Cliente sin nombre'}
-                      </p>
+                    <p className="font-semibold text-gray-900 text-sm truncate">
+                      {c.cliente_nombre || 'Cliente sin nombre'}
+                    </p>
+                    <p className="text-xs text-gray-400 mt-0.5 truncate">
+                      {c.cliente_tipo_doc && c.cliente_cedula
+                        ? `${c.cliente_tipo_doc} ${c.cliente_cedula} · `
+                        : ''}
+                      {c.placa || 'Sin placa'}
+                      {' · '}{fechaStr}
+                    </p>
+                    <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:8, marginTop:6 }}>
+                      <div style={{ display:'flex', alignItems:'center', gap:6, flexWrap:'wrap' }}>
+                        <span style={{ background: badge.bg, color: badge.color, fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 99, whiteSpace:'nowrap' }}>
+                          {badge.label}
+                        </span>
+                        {noEnviada && !within24h && (
+                          <span style={{ fontSize:10, color:'#ea580c', fontWeight:600 }}>Vencida</span>
+                        )}
+                      </div>
                       <button
                         onClick={() => setModalCot(c)}
                         style={{ display:'flex', alignItems:'center', gap:3, background:'#f3f4f6', border:'none',
@@ -753,21 +768,6 @@ export default function Cotizaciones() {
                           <path d="M9 18l6-6-6-6"/>
                         </svg>
                       </button>
-                    </div>
-                    <p className="text-xs text-gray-400 mt-0.5">
-                      {c.cliente_tipo_doc && c.cliente_cedula
-                        ? `${c.cliente_tipo_doc} ${c.cliente_cedula} · `
-                        : ''}
-                      {c.placa || 'Sin placa'}
-                      {' · '}{fechaStr}
-                    </p>
-                    <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-                      <span style={{ background: badge.bg, color: badge.color, fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 99, whiteSpace:'nowrap' }}>
-                        {badge.label}
-                      </span>
-                      {noEnviada && !within24h && (
-                        <span style={{ fontSize:10, color:'#ea580c', fontWeight:600 }}>Vencida</span>
-                      )}
                     </div>
                   </div>
                 </div>
