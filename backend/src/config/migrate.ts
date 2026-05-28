@@ -135,7 +135,7 @@ CREATE TABLE IF NOT EXISTS polizas (
   aseguradora      VARCHAR(80)   NOT NULL,
   valor_prima      DECIMAL(12,2) NOT NULL,
   comision_pct     DECIMAL(5,2)  NOT NULL DEFAULT 6.00,
-  valor_comision   DECIMAL(12,2) GENERATED ALWAYS AS (valor_prima * comision_pct / 100) STORED,
+  valor_comision   DECIMAL(12,2) GENERATED ALWAYS AS (ROUND(valor_prima / 1.19 * comision_pct / 100, 2)) STORED,
   estado           ENUM('en_proceso','aprobada','no_convertida') NOT NULL DEFAULT 'en_proceso',
   primer_pago_at   TIMESTAMP     NULL,
   mes              TINYINT       NOT NULL,

@@ -132,7 +132,7 @@ router.patch('/leads/:id/estado',
       }
 
       // Enviar email al aliado según el estado
-      const comision = Math.round(parseFloat(lead.valor_prima || 0) * 0.06)
+      const comision = Math.round(parseFloat(lead.valor_prima || 0) / 1.19 * 0.06)
       if (estado === 'aprobada') {
         sendPolizaAprobadaEmail({
           to:             lead.aliado_correo,
@@ -263,7 +263,7 @@ router.patch('/polizas/:id/estado',
       )
 
       // Email al aliado
-      const polComision = parseFloat(pol.valor_comision || 0) || Math.round(parseFloat(pol.valor_prima || 0) * 0.06)
+      const polComision = parseFloat(pol.valor_comision || 0) || Math.round(parseFloat(pol.valor_prima || 0) / 1.19 * 0.06)
       if (estado === 'aprobada') {
         sendPolizaAprobadaEmail({
           to:             pol.aliado_correo,

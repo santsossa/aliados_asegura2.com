@@ -149,7 +149,8 @@ export async function sendLeadRecibidoEmail(opts: {
   valor_prima:    number
   placa?:         string
 }): Promise<void> {
-  const comision  = Math.round(opts.valor_prima * 0.06)
+  const primaBase = Math.round(opts.valor_prima / 1.19)
+  const comision  = Math.round(primaBase * 0.06)
   const base      = (env.FRONTEND_URL || '').replace(/\/$/, '')
   const imgLogo   = `${base}/logo-email.png`   // frontend/public/logo-email.png
   const imgSobre  = `${base}/correoab.png`      // frontend/public/correoab.png
@@ -271,16 +272,24 @@ export async function sendLeadRecibidoEmail(opts: {
         </tr>
         <tr>
           <td style="padding:10px 16px;font-size:13px;color:#6b7280;
+                     border-bottom:1px solid #f3f4f6;font-family:Arial,sans-serif">
+            Prima anual (con IVA)</td>
+          <td style="padding:10px 16px;font-size:13px;font-weight:700;
+                     color:#111827;text-align:right;border-bottom:1px solid #f3f4f6;
+                     font-family:Arial,sans-serif">${fmtCOP(opts.valor_prima)}</td>
+        </tr>
+        <tr>
+          <td style="padding:10px 16px;font-size:13px;color:#6b7280;
                      border-bottom:2px solid #e2e3e8;font-family:Arial,sans-serif">
-            Prima anual</td>
+            Prima sin IVA (&#247;1,19)</td>
           <td style="padding:10px 16px;font-size:13px;font-weight:700;
                      color:#111827;text-align:right;border-bottom:2px solid #e2e3e8;
-                     font-family:Arial,sans-serif">${fmtCOP(opts.valor_prima)}</td>
+                     font-family:Arial,sans-serif">${fmtCOP(primaBase)}</td>
         </tr>
         <tr style="background:#f0eeff">
           <td style="padding:13px 16px;font-size:14px;font-weight:700;
                      color:#2D2A7A;font-family:Arial,sans-serif">
-            Tu comisi&#243;n estimada (6%)</td>
+            Tu comisi&#243;n estimada (6% s/IVA)</td>
           <td style="padding:13px 16px;font-size:18px;font-weight:900;
                      color:#2D2A7A;text-align:right;font-family:Arial,sans-serif">
             ${fmtCOP(comision)}</td>
@@ -576,6 +585,7 @@ export async function sendPolizaAprobadaEmail(opts: {
   valor_comision: number
   placa?: string
 }): Promise<void> {
+  const primaBase  = Math.round(opts.valor_prima / 1.19)
   const fechaPago  = nextPaymentDate()
   const base       = (env.FRONTEND_URL || '').replace(/\/$/, '')
   const imgLogo    = `${base}/logo-email.png`
@@ -660,11 +670,15 @@ export async function sendPolizaAprobadaEmail(opts: {
           <td style="padding:9px 16px;font-size:13px;font-weight:600;color:#111827;text-align:right;border-bottom:1px solid #f3f4f6;font-family:Arial,sans-serif">${opts.aseguradora}</td>
         </tr>
         <tr>
-          <td style="padding:9px 16px;font-size:13px;color:#6b7280;border-bottom:1px solid #f3f4f6;font-family:Arial,sans-serif">Prima anual</td>
+          <td style="padding:9px 16px;font-size:13px;color:#6b7280;border-bottom:1px solid #f3f4f6;font-family:Arial,sans-serif">Prima anual (con IVA)</td>
           <td style="padding:9px 16px;font-size:13px;font-weight:600;color:#111827;text-align:right;border-bottom:1px solid #f3f4f6;font-family:Arial,sans-serif">${fmtCOP(opts.valor_prima)}</td>
         </tr>
+        <tr>
+          <td style="padding:9px 16px;font-size:13px;color:#6b7280;border-bottom:1px solid #f3f4f6;font-family:Arial,sans-serif">Prima sin IVA (&#247;1,19)</td>
+          <td style="padding:9px 16px;font-size:13px;font-weight:600;color:#111827;text-align:right;border-bottom:1px solid #f3f4f6;font-family:Arial,sans-serif">${fmtCOP(primaBase)}</td>
+        </tr>
         <tr style="background:#f0eeff">
-          <td style="padding:12px 16px;font-size:13px;font-weight:700;color:#2D2A7A;font-family:Arial,sans-serif">Comisi&#243;n (6%)</td>
+          <td style="padding:12px 16px;font-size:13px;font-weight:700;color:#2D2A7A;font-family:Arial,sans-serif">Comisi&#243;n (6% sobre prima sin IVA)</td>
           <td style="padding:12px 16px;font-size:16px;font-weight:800;color:#16a34a;text-align:right;font-family:Arial,sans-serif">${fmtCOP(opts.valor_comision)}</td>
         </tr>
       </table>

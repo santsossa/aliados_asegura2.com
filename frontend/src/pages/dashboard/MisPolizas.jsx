@@ -109,7 +109,7 @@ function DetalleModal({ item, onClose, token }) {
   const comercialValue  = det?.comercial_value  || item.comercial_value
   const aseguradora     = det?.aseguradora      || item.aseguradora      || '—'
   const valorPrima      = det?.valor_prima      || item.valor_prima      || 0
-  const valorComision   = det?.valor_comision   || item.valor_comision   || Math.round(valorPrima * 0.06)
+  const valorComision   = det?.valor_comision   || item.valor_comision   || Math.round(valorPrima / 1.19 * 0.06)
   const observaciones   = det?.observaciones    || item.observaciones
   const createdAt       = det?.created_at       || item.created_at
 
@@ -209,9 +209,10 @@ function DetalleModal({ item, onClose, token }) {
                 <Row label="Valor asegurado" value={comercialValue ? fmt(comercialValue) : null} />
               </Sec>
               <Sec title="Póliza y tu comisión">
-                <Row label="Aseguradora"      value={aseguradora} />
-                <Row label="Prima anual"      value={fmt(valorPrima)} />
-                <Row label="Tu comisión (6%)" value={fmt(valorComision)} highlight />
+                <Row label="Aseguradora"              value={aseguradora} />
+                <Row label="Prima anual (con IVA)"    value={fmt(valorPrima)} />
+                <Row label="Prima sin IVA (÷1,19)"    value={fmt(Math.round(valorPrima / 1.19))} />
+                <Row label="Tu comisión (6% s/IVA)"   value={fmt(valorComision)} highlight />
               </Sec>
               <Sec title="Seguimiento">
                 <Row label="Lead enviado" value={fechaStr(createdAt)} />
