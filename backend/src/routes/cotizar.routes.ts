@@ -136,6 +136,33 @@ router.post('/fasecolda', async (req: Request, res: Response, next: NextFunction
   }
 })
 
+// ── Fasecolda 0 km — Marcas ─────────────────────────────────────────────────
+router.get('/fasecolda-marcas', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    if (!env.CRM_URL) { res.status(503).json({ error: 'CRM no configurado' }); return }
+    const r = await axios.get(`${env.CRM_URL}/api/fasecolda/marcas`, { headers: CRM_HEADERS })
+    res.json(r.data)
+  } catch (err: any) {
+    res.status(err.response?.status || 500).json({ error: 'Error obteniendo marcas' })
+  }
+})
+
+// ── Fasecolda 0 km — Líneas ──────────────────────────────────────────────────
+router.get('/fasecolda-lineas', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    if (!env.CRM_URL) { res.status(503).json({ error: 'CRM no configurado' }); return }
+    const { marca } = req.query
+    if (!marca) { res.status(400).json({ error: 'Falta parámetro marca' }); return }
+    const r = await axios.get(`${env.CRM_URL}/api/fasecolda/lineas`, {
+      params: { marca },
+      headers: CRM_HEADERS,
+    })
+    res.json(r.data)
+  } catch (err: any) {
+    res.status(err.response?.status || 500).json({ error: 'Error obteniendo líneas' })
+  }
+})
+
 // ── Proveedores activos ─────────────────────────────────────────────────────
 router.get('/proveedores', async (req: Request, res: Response, next: NextFunction) => {
   try {

@@ -222,7 +222,13 @@ export async function login(req: Request, res: Response, next: NextFunction) {
       // Éxito — reset contador, generar OTP
       await resetarIntentos('admins', admin.id)
       const otp = await generateAdminOTP(admin.id)
-      await sendOTPEmail(admin.correo, admin.nombre, otp)
+      try {
+        await sendOTPEmail(admin.correo, admin.nombre, otp)
+      } catch (emailErr) {
+        // El OTP se guardó en DB; si el correo falla, mostrarlo en logs para recuperación manual
+        console.error('[admin-login] Error enviando OTP por correo:', emailErr)
+        console.warn(`[admin-login] OTP para ${admin.correo}: ${otp}`)
+      }
       await logAuth('admin', admin.id, correo, 'login_ok', req)
 
       res.json({ status: 'success', message: 'Código enviado a tu correo.', userId: admin.id, tipo: 'admin' })

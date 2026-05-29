@@ -31,6 +31,21 @@ const MONTH_OPTIONS = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio',
                       .map((m,i) => ({ v:String(i+1), label:m }))
 const YEAR_OPTIONS  = Array.from({ length:2008-1940+1 }, (_,i) => ({ v:String(2008-i), label:String(2008-i) }))
 
+const ZK_ANOS = [
+  { v: '2025', label: '2025' },
+  { v: '2026', label: '2026' },
+  { v: '2027', label: '2027' },
+]
+
+// Normaliza distintos formatos de respuesta del CRM (array directo, {data:[]}, {response:[]}, {result:[]})
+function zkParse(d) {
+  if (Array.isArray(d))            return d
+  if (Array.isArray(d?.data))      return d.data
+  if (Array.isArray(d?.response))  return d.response
+  if (Array.isArray(d?.result))    return d.result
+  return []
+}
+
 const COMPANY_MAP = [
   { keys:['allianz'],           name:'Allianz',           logo:'/logos/allianz.webp'   },
   { keys:['axa','colpatria'],   name:'AXA Colpatria',     logo:'/logos/axa.webp'       },
@@ -445,6 +460,18 @@ export default function Cotizar() {
   })
   const setF = (k,v) => setForm(f => ({ ...f, [k]:v }))
 
+  // ── Estado 0 km ────────────────────────────────────────────────────────────
+  const [isZeroKm,        setIsZeroKm]        = useState(false)
+  const [zkHov,           setZkHov]           = useState(false)
+  const [zkMarca,         setZkMarca]         = useState('')
+  const [zkLinea,         setZkLinea]         = useState(null)   // { codigo, nombre, anos:[{ano,precio}] }
+  const [zkAno,           setZkAno]           = useState('')
+  const [zkAnoError,      setZkAnoError]      = useState(false)
+  const [zkMarcas,        setZkMarcas]        = useState([])
+  const [zkLineas,        setZkLineas]        = useState([])
+  const [zkLoadingMarcas, setZkLoadingMarcas] = useState(false)
+  const [zkLoadingLineas, setZkLoadingLineas] = useState(false)
+
   const [fullPlans,  setFullPlans]  = useState([])
   const [basicPlans, setBasicPlans] = useState([])
   const [loadingQ, setLoadingQ] = useState(false)
@@ -471,6 +498,50 @@ export default function Cotizar() {
       .then(d => setCities(d?.response || d?.data?.response || []))
       .catch(() => {})
   }, [])
+
+  // ── Cargar marcas al entrar a la fase zerokm ───────────────────────────────
+  useEffect(() => {
+    if (phase !== 'zerokm' || zkMarcas.length > 0) return
+    setZkLoadingMarcas(true)
+    fetch(`${API}/api/cotizar/fasecolda-marcas`, { headers: authH })
+      .then(r => r.json())
+      .then(d => setZkMarcas(zkParse(d)))
+      .catch(() => {})
+      .finally(() => setZkLoadingMarcas(false))
+  }, [phase])
+
+  // ── Handlers 0 km ──────────────────────────────────────────────────────────
+  function handleZkMarca(marca) {
+    setZkMarca(marca)
+    setZkLinea(null); setZkAno(''); setZkAnoError(false); setZkLineas([])
+    setCommercialValue(null)
+    if (!marca) return
+    setZkLoadingLineas(true)
+    fetch(`${API}/api/cotizar/fasecolda-lineas?marca=${encodeURIComponent(marca)}`, { headers: authH })
+      .then(r => r.json())
+      .then(d => setZkLineas(zkParse(d)))
+      .catch(() => {})
+      .finally(() => setZkLoadingLineas(false))
+  }
+
+  function handleZkLinea(codigo) {
+    const linea = zkLineas.find(l => l.codigo === codigo) || null
+    setZkLinea(linea); setZkAno(''); setZkAnoError(false); setCommercialValue(null)
+  }
+
+  function handleZkAno(ano) {
+    setZkAno(ano); setZkAnoError(false)
+    if (!zkLinea || !ano) { setCommercialValue(null); return }
+    const match = zkLinea.anos?.find(a => String(a.ano) === ano)
+    if (match) { setCommercialValue(match.precio) }
+    else       { setZkAnoError(true); setCommercialValue(null) }
+  }
+
+  function handleZkContinuar() {
+    setVehicleModel(String(zkAno))
+    setIsZeroKm(true)
+    setPhase('form'); setStep(1)
+  }
 
   // Parsea valor numérico tolerando formato colombiano "45.000.000"
   function parseNumericCV(raw) {
@@ -725,10 +796,11 @@ export default function Cotizar() {
     quotesLoadedRef.current = false
     saveRef.current.cotSaved = false
     cotizacionIdRef.current = null
-    setPhase('placa'); setPlate(''); setStep(1)
+    setPhase('select'); setPlate(''); setStep(1)
     setFullPlans([]); setBasicPlans([]); setSelectedPlan(null)
     setCedulaFile(null); setTarjetaFile(null); setSendErr('')
     setVehicleModel(''); setCommercialValue(null)
+    setIsZeroKm(false); setZkMarca(''); setZkLinea(null); setZkAno(''); setZkAnoError(false)
     setForm({ nombre:'', apellido:'', gender:'', tipoDoc:'CC', numDoc:'', diaNac:'', mesNac:'', anioNac:'', correo:'', ciudad:'', celular:'' })
     navigate('/dashboard')
   }
@@ -813,42 +885,58 @@ export default function Cotizar() {
         </button>
 
         {/* ── Vehículo 0 km ── */}
-        <div className="cotizar-select-card" style={{
-          background:'#fff', border:'2px solid #e8eaf0', borderRadius:20,
-          padding:'28px 24px 72px', cursor:'not-allowed', textAlign:'center',
-          display:'flex', flexDirection:'column', alignItems:'center', position:'relative',
-          boxShadow:'0 2px 8px rgba(0,0,0,0.04)',
-        }}>
+        <button
+          className="cotizar-select-card"
+          onClick={() => setPhase('zerokm')}
+          onMouseEnter={() => setZkHov(true)}
+          onMouseLeave={() => setZkHov(false)}
+          style={{
+            background:'#fff',
+            border: zkHov ? '2px solid #5745AB' : '2px solid #e8eaf0',
+            borderRadius:20, padding:'28px 24px 72px', cursor:'pointer',
+            textAlign:'center', display:'flex', flexDirection:'column', alignItems:'center', position:'relative',
+            boxShadow: zkHov ? '0 8px 32px rgba(87,69,171,0.14)' : '0 2px 8px rgba(0,0,0,0.04)',
+            transition:'border-color 0.18s, box-shadow 0.18s',
+          }}
+        >
           <div className="cotizar-card-img-wrap" style={{
-            width:148, height:148, borderRadius:'50%', background:'#f0f2f8',
+            width:148, height:148, borderRadius:'50%',
+            background: zkHov ? '#EEE7FD' : '#f0f2f8',
             display:'flex', alignItems:'center', justifyContent:'center',
             marginBottom:20, overflow:'hidden',
+            transition:'background 0.18s',
           }}>
             <img
               className="cotizar-card-img"
               src={cotizar0kmImg}
               alt="Vehículo 0 km"
-              style={{ width:148, height:148, objectFit:'cover', filter:'grayscale(1)' }}
+              style={{
+                width:148, height:148, objectFit:'cover',
+                filter: zkHov ? 'none' : 'grayscale(1)',
+                transition:'filter 0.18s',
+              }}
             />
           </div>
           <div className="cotizar-card-txt">
-            <p style={{ margin:'0 0 4px', fontFamily:'Poppins', fontSize:16, fontWeight:700, color:'#374151' }}>
+            <p style={{ margin:'0 0 4px', fontFamily:'Poppins', fontSize:16, fontWeight:700, color:'#111827' }}>
               Vehículo 0 km
             </p>
-            <p style={{ margin:0, fontFamily:'Inter', fontSize:13, color:'#9ca3af' }}>
+            <p style={{ margin:0, fontFamily:'Inter', fontSize:13, color:'#6b7280' }}>
               Sin placa requerida.
             </p>
           </div>
           <div className="cotizar-card-arrow" style={{
             position:'absolute', bottom:22, right:22, width:42, height:42,
-            borderRadius:'50%', background:'#e8eaf0',
+            borderRadius:'50%',
+            background: zkHov ? '#5745AB' : '#e8eaf0',
             display:'flex', alignItems:'center', justifyContent:'center',
+            transition:'background 0.18s',
           }}>
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
-              <path d="M5 12h14M13 6l6 6-6 6" stroke="#9ca3af" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M5 12h14M13 6l6 6-6 6" stroke={zkHov ? '#fff' : '#9ca3af'} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </div>
-        </div>
+        </button>
 
       </div>
     </div>
@@ -881,17 +969,95 @@ export default function Cotizar() {
     </div>
   )
 
+  /* ── ZEROKM ── */
+  if (phase === 'zerokm') return (
+    <div style={{ padding:'0 24px 32px', maxWidth:'72rem', margin:'0 auto' }}>
+      <div style={{ paddingTop:8, marginBottom:20 }}>
+        <button onClick={() => setPhase('select')} style={{ fontFamily:'Inter', fontSize:13, color:'#9ca3af', background:'none', border:'none', cursor:'pointer', padding:0, marginBottom:10, display:'block' }}>← Volver</button>
+        <h1 style={{ fontFamily:'Poppins', fontSize:22, fontWeight:700, color:'#111827', margin:'0 0 4px' }}>Vehículo 0 km</h1>
+        <p style={{ fontFamily:'Inter', fontSize:13, color:'#9ca3af', margin:0 }}>Sin placa requerida — selecciona marca, referencia y año.</p>
+      </div>
+
+      <div style={card}>
+        {/* Marca */}
+        <Fld label="Marca *">
+          {zkLoadingMarcas
+            ? <p style={{ fontSize:13, color:'#9ca3af', margin:'8px 0' }}>Cargando marcas...</p>
+            : <ComboBox
+                value={zkMarca}
+                onChange={handleZkMarca}
+                options={zkMarcas.map(m => ({ v: String(m), label: String(m) }))}
+                placeholder="Selecciona una marca..."
+              />
+          }
+        </Fld>
+
+        {/* Referencia / Línea — aparece solo cuando hay marca */}
+        {zkMarca && (
+          <Fld label="Referencia *">
+            {zkLoadingLineas
+              ? <p style={{ fontSize:13, color:'#9ca3af', margin:'8px 0' }}>Cargando referencias...</p>
+              : <ComboBox
+                  value={zkLinea?.codigo || ''}
+                  onChange={handleZkLinea}
+                  options={zkLineas.map(l => ({ v: l.codigo, label: l.nombre }))}
+                  placeholder="Selecciona una referencia..."
+                />
+            }
+          </Fld>
+        )}
+
+        {/* Año — aparece solo cuando hay línea */}
+        {zkLinea && (
+          <Fld label="Año del vehículo *">
+            <ComboBox
+              value={zkAno}
+              onChange={handleZkAno}
+              options={ZK_ANOS}
+              placeholder="Selecciona el año..."
+            />
+            {zkAnoError && (
+              <p style={{ color:'#dc2626', fontSize:12, margin:'6px 0 0' }}>
+                Algunos datos no coinciden con el vehículo seleccionado
+              </p>
+            )}
+            {zkAno && !zkAnoError && commercialValue != null && commercialValue > 0 && (
+              <div style={{ display:'flex', alignItems:'center', gap:8, marginTop:10,
+                            background:'#f0fdf4', border:'1px solid #bbf7d0', borderRadius:10, padding:'10px 14px' }}>
+                <span style={{ fontSize:16 }}>✅</span>
+                <div>
+                  <p style={{ margin:0, fontSize:12, fontWeight:700, color:'#166534' }}>Valor comercial del vehículo</p>
+                  <p style={{ margin:0, fontSize:16, fontWeight:800, color:'#16a34a' }}>{fmt(commercialValue)}</p>
+                </div>
+              </div>
+            )}
+          </Fld>
+        )}
+
+        <button
+          onClick={handleZkContinuar}
+          disabled={!zkAno || zkAnoError}
+          style={{ ...btnP(!zkAno || zkAnoError), width:'100%', marginTop:8 }}
+        >
+          Continuar con los datos del cliente →
+        </button>
+      </div>
+    </div>
+  )
+
   /* ── FORM ── */
   if (phase === 'form') return (
     <div className="p-6 lg:p-8" style={{ height:'100%', overflowY:'auto' }}>
       <div className="max-w-5xl mx-auto">
-      {/* Pill placa */}
+      {/* Pill placa / vehículo 0 km */}
       <div style={{ display:'flex',alignItems:'center',gap:10,maxWidth:520,margin:'0 auto 16px' }}>
         <span style={{ display:'flex',alignItems:'center',gap:8,background:'#edeef3',borderRadius:99,padding:'6px 14px',fontSize:13,fontWeight:700,color:'#2D2A7A' }}>
-          <span style={{ background:'#2D2A7A',color:'#fff',fontSize:10,padding:'2px 6px',borderRadius:4 }}>CO</span>
-          {displayPlate(plate)}
+          <span style={{ background:'#2D2A7A',color:'#fff',fontSize:10,padding:'2px 6px',borderRadius:4 }}>
+            {isZeroKm ? '0 km' : 'CO'}
+          </span>
+          {isZeroKm ? `${zkMarca} · ${zkLinea?.nombre} · ${zkAno}` : displayPlate(plate)}
         </span>
-        <button onClick={() => setPhase('placa')} style={{ fontSize:12,color:'#9ca3af',background:'none',border:'none',cursor:'pointer' }}>Cambiar</button>
+        <button onClick={() => setPhase(isZeroKm ? 'zerokm' : 'placa')} style={{ fontSize:12,color:'#9ca3af',background:'none',border:'none',cursor:'pointer' }}>Cambiar</button>
       </div>
 
       {/* Stepper */}
