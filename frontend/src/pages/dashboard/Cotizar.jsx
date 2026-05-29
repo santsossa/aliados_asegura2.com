@@ -471,6 +471,7 @@ export default function Cotizar() {
   const [zkLineas,        setZkLineas]        = useState([])
   const [zkLoadingMarcas, setZkLoadingMarcas] = useState(false)
   const [zkLoadingLineas, setZkLoadingLineas] = useState(false)
+  const [zkClassId,       setZkClassId]       = useState('1')  // 1=Automóvil, 4=Camioneta
 
   const [fullPlans,  setFullPlans]  = useState([])
   const [basicPlans, setBasicPlans] = useState([])
@@ -605,15 +606,39 @@ export default function Cotizar() {
     const signal = abortCtrl.signal
 
     const birthDate = `${form.anioNac}-${String(form.mesNac).padStart(2,'0')}-${String(form.diaNac).padStart(2,'0')}`
-    const model = {
-      documentTypeId: form.tipoDoc,    identification: form.numDoc,
-      firstName:      form.nombre,     lastName:       form.apellido,
-      birthDate,                       plate,
-      municipalityId: form.ciudad,     mobileNumber:   form.celular,
-      genderId:       form.gender==='M' ? 1 : 2,
-      gender:         form.gender,     email:          form.correo,
-      city:           cityName,        vehicleModel,
-    }
+
+    // El modelo varía según si es 0 km o vehículo con placa
+    const model = isZeroKm
+      ? {
+          documentTypeId:        form.tipoDoc,
+          identification:        form.numDoc,
+          firstName:             form.nombre,
+          lastName:              form.apellido,
+          birthDate:             `${birthDate}T00:00:00`,
+          municipalityId:        form.ciudad,
+          mobileNumber:          form.celular,
+          genderId:              form.gender === 'M' ? 1 : 2,
+          gender:                form.gender,
+          email:                 form.correo,
+          fasecoldaCode:         zkLinea?.codigo || '',
+          homologoFasecoldaCode: zkLinea?.codigo || '',
+          valorAsegurado:        String(Math.round(commercialValue || 0)),
+          modelo:                zkAno,
+          brand:                 zkMarca,
+          brandLine:             zkLinea?.nombre || '',
+          classId:               zkClassId,
+        }
+      : {
+          documentTypeId: form.tipoDoc,    identification: form.numDoc,
+          firstName:      form.nombre,     lastName:       form.apellido,
+          birthDate,                       plate,
+          municipalityId: form.ciudad,     mobileNumber:   form.celular,
+          genderId:       form.gender === 'M' ? 1 : 2,
+          gender:         form.gender,     email:          form.correo,
+          city:           cityName,        vehicleModel,
+        }
+
+    const quoteEndpoint = isZeroKm ? 'quote-0km' : 'quote'
 
     try {
       const provR = await fetch(`${API}/api/cotizar/proveedores`, { headers: authH, signal })
@@ -627,7 +652,7 @@ export default function Cotizar() {
       await Promise.allSettled(
         providers.map(provider => {
           const timeoutId = setTimeout(() => { done++; setProgress({ done, total: providers.length }) }, 15000)
-          return fetch(`${API}/api/cotizar/quote`, {
+          return fetch(`${API}/api/cotizar/${quoteEndpoint}`, {
             method:'POST', headers: authH, signal,
             body: JSON.stringify({ ...model, provider }),
           })
@@ -684,18 +709,18 @@ export default function Cotizar() {
 
   // Ref siempre actualizado — resuelve stale closure en cleanup
   const saveRef = React.useRef({})
-  saveRef.current = { plate, form, vehicleModel, commercialValue, cityName, cotSaved }
+  saveRef.current = { plate, form, vehicleModel, commercialValue, cityName, cotSaved, isZeroKm, zkMarca, zkLinea, zkAno }
 
   // Guardar cotizacion con planes reales (llamado al final de fetchQuotes)
   async function saveCotizacionWithPlans(allFull, allBasic) {
     const s = saveRef.current
     const allQuotes = [...allFull, ...allBasic]
     // Solo guardar si hay al menos 1 plan con precio — nunca cotizaciones vacías
-    if (s.cotSaved || !s.plate || allQuotes.length === 0) return
+    if (s.cotSaved || (!s.plate && !s.isZeroKm) || allQuotes.length === 0) return
     try {
       const nombre = `${s.form.nombre} ${s.form.apellido}`.trim() || null
       const body = {
-        placa: s.plate,
+        placa: s.isZeroKm ? null : s.plate,
         vehicleModel: s.vehicleModel,
         comercial_value: s.commercialValue,
         cliente_nombre: nombre,
@@ -800,7 +825,7 @@ export default function Cotizar() {
     setFullPlans([]); setBasicPlans([]); setSelectedPlan(null)
     setCedulaFile(null); setTarjetaFile(null); setSendErr('')
     setVehicleModel(''); setCommercialValue(null)
-    setIsZeroKm(false); setZkMarca(''); setZkLinea(null); setZkAno(''); setZkAnoError(false)
+    setIsZeroKm(false); setZkMarca(''); setZkLinea(null); setZkAno(''); setZkAnoError(false); setZkClassId('1')
     setForm({ nombre:'', apellido:'', gender:'', tipoDoc:'CC', numDoc:'', diaNac:'', mesNac:'', anioNac:'', correo:'', ciudad:'', celular:'' })
     navigate('/dashboard')
   }
@@ -1024,10 +1049,25 @@ export default function Cotizar() {
           </Fld>
         )}
 
+        {/* Tipo de vehículo — aparece solo cuando hay año válido */}
+        {zkAno && !zkAnoError && (
+          <Fld label="Tipo de vehículo *">
+            <ComboBox
+              value={zkClassId}
+              onChange={setZkClassId}
+              options={[
+                { v: '1', label: 'Automóvil' },
+                { v: '4', label: 'Camioneta / SUV' },
+              ]}
+              placeholder="Selecciona el tipo..."
+            />
+          </Fld>
+        )}
+
         <button
           onClick={handleZkContinuar}
-          disabled={!zkAno || zkAnoError}
-          style={{ ...btnP(!zkAno || zkAnoError), width:'100%', marginTop:8 }}
+          disabled={!zkAno || zkAnoError || !zkClassId}
+          style={{ ...btnP(!zkAno || zkAnoError || !zkClassId), width:'100%', marginTop:8 }}
         >
           Continuar con los datos del cliente →
         </button>

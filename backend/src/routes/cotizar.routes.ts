@@ -173,7 +173,7 @@ router.get('/proveedores', async (req: Request, res: Response, next: NextFunctio
   }
 })
 
-// ── Cotizar 1 proveedor ─────────────────────────────────────────────────────
+// ── Cotizar 1 proveedor (vehículo usado con placa) ──────────────────────────
 router.post('/quote', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const body = normalizeQuote(req.body)
@@ -184,8 +184,45 @@ router.post('/quote', async (req: Request, res: Response, next: NextFunction) =>
     )
     res.json(r.data)
   } catch (err: any) {
-    // Devuelve 200 con error embebido para que el frontend lo ignore (igual que front-a2)
     res.json({ response: null, error: err.response?.data || 'Error cotizando' })
+  }
+})
+
+// ── Cotizar 1 proveedor (vehículo 0 km) ─────────────────────────────────────
+router.post('/quote-0km', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const raw = { ...req.body }
+
+    // documentTypeId → número
+    if (typeof raw.documentTypeId === 'string') {
+      const n = parseInt(raw.documentTypeId, 10)
+      raw.documentTypeId = isNaN(n) ? (DOC_MAP[raw.documentTypeId] ?? 1) : n
+    }
+    // municipalityId → número
+    if (typeof raw.municipalityId === 'string') {
+      const n = parseInt(raw.municipalityId, 10)
+      if (!isNaN(n)) raw.municipalityId = n
+    }
+    // genderId → número
+    if (raw.genderId !== undefined && raw.genderId !== null) {
+      const n = parseInt(String(raw.genderId), 10)
+      raw.genderId = isNaN(n) ? (GENDER_MAP[raw.genderId] ?? undefined) : n
+    }
+    if (!raw.genderId) delete raw.genderId
+    // identification y mobileNumber → string
+    if (raw.identification !== undefined) raw.identification = String(raw.identification)
+    if (raw.mobileNumber   !== undefined) raw.mobileNumber   = String(raw.mobileNumber)
+    // valorAsegurado → string (la API lo espera así)
+    if (raw.valorAsegurado !== undefined) raw.valorAsegurado = String(Math.round(Number(raw.valorAsegurado)))
+
+    const r = await axios.post(
+      `${INS_BASE}/api/InsuranceQuotation/lightVehicleCeroKm`,
+      raw,
+      { headers: INS_HEADERS }
+    )
+    res.json(r.data)
+  } catch (err: any) {
+    res.json({ response: null, error: err.response?.data || 'Error cotizando 0km' })
   }
 })
 
