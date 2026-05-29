@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { Loader2, Shield, Scale, MessageCircle, FileCheck, Sparkles, ArrowUp, Copy, Check } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
-import { useIsMobile } from '../../hooks/use-mobile'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
@@ -70,7 +69,6 @@ function MarkdownText({ text, style }) {
 // ── Main component ────────────────────────────────────────────────────────────
 export default function Anto() {
   const { getToken, user } = useAuth()
-  const isMobile = useIsMobile()
   const nombre = user?.nombre || user?.email?.split('@')[0] || 'aliado'
 
   const [messages,   setMessages]   = useState([])
@@ -155,34 +153,21 @@ export default function Anto() {
 
         {!hasMessages ? (
           /* ── Bienvenida ── */
-          <div style={{ maxWidth: 520, margin: '0 auto', paddingTop: isMobile ? 28 : 56, paddingBottom: 24 }}>
-
-            {/* Imagen central + saludo */}
-            <div style={{ marginBottom: isMobile ? 24 : 32, textAlign: 'center' }}>
-              <div style={{
-                width: isMobile ? 56 : 52, height: isMobile ? 56 : 52,
-                borderRadius: '50%', background: 'linear-gradient(135deg,#4f46e5,#2D2A7A)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                margin: '0 auto', marginBottom: isMobile ? 16 : 18,
-                boxShadow: isMobile ? '0 6px 24px rgba(79,70,229,0.28)' : 'none',
-              }}>
-                <Sparkles size={isMobile ? 24 : 22} color="#fff" />
+          <div style={{ maxWidth: 520, margin: '0 auto', paddingTop: 56, paddingBottom: 24 }}>
+            <div style={{ marginBottom: 32, textAlign: 'center' }}>
+              <div style={{ width: 52, height: 52, borderRadius: '50%', background: 'linear-gradient(135deg,#4f46e5,#2D2A7A)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 18px' }}>
+                <Sparkles size={22} color="#fff" />
               </div>
-              <h1 style={{ margin: '0 0 8px', fontFamily: 'Poppins', fontWeight: 700, fontSize: isMobile ? 22 : 26, color: '#111827' }}>
+              <h1 style={{ margin: '0 0 10px', fontFamily: 'Poppins', fontWeight: 700, fontSize: 26, color: '#111827' }}>
                 Hola, {nombre} 👋
               </h1>
-              <p style={{ margin: 0, fontFamily: 'Inter', fontSize: isMobile ? 13 : 14, color: '#6b7280', lineHeight: 1.6 }}>
-                Soy Anto, tu asistente de seguros.{isMobile ? ' ' : <br />}Pregúntame lo que necesites saber.
+              <p style={{ margin: 0, fontFamily: 'Inter', fontSize: 14, color: '#6b7280', lineHeight: 1.6 }}>
+                Soy Anto, tu asistente de seguros.<br />Pregúntame lo que necesites saber.
               </p>
             </div>
 
-            {/* Título "¿Cómo te puedo ayudar?" */}
-            <p style={{ margin: isMobile ? '0 0 12px' : '0 0 12px', fontFamily: 'Inter', fontSize: 12, fontWeight: 600, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.06em', textAlign: isMobile ? 'left' : 'left' }}>
-              ¿Cómo te puedo ayudar?
-            </p>
-
-            {/* Cards — 1 columna en móvil, 2x2 en desktop */}
-            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? 10 : 12 }}>
+            {/* Cards rápidas 2×2 */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
               {QUICK_CARDS.map((c, i) => {
                 const Icon = c.icon
                 return (
@@ -192,7 +177,7 @@ export default function Anto() {
                     style={{
                       display: 'flex', alignItems: 'center', gap: 12,
                       background: '#fff', border: '1.5px solid #e5e7eb',
-                      borderRadius: 14, padding: isMobile ? '13px 14px' : '14px 16px',
+                      borderRadius: 14, padding: '14px 16px',
                       cursor: 'pointer', textAlign: 'left',
                       transition: 'border-color 0.15s, box-shadow 0.15s',
                     }}

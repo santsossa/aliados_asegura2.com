@@ -185,7 +185,7 @@ export default function DashboardLayout() {
           </div>
         </header>
 
-        <main style={{ flex: 1, minHeight: 0, overflowY: isAnto ? 'hidden' : 'auto', background: '#fff' }}>
+        <main style={{ flex: 1, overflowY: 'auto', background: '#fff' }}>
           <Outlet />
         </main>
 
