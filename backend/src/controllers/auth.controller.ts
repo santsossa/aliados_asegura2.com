@@ -370,7 +370,14 @@ export async function refresh(req: Request, res: Response, next: NextFunction) {
 export async function logout(req: Request, res: Response, next: NextFunction) {
   try {
     if (req.aliado) {
-      await revokeAllRefreshTokens(req.aliado.sub, req.aliado.tipo)
+      // Revocar solo el refresh token de ESTE dispositivo, no todos
+      const cookieToken = req.cookies?.refreshToken
+      if (cookieToken) {
+        const found = await verifyRefreshToken(cookieToken)
+        if (found) {
+          await revokeRefreshToken(found.tokenId, found.tipo)
+        }
+      }
       await logAuth(req.aliado.tipo, req.aliado.sub, req.aliado.email, 'logout', req)
     }
     res.clearCookie('refreshToken', { path: '/' })
