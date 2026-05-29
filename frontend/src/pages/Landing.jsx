@@ -663,16 +663,14 @@ export default function Landing() {
 
           {/* ── Header centrado ── */}
           <div style={{ textAlign:'center', marginBottom:52 }}>
-            {/* Título */}
-            <h2 style={{ fontFamily:'Poppins', fontSize:42, fontWeight:800, color:'#111827', margin:'0 0 16px', letterSpacing:'-0.5px', lineHeight:1.15 }}>
-              Vende seguros sin saber nada<br />
+            <h2 className="anto-title" style={{ fontFamily:'Poppins', fontWeight:800, color:'#111827', margin:'0 0 16px', letterSpacing:'-0.5px', lineHeight:1.15 }}>
+              Vende seguros sin saber nada{' '}
+              <span className="hidden sm:inline"><br /></span>
               <span style={{ color:'#7c3aed' }}>de seguros</span>
             </h2>
-            {/* Subtítulo */}
             <p style={{ fontFamily:'Inter', fontSize:16, color:'#6b7280', maxWidth:520, margin:'0 auto 28px', lineHeight:1.7 }}>
               <strong style={{ color:'#111827' }}>Anto</strong> es tu IA integrada al portal. Responde las preguntas difíciles de tus clientes, te explica coberturas y te ayuda a cerrar cada venta — en segundos.
             </p>
-            {/* Pills de características */}
             <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:10, flexWrap:'wrap' }}>
               {[
                 { Icon:Zap,       text:'Respuestas al instante' },
@@ -689,11 +687,10 @@ export default function Landing() {
             </div>
           </div>
 
-          {/* ── 3 columnas: cards izq | mockup | cards der ── */}
-          <div style={{ display:'grid', gridTemplateColumns:'170px 1fr 170px', gap:20, alignItems:'center', marginBottom:64 }}>
+          {/* ── Desktop: 3 columnas cards | mockup | cards ── */}
+          <div className="anto-main-layout" style={{ display:'grid', gridTemplateColumns:'170px 1fr 170px', gap:20, alignItems:'center', marginBottom:64 }}>
 
-            {/* Cards izquierda */}
-            <div style={{ display:'flex', flexDirection:'column', gap:14 }}>
+            <div className="anto-side-cards" style={{ display:'flex', flexDirection:'column', gap:14 }}>
               {[
                 { Icon:Zap,    title:'Respuestas al instante', desc:'Anto responde en segundos lo que antes te tomaba minutos.' },
                 { Icon:Shield, title:'Información confiable',  desc:'Basada en las condiciones de tus pólizas y tu negocio.' },
@@ -710,13 +707,12 @@ export default function Landing() {
               ))}
             </div>
 
-            {/* Mockup central — imagen real */}
+            {/* Mockup central */}
             <div style={{ borderRadius:28, overflow:'hidden', boxShadow:'0 32px 80px rgba(87,69,171,0.18)' }}>
               <img src={imgPantallanto} alt="Anto IA — panel de control" style={{ width:'calc(100% + 4px)', marginLeft:-2, marginTop:-2, marginBottom:-2, display:'block' }} />
             </div>
 
-            {/* Cards derecha */}
-            <div style={{ display:'flex', flexDirection:'column', gap:14 }}>
+            <div className="anto-side-cards" style={{ display:'flex', flexDirection:'column', gap:14 }}>
               {[
                 { Icon:Users, title:'Aumenta tus ventas', desc:'Responde mejor, genera confianza y cierra más negocios.' },
                 { Icon:Clock, title:'Ahorra tiempo',       desc:'Automatiza respuestas y enfócate en lo que importa: tus clientes.' },
@@ -735,17 +731,37 @@ export default function Landing() {
 
           </div>
 
-          {/* ── ¿Cómo te ayuda Anto? ── */}
-          <div style={{ textAlign:'center', marginBottom:36 }}>
-            <h3 style={{ fontFamily:'Poppins', fontSize:26, fontWeight:700, color:'#111827', margin:'0 0 32px' }}>¿Cómo te ayuda Anto?</h3>
-          </div>
-          <div style={{ display:'grid', gridTemplateColumns:'repeat(5, 1fr)', gap:14 }}>
+          {/* ── Móvil: las 4 cards debajo de la imagen ── */}
+          <div className="anto-mobile-cards">
             {[
-              { Icon:FileText,    title:'Explica coberturas',    desc:'De forma clara y sencilla, como si fueras un experto.' },
-              { Icon:MessageCircle, title:'Resuelve objeciones', desc:'Te da argumentos listos para cada situación.' },
-              { Icon:BarChart3,   title:'Compara opciones',      desc:'Muestra diferencias entre planes al instante.' },
-              { Icon:Mail,        title:'Redacta mensajes',      desc:'Crea respuestas listas para enviar por WhatsApp.' },
-              { Icon:TrendingUp,  title:'Aprende de tu negocio', desc:'Entre más la usas, mejor te ayuda a vender.' },
+              { Icon:Zap,    title:'Respuestas al instante', desc:'Anto responde en segundos lo que antes te tomaba minutos.' },
+              { Icon:Shield, title:'Información confiable',  desc:'Basada en las condiciones de tus pólizas y tu negocio.' },
+              { Icon:Users,  title:'Aumenta tus ventas',     desc:'Responde mejor, genera confianza y cierra más negocios.' },
+              { Icon:Clock,  title:'Ahorra tiempo',          desc:'Automatiza respuestas y enfócate en lo que importa.' },
+            ].map(c => (
+              <div key={c.title} style={{ background:'#fff', borderRadius:16, padding:'14px', boxShadow:'0 2px 12px rgba(0,0,0,0.07)' }}>
+                <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:6 }}>
+                  <div style={{ width:30, height:30, borderRadius:8, background:'#EEE7FD', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                    <c.Icon size={15} color="#5745AB" />
+                  </div>
+                  <p style={{ margin:0, fontFamily:'Poppins', fontWeight:700, fontSize:12, color:'#111827' }}>{c.title}</p>
+                </div>
+                <p style={{ margin:0, fontFamily:'Inter', fontSize:12, color:'#6b7280', lineHeight:1.5 }}>{c.desc}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* ── ¿Cómo te ayuda Anto? ── */}
+          <div style={{ textAlign:'center', marginBottom:28 }}>
+            <h3 style={{ fontFamily:'Poppins', fontSize:26, fontWeight:700, color:'#111827', margin:'0 0 28px' }}>¿Cómo te ayuda Anto?</h3>
+          </div>
+          <div className="anto-help-grid" style={{ display:'grid', gridTemplateColumns:'repeat(5, 1fr)', gap:14 }}>
+            {[
+              { Icon:FileText,      title:'Explica coberturas',    desc:'De forma clara y sencilla, como si fueras un experto.' },
+              { Icon:MessageCircle, title:'Resuelve objeciones',   desc:'Te da argumentos listos para cada situación.' },
+              { Icon:BarChart3,     title:'Compara opciones',      desc:'Muestra diferencias entre planes al instante.' },
+              { Icon:Mail,          title:'Redacta mensajes',      desc:'Crea respuestas listas para enviar por WhatsApp.' },
+              { Icon:TrendingUp,    title:'Aprende de tu negocio', desc:'Entre más la usas, mejor te ayuda a vender.' },
             ].map(item => (
               <div key={item.title} style={{ background:'#fff', borderRadius:18, padding:'20px 16px', border:'1px solid #EEE7FD', textAlign:'center', boxShadow:'0 1px 8px rgba(87,69,171,0.06)' }}>
                 <div style={{ width:44, height:44, borderRadius:13, background:'#EEE7FD', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 12px' }}>
@@ -758,6 +774,29 @@ export default function Landing() {
           </div>
 
         </div>
+
+        <style>{`
+          .anto-title { font-size: 42px; }
+          .anto-mobile-cards { display: none; }
+          @media (max-width: 640px) {
+            .anto-title { font-size: 28px !important; }
+            .anto-main-layout {
+              grid-template-columns: 1fr !important;
+              gap: 0 !important;
+              margin-bottom: 24px !important;
+            }
+            .anto-side-cards { display: none !important; }
+            .anto-mobile-cards {
+              display: grid !important;
+              grid-template-columns: 1fr 1fr;
+              gap: 12px;
+              margin-bottom: 40px;
+            }
+            .anto-help-grid {
+              grid-template-columns: repeat(2, 1fr) !important;
+            }
+          }
+        `}</style>
       </section>
 
       {/* ── Beneficios ──────────────────────────────────────────── */}
