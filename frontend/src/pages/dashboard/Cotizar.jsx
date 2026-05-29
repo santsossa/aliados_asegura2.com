@@ -1021,16 +1021,6 @@ export default function Cotizar() {
                 Algunos datos no coinciden con el vehículo seleccionado
               </p>
             )}
-            {zkAno && !zkAnoError && commercialValue != null && commercialValue > 0 && (
-              <div style={{ display:'flex', alignItems:'center', gap:8, marginTop:10,
-                            background:'#f0fdf4', border:'1px solid #bbf7d0', borderRadius:10, padding:'10px 14px' }}>
-                <span style={{ fontSize:16 }}>✅</span>
-                <div>
-                  <p style={{ margin:0, fontSize:12, fontWeight:700, color:'#166534' }}>Valor comercial del vehículo</p>
-                  <p style={{ margin:0, fontSize:16, fontWeight:800, color:'#16a34a' }}>{fmt(commercialValue)}</p>
-                </div>
-              </div>
-            )}
           </Fld>
         )}
 
