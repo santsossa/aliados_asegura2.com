@@ -752,7 +752,7 @@ export default function Landing() {
           </div>
 
           {/* ── ¿Cómo te ayuda Anto? ── */}
-          <div style={{ textAlign:'center', marginBottom:28 }}>
+          <div className="anto-help-title" style={{ textAlign:'center', marginBottom:28 }}>
             <h3 style={{ fontFamily:'Poppins', fontSize:26, fontWeight:700, color:'#111827', margin:'0 0 28px' }}>¿Cómo te ayuda Anto?</h3>
           </div>
           <div className="anto-help-grid" style={{ display:'grid', gridTemplateColumns:'repeat(5, 1fr)', gap:14 }}>
@@ -792,9 +792,8 @@ export default function Landing() {
               gap: 12px;
               margin-bottom: 40px;
             }
-            .anto-help-grid {
-              grid-template-columns: repeat(2, 1fr) !important;
-            }
+            .anto-help-title { display: none !important; }
+            .anto-help-grid   { display: none !important; }
           }
         `}</style>
       </section>
