@@ -78,9 +78,11 @@ export default function Anto() {
   const [copiedMsg,  setCopiedMsg]  = useState(null)
   const [typingIdx,  setTypingIdx]  = useState(null)
   const [typingLen,  setTypingLen]  = useState(0)
-  const bottomRef = useRef(null)
-  const inputRef  = useRef(null)
-  const typingRef = useRef(null)
+  const bottomRef   = useRef(null)
+  const userMsgRef  = useRef(null)
+  const justSentRef = useRef(false)
+  const inputRef    = useRef(null)
+  const typingRef   = useRef(null)
 
   function copiar(idx, text) {
     navigator.clipboard.writeText(text).then(() => {
@@ -89,14 +91,17 @@ export default function Anto() {
     })
   }
 
+  // Solo scrollea al mensaje del usuario recién enviado
   useEffect(() => {
+    if (!justSentRef.current) return
+    justSentRef.current = false
     const raf = requestAnimationFrame(() => {
-      bottomRef.current?.scrollIntoView({ behavior: 'auto' })
+      userMsgRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
     })
     return () => cancelAnimationFrame(raf)
-  }, [messages, loading])
+  }, [messages])
 
-  // Typing animation — starts when a new assistant message is added
+  // Typing animation — starts when a new assistant message is added (sin auto-scroll)
   useEffect(() => {
     const last = messages[messages.length - 1]
     if (!last || last.role !== 'assistant') return
@@ -106,9 +111,8 @@ export default function Anto() {
     clearInterval(typingRef.current)
     let i = 0
     typingRef.current = setInterval(() => {
-      i += 4 // 4 chars per tick → very fast
+      i += 4
       setTypingLen(i)
-      bottomRef.current?.scrollIntoView({ behavior: 'instant' })
       if (i >= last.content.length) {
         clearInterval(typingRef.current)
         setTypingIdx(null)
@@ -122,6 +126,7 @@ export default function Anto() {
     if (!pregunta || loading) return
     setInput('')
     const historial = [...messages, { role: 'user', content: pregunta }]
+    justSentRef.current = true
     setMessages(historial)
     setLoading(true)
     try {
@@ -239,15 +244,17 @@ export default function Anto() {
                     </div>
                   ) : (
                     /* Aliado — burbuja azul transparente */
-                    <div style={{
-                      maxWidth: '72%',
-                      background: 'rgba(45, 42, 122, 0.08)',
-                      color: '#1e1b4b',
-                      borderRadius: '16px 4px 16px 16px',
-                      padding: '9px 14px',
-                      fontFamily: 'Inter', fontSize: 13.5, lineHeight: 1.65,
-                      whiteSpace: 'pre-wrap',
-                    }}>
+                    <div
+                      ref={i === messages.length - 1 ? userMsgRef : null}
+                      style={{
+                        maxWidth: '72%',
+                        background: 'rgba(45, 42, 122, 0.08)',
+                        color: '#1e1b4b',
+                        borderRadius: '16px 4px 16px 16px',
+                        padding: '9px 14px',
+                        fontFamily: 'Inter', fontSize: 13.5, lineHeight: 1.65,
+                        whiteSpace: 'pre-wrap',
+                      }}>
                       {m.content}
                     </div>
                   )}
