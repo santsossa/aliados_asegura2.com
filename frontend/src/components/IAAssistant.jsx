@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { Sparkles, ArrowUp, X } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
-import { loadConvs, saveConvs, MAX_CONVS } from '../context/AntoContext'
+import { loadConvs, saveConvs, MAX_CONVS, generateTitle } from '../context/AntoContext'
 
 const API   = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 const MAX_H = 300
@@ -145,6 +145,14 @@ export default function IAAssistant() {
       const full = [...hist, reply]
       setMessages(full)
       saveToHistory(full)
+      if (hist.length === 1) {
+        generateTitle(q, reply.content, getToken).then(aiTitle => {
+          if (aiTitle && convIdRef.current) {
+            const convs = loadConvs()
+            saveConvs(convs.map(c => c.id === convIdRef.current ? { ...c, title: aiTitle } : c))
+          }
+        })
+      }
     } catch {
       const reply = { role: 'assistant', content: '⚠️ Sin conexión.' }
       const full  = [...hist, reply]

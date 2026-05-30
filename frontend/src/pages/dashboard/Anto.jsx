@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { Loader2, Shield, Scale, MessageCircle, FileCheck, Sparkles, ArrowUp, Copy, Check } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
-import { useAnto } from '../../context/AntoContext'
+import { useAnto, generateTitle } from '../../context/AntoContext'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
@@ -154,12 +154,14 @@ export default function Anto() {
       const fullMessages = [...historial, reply]
       setMessages(fullMessages)
 
-      upsertConv({
-        id: convId,
-        title: pregunta.length > 48 ? pregunta.slice(0, 48) + '…' : pregunta,
-        messages: fullMessages,
-        updatedAt: Date.now(),
-      })
+      const tempTitle = pregunta.length > 48 ? pregunta.slice(0, 48) + '…' : pregunta
+      upsertConv({ id: convId, title: tempTitle, messages: fullMessages, updatedAt: Date.now() })
+
+      if (isNew) {
+        generateTitle(pregunta, reply.content, getToken).then(aiTitle => {
+          if (aiTitle) upsertConv({ id: convId, title: aiTitle, messages: fullMessages, updatedAt: Date.now() })
+        })
+      }
     } catch {
       setMessages(prev => [...prev, { role: 'assistant', content: '⚠️ Sin conexión con Anto.' }])
     } finally {

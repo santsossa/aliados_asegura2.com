@@ -3,6 +3,29 @@ import { createContext, useContext, useState } from 'react'
 export const CONV_KEY  = 'anto_convs'
 export const MAX_CONVS = 10
 
+const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+
+export async function generateTitle(userMsg, assistantMsg, getToken) {
+  try {
+    const r = await fetch(`${API}/api/ia/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
+      credentials: 'include',
+      body: JSON.stringify({
+        messages: [{
+          role: 'user',
+          content: `Genera un título muy corto (máximo 5 palabras) que describa de qué trata esta conversación sobre seguros. Responde SOLO con el título, sin comillas ni puntuación al final.\n\nPregunta: "${userMsg.slice(0, 200)}"\nRespuesta: "${assistantMsg.slice(0, 300)}"`,
+        }],
+      }),
+    })
+    const data = await r.json()
+    if (data.status === 'success') return data.message.trim().replace(/^["""'']+|["""'']+$/g, '').replace(/\.$/, '')
+    return null
+  } catch {
+    return null
+  }
+}
+
 export function loadConvs()      { try { return JSON.parse(localStorage.getItem(CONV_KEY) || '[]') } catch { return [] } }
 export function saveConvs(convs) { try { localStorage.setItem(CONV_KEY, JSON.stringify(convs)) } catch {} }
 
