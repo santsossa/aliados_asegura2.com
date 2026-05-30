@@ -79,6 +79,7 @@ export default function Anto() {
   const [typingIdx,  setTypingIdx]  = useState(null)
   const [typingLen,  setTypingLen]  = useState(0)
   const bottomRef   = useRef(null)
+  const msgsRef     = useRef(null)
   const userMsgRef  = useRef(null)
   const justSentRef = useRef(false)
   const inputRef    = useRef(null)
@@ -91,12 +92,15 @@ export default function Anto() {
     })
   }
 
-  // Solo scrollea al mensaje del usuario recién enviado
+  // Solo scrollea al mensaje del usuario recién enviado — dentro del contenedor, sin tocar la página
   useEffect(() => {
     if (!justSentRef.current) return
     justSentRef.current = false
     const raf = requestAnimationFrame(() => {
-      userMsgRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      const container = msgsRef.current
+      const el = userMsgRef.current
+      if (!container || !el) return
+      container.scrollTop = el.offsetTop - container.offsetTop - 16
     })
     return () => cancelAnimationFrame(raf)
   }, [messages])
@@ -154,7 +158,7 @@ export default function Anto() {
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: 'transparent', overflow: 'hidden' }}>
 
       {/* Área de mensajes / bienvenida */}
-      <div className="anto-msgs" style={{ flex: 1, overflowY: 'auto', padding: hasMessages ? '24px 32px' : '0 32px' }}>
+      <div ref={msgsRef} className="anto-msgs" style={{ flex: 1, overflowY: 'auto', padding: hasMessages ? '24px 32px' : '0 32px' }}>
 
         {!hasMessages ? (
           /* ── Bienvenida ── */
