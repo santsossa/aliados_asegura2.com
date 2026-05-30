@@ -9,6 +9,11 @@ import { env } from '../config/env'
 
 const MAX_INTENTOS    = 3
 const BLOQUEO_MINUTOS = 15
+
+// Allowlist de tablas para evitar SQL injection en funciones internas
+const TABLA_ALIADOS = 'aliados'
+const TABLA_ADMINS  = 'admins'
+
 const COOKIE_OPTS = {
   httpOnly:  true,
   secure:    env.NODE_ENV === 'production',
@@ -42,28 +47,21 @@ function estaBloqueado(row: any): boolean {
 }
 
 // ── Incrementar intentos fallidos y bloquear si llega al límite ──────────
-async function registrarIntentFallido(tabla: string, id: string) {
+async function registrarIntentFallido(tabla: 'aliados' | 'admins', id: string) {
   const bloqueadoHasta = new Date()
   bloqueadoHasta.setMinutes(bloqueadoHasta.getMinutes() + BLOQUEO_MINUTOS)
-
-  await pool.execute(
-    `UPDATE ${tabla}
-     SET intentos_fallidos = intentos_fallidos + 1,
-         bloqueado_hasta = CASE
-           WHEN intentos_fallidos + 1 >= ? THEN ?
-           ELSE bloqueado_hasta
-         END
-     WHERE id = ?`,
-    [MAX_INTENTOS, bloqueadoHasta, id]
-  )
+  const sql = tabla === TABLA_ADMINS
+    ? `UPDATE admins SET intentos_fallidos = intentos_fallidos + 1, bloqueado_hasta = CASE WHEN intentos_fallidos + 1 >= ? THEN ? ELSE bloqueado_hasta END WHERE id = ?`
+    : `UPDATE aliados SET intentos_fallidos = intentos_fallidos + 1, bloqueado_hasta = CASE WHEN intentos_fallidos + 1 >= ? THEN ? ELSE bloqueado_hasta END WHERE id = ?`
+  await pool.execute(sql, [MAX_INTENTOS, bloqueadoHasta, id])
 }
 
 // ── Resetear contador tras login exitoso ──────────────────────────────────
-async function resetarIntentos(tabla: string, id: string) {
-  await pool.execute(
-    'UPDATE ' + tabla + ' SET intentos_fallidos = 0, bloqueado_hasta = NULL WHERE id = ?',
-    [id]
-  )
+async function resetarIntentos(tabla: 'aliados' | 'admins', id: string) {
+  const sql = tabla === TABLA_ADMINS
+    ? 'UPDATE admins SET intentos_fallidos = 0, bloqueado_hasta = NULL WHERE id = ?'
+    : 'UPDATE aliados SET intentos_fallidos = 0, bloqueado_hasta = NULL WHERE id = ?'
+  await pool.execute(sql, [id])
 }
 
 // ── Respuesta genérica para credenciales incorrectas (anti-enumeración) ───
@@ -212,7 +210,7 @@ export async function login(req: Request, res: Response, next: NextFunction) {
 
       const match = await bcrypt.compare(contrasena, admin.contrasena_hash)
       if (!match) {
-        await registrarIntentFallido('admins', admin.id)
+        await registrarIntentFallido(TABLA_ADMINS, admin.id)
         await logAuth('admin', admin.id, correo, 'login_fail', req)
         const restantes = MAX_INTENTOS - (admin.intentos_fallidos + 1)
         res.status(401).json({ ...CREDS_ERROR, ...(restantes > 0 && { intentos_restantes: restantes }) })
@@ -220,14 +218,13 @@ export async function login(req: Request, res: Response, next: NextFunction) {
       }
 
       // Éxito — reset contador, generar OTP
-      await resetarIntentos('admins', admin.id)
+      await resetarIntentos(TABLA_ADMINS, admin.id)
       const otp = await generateAdminOTP(admin.id)
       try {
         await sendOTPEmail(admin.correo, admin.nombre, otp)
       } catch (emailErr) {
-        // El OTP se guardó en DB; si el correo falla, mostrarlo en logs para recuperación manual
         console.error('[admin-login] Error enviando OTP por correo:', emailErr)
-        console.warn(`[admin-login] OTP para ${admin.correo}: ${otp}`)
+        // No loguear el OTP — consultar directamente la DB si se requiere recuperación manual
       }
       await logAuth('admin', admin.id, correo, 'login_ok', req)
 
@@ -260,7 +257,7 @@ export async function login(req: Request, res: Response, next: NextFunction) {
 
     const match = await bcrypt.compare(contrasena, aliado.contrasena_hash)
     if (!match) {
-      await registrarIntentFallido('aliados', aliado.id)
+      await registrarIntentFallido(TABLA_ALIADOS, aliado.id)
       await logAuth('aliado', aliado.id, correo, 'login_fail', req)
       const restantes = MAX_INTENTOS - (aliado.intentos_fallidos + 1)
       res.status(401).json({ ...CREDS_ERROR, ...(restantes > 0 && { intentos_restantes: restantes }) })
@@ -273,7 +270,7 @@ export async function login(req: Request, res: Response, next: NextFunction) {
     }
 
     // Éxito
-    await resetarIntentos('aliados', aliado.id)
+    await resetarIntentos(TABLA_ALIADOS, aliado.id)
     const otp = await generateOTP(aliado.id)
     await sendOTPEmail(aliado.correo, aliado.nombre ?? 'aliado', otp)
     await logAuth('aliado', aliado.id, correo, 'login_ok', req)

@@ -227,7 +227,20 @@ router.post('/quote-0km', async (req: Request, res: Response, next: NextFunction
 })
 
 // ── Emitir lead al CRM (con documentos) ────────────────────────────────────
-const memUpload = multer({ storage: multer.memoryStorage() })
+const ALLOWED_MIMES = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf']
+const MAX_FILE_SIZE = 5 * 1024 * 1024  // 5 MB por archivo
+
+const memUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: MAX_FILE_SIZE, files: 2 },
+  fileFilter: (_req, file, cb) => {
+    if (ALLOWED_MIMES.includes(file.mimetype)) {
+      cb(null, true)
+    } else {
+      cb(new Error('Tipo de archivo no permitido. Solo JPG, PNG, WEBP o PDF.'))
+    }
+  },
+})
 
 // Mapeo tipo documento: string del portal → número que espera el CRM
 // CRM: 1=CC, 2=CE, 3=TI, 4=Pasaporte, 5=NIT
@@ -243,8 +256,10 @@ router.post('/emitir',
       const aliado = req.aliado!
       const files  = req.files as { [f: string]: Express.Multer.File[] }
 
-      // Nota: la validación de documentos obligatorios se hace en el frontend.
-      // El CRM los declara opcionales pero en práctica siempre se envían.
+      if (!files?.cedula_titular?.length || !files?.tarjeta_propiedad?.length) {
+        res.status(400).json({ status: 'error', message: 'Se requieren los documentos: cédula y tarjeta de propiedad.' })
+        return
+      }
 
       // ── Normalizar formData para que coincida exactamente con la API del CRM ──
       let formDataParsed: Record<string, any> = {}

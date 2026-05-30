@@ -109,7 +109,12 @@ router.put('/me/banco',
 router.put('/me/contrasena',
   [
     body('contrasena_actual').notEmpty(),
-    body('contrasena_nueva').isLength({ min:8 }).withMessage('Mínimo 8 caracteres'),
+    body('contrasena_nueva')
+      .isLength({ min:8 }).withMessage('Mínimo 8 caracteres')
+      .matches(/[A-Z]/).withMessage('Debe tener al menos una mayúscula')
+      .matches(/[a-z]/).withMessage('Debe tener al menos una minúscula')
+      .matches(/[0-9]/).withMessage('Debe tener al menos un número')
+      .matches(/[^A-Za-z0-9]/).withMessage('Debe tener al menos un carácter especial'),
   ],
   validate,
   async (req: any, res: any, next: any) => {

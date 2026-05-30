@@ -1,10 +1,12 @@
 import { Router, Request, Response, NextFunction } from 'express'
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import { requireAuth } from '../middleware/auth'
+import { iaRateLimit } from '../middleware/security'
 import { env } from '../config/env'
 
 const router = Router()
 router.use(requireAuth)
+router.use(iaRateLimit)
 
 const SYSTEM_PROMPT = `Eres Anto, el asistente inteligente de Asegura2.com para el Portal de Aliados.
 Tu misión es ayudar a los aliados (asesores independientes) a responder preguntas de sus clientes sobre seguros de autos en Colombia, y a entender cómo funciona la plataforma.

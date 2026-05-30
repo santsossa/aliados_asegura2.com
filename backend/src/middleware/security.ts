@@ -32,16 +32,18 @@ export const helmetMiddleware = helmet({
 export const corsMiddleware = cors({
   origin: (origin, callback) => {
     const allowed = [env.FRONTEND_URL]
-    // En desarrollo también permitimos sin origin (Postman, etc.)
-    if (!origin || allowed.includes(origin)) {
+    // Sin origin: solo se permite en desarrollo (Postman, scripts locales)
+    // En producción toda petición de browser lleva Origin
+    const noOriginAllowed = !origin && env.NODE_ENV !== 'production'
+    if (noOriginAllowed || (origin && allowed.includes(origin))) {
       callback(null, true)
     } else {
-      callback(new Error(`CORS: origen no permitido — ${origin}`))
+      callback(new Error(`CORS: origen no permitido — ${origin ?? 'sin origin'}`))
     }
   },
   credentials:    true,
   methods:        ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Admin-Api-Key'],
   exposedHeaders: ['X-Total-Count'],
   maxAge:         86400,
 })
@@ -97,6 +99,19 @@ export const otpRateLimit = rateLimit({
       message: 'Demasiados intentos de verificación. Espera 10 minutos.',
       code:    'RATE_LIMIT_OTP',
     })
+  },
+})
+
+// ── Rate limit para IA — máx 20 peticiones por usuario cada 5 min ─────────
+export const iaRateLimit = rateLimit({
+  windowMs: 5 * 60 * 1000,
+  max:      20,
+  standardHeaders: true,
+  legacyHeaders:   false,
+  keyGenerator: (req: any) => req.aliado?.sub || req.ip,
+  message: {
+    status:  429,
+    message: 'Demasiadas consultas al asistente. Espera unos minutos.',
   },
 })
 

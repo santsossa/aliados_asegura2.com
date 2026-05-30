@@ -441,20 +441,4 @@ router.get('/reportes/resumen', async (_req, res, next) => {
   } catch(err) { next(err) }
 })
 
-// ── CLEANUP TEMPORAL — borrar después de usar ─────────────────────────────
-router.delete('/cleanup-transaccional', async (_req, res, next) => {
-  try {
-    const tables = ['notificaciones','pago_detalles','pagos','polizas','leads','cotizaciones']
-    const result: Record<string, number> = {}
-    for (const t of tables) {
-      try {
-        const [[row]] = await pool.execute<any[]>(`SELECT COUNT(*) as n FROM ${t}`)
-        await pool.execute(`DELETE FROM ${t}`)
-        result[t] = Number(row.n)
-      } catch { result[t] = -1 }
-    }
-    res.json({ status: 'success', deleted: result })
-  } catch(err) { next(err) }
-})
-
 export default router
