@@ -56,14 +56,11 @@ export default function IAAssistant() {
   const justSentRef = useRef(false)
   const { getToken } = useAuth()
 
-  // Recalcula altura del panel cuando el contenido crece (typing incluido)
+  // En cuanto hay mensajes abre al máximo; se cierra solo cuando no hay nada
   useEffect(() => {
-    if (!chatRef.current) return
-    const h = messages.length > 0 || loading
-      ? Math.min(chatRef.current.scrollHeight, MAX_H)
-      : 0
+    const h = messages.length > 0 || loading ? MAX_H : 0
     setChatH(h)
-  }, [messages, loading, typingLen])
+  }, [messages.length, loading])
 
   // Scroll al fondo SOLO cuando el usuario envía un mensaje
   useEffect(() => {
