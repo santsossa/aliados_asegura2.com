@@ -92,17 +92,19 @@ export default function Anto() {
     })
   }
 
-  // Solo scrollea al mensaje del usuario recién enviado — dentro del contenedor, sin tocar la página
+  // Scroll al mensaje del usuario recién enviado — dos RAFs para asegurar layout completo
   useEffect(() => {
     if (!justSentRef.current) return
     justSentRef.current = false
-    const raf = requestAnimationFrame(() => {
-      const container = msgsRef.current
-      const el = userMsgRef.current
-      if (!container || !el) return
-      container.scrollTop = el.offsetTop - container.offsetTop - 16
+    const r1 = requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        const container = msgsRef.current
+        const el = userMsgRef.current
+        if (!container || !el) return
+        container.scrollTop = el.offsetTop - container.offsetTop - 16
+      })
     })
-    return () => cancelAnimationFrame(raf)
+    return () => cancelAnimationFrame(r1)
   }, [messages])
 
   // Typing animation — starts when a new assistant message is added (sin auto-scroll)
@@ -158,7 +160,7 @@ export default function Anto() {
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: 'transparent', overflow: 'hidden' }}>
 
       {/* Área de mensajes / bienvenida */}
-      <div ref={msgsRef} className="anto-msgs" style={{ flex: 1, overflowY: 'auto', padding: hasMessages ? '24px 32px' : '0 32px' }}>
+      <div ref={msgsRef} className="anto-msgs" style={{ flex: 1, overflowY: 'auto', overflowAnchor: 'none', padding: hasMessages ? '24px 32px' : '0 32px' }}>
 
         {!hasMessages ? (
           /* ── Bienvenida ── */
@@ -334,6 +336,7 @@ export default function Anto() {
       <style>{`
         @keyframes dp { 0%,80%,100%{transform:scale(0.6);opacity:0.4} 40%{transform:scale(1);opacity:1} }
         @keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+        .anto-msgs * { overflow-anchor: none; }
         @media (max-width: 640px) {
           .anto-msgs  { padding: 16px 16px !important; }
           .anto-input { padding: 8px 16px 16px !important; }
