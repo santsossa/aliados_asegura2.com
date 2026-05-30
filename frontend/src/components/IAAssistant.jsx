@@ -141,7 +141,7 @@ export default function IAAssistant() {
       {/* Hover label */}
       <div style={{
         background:'#fff', borderRadius:14, overflow:'hidden', whiteSpace:'nowrap',
-        maxWidth:     (hover && !open) ? 220 : 0,
+        maxWidth:     (hover && !open) ? 260 : 0,
         opacity:      (hover && !open) ? 1   : 0,
         paddingLeft:  (hover && !open) ? 16  : 0,
         paddingRight: (hover && !open) ? 14  : 0,
