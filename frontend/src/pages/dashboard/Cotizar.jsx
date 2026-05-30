@@ -471,7 +471,6 @@ export default function Cotizar() {
   const [zkLineas,        setZkLineas]        = useState([])
   const [zkLoadingMarcas, setZkLoadingMarcas] = useState(false)
   const [zkLoadingLineas, setZkLoadingLineas] = useState(false)
-  const [zkClassId,       setZkClassId]       = useState('1')  // 1=Automóvil, 4=Camioneta
 
   const [fullPlans,  setFullPlans]  = useState([])
   const [basicPlans, setBasicPlans] = useState([])
@@ -626,7 +625,7 @@ export default function Cotizar() {
           modelo:                zkAno,
           brand:                 zkMarca,
           brandLine:             zkLinea?.nombre || '',
-          classId:               zkClassId,
+          classId:               zkLinea?.clase === 'AUTOMOVIL' ? '1' : '4',
         }
       : {
           documentTypeId: form.tipoDoc,    identification: form.numDoc,
@@ -1050,24 +1049,11 @@ export default function Cotizar() {
         )}
 
         {/* Tipo de vehículo — aparece solo cuando hay año válido */}
-        {zkAno && !zkAnoError && (
-          <Fld label="Tipo de vehículo *">
-            <ComboBox
-              value={zkClassId}
-              onChange={setZkClassId}
-              options={[
-                { v: '1', label: 'Automóvil' },
-                { v: '4', label: 'Camioneta / SUV' },
-              ]}
-              placeholder="Selecciona el tipo..."
-            />
-          </Fld>
-        )}
 
         <button
           onClick={handleZkContinuar}
-          disabled={!zkAno || zkAnoError || !zkClassId}
-          style={{ ...btnP(!zkAno || zkAnoError || !zkClassId), width:'100%', marginTop:8 }}
+          disabled={!zkAno || zkAnoError}
+          style={{ ...btnP(!zkAno || zkAnoError), width:'100%', marginTop:8 }}
         >
           Continuar con los datos del cliente →
         </button>
