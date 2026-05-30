@@ -48,22 +48,31 @@ export default function IAAssistant() {
   const [typingIdx,  setTypingIdx]  = useState(-1)
   const [typingLen,  setTypingLen]  = useState(0)
 
-  const inputRef  = useRef(null)
-  const bottomRef = useRef(null)
-  const chatRef   = useRef(null)
-  const pillRef   = useRef(null)
-  const typingRef = useRef(null)
+  const inputRef    = useRef(null)
+  const bottomRef   = useRef(null)
+  const chatRef     = useRef(null)
+  const pillRef     = useRef(null)
+  const typingRef   = useRef(null)
+  const justSentRef = useRef(false)
   const { getToken } = useAuth()
 
-  // Mide altura real del área de mensajes
+  // Recalcula altura del panel cuando el contenido crece (typing incluido)
   useEffect(() => {
     if (!chatRef.current) return
     const h = messages.length > 0 || loading
       ? Math.min(chatRef.current.scrollHeight, MAX_H)
       : 0
     setChatH(h)
-    if (h > 0) bottomRef.current?.scrollIntoView({ behavior: 'instant' })
   }, [messages, loading, typingLen])
+
+  // Scroll al fondo SOLO cuando el usuario envía un mensaje
+  useEffect(() => {
+    if (!justSentRef.current) return
+    justSentRef.current = false
+    requestAnimationFrame(() => {
+      bottomRef.current?.scrollIntoView({ behavior: 'instant' })
+    })
+  }, [messages])
 
   useEffect(() => {
     if (open) setTimeout(() => inputRef.current?.focus(), 340)
@@ -117,6 +126,7 @@ export default function IAAssistant() {
     if (!q || loading) return
     setInput('')
     const hist = [...messages, { role: 'user', content: q }]
+    justSentRef.current = true
     setMessages(hist)
     setLoading(true)
     try {
