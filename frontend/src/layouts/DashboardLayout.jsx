@@ -4,11 +4,13 @@ import { createPortal } from 'react-dom'
 import {
   Home, FileText, ShieldCheck, Wallet, Calculator,
   AlignJustify, X, LogOut, Sparkles, Settings, Headphones, Search, ChevronLeft, ChevronRight,
+  Plus, MessageSquare, ChevronDown, Trash2,
 } from 'lucide-react'
 import { LogoIcon } from '../components/Logo'
 import { useIsMobile } from '../hooks/use-mobile'
 import { useAuth } from '../context/AuthContext'
 import { SSEProvider } from '../context/SSEContext'
+import { AntoProvider, useAnto } from '../context/AntoContext'
 import NotificationBell from '../components/NotificationBell'
 import IAAssistant from '../components/IAAssistant'
 import { getAvatarSrc } from '../utils/avatars'
@@ -122,6 +124,111 @@ function SideTooltip({ label, sideOpen, children }) {
   )
 }
 
+// ── Controles de historial Anto — aparecen en topbar solo en /dashboard/anto ──
+function AntoControls() {
+  const { convs, activeId, selectConv, newConv, deleteConv } = useAnto()
+  const [ddOpen, setDdOpen] = useState(false)
+  const ddRef = useRef(null)
+  const activeConv = convs.find(c => c.id === activeId)
+
+  useEffect(() => {
+    if (!ddOpen) return
+    function onDown(e) { if (ddRef.current && !ddRef.current.contains(e.target)) setDdOpen(false) }
+    document.addEventListener('mousedown', onDown)
+    return () => document.removeEventListener('mousedown', onDown)
+  }, [ddOpen])
+
+  return (
+    <div style={{ display:'flex', alignItems:'center', gap:6 }}>
+      {/* Nueva conversación */}
+      <button
+        onClick={newConv}
+        style={{
+          display:'flex', alignItems:'center', gap:5,
+          height:34, padding:'0 12px', borderRadius:8,
+          border:'1px solid #e5e7eb', background:'#fff',
+          fontFamily:'Inter', fontSize:12.5, fontWeight:500, color:'#374151',
+          cursor:'pointer', whiteSpace:'nowrap',
+          transition:'border-color 0.15s, box-shadow 0.15s',
+        }}
+        onMouseEnter={e => { e.currentTarget.style.borderColor='#c4b5fd'; e.currentTarget.style.boxShadow='0 2px 8px rgba(87,69,171,0.10)' }}
+        onMouseLeave={e => { e.currentTarget.style.borderColor='#e5e7eb'; e.currentTarget.style.boxShadow='none' }}
+      >
+        <Plus size={13} />
+        Nueva
+      </button>
+
+      {/* Dropdown historial */}
+      {convs.length > 0 && (
+        <div ref={ddRef} style={{ position:'relative' }}>
+          <button
+            onClick={() => setDdOpen(v => !v)}
+            style={{
+              display:'flex', alignItems:'center', gap:5,
+              height:34, padding:'0 12px', borderRadius:8,
+              border:'1px solid ' + (activeId ? '#c4b5fd' : '#e5e7eb'),
+              background: activeId ? '#f5f3ff' : '#fff',
+              fontFamily:'Inter', fontSize:12.5, fontWeight:500,
+              color: activeId ? '#5b21b6' : '#374151',
+              cursor:'pointer', maxWidth:200,
+              transition:'border-color 0.15s',
+            }}
+          >
+            <MessageSquare size={13} style={{ flexShrink:0 }} />
+            <span style={{ overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', flex:1 }}>
+              {activeConv ? activeConv.title : `Historial (${convs.length})`}
+            </span>
+            <ChevronDown size={12} style={{ flexShrink:0, transition:'transform 0.15s', transform: ddOpen ? 'rotate(180deg)' : 'none' }} />
+          </button>
+
+          {ddOpen && (
+            <div style={{
+              position:'absolute', top:'calc(100% + 6px)', right:0, zIndex:400,
+              background:'#fff', border:'1px solid #e5e7eb', borderRadius:14,
+              boxShadow:'0 8px 24px rgba(0,0,0,0.10)',
+              minWidth:260, maxWidth:340, maxHeight:300, overflowY:'auto',
+              padding:6,
+            }}>
+              {convs.map(conv => (
+                <div
+                  key={conv.id}
+                  onClick={() => { selectConv(conv.id); setDdOpen(false) }}
+                  style={{
+                    display:'flex', alignItems:'center', gap:8,
+                    padding:'8px 10px', borderRadius:8, cursor:'pointer',
+                    background: conv.id === activeId ? '#f5f3ff' : 'transparent',
+                    transition:'background 0.12s',
+                  }}
+                  onMouseEnter={e => { if (conv.id !== activeId) e.currentTarget.style.background='#f9fafb' }}
+                  onMouseLeave={e => { if (conv.id !== activeId) e.currentTarget.style.background='transparent' }}
+                >
+                  <MessageSquare size={13} color={conv.id === activeId ? '#7c3aed' : '#9ca3af'} style={{ flexShrink:0 }} />
+                  <span style={{
+                    flex:1, fontFamily:'Inter', fontSize:12.5,
+                    color: conv.id === activeId ? '#5b21b6' : '#374151',
+                    fontWeight: conv.id === activeId ? 500 : 400,
+                    overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap',
+                  }}>
+                    {conv.title}
+                  </span>
+                  <button
+                    onClick={e => { e.stopPropagation(); deleteConv(conv.id) }}
+                    style={{ background:'none', border:'none', cursor:'pointer', padding:2, borderRadius:4, color:'#d1d5db', flexShrink:0, display:'flex', alignItems:'center' }}
+                    onMouseEnter={e => e.currentTarget.style.color='#ef4444'}
+                    onMouseLeave={e => e.currentTarget.style.color='#d1d5db'}
+                  >
+                    <Trash2 size={12} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function DashboardLayout() {
   const navigate                    = useNavigate()
   const isMobile                    = useIsMobile()
@@ -166,6 +273,7 @@ export default function DashboardLayout() {
   // ── MÓVIL ─────────────────────────────────────────────────────────────────
   if (isMobile) {
     return (
+      <AntoProvider>
       <SSEProvider>
       <div style={{ display: 'flex', flexDirection: 'column', height: '100dvh', background: '#fff' }}>
 
@@ -247,11 +355,13 @@ export default function DashboardLayout() {
       </div>
       {!isAnto && <IAAssistant />}
       </SSEProvider>
+      </AntoProvider>
     )
   }
 
   // ── DESKTOP / TABLET ───────────────────────────────────────────────────────
   return (
+    <AntoProvider>
     <SSEProvider>
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: '#fff' }}>
       <div style={{ flex: 1, padding: '6px', overflow: 'hidden' }}>
@@ -396,6 +506,7 @@ export default function DashboardLayout() {
                 )}
                 {/* Bell + user */}
                 <div style={{ display:'flex', alignItems:'center', gap:8, flexShrink:0 }}>
+                  {isAnto && <AntoControls />}
                   <NotificationBell />
                   <div style={{ display:'flex', alignItems:'center', gap:8, background:'#fff', borderRadius:999, padding:'4px 12px 4px 4px' }}>
                     <UserAvatar avatarId={avatarId} initials={initials} size={30} />
@@ -419,5 +530,6 @@ export default function DashboardLayout() {
     </div>
     {!isAnto && <IAAssistant />}
     </SSEProvider>
+    </AntoProvider>
   )
 }

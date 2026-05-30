@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { Sparkles, ArrowUp, X } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
+import { loadConvs, saveConvs, MAX_CONVS } from '../context/AntoContext'
 
 const API   = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 const MAX_H = 300
@@ -53,7 +54,20 @@ export default function IAAssistant() {
   const pillRef     = useRef(null)
   const typingRef   = useRef(null)
   const justSentRef = useRef(false)
+  const convIdRef   = useRef(null)
   const { getToken } = useAuth()
+
+  function saveToHistory(msgs) {
+    const id    = convIdRef.current
+    const title = msgs.find(m => m.role === 'user')?.content?.slice(0, 60) || 'Conversación'
+    const conv  = { id, title, messages: msgs, updatedAt: Date.now() }
+    const convs = loadConvs()
+    const exists = convs.find(c => c.id === id)
+    const next  = exists
+      ? convs.map(c => c.id === id ? { ...c, ...conv } : c)
+      : [conv, ...convs].slice(0, MAX_CONVS)
+    saveConvs(next)
+  }
 
   // Abre al máximo en cuanto hay mensajes
   useEffect(() => {
@@ -104,11 +118,13 @@ export default function IAAssistant() {
     setChatH(0)
     setTypingIdx(-1)
     setTypingLen(0)
+    convIdRef.current = null
   }, [])
 
   async function enviar(texto) {
     const q = (texto ?? input).trim()
     if (!q || loading) return
+    if (!convIdRef.current) convIdRef.current = Date.now().toString()
     setInput('')
     const hist = [...messages, { role: 'user', content: q }]
     justSentRef.current = true
@@ -122,12 +138,18 @@ export default function IAAssistant() {
         body:        JSON.stringify({ messages: hist }),
       })
       const data = await r.json()
-      setMessages(prev => [...prev, {
+      const reply = {
         role:    'assistant',
         content: data.status === 'success' ? data.message : '⚠️ No pude obtener respuesta.',
-      }])
+      }
+      const full = [...hist, reply]
+      setMessages(full)
+      saveToHistory(full)
     } catch {
-      setMessages(prev => [...prev, { role: 'assistant', content: '⚠️ Sin conexión.' }])
+      const reply = { role: 'assistant', content: '⚠️ Sin conexión.' }
+      const full  = [...hist, reply]
+      setMessages(full)
+      saveToHistory(full)
     } finally {
       setLoading(false)
     }
