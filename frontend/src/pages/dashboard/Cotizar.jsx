@@ -464,7 +464,7 @@ export default function Cotizar() {
   const [isZeroKm,        setIsZeroKm]        = useState(false)
   const [zkHov,           setZkHov]           = useState(false)
   const [zkMarca,         setZkMarca]         = useState('')
-  const [zkLinea,         setZkLinea]         = useState(null)   // { codigo, nombre, anos:[{ano,precio}] }
+  const [zkLinea,         setZkLinea]         = useState(null)   // { codigo, homologoCodigo, nombre, anos:[{ano,precio}] }
   const [zkAno,           setZkAno]           = useState('')
   const [zkAnoError,      setZkAnoError]      = useState(false)
   const [zkMarcas,        setZkMarcas]        = useState([])
@@ -534,7 +534,7 @@ export default function Cotizar() {
     setZkAno(ano); setZkAnoError(false)
     if (!zkLinea || !ano) { setCommercialValue(null); return }
     const match = zkLinea.anos?.find(a => String(a.ano) === ano)
-    if (match) { setCommercialValue(match.precio) }
+    if (match) { setCommercialValue(match.precio * 1000) }
     else       { setZkAnoError(true); setCommercialValue(null) }
   }
 
@@ -621,7 +621,7 @@ export default function Cotizar() {
           gender:                form.gender,
           email:                 form.correo,
           fasecoldaCode:         zkLinea?.codigo || '',
-          homologoFasecoldaCode: zkLinea?.codigo || '',
+          homologoFasecoldaCode: zkLinea?.homologoCodigo || '',
           valorAsegurado:        String(Math.round(commercialValue || 0)),
           modelo:                zkAno,
           brand:                 zkMarca,
